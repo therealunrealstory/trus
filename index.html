@@ -108,25 +108,21 @@
       </div>
     </section>
 
-    <!-- Support Map -->
+    <!-- Support Map (click required) -->
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="mapTitle">🌍 Карта поддержки</h2>
       <div id="map" class="rounded-2xl shadow-sm border"></div>
+      <p class="text-xs text-gray-400 mt-2">
+        Обязательно кликните по карте, чтобы указать точное место вашей поддержки.
+      </p>
+
       <div class="mt-4 grid md:grid-cols-3 gap-3">
         <input id="name" class="px-3 py-2 rounded-xl border bg-gray-800 text-white" placeholder="Имя" />
         <input id="msg" class="px-3 py-2 rounded-2xl border bg-gray-800 text-white md:col-span-2" placeholder="Сообщение (до 140 символов)" maxlength="140" />
       </div>
       <div class="grid md:grid-cols-3 gap-3 mt-2">
-        <select id="country" class="px-3 py-2 rounded-xl border bg-gray-800 text-white">
-          <option value="DE">Germany</option>
-          <option value="US">United States</option>
-          <option value="GB">United Kingdom</option>
-          <option value="ES">Spain</option>
-          <option value="IT">Italy</option>
-          <option value="PL">Poland</option>
-        </select>
-        <button id="addMark" class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" data-i18n="addBtn">Добавить</button>
-        <div class="text-xs text-gray-400" data-i18n="localStorage">Данные хранятся в базе</div>
+        <button id="addMark" class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm col-span-1" data-i18n="addBtn">Добавить</button>
+        <div class="col-span-2 text-xs text-gray-400 flex items-center">Данные хранятся в базе</div>
       </div>
       <div class="mt-2 text-sm text-gray-400" data-i18n="marksTotal">Всего отметок: <span id="marksCount">0</span></div>
     </section>
@@ -239,14 +235,41 @@
     });
     renderHearts();
 
-    /* Map (Leaflet) — robust version */
-    const coordsByCountry = {
-      "US":[-98.57,39.82],"GB":[-3.43,55.37],"DE":[10.45,51.16],
-      "ES":[-3.74,40.46],"IT":[12.56,41.87],"PL":[19.14,51.91]
-    };
+    /* Map (Leaflet) — click required + geolocation */
     const map = L.map('map').setView([20, 0], 2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
     const layer = L.layerGroup().addTo(map);
+
+    // попытка определить местоположение пользователя
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          map.setView([latitude, longitude], 6);
+          L.marker([latitude, longitude])
+            .addTo(map)
+            .bindPopup("Вы здесь")
+            .openPopup();
+        },
+        (err) => {
+          console.warn("Геолокация недоступна:", err.message);
+        }
+      );
+    }
+
+    let selectedLatLng = null;
+    let previewMarker = null;
+
+    // выбор точки кликом (обязательно)
+    map.on('click', (e) => {
+      selectedLatLng = e.latlng;
+      if (previewMarker) previewMarker.remove();
+      previewMarker = L.marker([selectedLatLng.lat, selectedLatLng.lng], { draggable: true })
+        .addTo(map)
+        .bindPopup('Выбранная точка (можно перетащить)')
+        .openPopup();
+      previewMarker.on('dragend', () => { selectedLatLng = previewMarker.getLatLng(); });
+    });
 
     function setMarksCount(n){ const el = document.getElementById('marksCount'); if (el) el.textContent = Number.isFinite(n)? String(n): '0'; }
 
@@ -276,19 +299,22 @@
       try{
         const name=document.getElementById('name').value.trim();
         const message=document.getElementById('msg').value.trim();
-        const country=document.getElementById('country').value;
-        if(!message) return;
-        const [lon,lat]=coordsByCountry[country] || [10.45,51.16];
+        if(!message) return alert("Введите сообщение");
+        if(!selectedLatLng) return alert("Сначала кликните по карте!");
+
+        const { lat, lng } = selectedLatLng;
         const resp = await fetch('/.netlify/functions/marks', {
           method:'POST',
           headers:{ 'content-type':'application/json' },
-          body: JSON.stringify({ name, message, lat, lon })
+          body: JSON.stringify({ name, message, lat, lon: lng })
         });
         if (!resp.ok) {
           const t = await resp.text().catch(()=>'-');
           throw new Error('POST /marks ' + resp.status + ' ' + t);
         }
         document.getElementById('msg').value='';
+        selectedLatLng = null;
+        if (previewMarker) { previewMarker.remove(); previewMarker = null; }
         await renderMarks();
       } catch(e){
         console.error('addMark error:', e);
