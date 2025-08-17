@@ -37,16 +37,15 @@
   </style>
 </head>
 <body class="text-white">
-  <!-- HEADER -->
+  <!-- HEADER (только кнопки справа: сначала "История в музыке", затем выбор языка) -->
   <header class="max-w-5xl mx-auto px-4 py-6">
-    <div class="text-3xl sm:text-4xl font-bold tracking-tight leading-tight">The Real Unreal Story</div>
-    <div class="mt-4 flex flex-wrap gap-2 items-center justify-end">
+    <div class="flex flex-wrap gap-2 items-center justify-end">
+      <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse">История в музыке</button>
       <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
         <option value="EN">EN</option><option value="ES">ES</option><option value="FR">FR</option>
         <option value="PT">PT</option><option value="DE">DE</option><option value="IT">IT</option>
         <option value="RU" selected>RU</option><option value="CN">CN</option><option value="AR">AR</option>
       </select>
-      <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse">История в музыке</button>
     </div>
   </header>
 
@@ -202,6 +201,8 @@
         <div id="heartsSplide" class="splide mt-6" aria-label="Сердца поддержки">
           <div class="splide__track"><ul id="heartsSlides" class="splide__list"></ul></div>
         </div>
+        <!-- Кнопка пагинации для сердец -->
+        <button id="loadMoreHearts" class="mt-4 px-4 py-2 rounded-xl bg-gray-800/60 border border-gray-700 text-sm">Показать ещё сердца</button>
       </div>
     </section>
   </main>
@@ -321,7 +322,7 @@
     }
     renderTgFeed();
 
-    /* ====== Карта ====== */
+    /* ====== Карта (постраничная загрузка меток) ====== */
     const map=L.map('map').setView([20,0],2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
     const layer=L.layerGroup().addTo(map);
@@ -338,19 +339,46 @@
       previewMarker.on('dragend',()=>{selectedLatLng=previewMarker.getLatLng();});
     });
     function setMarksCount(n){ const el=document.getElementById('marksCount'); if(el) el.textContent=Number.isFinite(n)?String(n):'0'; }
-    async function renderMarks(){
-      try{
-        layer.clearLayers();
-        const r=await fetch('/.netlify/functions/marks',{cache:'no-store'}); if(!r.ok) throw new Error(r.status);
-        const data=await r.json(), arr=Array.isArray(data)?data:[];
-        setMarksCount(arr.length);
-        arr.forEach(m=>{
-          const lat=Number(m.lat), lon=Number(m.lon); if(!Number.isFinite(lat)||!Number.isFinite(lon)) return;
-          L.circleMarker([lat,lon],{radius:4,color:'lime'}).bindPopup(`<b>${m.name||'Anon'}</b><br>${m.message||''}`).addTo(layer);
-        });
-      }catch(e){ console.error(e); setMarksCount(0); }
+
+    // Пагинация для marks
+    let marksOffset = 0;
+    const marksPageSize = 500;
+    async function fetchMarksPage() {
+      const r = await fetch(`/.netlify/functions/marks?limit=${marksPageSize}&offset=${marksOffset}`, { cache: 'no-store' });
+      const chunk = await r.json();
+      return Array.isArray(chunk) ? chunk : [];
     }
-    renderMarks();
+    function drawMarksBatch(points, batch=300) {
+      let i = 0;
+      function step() {
+        const end = Math.min(i + batch, points.length);
+        for (; i < end; i++) {
+          const m = points[i];
+          const lat = Number(m.lat), lon = Number(m.lon);
+          if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
+          L.circleMarker([lat, lon], { radius:4, color:'lime' })
+            .bindPopup(`<b>${m.name||'Anon'}</b><br>${m.message||''}`)
+            .addTo(layer);
+        }
+        if (i < points.length) requestAnimationFrame(step);
+      }
+      step();
+    }
+    async function loadAllMarksPaged() {
+      layer.clearLayers();
+      let total = 0;
+      while (true) {
+        const chunk = await fetchMarksPage();
+        if (!chunk.length) break;
+        total += chunk.length;
+        drawMarksBatch(chunk, 300);
+        marksOffset += chunk.length;
+        if (chunk.length < marksPageSize) break; // достигли конца
+      }
+      setMarksCount(total);
+    }
+    loadAllMarksPaged();
+
     document.getElementById('addMark').addEventListener('click', async ()=>{
       const name=document.getElementById('name').value.trim();
       const message=document.getElementById('msg').value.trim();
@@ -359,10 +387,13 @@
       const {lat,lng}=selectedLatLng;
       const resp=await fetch('/.netlify/functions/marks',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name,message,lat,lon:lng})});
       if(!resp.ok){ const t=await resp.text().catch(()=>'-'); alert('Ошибка сохранения: '+t); return; }
-      document.getElementById('msg').value=''; selectedLatLng=null; if(previewMarker){previewMarker.remove(); previewMarker=null;} renderMarks();
+      document.getElementById('msg').value=''; selectedLatLng=null; if(previewMarker){previewMarker.remove(); previewMarker=null;}
+      // перезагружаем метки сначала
+      marksOffset = 0;
+      loadAllMarksPaged();
     });
 
-    /* ====== Hearts + Splide (18/слайд) ====== */
+    /* ====== Hearts + Splide (постраничная подгрузка) ====== */
     let splide;
     function chunk(a,s){const out=[];for(let i=0;i<a.length;i+=s) out.push(a.slice(i,i+s));return out;}
     function heartCard(n){return `<div class="p-4 rounded-2xl bg-gray-900/50 shadow-sm border border-gray-700"><div class="flex items-center gap-2"><span class="text-xl">❤️</span><div class="text-sm text-gray-200">${n||'Anon'}</div></div></div>`;}
@@ -373,14 +404,51 @@
       if(splide) splide.destroy(true);
       splide=new Splide('#heartsSplide',{type:'slide',perPage:1,perMove:1,pagination:true,arrows:true,classes:{pagination:'splide__pagination mt-4'}}); splide.mount();
     }
-    async function fetchHearts(){ const r=await fetch('/.netlify/functions/hearts',{cache:'no-store'}); const d=await r.json(); return Array.isArray(d)?d:[]; }
-    async function renderHearts(){ renderHeartsSlides(await fetchHearts()); }
+
+    let heartsOffset = 0;
+    const heartsPageSize = 200;
+    let allHearts = [];
+
+    async function fetchHeartsPage() {
+      const r = await fetch(`/.netlify/functions/hearts?limit=${heartsPageSize}&offset=${heartsOffset}`, { cache: 'no-store' });
+      const chunk = await r.json();
+      if (!Array.isArray(chunk)) return [];
+      return chunk;
+    }
+
+    async function loadMoreHearts() {
+      const chunk = await fetchHeartsPage();
+      if (!chunk.length) {
+        const btn = document.getElementById('loadMoreHearts');
+        btn?.setAttribute('disabled','disabled');
+        btn?.classList.add('opacity-50','cursor-not-allowed');
+        return;
+      }
+      allHearts = allHearts.concat(chunk);
+      heartsOffset += chunk.length;
+      renderHeartsSlides(allHearts);
+      if (chunk.length < heartsPageSize) {
+        const btn = document.getElementById('loadMoreHearts');
+        btn?.setAttribute('disabled','disabled');
+        btn?.classList.add('opacity-50','cursor-not-allowed');
+      }
+    }
+
+    document.getElementById('loadMoreHearts')?.addEventListener('click', loadMoreHearts);
+    // первая порция сердец
+    loadMoreHearts();
+
+    // добавление сердца
     document.getElementById('addHeart').addEventListener('click', async ()=>{
       const inp=document.getElementById('heartName'); const name=(inp.value||'').trim();
       await fetch('/.netlify/functions/hearts',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name})});
-      inp.value=''; renderHearts();
+      inp.value='';
+      // перезагружаем список с нуля, чтобы новое сердце попало в начало
+      allHearts = []; heartsOffset = 0;
+      const btn = document.getElementById('loadMoreHearts');
+      btn?.removeAttribute('disabled'); btn?.classList.remove('opacity-50','cursor-not-allowed');
+      loadMoreHearts();
     });
-    renderHearts();
 
     /* ====== Мини-плеер аудио-анонса ====== */
     const announceAudio=document.getElementById('announceAudio');
@@ -417,4 +485,3 @@
   </script>
 </body>
 </html>
-
