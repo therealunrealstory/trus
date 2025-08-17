@@ -10,43 +10,29 @@
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- Splide (карусель сердец) -->
+  <!-- Splide -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
 
   <style>
     body{
       background-image:url('images/bg.png');
-      background-size:cover;
-      background-attachment:fixed;
-      background-position:center;
+      background-size:cover; background-attachment:fixed; background-position:center;
     }
     #map{height:360px}
     section,header,footer{background:rgba(0,0,0,0.85);border-radius:1rem;margin-top:1rem;padding:1rem;color:#fff}
     .modal-backdrop{display:none}.modal-backdrop.show{display:block}
     .icon-btn{display:inline-flex;align-items:center;gap:8px}
     .icon-btn svg{width:18px;height:18px}
-    /* тайлы с фоном */
-    .tile{
-      position:relative; overflow:hidden; border-radius:1rem; height:180px;
-      background-size:cover; background-position:center; cursor:pointer;
-      border:1px solid rgba(255,255,255,0.08)
-    }
-    .tile::after{
-      content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent,rgba(0,0,0,.6));
-    }
-    .tile > span{
-      position:absolute; left:1rem; bottom:1rem; z-index:1;
-      background:rgba(0,0,0,.55); padding:.4rem .7rem; border-radius:.8rem
-    }
-    /* адаптивный плеер 16:9 */
+    .tile{position:relative;overflow:hidden;border-radius:1rem;height:180px;background-size:cover;background-position:center;cursor:pointer;border:1px solid rgba(255,255,255,.08)}
+    .tile::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,.6))}
+    .tile>span{position:absolute;left:1rem;bottom:1rem;z-index:1;background:rgba(0,0,0,.55);padding:.4rem .7rem;border-radius:.8rem}
     .video-wrap{position:relative;width:100%;padding-top:56.25%;border-radius:1rem;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
     .video-wrap iframe{position:absolute;inset:0;width:100%;height:100%}
   </style>
 </head>
 <body class="text-white">
-
-  <!-- HEADER: на мобиле — столбиком -->
+  <!-- HEADER: всё слева -->
   <header class="max-w-5xl mx-auto px-4 py-6">
     <div class="text-3xl sm:text-4xl font-bold tracking-tight leading-tight">The Real Unreal Story</div>
     <div class="mt-4 flex flex-wrap gap-2 items-center">
@@ -64,22 +50,18 @@
   <section class="max-w-5xl mx-auto px-4">
     <div class="flex items-center gap-3 flex-wrap">
       <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://instagram.com" target="_blank" rel="noreferrer">
-        <!-- Instagram -->
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2.2A2.8 2.8 0 1 0 12 15.8 2.8 2.8 0 0 0 12 9.2zm4.8-2.5a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2z"/></svg>
         Instagram
       </a>
       <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://t.me/therealunrealstory" target="_blank" rel="noreferrer">
-        <!-- Telegram -->
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.96 15.47l-.4 5.63c.57 0 .81-.24 1.1-.53l2.64-2.53 5.47 4c1.01.56 1.73.27 2-.93l3.62-16.97.01-.01c.32-1.5-.54-2.08-1.52-1.72L1.2 9.65c-1.46.57-1.44 1.39-.25 1.76l5.54 1.73 12.85-8.11c.6-.39 1.15-.17.7.22"/></svg>
         Telegram
       </a>
       <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://www.youtube.com" target="_blank" rel="noreferrer">
-        <!-- YouTube -->
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .6 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.3.6 9.3.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.6-5.8zM9.6 15.5v-7l6.2 3.5-6.2 3.5z"/></svg>
         YouTube
       </a>
       <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://open.spotify.com" target="_blank" rel="noreferrer">
-        <!-- Spotify -->
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5a10.5 10.5 0 1 0 0 21 10.5 10.5 0 0 0 0-21zm4.84 15.2c-.19.3-.6.39-.9.2-2.44-1.5-5.52-1.84-9.13-1-.35.08-.7-.14-.78-.5-.08-.35.14-.7.5-.78 3.93-.9 7.34-.51 10.02 1.15.3.18.4.6.2.92zm1.28-2.88c-.24.38-.75.5-1.13.26-2.8-1.72-7.08-2.23-10.4-1.2-.43.13-.88-.11-1-.54-.13-.43.1-.88.54-1 3.76-1.12 8.45-.54 11.67 1.4.4.24.52.76.3 1.08zm.1-3.1c-3.23-1.92-8.6-2.1-11.69-1.14-.5.15-1.04-.14-1.2-.66-.15-.5.14-1.04.66-1.2 3.57-1.1 9.46-.86 13.2 1.37.47.28.63.9.35 1.36-.28.48-.9.63-1.32.27z"/></svg>
         Spotify
       </a>
@@ -92,19 +74,15 @@
       <h1 class="text-3xl md:text-5xl font-semibold leading-tight">
         The Real Unreal Story — помощь Адаму<span class="align-super text-green-400 text-xl">*</span>
       </h1>
-      <p class="mt-4">
-        Правдивая история хирурга, который всю жизнь спасал других, а теперь сам борется за жизнь. Присоединяйтесь: поддержите деньгами, временем, делом или словом.
-      </p>
-      <p class="mt-2 text-xs text-gray-400">
-        * «Адам» — это псевдоним реального человека с описанной историей. Имя изменено для защиты личной жизни.
-      </p>
+      <p class="mt-4">Правдивая история хирурга, который всю жизнь спасал других, а теперь сам борется за жизнь. Присоединяйтесь: поддержите деньгами, временем, делом или словом.</p>
+      <p class="mt-2 text-xs text-gray-400">* «Адам» — это псевдоним реального человека с описанной историей. Имя изменено для защиты личной жизни.</p>
       <div class="mt-5 flex flex-wrap items-center gap-3">
         <a id="donateHero" target="_blank" class="px-4 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-sm font-medium">Пожертвовать</a>
         <button id="shareBtn" class="px-4 py-2 rounded-xl bg-gray-200 text-black text-sm hover:opacity-90">Поделиться</button>
       </div>
     </section>
 
-    <!-- Блок вовлечённости (вместо «Подарить время») -->
+    <!-- ВОВЛЕЧЁННОСТЬ (перенесён перед картой) -->
     <section>
       <h2 class="text-xl font-semibold mb-4">Ваша вовлечённость</h2>
       <p class="text-sm text-gray-300 mb-3">Отметьте, что вы уже сделали — это тоже поддержка ❤️</p>
@@ -118,20 +96,7 @@
       <p class="mt-2 text-xs text-gray-400">Состояние сохраняется в вашем браузере. Можно включать и выключать.</p>
     </section>
 
-    <!-- Лента новостей Telegram -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4">Новости</h2>
-      <div id="tgFeed" class="rounded-2xl bg-gray-900 border border-gray-700 p-4" style="max-height: 560px; overflow-y: auto;">
-        <div class="text-sm text-gray-400">Загрузка новостей…</div>
-      </div>
-      <div class="mt-4">
-        <a href="https://t.me/therealunrealstory" target="_blank" rel="noreferrer" class="px-4 py-2 rounded-xl bg-sky-600 text-white text-sm hover:bg-sky-700">
-          Следите за нашей историей в Telegram
-        </a>
-      </div>
-    </section>
-
-    <!-- 3 тайла-кнопки -->
+    <!-- 3 ТАЙЛА -->
     <section>
       <div class="grid md:grid-cols-3 gap-4">
         <div id="tile1" class="tile" style="background-image:url('images/1.png')"><span>Я — Нико</span></div>
@@ -139,18 +104,38 @@
         <div id="tile3" class="tile" style="background-image:url('images/3.png')"><span>Другие участники истории</span></div>
       </div>
     </section>
+    <!-- МИНИ-ПЛЕЕР АУДИО-АНОНСА (после тайлов) -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Аудио-анонс истории</h2>
+      <div class="rounded-2xl bg-gray-900 border border-gray-700 p-4 flex items-center gap-3">
+        <button id="announceBtn" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm">▶︎ Воспроизвести</button>
+        <div class="text-sm text-gray-200">Короткий аудио-анонс (язык страницы)</div>
+        <div id="announceStatus" class="ml-auto text-xs text-gray-400"></div>
+      </div>
+      <audio id="announceAudio" preload="auto"></audio>
+    </section>
 
-    <!-- YouTube-видео (анонс) -->
+    <!-- YouTube -->
     <section>
       <h2 class="text-xl font-semibold mb-4">Видео-анонс</h2>
       <div class="video-wrap">
         <iframe src="https://www.youtube.com/embed/9bWXMziCmXk" title="YouTube video" frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen></iframe>
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       </div>
     </section>
 
-    <!-- Карта поддержки -->
+    <!-- НОВОСТИ (перенесены под YouTube) -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Новости</h2>
+      <div id="tgFeed" class="rounded-2xl bg-gray-900 border border-gray-700 p-4" style="max-height:560px;overflow-y:auto;">
+        <div class="text-sm text-gray-400">Загрузка новостей…</div>
+      </div>
+      <div class="mt-4">
+        <a href="https://t.me/therealunrealstory" target="_blank" rel="noreferrer" class="px-4 py-2 rounded-xl bg-sky-600 text-white text-sm hover:bg-sky-700">Следите за нашей историей в Telegram</a>
+      </div>
+    </section>
+
+    <!-- КАРТА ПОДДЕРЖКИ -->
     <section>
       <h2 class="text-xl font-semibold mb-4">🌍 Карта поддержки</h2>
       <div id="map" class="rounded-2xl shadow-sm border"></div>
@@ -166,21 +151,16 @@
       <div class="mt-2 text-sm text-gray-400">Всего отметок: <span id="marksCount">0</span></div>
     </section>
 
-    <!-- Сердца поддержки (кнопка под полем на мобиле) -->
+    <!-- СЕРДЦА (кнопка под полем на мобиле) -->
     <section id="contact">
       <div class="rounded-3xl bg-gray-900 p-6 shadow-sm border border-gray-700">
         <div class="text-lg font-semibold mb-3">Сердце поддержки</div>
-
-        <!-- ввод + кнопка: в одну строку на md+, столбиком на мобиле -->
         <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2">
           <input id="heartName" class="px-3 py-2 rounded-xl border bg-gray-800 text-white text-sm" placeholder="Имя" />
           <button id="addHeart" class="px-4 py-2 rounded-xl bg-pink-600 text-white text-sm">Оставить сердце</button>
         </div>
-
         <div id="heartsSplide" class="splide mt-6" aria-label="Сердца поддержки">
-          <div class="splide__track">
-            <ul id="heartsSlides" class="splide__list"></ul>
-          </div>
+          <div class="splidetrack"><ul id="heartsSlides" class="splidelist"></ul></div>
         </div>
       </div>
     </section>
@@ -190,19 +170,17 @@
     Спасибо за любую поддержку — даже репост меняет судьбу.
   </footer>
 
-  <!-- Аудио -->
+  <!-- Аудио в шапке -->
   <audio id="bgAudio" preload="auto"></audio>
 
-  <!-- Универсальная модалка -->
+  <!-- Модалка -->
   <div id="modalBackdrop" class="modal-backdrop fixed inset-0 bg-black/60 z-50">
     <div class="min-h-full flex items-center justify-center p-4">
       <div class="bg-gray-900 text-white rounded-2xl shadow-xl border border-gray-700 max-w-xl w-full p-6 relative">
         <button id="modalClose" class="absolute right-3 top-3 text-gray-400 hover:text-white" aria-label="Закрыть">✕</button>
         <h3 id="modalTitle" class="text-lg font-semibold mb-3"></h3>
         <div id="modalBody" class="text-sm text-gray-200 leading-relaxed"></div>
-        <div class="mt-5 text-right">
-          <button id="modalOk" class="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600">Ок</button>
-        </div>
+        <div class="mt-5 text-right"><button id="modalOk" class="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600">Ок</button></div>
       </div>
     </div>
   </div>
@@ -220,44 +198,28 @@
       }catch{}
     });
 
-    /* ====== Вовлечённость (toggle + localStorage) ====== */
+    /* Вовлечённость */
     const engageBtns=[...document.querySelectorAll('.eng-btn')];
     const ENG_KEY='engagement_v1';
-    function loadEng(){ try{ return JSON.parse(localStorage.getItem(ENG_KEY)||'[]'); }catch{return []} }
-    function saveEng(arr){ try{ localStorage.setItem(ENG_KEY, JSON.stringify(arr)); }catch{} }
-    function applyEng(){
-      const active=loadEng();
-      engageBtns.forEach((btn,idx)=>{
-        const on=active.includes(idx);
-        btn.classList.toggle('bg-green-700', on);
-        btn.classList.toggle('border-green-400', on);
-      });
-    }
-    engageBtns.forEach((btn,idx)=>{
-      btn.addEventListener('click', ()=>{
-        const active=loadEng();
-        const pos=active.indexOf(idx);
-        if(pos>=0) active.splice(pos,1); else active.push(idx);
-        saveEng(active); applyEng();
-      });
-    });
+    function loadEng(){ try{return JSON.parse(localStorage.getItem(ENG_KEY)||'[]');}catch{return []} }
+    function saveEng(a){ try{localStorage.setItem(ENG_KEY,JSON.stringify(a));}catch{} }
+    function applyEng(){ const on=loadEng(); engageBtns.forEach((b,i)=>{const s=on.includes(i); b.classList.toggle('bg-green-700',s); b.classList.toggle('border-green-400',s);}); }
+    engageBtns.forEach((b,i)=>b.addEventListener('click',()=>{const on=loadEng(); const p=on.indexOf(i); if(p>=0) on.splice(p,1); else on.push(i); saveEng(on); applyEng();}));
     applyEng();
 
-    /* ====== Hearts + Splide (18/слайд) ====== */
+    /* Hearts + Splide */
     let splide;
-    function chunk(arr,size){ const out=[]; for(let i=0;i<arr.length;i+=size) out.push(arr.slice(i,i+size)); return out; }
-    function heartCard(name){ return `<div class="p-4 rounded-2xl bg-gray-800 shadow-sm border border-gray-700"><div class="flex items-center gap-2"><span class="text-xl">❤️</span><div class="text-sm text-gray-300">${name||'Anon'}</div></div></div>`;}
+    function chunk(a,s){const o=[];for(let i=0;i<a.length;i+=s)o.push(a.slice(i,i+s));return o;}
+    function heartCard(n){return <div class="p-4 rounded-2xl bg-gray-800 shadow-sm border border-gray-700"><div class="flex items-center gap-2"><span class="text-xl">❤️</span><div class="text-sm text-gray-300">${n||'Anon'}</div></div></div>;}
     function renderHeartsSlides(arr){
-      const pages=chunk(arr,18);
-      const ul=document.getElementById('heartsSlides');
-      ul.innerHTML=pages.map(page=>`<li class="splide__slide"><div class="grid md:grid-cols-3 gap-3">${page.map(x=>heartCard(x.name)).join('')}</div></li>`).join('')
-        || `<li class="splide__slide"><div class="text-sm text-gray-400">Пока нет сердец.</div></li>`;
+      const pages=chunk(arr,18), ul=document.getElementById('heartsSlides');
+      ul.innerHTML=pages.map(p=><li class="splide__slide"><div class="grid md:grid-cols-3 gap-3">${p.map(x=>heartCard(x.name)).join('')}</div></li>).join('')
+        || <li class="splide__slide"><div class="text-sm text-gray-400">Пока нет сердец.</div></li>;
       if(splide) splide.destroy(true);
-      splide=new Splide('#heartsSplide',{type:'slide',perPage:1,perMove:1,pagination:true,arrows:true,classes:{pagination:'splide__pagination mt-4'}});
-      splide.mount();
+      splide=new Splide('#heartsSplide',{type:'slide',perPage:1,perMove:1,pagination:true,arrows:true,classes:{pagination:'splide__pagination mt-4'}}); splide.mount();
     }
-    async function fetchHearts(){ const r=await fetch('/.netlify/functions/hearts',{cache:'no-store'}); const d=await r.json(); return Array.isArray(d)?d:[]; }
-    async function renderHearts(){ renderHeartsSlides(await fetchHearts()); }
+    async function fetchHearts(){const r=await fetch('/.netlify/functions/hearts',{cache:'no-store'});const d=await r.json();return Array.isArray(d)?d:[];}
+    async function renderHearts(){renderHeartsSlides(await fetchHearts());}
     document.getElementById('addHeart').addEventListener('click', async ()=>{
       const inp=document.getElementById('heartName'); const name=(inp.value||'').trim();
       await fetch('/.netlify/functions/hearts',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name})});
@@ -265,44 +227,38 @@
     });
     renderHearts();
 
-    /* ====== Telegram feed ====== */
+    /* Telegram feed */
     async function renderTgFeed(){
       try{
-        const res=await fetch('/.netlify/functions/news?limit=30',{cache:'no-store'});
-        if(!res.ok) throw new Error('news API '+res.status);
-        const arr=await res.json(); const box=document.getElementById('tgFeed');
+        const res=await fetch('/.netlify/functions/news?limit=30',{cache:'no-store'}); if(!res.ok) throw new Error(res.status);
+        const arr=await res.json(), box=document.getElementById('tgFeed');
         if(!Array.isArray(arr)||!arr.length){ box.innerHTML='<div class="text-sm text-gray-400">Пока нет постов.</div>'; return; }
         box.innerHTML=arr.map(p=>{
-          const dt=p.date?new Date(p.date):null; const time=dt?dt.toLocaleString():'';
-          const link=p.link?`<a href="${p.link}" target="_blank" class="underline text-sky-400">Открыть в Telegram</a>`:'';
+          const dt=p.date?new Date(p.date):null, time=dt?dt.toLocaleString():'';
+          const link=p.link?<a href="${p.link}" target="_blank" class="underline text-sky-400">Открыть в Telegram</a>:'';
           const text=(p.text||'').replace(/\n/g,'<br>');
-          return `<article class="mb-4 p-3 rounded-xl bg-gray-800 border border-gray-700"><div class="text-xs text-gray-400 mb-2">${time} ${link?` · ${link}`:''}</div><div class="text-sm leading-relaxed">${text}</div></article>`
+          return <article class="mb-4 p-3 rounded-xl bg-gray-800 border border-gray-700"><div class="text-xs text-gray-400 mb-2">${time}${link? · ${link}:''}</div><div class="text-sm leading-relaxed">${text}</div></article>;
         }).join('');
-      }catch(e){
-        console.error(e); document.getElementById('tgFeed').innerHTML='<div class="text-sm text-red-400">Не удалось загрузить новости.</div>';
-      }
+      }catch(e){ console.error(e); document.getElementById('tgFeed').innerHTML='<div class="text-sm text-red-400">Не удалось загрузить новости.</div>'; }
     }
     renderTgFeed();
 
-    /* ====== Карта ====== */
+    /* Карта */
     const map=L.map('map').setView([20,0],2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
     const layer=L.layerGroup().addTo(map);
-    if(navigator.geolocation){ navigator.geolocation.getCurrentPosition(pos=>{ const {latitude,longitude}=pos.coords; map.setView([latitude,longitude],6); L.marker([latitude,longitude]).addTo(map).bindPopup('Вы здесь').openPopup(); }); }
+    if(navigator.geolocation){ navigator.geolocation.getCurrentPosition(pos=>{const {latitude,longitude}=pos.coords; map.setView([latitude,longitude],6); L.marker([latitude,longitude]).addTo(map).bindPopup('Вы здесь').openPopup();}); }
     let selectedLatLng=null, previewMarker=null;
-    map.on('click', e=>{
-      selectedLatLng=e.latlng; if(previewMarker) previewMarker.remove();
+    map.on('click',e=>{ selectedLatLng=e.latlng; if(previewMarker) previewMarker.remove();
       previewMarker=L.marker([selectedLatLng.lat,selectedLatLng.lng],{draggable:true}).addTo(map).bindPopup('Выбранная точка (можно перетащить)').openPopup();
       previewMarker.on('dragend',()=>{selectedLatLng=previewMarker.getLatLng();});
     });
-    function setMarksCount(n){ const el=document.getElementById('marksCount'); if(el) el.textContent=Number.isFinite(n)?String(n):'0'; }
+    function setMarksCount(n){const el=document.getElementById('marksCount'); if(el) el.textContent=Number.isFinite(n)?String(n):'0';}
     async function renderMarks(){
-      try{
-        layer.clearLayers(); const r=await fetch('/.netlify/functions/marks',{cache:'no-store'}); if(!r.ok) throw new Error(r.status);
-        const data=await r.json(); const arr=Array.isArray(data)?data:[];
-        setMarksCount(arr.length);
-        arr.forEach(m=>{ const lat=Number(m.lat),lon=Number(m.lon); if(!Number.isFinite(lat)||!Number.isFinite(lon)) return;
-          L.circleMarker([lat,lon],{radius:4,color:'lime'}).bindPopup(`<b>${m.name||'Anon'}</b><br>${m.message||''}`).addTo(layer); });
+      try{ layer.clearLayers(); const r=await fetch('/.netlify/functions/marks',{cache:'no-store'}); if(!r.ok) throw new Error(r.status);
+        const data=await r.json(), arr=Array.isArray(data)?data:[]; setMarksCount(arr.length);
+        arr.forEach(m=>{const lat=Number(m.lat),lon=Number(m.lon); if(!Number.isFinite(lat)||!Number.isFinite(lon)) return;
+          L.circleMarker([lat,lon],{radius:4,color:'lime'}).bindPopup(<b>${m.name||'Anon'}</b><br>${m.message||''}).addTo(layer);});
       }catch(e){ console.error(e); setMarksCount(0); }
     }
     renderMarks();
@@ -316,37 +272,50 @@
       document.getElementById('msg').value=''; selectedLatLng=null; if(previewMarker){previewMarker.remove(); previewMarker=null;} renderMarks();
     });
 
-    /* ====== Аудио и языки (как было) ====== */
-    const dict={RU:{},EN:{},ES:{},FR:{},PT:{},DE:{},IT:{},CN:{},AR:{}};
-    const langSelect=document.getElementById('lang'); const audio=document.getElementById('bgAudio'); const audioBtn=document.getElementById('audioBtn');
+    /* Аудио (шапка) + языки */
+    const audio=document.getElementById('bgAudio'); const audioBtn=document.getElementById('audioBtn'); const langSelect=document.getElementById('lang');
     const audioByLang={EN:"audio/ORUS-EN.mp3",ES:"audio/ORUS-ES.mp3",FR:"audio/ORUS-FR.mp3",PT:"audio/ORUS-PT.mp3",DE:"audio/ORUS-DE.mp3",IT:"audio/ORUS-IT.mp3",RU:"audio/ORUS-RU.mp3",CN:"audio/ORUS-CN.mp3",AR:"audio/ORUS-AR.mp3"};
-    function setAudioForLang(l,autoplay=false){const src=audioByLang[l]||audioByLang['EN']; if(audio.src.endsWith(src)){ if(autoplay&&audio.paused) audio.play().catch(()=>{}); return;} audio.pause(); audio.src=src; if(autoplay) audio.play().catch(()=>{}); }
+    function setAudioForLang(l,autoplay=false){const src=audioByLang[l]||audioByLang.EN; if(audio.src.endsWith(src)){ if(autoplay&&audio.paused) audio.play().catch(()=>{}); return;} audio.pause(); audio.src=src; if(autoplay) audio.play().catch(()=>{});}
     const savedLang=localStorage.getItem('site_lang')||'RU'; langSelect.value=savedLang; setAudioForLang(savedLang);
-    langSelect.addEventListener('change',e=>{const l=e.target.value; localStorage.setItem('site_lang',l); setAudioForLang(l,!audio.paused);});
+    langSelect.addEventListener('change',e=>{const l=e.target.value; localStorage.setItem('site_lang',l); setAudioForLang(l,!audio.paused); setAnnouncementForLang(l, /*autoplayIfWas*/ !announceAudio.paused);});
     audioBtn.addEventListener('click',async()=>{ if(audio.paused){ setAudioForLang(langSelect.value); try{await audio.play(); audioBtn.textContent='Пауза';}catch{ audioBtn.textContent='Аудио'; } } else { audio.pause(); audioBtn.textContent='Аудио'; } });
 
-    /* ====== Модалки для трёх тайлов ====== */
+    /* Модалки тайлов */
     const modal=document.getElementById('modalBackdrop'), mTitle=document.getElementById('modalTitle'), mBody=document.getElementById('modalBody');
-    const openModal=(title,html)=>{ mTitle.textContent=title; mBody.innerHTML=html; modal.classList.add('show'); };
+    const openModal=(t,h)=>{mTitle.textContent=t; mBody.innerHTML=h; modal.classList.add('show');};
     const closeModal=()=>modal.classList.remove('show');
     document.getElementById('modalClose').onclick=closeModal; document.getElementById('modalOk').onclick=closeModal;
     modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
-    document.getElementById('tile1').onclick=()=>openModal('Я — Нико', `
-      Меня зовут Нико, и я друг Адама. Я стал невольным участником этой истории, которую назвал «реально-нереальная» — из-за событий, которые будто невозможны, но происходят и по сей день.
-      Сейчас я обратился к широкой аудитории за поддержкой — сам я больше не справляюсь, а впереди полная неизвестность и рядом нет той опоры, что была раньше.
-      Поэтому я рассказываю нашу историю без вымысла и параллельно запускаю сбор средств на GoFundMe.
-    `);
-    document.getElementById('tile2').onclick=()=>openModal('Об Адаме', `
-      Адам — великолепный человек и хирург с уникальными методиками, благотворитель; спасал людей и животных.
-      С 2019 года он несколько раз сталкивался с различными формами онкологии крови. В июле 2025 — новый тяжёлый виток: другая форма лейкемии.
-      За последние 6 лет к болезням добавились колоссальные личные потрясения, давление родственников, утраты и даже несколько клинических смертей.
-    `);
-    document.getElementById('tile3').onclick=()=>openModal('Другие участники истории', `
-      История Адама полна реальных неожиданностей, которых не встретишь даже в самых драматичных фильмах.
-      Были невероятные помощники — родители, медсёстры с очень непростой судьбой, без которых он бы не дожил до сегодня.
-      Были и те, кто сознательно вредил: отдельные медработники ради выгоды, а также родственники, блокировавшие имущество в попытках уничтожить его и получить наследство.
-      И были люди, которых будто сама вселенная приводила в нужный момент — так, как трудно поверить.
-    `);
+    document.getElementById('tile1').onclick=()=>openModal('Я — Нико',Меня зовут Нико, и я друг Адама. Я стал невольным участником этой истории, которую назвал «реально-нереальная». Сейчас я обратился к широкой аудитории за поддержкой — сам я больше не справляюсь. Поэтому я рассказываю нашу историю без вымысла и параллельно запускаю сбор средств на GoFundMe.);
+    document.getElementById('tile2').onclick=()=>openModal('Об Адаме',Адам — великолепный человек и хирург с уникальными методиками, благотворитель. С 2019 года он несколько раз сталкивался с различными формами онкологии крови. В июле 2025 — новый тяжёлый виток: другая форма лейкемии. За последние 6 лет к болезням добавились колоссальные личные потрясения.);
+    document.getElementById('tile3').onclick=()=>openModal('Другие участники истории',История Адама полна реальных неожиданностей. Были невероятные помощники, без которых он бы не дожил до сегодня. Были и те, кто сознательно вредил. И были люди, которых будто сама вселенная приводила в нужный момент.);
+
+    /* Мини-плеер аудио-анонса */
+    const announceAudio=document.getElementById('announceAudio');
+    const announceBtn=document.getElementById('announceBtn');
+    const announceStatus=document.getElementById('announceStatus');
+    const announcementByLang={
+      EN:"audio/ANNOUNCEMENT-EN.mp3", ES:"audio/ANNOUNCEMENT-ES.mp3", FR:"audio/ANNOUNCEMENT-FR.mp3",
+      PT:"audio/ANNOUNCEMENT-PT.mp3", DE:"audio/ANNOUNCEMENT-DE.mp3", IT:"audio/ANNOUNCEMENT-IT.mp3",
+      RU:"audio/ANNOUNCEMENT-RU.mp3", CN:"audio/ANNOUNCEMENT-CN.mp3", AR:"audio/ANNOUNCEMENT-AR.mp3"
+    };
+    function setAnnouncementForLang(l, autoplay=false){
+      const src=announcementByLang[l]||announcementByLang.EN;
+      if(announceAudio.src.endsWith(src)){ if(autoplay && announceAudio.paused) announceAudio.play().catch(()=>{}); return; }
+      announceAudio.pause(); announceAudio.src=src;
+      announceStatus.textContent = l ? Язык: ${l} : '';
+      if(autoplay) announceAudio.play().catch(()=>{});
+    }
+    setAnnouncementForLang(savedLang);
+    announceBtn.addEventListener('click', async ()=>{
+      if(announceAudio.paused){
+        setAnnouncementForLang(langSelect.value);
+        try{ await announceAudio.play(); announceBtn.textContent='⏸ Пауза'; }catch{}
+      }else{
+        announceAudio.pause(); announceBtn.textContent='▶︎ Воспроизвести';
+      }
+    });
+    announceAudio.addEventListener('ended',()=>{ announceBtn.textContent='▶︎ Воспроизвести'; });
   </script>
 </body>
 </html>
