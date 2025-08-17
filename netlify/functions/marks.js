@@ -5,22 +5,21 @@ export default async (req) => {
 
   if (req.method === "GET") {
     const url = new URL(req.url);
-    const hasLimit  = url.searchParams.has("limit");
-    const hasOffset = url.searchParams.has("offset");
-
-    if (hasLimit || hasOffset) {
-      const limit  = Math.min(parseInt(url.searchParams.get("limit")  || "200", 10), 2000);
+    const hasLimit = url.searchParams.has("limit") || url.searchParams.has("offset");
+    if (hasLimit) {
+      const limit  = Math.min(Math.max(parseInt(url.searchParams.get("limit")  || "500", 10), 1), 5000);
       const offset = Math.max(parseInt(url.searchParams.get("offset") || "0",   10), 0);
       const { rows } = await query(
         "select name, message, lat, lon, ts from marks order by ts desc limit $1 offset $2",
         [limit, offset]
       );
       return cors(rows);
-    } else {
-      // Без параметров — вернуть ВСЁ
-      const { rows } = await query("select name, message, lat, lon, ts from marks order by ts desc");
-      return cors(rows);
     }
+    // без параметров — вернуть все
+    const { rows } = await query(
+      "select name, message, lat, lon, ts from marks order by ts desc"
+    );
+    return cors(rows);
   }
 
   if (req.method === "POST") {
@@ -40,5 +39,3 @@ export default async (req) => {
 
   return cors({ error: "Method not allowed" }, 405);
 };
-
-
