@@ -104,6 +104,7 @@
         <div id="tile3" class="tile" style="background-image:url('images/3.png')"><span>Другие участники истории</span></div>
       </div>
     </section>
+
     <!-- МИНИ-ПЛЕЕР АУДИО-АНОНСА (после тайлов) -->
     <section>
       <h2 class="text-xl font-semibold mb-4">Аудио-анонс истории</h2>
@@ -160,7 +161,7 @@
           <button id="addHeart" class="px-4 py-2 rounded-xl bg-pink-600 text-white text-sm">Оставить сердце</button>
         </div>
         <div id="heartsSplide" class="splide mt-6" aria-label="Сердца поддержки">
-          <div class="splidetrack"><ul id="heartsSlides" class="splidelist"></ul></div>
+          <div class="splide__track"><ul id="heartsSlides" class="splide__list"></ul></div>
         </div>
       </div>
     </section>
@@ -210,11 +211,11 @@
     /* Hearts + Splide */
     let splide;
     function chunk(a,s){const o=[];for(let i=0;i<a.length;i+=s)o.push(a.slice(i,i+s));return o;}
-    function heartCard(n){return <div class="p-4 rounded-2xl bg-gray-800 shadow-sm border border-gray-700"><div class="flex items-center gap-2"><span class="text-xl">❤️</span><div class="text-sm text-gray-300">${n||'Anon'}</div></div></div>;}
+    function heartCard(n){return `<div class="p-4 rounded-2xl bg-gray-800 shadow-sm border border-gray-700"><div class="flex items-center gap-2"><span class="text-xl">❤️</span><div class="text-sm text-gray-300">${n||'Anon'}</div></div></div>`;}
     function renderHeartsSlides(arr){
       const pages=chunk(arr,18), ul=document.getElementById('heartsSlides');
-      ul.innerHTML=pages.map(p=><li class="splide__slide"><div class="grid md:grid-cols-3 gap-3">${p.map(x=>heartCard(x.name)).join('')}</div></li>).join('')
-        || <li class="splide__slide"><div class="text-sm text-gray-400">Пока нет сердец.</div></li>;
+      ul.innerHTML=pages.map(p=>`<li class="splide__slide"><div class="grid md:grid-cols-3 gap-3">${p.map(x=>heartCard(x.name)).join('')}</div></li>`).join('')
+        || `<li class="splide__slide"><div class="text-sm text-gray-400">Пока нет сердец.</div></li>`;
       if(splide) splide.destroy(true);
       splide=new Splide('#heartsSplide',{type:'slide',perPage:1,perMove:1,pagination:true,arrows:true,classes:{pagination:'splide__pagination mt-4'}}); splide.mount();
     }
@@ -235,9 +236,9 @@
         if(!Array.isArray(arr)||!arr.length){ box.innerHTML='<div class="text-sm text-gray-400">Пока нет постов.</div>'; return; }
         box.innerHTML=arr.map(p=>{
           const dt=p.date?new Date(p.date):null, time=dt?dt.toLocaleString():'';
-          const link=p.link?<a href="${p.link}" target="_blank" class="underline text-sky-400">Открыть в Telegram</a>:'';
+          const link=p.link?`<a href="${p.link}" target="_blank" class="underline text-sky-400">Открыть в Telegram</a>`:'';
           const text=(p.text||'').replace(/\n/g,'<br>');
-          return <article class="mb-4 p-3 rounded-xl bg-gray-800 border border-gray-700"><div class="text-xs text-gray-400 mb-2">${time}${link? · ${link}:''}</div><div class="text-sm leading-relaxed">${text}</div></article>;
+          return `<article class="mb-4 p-3 rounded-xl bg-gray-800 border border-gray-700"><div class="text-xs text-gray-400 mb-2">${time}${link?` · ${link}`:''}</div><div class="text-sm leading-relaxed">${text}</div></article>`;
         }).join('');
       }catch(e){ console.error(e); document.getElementById('tgFeed').innerHTML='<div class="text-sm text-red-400">Не удалось загрузить новости.</div>'; }
     }
@@ -258,7 +259,7 @@
       try{ layer.clearLayers(); const r=await fetch('/.netlify/functions/marks',{cache:'no-store'}); if(!r.ok) throw new Error(r.status);
         const data=await r.json(), arr=Array.isArray(data)?data:[]; setMarksCount(arr.length);
         arr.forEach(m=>{const lat=Number(m.lat),lon=Number(m.lon); if(!Number.isFinite(lat)||!Number.isFinite(lon)) return;
-          L.circleMarker([lat,lon],{radius:4,color:'lime'}).bindPopup(<b>${m.name||'Anon'}</b><br>${m.message||''}).addTo(layer);});
+          L.circleMarker([lat,lon],{radius:4,color:'lime'}).bindPopup(`<b>${m.name||'Anon'}</b><br>${m.message||''}`).addTo(layer);});
       }catch(e){ console.error(e); setMarksCount(0); }
     }
     renderMarks();
@@ -286,9 +287,9 @@
     const closeModal=()=>modal.classList.remove('show');
     document.getElementById('modalClose').onclick=closeModal; document.getElementById('modalOk').onclick=closeModal;
     modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
-    document.getElementById('tile1').onclick=()=>openModal('Я — Нико',Меня зовут Нико, и я друг Адама. Я стал невольным участником этой истории, которую назвал «реально-нереальная». Сейчас я обратился к широкой аудитории за поддержкой — сам я больше не справляюсь. Поэтому я рассказываю нашу историю без вымысла и параллельно запускаю сбор средств на GoFundMe.);
-    document.getElementById('tile2').onclick=()=>openModal('Об Адаме',Адам — великолепный человек и хирург с уникальными методиками, благотворитель. С 2019 года он несколько раз сталкивался с различными формами онкологии крови. В июле 2025 — новый тяжёлый виток: другая форма лейкемии. За последние 6 лет к болезням добавились колоссальные личные потрясения.);
-    document.getElementById('tile3').onclick=()=>openModal('Другие участники истории',История Адама полна реальных неожиданностей. Были невероятные помощники, без которых он бы не дожил до сегодня. Были и те, кто сознательно вредил. И были люди, которых будто сама вселенная приводила в нужный момент.);
+    document.getElementById('tile1').onclick=()=>openModal('Я — Нико',`Меня зовут Нико, и я друг Адама. Я стал невольным участником этой истории, которую назвал «реально-нереальная». Сейчас я обратился к широкой аудитории за поддержкой — сам я больше не справляюсь. Поэтому я рассказываю нашу историю без вымысла и параллельно запускаю сбор средств на GoFundMe.`);
+    document.getElementById('tile2').onclick=()=>openModal('Об Адаме',`Адам — великолепный человек и хирург с уникальными методиками, благотворитель. С 2019 года он несколько раз сталкивался с различными формами онкологии крови. В июле 2025 — новый тяжёлый виток: другая форма лейкемии. За последние 6 лет к болезням добавились колоссальные личные потрясения.`);
+    document.getElementById('tile3').onclick=()=>openModal('Другие участники истории',`История Адама полна реальных неожиданностей. Были невероятные помощники, без которых он бы не дожил до сегодня. Были и те, кто сознательно вредил. И были люди, которых будто сама вселенная приводила в нужный момент.`);
 
     /* Мини-плеер аудио-анонса */
     const announceAudio=document.getElementById('announceAudio');
@@ -303,7 +304,7 @@
       const src=announcementByLang[l]||announcementByLang.EN;
       if(announceAudio.src.endsWith(src)){ if(autoplay && announceAudio.paused) announceAudio.play().catch(()=>{}); return; }
       announceAudio.pause(); announceAudio.src=src;
-      announceStatus.textContent = l ? Язык: ${l} : '';
+      announceStatus.textContent = l ? `Язык: ${l}` : '';
       if(autoplay) announceAudio.play().catch(()=>{});
     }
     setAnnouncementForLang(savedLang);
