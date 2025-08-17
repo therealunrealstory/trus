@@ -34,7 +34,7 @@
   <header class="max-w-5xl mx-auto px-4 py-6 flex items-center gap-3">
     <div class="text-2xl font-bold tracking-tight">The Real Unreal Story</div>
     <div class="ml-auto flex gap-2 items-center">
-      <!-- Language switch (EN, ES, FR, PT, DE, IT, RU, CN, AR) -->
+      <!-- Language switch -->
       <select id="lang" class="px-2 py-1 rounded bg-gray-800 text-white text-sm">
         <option value="EN">EN</option>
         <option value="ES">ES</option>
@@ -51,7 +51,7 @@
     </div>
   </header>
 
-  <!-- Socials just under header -->
+  <!-- Socials -->
   <section class="max-w-5xl mx-auto px-4">
     <h2 class="text-lg font-semibold mb-3">Соцсети</h2>
     <div class="flex items-center gap-3 flex-wrap">
@@ -131,7 +131,7 @@
       <div class="mt-2 text-sm text-gray-400" data-i18n="marksTotal">Всего отметок: <span id="marksCount">0</span></div>
     </section>
 
-    <!-- Support Hearts (name only) -->
+    <!-- Support Hearts -->
     <section id="contact">
       <div class="rounded-3xl bg-gray-900 p-6 shadow-sm border border-gray-700">
         <div class="flex items-center justify-between gap-3 flex-wrap">
@@ -175,17 +175,15 @@
   <script>
     const donateURL = "https://www.gofundme.com/f/your-campaign-slug";
 
-    /* -------- Donate & Share -------- */
+    /* Donate & Share */
     document.getElementById('donateTop').href = donateURL;
     document.getElementById('donateHero').href = donateURL;
-
     document.querySelectorAll('.quick').forEach(btn => {
       btn.addEventListener('click', () => {
         const amt = btn.dataset.amt;
         window.open(`${donateURL}/donate?amount=${amt}`, '_blank');
       });
     });
-
     const shareBtn = document.getElementById('shareBtn');
     shareBtn.addEventListener('click', async () => {
       try {
@@ -199,34 +197,28 @@
       } catch {}
     });
 
-    /* -------- Helpers -------- */
-    function safeGet(key, fallback) {
-      try { const v = localStorage.getItem(key); return v === null ? fallback : JSON.parse(v); }
-      catch { return fallback; }
-    }
-    function safeSet(key, value) {
-      try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
-    }
+    /* Helpers for local minutes */
+    function safeGet(key, fallback) { try { const v=localStorage.getItem(key); return v===null?fallback:JSON.parse(v);} catch {return fallback;} }
+    function safeSet(key, value){ try { localStorage.setItem(key, JSON.stringify(value)); } catch {} }
 
-    /* -------- Pledge minutes (локально, символика) -------- */
+    /* Pledge minutes (local only) */
     const minEl = document.getElementById('minTotal');
     let minutes = Number(safeGet('ru_minutes', 0)) || 0;
     const updateMinutesUI = () => { if (minEl) minEl.textContent = minutes.toLocaleString(); };
     updateMinutesUI();
     document.querySelectorAll('.pledge').forEach(btn => {
       btn.addEventListener('click', () => {
-        const inc = parseInt(btn.dataset.min, 10) || 0;
-        minutes += inc;
+        minutes += parseInt(btn.dataset.min, 10) || 0;
         safeSet('ru_minutes', minutes);
         updateMinutesUI();
       });
     });
 
-    /* -------- Hearts via Netlify Functions -------- */
+    /* Hearts via Netlify Functions */
     async function renderHearts(){
-      const res = await fetch("/.netlify/functions/hearts");
+      const res = await fetch("/.netlify/functions/hearts", { cache: "no-store" });
       const arr = await res.json();
-      document.getElementById('heartsWall').innerHTML = arr.map(x => `
+      document.getElementById('heartsWall').innerHTML = (Array.isArray(arr)?arr:[]).map(x => `
         <div class="p-4 rounded-2xl bg-gray-800 shadow-sm border border-gray-700">
           <div class="flex items-center gap-2">
             <span class="text-xl">❤️</span>
@@ -239,8 +231,7 @@
       const inp = document.getElementById('heartName');
       const name = (inp.value || "").trim();
       await fetch("/.netlify/functions/hearts", {
-        method:"POST",
-        headers:{ "content-type":"application/json" },
+        method:"POST", headers:{ "content-type":"application/json" },
         body: JSON.stringify({ name })
       });
       inp.value = "";
@@ -248,42 +239,63 @@
     });
     renderHearts();
 
-    /* -------- Map (Leaflet) -------- */
-    const coordsByCountry = {"US":[-98.57,39.82],"GB":[-3.43,55.37],"DE":[10.45,51.16],"ES":[-3.74,40.46],"IT":[12.56,41.87],"PL":[19.14,51.91]};
-    const map = L.map('map').setView([20,0], 2);
+    /* Map (Leaflet) — robust version */
+    const coordsByCountry = {
+      "US":[-98.57,39.82],"GB":[-3.43,55.37],"DE":[10.45,51.16],
+      "ES":[-3.74,40.46],"IT":[12.56,41.87],"PL":[19.14,51.91]
+    };
+    const map = L.map('map').setView([20, 0], 2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
     const layer = L.layerGroup().addTo(map);
 
+    function setMarksCount(n){ const el = document.getElementById('marksCount'); if (el) el.textContent = Number.isFinite(n)? String(n): '0'; }
+
     async function renderMarks(){
-      layer.clearLayers();
-      const res = await fetch("/.netlify/functions/marks");
-      const arr = await res.json();
-      document.getElementById('marksCount').textContent = arr.length;
-      arr.forEach(m=>{
-        L.circleMarker([m.lat, m.lon], { radius:4, color:"lime" })
-         .bindPopup(`<b>${m.name||'Anon'}</b><br>${m.message||''}`)
-         .addTo(layer);
-      });
+      try{
+        layer.clearLayers();
+        const res = await fetch('/.netlify/functions/marks', { cache:'no-store' });
+        if (!res.ok) throw new Error('API /marks ' + res.status);
+        const data = await res.json();
+        const arr = Array.isArray(data) ? data : [];
+        setMarksCount(arr.length);
+        arr.forEach(m=>{
+          const lat = Number(m.lat), lon = Number(m.lon);
+          if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+          L.circleMarker([lat, lon], { radius:4, color:'lime' })
+           .bindPopup(`<b>${m.name||'Anon'}</b><br>${m.message||''}`)
+           .addTo(layer);
+        });
+      } catch(e){
+        console.error('renderMarks error:', e);
+        setMarksCount(0);
+      }
     }
     renderMarks();
 
     document.getElementById('addMark').addEventListener('click', async ()=>{
-      const name=document.getElementById('name').value.trim();
-      const message=document.getElementById('msg').value.trim();
-      const country=document.getElementById('country').value;
-      if(!message) return;
-      const [lon,lat] = coordsByCountry[country] || [10.45,51.16];
-
-      await fetch("/.netlify/functions/marks", {
-        method:"POST",
-        headers:{ "content-type":"application/json" },
-        body: JSON.stringify({ name, message, lat, lon })
-      });
-      document.getElementById('msg').value='';
-      renderMarks();
+      try{
+        const name=document.getElementById('name').value.trim();
+        const message=document.getElementById('msg').value.trim();
+        const country=document.getElementById('country').value;
+        if(!message) return;
+        const [lon,lat]=coordsByCountry[country] || [10.45,51.16];
+        const resp = await fetch('/.netlify/functions/marks', {
+          method:'POST',
+          headers:{ 'content-type':'application/json' },
+          body: JSON.stringify({ name, message, lat, lon })
+        });
+        if (!resp.ok) {
+          const t = await resp.text().catch(()=>'-');
+          throw new Error('POST /marks ' + resp.status + ' ' + t);
+        }
+        document.getElementById('msg').value='';
+        await renderMarks();
+      } catch(e){
+        console.error('addMark error:', e);
+      }
     });
 
-    /* -------- i18n (RU full; остальные — заглушки) -------- */
+    /* i18n (RU full; others placeholders) */
     const dict = {
       RU: {
         heroTitle:"The Real Unreal Story — помощь Адаму",
@@ -308,7 +320,6 @@
     const langSelect = document.getElementById("lang");
     const audio = document.getElementById("bgAudio");
     const audioBtn = document.getElementById("audioBtn");
-
     const audioByLang = {
       EN: "audio/ORUS-EN.mp3", ES: "audio/ORUS-ES.mp3", FR: "audio/ORUS-FR.mp3",
       PT: "audio/ORUS-PT.mp3", DE: "audio/ORUS-DE.mp3", IT: "audio/ORUS-IT.mp3",
@@ -324,7 +335,7 @@
       const l = e.target.value;
       localStorage.setItem("site_lang", l);
       applyLang(l);
-      setAudioForLang(l, /*autoplayIfPlaying=*/!audio.paused);
+      setAudioForLang(l, !audio.paused);
     });
 
     function applyLang(l){
@@ -352,15 +363,13 @@
       }
     });
 
-    /* -------- Modal (Я хочу помочь) -------- */
+    /* Modal */
     const modalBackdrop = document.getElementById('modalBackdrop');
     const modalClose = document.getElementById('modalClose');
     const modalOk = document.getElementById('modalOk');
     const wantHelpBtn = document.getElementById('wantHelp');
-
     function openModal(){ modalBackdrop.classList.add('show'); }
     function closeModal(){ modalBackdrop.classList.remove('show'); }
-
     wantHelpBtn.addEventListener('click', openModal);
     modalClose.addEventListener('click', closeModal);
     modalOk.addEventListener('click', closeModal);
