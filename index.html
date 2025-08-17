@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>The Real Unreal Story — support for Adam</title>
   <meta name="description" content="The Real Unreal Story — the true story of a surgeon who saved others all his life and is now fighting for his own." />
+
+  <!-- Hreflang (клиентский вариант через ?lang=) -->
+  <link rel="alternate" hreflang="x-default" href="/?lang=EN">
+  <link rel="alternate" hreflang="en" href="/?lang=EN">
+  <link rel="alternate" hreflang="es" href="/?lang=ES">
+  <link rel="alternate" hreflang="fr" href="/?lang=FR">
+  <link rel="alternate" hreflang="it" href="/?lang=IT">
+  <link rel="alternate" hreflang="de" href="/?lang=DE">
+  <link rel="alternate" hreflang="pt" href="/?lang=PT">
+  <link rel="alternate" hreflang="ru" href="/?lang=RU">
+  <link rel="alternate" hreflang="zh" href="/?lang=CN">
+  <link rel="alternate" hreflang="ar" href="/?lang=AR">
+
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Leaflet -->
@@ -35,6 +48,10 @@
       100%{ transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,0); }
     }
     .pulse{ animation:pulse 2s infinite; }
+
+    /* Небольшая косметика для RTL */
+    html[dir="rtl"] .icon-btn { flex-direction: row-reverse; }
+    html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
   </style>
 </head>
 <body class="text-white">
@@ -236,12 +253,28 @@
       if (d) d.href = donateURL;
     });
 
-    // Share
+    // ===== LANGUAGE from ?lang= + Share keeps lang in URL =====
+    function getLangFromQuery() {
+      try {
+        const u = new URL(location.href);
+        const p = (u.searchParams.get('lang') || '').toUpperCase();
+        const ok = ['EN','ES','FR','IT','DE','PT','RU','CN','AR'];
+        return ok.includes(p) ? p : null;
+      } catch { return null; }
+    }
+
+    // Share (вставляем текущий язык в ссылку)
     document.getElementById('shareBtn').addEventListener('click', async () => {
       try {
-        const url = location.href;
-        if (navigator.share) await navigator.share({ title: 'The Real Unreal Story', url });
-        else { await navigator.clipboard.writeText(url); alert((window.I18N && I18N["share.copied"]) || 'Link copied'); }
+        const u = new URL(location.href);
+        u.searchParams.set('lang', document.getElementById('lang').value);
+        const url = u.toString();
+        if (navigator.share) {
+          await navigator.share({ title: 'The Real Unreal Story', url });
+        } else {
+          await navigator.clipboard.writeText(url);
+          alert((window.I18N && I18N["share.copied"]) || 'Link copied');
+        }
       } catch {}
     });
 
@@ -530,17 +563,31 @@
       setAnnouncementForLang(lang, !announceAudio.paused);
     }
 
-    // ===== default language: EN =====
-    const savedLang = localStorage.getItem('site_lang') || 'EN';
-    langSelect.value = savedLang;
-    loadLocale(savedLang);
+    // ===== default language: EN, но уважаем ?lang= и localStorage
+    (function initLanguage(){
+      const fromQuery = getLangFromQuery();
+      const initialLang = fromQuery || localStorage.getItem('site_lang') || 'EN';
+      langSelect.value = initialLang;
+      localStorage.setItem('site_lang', initialLang);
+      loadLocale(initialLang);
 
-    // смена языка
-    langSelect.addEventListener('change', e => {
-      const l = e.target.value;
-      localStorage.setItem('site_lang', l);
-      loadLocale(l);
-    });
+      // если был ?lang= — убираем его из адресной строки
+      if (fromQuery) {
+        const u = new URL(location.href);
+        u.searchParams.delete('lang');
+        history.replaceState({}, '', u);
+      }
+
+      // смена языка: сохраняем, меняем URL (без перезагрузки) и перезагружаем тексты
+      langSelect.addEventListener('change', e => {
+        const l = e.target.value;
+        localStorage.setItem('site_lang', l);
+        const u = new URL(location.href);
+        u.searchParams.set('lang', l);
+        history.replaceState({}, '', u);
+        loadLocale(l);
+      });
+    })();
   </script>
 </body>
 </html>
