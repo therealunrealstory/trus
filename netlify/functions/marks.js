@@ -5,7 +5,7 @@ export default async (req) => {
 
   if (req.method === "GET") {
     const { rows } = await query(
-      "select name, message, lat, lon, ts from marks order by ts desc limit 300"
+      "select name, message, lat, lon, ts from marks order by ts desc"
     );
     return cors(rows);
   }
