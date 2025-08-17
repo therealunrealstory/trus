@@ -10,6 +10,10 @@
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Splide (для карусели сердец) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
   <style>
     body {
       background-image: url('images/bg.png');
@@ -27,6 +31,9 @@
     }
     .modal-backdrop { display:none; }
     .modal-backdrop.show { display:block; }
+    /* иконки-кнопки */
+    .icon-btn { display:inline-flex; align-items:center; gap:8px; }
+    .icon-btn svg { width:18px; height:18px; }
   </style>
 </head>
 <body class="text-white">
@@ -51,13 +58,30 @@
     </div>
   </header>
 
-  <!-- Socials -->
+  <!-- Соцсети -->
   <section class="max-w-5xl mx-auto px-4">
     <h2 class="text-lg font-semibold mb-3">Соцсети</h2>
     <div class="flex items-center gap-3 flex-wrap">
-      <a class="px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://instagram.com" target="_blank" rel="noreferrer">Instagram</a>
-      <a class="px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://t.me" target="_blank" rel="noreferrer">Telegram</a>
-      <a class="px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://www.youtube.com" target="_blank" rel="noreferrer">YouTube</a>
+      <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://instagram.com" target="_blank" rel="noreferrer">
+        <!-- Instagram -->
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2.2A2.8 2.8 0 1 0 12 15.8 2.8 2.8 0 0 0 12 9.2zm4.8-2.5a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2z"/></svg>
+        Instagram
+      </a>
+      <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://t.me/therealunrealstory" target="_blank" rel="noreferrer">
+        <!-- Telegram -->
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.96 15.47l-.4 5.63c.57 0 .81-.24 1.1-.53l2.64-2.53 5.47 4c1.01.56 1.73.27 2-.93l3.62-16.97.01-.01c.32-1.5-.54-2.08-1.52-1.72L1.2 9.65c-1.46.57-1.44 1.39-.25 1.76l5.54 1.73 12.85-8.11c.6-.39 1.15-.17.7.22"/></svg>
+        Telegram
+      </a>
+      <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://www.youtube.com" target="_blank" rel="noreferrer">
+        <!-- YouTube -->
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .6 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.3.6 9.3.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.6-5.8zM9.6 15.5v-7l6.2 3.5-6.2 3.5z"/></svg>
+        YouTube
+      </a>
+      <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://open.spotify.com" target="_blank" rel="noreferrer">
+        <!-- Spotify -->
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5a10.5 10.5 0 1 0 0 21 10.5 10.5 0 0 0 0-21zm4.84 15.2c-.19.3-.6.39-.9.2-2.44-1.5-5.52-1.84-9.13-1-.35.08-.7-.14-.78-.5-.08-.35.14-.7.5-.78 3.93-.9 7.34-.51 10.02 1.15.3.18.4.6.2.92zm1.28-2.88c-.24.38-.75.5-1.13.26-2.8-1.72-7.08-2.23-10.4-1.2-.43.13-.88-.11-1-.54-.13-.43.1-.88.54-1 3.76-1.12 8.45-.54 11.67 1.4.4.24.52.76.3 1.08zm.1-3.1c-3.23-1.92-8.6-2.1-11.69-1.14-.5.15-1.04-.14-1.2-.66-.15-.5.14-1.04.66-1.2 3.57-1.1 9.46-.86 13.2 1.37.47.28.63.9.35 1.36-.28.48-.9.63-1.32.27z"/></svg>
+        Spotify
+      </a>
     </div>
   </section>
 
@@ -76,7 +100,7 @@
       </div>
     </section>
 
-    <!-- How to help -->
+    <!-- Как помочь -->
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="howHelpTitle">Как помочь</h2>
       <div class="grid md:grid-cols-3 gap-4">
@@ -108,14 +132,24 @@
       </div>
     </section>
 
-    <!-- Support Map (click required) -->
+    <!-- Лента новостей Telegram -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Новости</h2>
+      <div id="tgFeed" class="rounded-2xl bg-gray-900 border border-gray-700 p-4" style="max-height: 560px; overflow-y: auto;">
+        <div class="text-sm text-gray-400">Загрузка новостей…</div>
+      </div>
+      <div class="mt-4">
+        <a href="https://t.me/therealunrealstory" target="_blank" rel="noreferrer" class="px-4 py-2 rounded-xl bg-sky-600 text-white text-sm hover:bg-sky-700">
+          Следите за нашей историей в Telegram
+        </a>
+      </div>
+    </section>
+
+    <!-- Карта поддержки (клик обязателен) -->
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="mapTitle">🌍 Карта поддержки</h2>
       <div id="map" class="rounded-2xl shadow-sm border"></div>
-      <p class="text-xs text-gray-400 mt-2">
-        Обязательно кликните по карте, чтобы указать точное место вашей поддержки.
-      </p>
-
+      <p class="text-xs text-gray-400 mt-2">Обязательно кликните по карте, чтобы указать точное место вашей поддержки.</p>
       <div class="mt-4 grid md:grid-cols-3 gap-3">
         <input id="name" class="px-3 py-2 rounded-xl border bg-gray-800 text-white" placeholder="Имя" />
         <input id="msg" class="px-3 py-2 rounded-2xl border bg-gray-800 text-white md:col-span-2" placeholder="Сообщение (до 140 символов)" maxlength="140" />
@@ -127,7 +161,7 @@
       <div class="mt-2 text-sm text-gray-400" data-i18n="marksTotal">Всего отметок: <span id="marksCount">0</span></div>
     </section>
 
-    <!-- Support Hearts -->
+    <!-- Сердце поддержки (Splide 18/слайд) -->
     <section id="contact">
       <div class="rounded-3xl bg-gray-900 p-6 shadow-sm border border-gray-700">
         <div class="flex items-center justify-between gap-3 flex-wrap">
@@ -137,7 +171,12 @@
             <button id="addHeart" class="px-4 py-2 rounded-xl bg-pink-600 text-white text-sm" data-i18n="heartsBtn">Оставить сердце</button>
           </div>
         </div>
-        <div id="heartsWall" class="mt-6 grid md:grid-cols-3 gap-3"></div>
+
+        <div id="heartsSplide" class="splide mt-6" aria-label="Сердца поддержки">
+          <div class="splide__track">
+            <ul id="heartsSlides" class="splide__list"></ul>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -210,18 +249,52 @@
       });
     });
 
-    /* Hearts via Netlify Functions */
-    async function renderHearts(){
-      const res = await fetch("/.netlify/functions/hearts", { cache: "no-store" });
-      const arr = await res.json();
-      document.getElementById('heartsWall').innerHTML = (Array.isArray(arr)?arr:[]).map(x => `
+    /* Hearts via Netlify Functions + Splide (18 на слайд) */
+    let splide;
+    function chunk(arr, size) {
+      const out = [];
+      for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+      return out;
+    }
+    function heartCard(name) {
+      return `
         <div class="p-4 rounded-2xl bg-gray-800 shadow-sm border border-gray-700">
           <div class="flex items-center gap-2">
             <span class="text-xl">❤️</span>
-            <div class="text-sm text-gray-300">${x.name || 'Anon'}</div>
+            <div class="text-sm text-gray-300">${name || 'Anon'}</div>
           </div>
-        </div>
-      `).join('');
+        </div>`;
+    }
+    function renderHeartsSlides(arr) {
+      const pages = chunk(arr, 18);
+      const slidesUl = document.getElementById('heartsSlides');
+      slidesUl.innerHTML = pages.map(page => `
+        <li class="splide__slide">
+          <div class="grid md:grid-cols-3 gap-3">
+            ${page.map(x => heartCard(x.name)).join('')}
+          </div>
+        </li>
+      `).join('') || `<li class="splide__slide"><div class="text-sm text-gray-400">Пока нет сердец.</div></li>`;
+
+      if (splide) { splide.destroy(true); }
+      splide = new Splide('#heartsSplide', {
+        type: 'slide',
+        perPage: 1,
+        perMove: 1,
+        pagination: true,
+        arrows: true,
+        classes: { pagination: 'splide__pagination mt-4' }
+      });
+      splide.mount();
+    }
+    async function fetchHearts(){
+      const res = await fetch("/.netlify/functions/hearts", { cache: "no-store" });
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
+    }
+    async function renderHearts(){
+      const arr = await fetchHearts();
+      renderHeartsSlides(arr);
     }
     document.getElementById('addHeart').addEventListener('click', async () => {
       const inp = document.getElementById('heartName');
@@ -230,49 +303,67 @@
         method:"POST", headers:{ "content-type":"application/json" },
         body: JSON.stringify({ name })
       });
-      inp.value = "";
-      renderHearts();
+      inp.value = ""; renderHearts();
     });
     renderHearts();
+
+    /* Telegram feed */
+    async function renderTgFeed() {
+      try {
+        const res = await fetch('/.netlify/functions/news?limit=30', { cache: 'no-store' });
+        if (!res.ok) throw new Error('news API ' + res.status);
+        const arr = await res.json();
+        const box = document.getElementById('tgFeed');
+        if (!Array.isArray(arr) || !arr.length) {
+          box.innerHTML = '<div class="text-sm text-gray-400">Пока нет постов.</div>';
+          return;
+        }
+        box.innerHTML = arr.map(p => {
+          const dt = p.date ? new Date(p.date) : null;
+          const time = dt ? dt.toLocaleString() : '';
+          const link = p.link ? `<a href="${p.link}" target="_blank" class="underline text-sky-400">Открыть в Telegram</a>` : '';
+          const text = (p.text || '').replace(/\n/g, '<br>');
+          return `
+            <article class="mb-4 p-3 rounded-xl bg-gray-800 border border-gray-700">
+              <div class="text-xs text-gray-400 mb-2">${time} ${link ? ' · ' + link : ''}</div>
+              <div class="text-sm leading-relaxed">${text}</div>
+            </article>`;
+        }).join('');
+      } catch (e) {
+        console.error(e);
+        document.getElementById('tgFeed').innerHTML =
+          '<div class="text-sm text-red-400">Не удалось загрузить новости.</div>';
+      }
+    }
+    renderTgFeed();
 
     /* Map (Leaflet) — click required + geolocation */
     const map = L.map('map').setView([20, 0], 2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
     const layer = L.layerGroup().addTo(map);
 
-    // попытка определить местоположение пользователя
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const { latitude, longitude } = pos.coords;
           map.setView([latitude, longitude], 6);
-          L.marker([latitude, longitude])
-            .addTo(map)
-            .bindPopup("Вы здесь")
-            .openPopup();
+          L.marker([latitude, longitude]).addTo(map).bindPopup("Вы здесь").openPopup();
         },
-        (err) => {
-          console.warn("Геолокация недоступна:", err.message);
-        }
+        (err) => { console.warn("Геолокация недоступна:", err.message); }
       );
     }
 
     let selectedLatLng = null;
     let previewMarker = null;
-
-    // выбор точки кликом (обязательно)
     map.on('click', (e) => {
       selectedLatLng = e.latlng;
       if (previewMarker) previewMarker.remove();
       previewMarker = L.marker([selectedLatLng.lat, selectedLatLng.lng], { draggable: true })
-        .addTo(map)
-        .bindPopup('Выбранная точка (можно перетащить)')
-        .openPopup();
+        .addTo(map).bindPopup('Выбранная точка (можно перетащить)').openPopup();
       previewMarker.on('dragend', () => { selectedLatLng = previewMarker.getLatLng(); });
     });
 
     function setMarksCount(n){ const el = document.getElementById('marksCount'); if (el) el.textContent = Number.isFinite(n)? String(n): '0'; }
-
     async function renderMarks(){
       try{
         layer.clearLayers();
@@ -304,8 +395,7 @@
 
         const { lat, lng } = selectedLatLng;
         const resp = await fetch('/.netlify/functions/marks', {
-          method:'POST',
-          headers:{ 'content-type':'application/json' },
+          method:'POST', headers:{ 'content-type':'application/json' },
           body: JSON.stringify({ name, message, lat, lon: lng })
         });
         if (!resp.ok) {
@@ -353,17 +443,11 @@
     };
 
     const savedLang = localStorage.getItem("site_lang") || "RU";
-    langSelect.value = savedLang;
-    applyLang(savedLang);
-    setAudioForLang(savedLang);
-
+    langSelect.value = savedLang; applyLang(savedLang); setAudioForLang(savedLang);
     langSelect.addEventListener("change", e => {
-      const l = e.target.value;
-      localStorage.setItem("site_lang", l);
-      applyLang(l);
-      setAudioForLang(l, !audio.paused);
+      const l = e.target.value; localStorage.setItem("site_lang", l);
+      applyLang(l); setAudioForLang(l, !audio.paused);
     });
-
     function applyLang(l){
       const trans=dict[l]||dict["RU"];
       document.querySelectorAll("[data-i18n]").forEach(el=>{
@@ -374,19 +458,12 @@
     function setAudioForLang(l, autoplay=false){
       const src = audioByLang[l] || audioByLang["EN"];
       if (audio.src.endsWith(src)) { if (autoplay && audio.paused) audio.play().catch(()=>{}); return; }
-      audio.pause();
-      audio.src = src;
-      if (autoplay) audio.play().catch(()=>{});
+      audio.pause(); audio.src = src; if (autoplay) audio.play().catch(()=>{});
     }
     audioBtn.addEventListener("click", async () => {
-      if (audio.paused) {
-        setAudioForLang(langSelect.value);
-        try { await audio.play(); audioBtn.textContent = "Пауза"; }
-        catch { audioBtn.textContent = "Аудио"; }
-      } else {
-        audio.pause();
-        audioBtn.textContent = "Аудио";
-      }
+      if (audio.paused) { setAudioForLang(langSelect.value);
+        try { await audio.play(); audioBtn.textContent = "Пауза"; } catch { audioBtn.textContent = "Аудио"; }
+      } else { audio.pause(); audioBtn.textContent = "Аудио"; }
     });
 
     /* Modal */
