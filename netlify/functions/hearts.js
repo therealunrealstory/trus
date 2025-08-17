@@ -5,7 +5,7 @@ export default async (req) => {
 
   if (req.method === "GET") {
     const { rows } = await query(
-      "select name, ts from hearts order by ts desc limit 60"
+      "select name, ts from hearts order by ts desc"
     );
     return cors(rows);
   }
@@ -19,3 +19,4 @@ export default async (req) => {
 
   return cors({ error: "Method not allowed" }, 405);
 };
+
