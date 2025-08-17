@@ -15,19 +15,25 @@
   <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
 
   <style>
-    body{
-      background:#000 url('images/bg.png') center/cover fixed no-repeat;
+    body{ background:#000 url('images/bg.png') center/cover fixed no-repeat; }
+    #map{ height:360px }
+    section,header,footer{ background:rgba(0,0,0,.85); border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff }
+    .icon-btn{ display:inline-flex; align-items:center; gap:8px }
+    .icon-btn svg{ width:18px; height:18px }
+    .tile{ position:relative; overflow:hidden; border-radius:1rem; height:180px; background-size:cover; background-position:center; cursor:pointer; border:1px solid rgba(255,255,255,.08) }
+    .tile::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent,rgba(0,0,0,.6)) }
+    .tile>span{ position:absolute; left:1rem; bottom:1rem; z-index:1; background:rgba(0,0,0,.55); padding:.4rem .7rem; border-radius:.8rem }
+    .video-wrap{ position:relative; width:100%; padding-top:56.25%; border-radius:1rem; overflow:hidden; border:1px solid rgba(255,255,255,.08) }
+    .video-wrap iframe{ position:absolute; inset:0; width:100%; height:100% }
+    .modal-backdrop{ display:none; z-index:9999; } /* поверх Leaflet */
+    .modal-backdrop.show{ display:block }
+    /* Пульсирующая кнопка */
+    @keyframes pulse {
+      0% { transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,.6); }
+      70%{ transform:scale(1.03); box-shadow:0 0 0 12px rgba(99,102,241,0); }
+      100%{ transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,0); }
     }
-    #map{height:360px}
-    section,header,footer{background:rgba(0,0,0,0.85);border-radius:1rem;margin-top:1rem;padding:1rem;color:#fff}
-    .icon-btn{display:inline-flex;align-items:center;gap:8px}
-    .icon-btn svg{width:18px;height:18px}
-    .tile{position:relative;overflow:hidden;border-radius:1rem;height:180px;background-size:cover;background-position:center;cursor:pointer;border:1px solid rgba(255,255,255,.08)}
-    .tile::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,.6))}
-    .tile>span{position:absolute;left:1rem;bottom:1rem;z-index:1;background:rgba(0,0,0,.55);padding:.4rem .7rem;border-radius:.8rem}
-    .video-wrap{position:relative;width:100%;padding-top:56.25%;border-radius:1rem;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
-    .video-wrap iframe{position:absolute;inset:0;width:100%;height:100%}
-    .modal-backdrop{display:none}.modal-backdrop.show{display:block}
+    .pulse{ animation:pulse 2s infinite; }
   </style>
 </head>
 <body class="text-white">
@@ -42,8 +48,10 @@
         <option value="PT">PT</option><option value="DE">DE</option><option value="IT">IT</option>
         <option value="RU" selected>RU</option><option value="CN">CN</option><option value="AR">AR</option>
       </select>
-      <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm">Аудио</button>
-      <a id="donateTop" target="_blank" class="px-4 py-2 rounded-xl bg-green-600 text-white text-sm hover:bg-green-700">Пожертвовать</a>
+      <button id="audioBtn" class="pulse px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm">
+        История в музыке
+      </button>
+      <!-- Убрали кнопку доната в шапке -->
     </div>
   </header>
 
@@ -94,10 +102,10 @@
 
     <!-- МИНИ-ПЛЕЕР АУДИО-АНОНСА -->
     <section>
-      <h2 class="text-xl font-semibold mb-4">Короткий аудио-анонс</h2>
+      <h2 class="text-xl font-semibold mb-4">Анонс нашей истории</h2>
       <div class="rounded-2xl bg-gray-900 border border-gray-700 p-4 flex items-center gap-3">
         <button id="announceBtn" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm">▶︎ Воспроизвести</button>
-        <div class="text-sm text-gray-200">Анонс истории (1–2 минуты)</div>
+        <div class="text-sm text-gray-200">Короткий аудио-анонс</div>
         <div id="announceStatus" class="ml-auto text-xs text-gray-400"></div>
       </div>
       <audio id="announceAudio" preload="auto"></audio>
@@ -110,6 +118,33 @@
         <iframe src="https://www.youtube.com/embed/9bWXMziCmXk" title="YouTube video" frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen></iframe>
+      </div>
+    </section>
+
+    <!-- ПОДДЕРЖАТЬ СЕЙЧАС (перенесён перед новостями) -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Поддержать сейчас</h2>
+      <div class="grid md:grid-cols-2 gap-4">
+        <!-- Донаты -->
+        <div class="p-5 rounded-2xl bg-gray-900 shadow-sm border border-gray-700">
+          <div class="text-2xl mb-2">💚</div>
+          <div class="font-medium mb-2">Пожертвовать средства</div>
+          <div class="flex flex-wrap gap-2">
+            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=5">$5</a>
+            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=10">$10</a>
+            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=25">$25</a>
+            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=50">$50</a>
+            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=100">$100</a>
+            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=250">$250</a>
+            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=500">$500</a>
+          </div>
+        </div>
+        <!-- Физическая помощь -->
+        <div class="p-5 rounded-2xl bg-gray-900 shadow-sm border border-gray-700">
+          <div class="text-2xl mb-2">👥</div>
+          <div class="font-medium mb-2">Физическая помощь</div>
+          <button id="wantHelp" class="text-sm underline">Я хочу помочь</button>
+        </div>
       </div>
     </section>
 
@@ -138,30 +173,6 @@
         <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800 text-left">Подписался на Instagram</button>
       </div>
       <p class="mt-2 text-xs text-gray-400">Состояние сохраняется в вашем браузере.</p>
-    </section>
-
-    <!-- ПОДДЕРЖАТЬ СЕЙЧАС (донаты + физическая помощь) -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4">Поддержать сейчас</h2>
-      <div class="grid md:grid-cols-2 gap-4">
-        <!-- Донаты -->
-        <div class="p-5 rounded-2xl bg-gray-900 shadow-sm border border-gray-700">
-          <div class="text-2xl mb-2">💚</div>
-          <div class="font-medium mb-2">Пожертвовать средства</div>
-          <div class="flex flex-wrap gap-2">
-            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=10">$10</a>
-            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=25">$25</a>
-            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=50">$50</a>
-            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=100">$100</a>
-          </div>
-        </div>
-        <!-- Физическая помощь -->
-        <div class="p-5 rounded-2xl bg-gray-900 shadow-sm border border-gray-700">
-          <div class="text-2xl mb-2">👥</div>
-          <div class="font-medium mb-2">Физическая помощь</div>
-          <button id="wantHelp" class="text-sm underline">Я хочу помочь</button>
-        </div>
-      </div>
     </section>
 
     <!-- КАРТА ПОДДЕРЖКИ -->
@@ -203,7 +214,7 @@
   <audio id="bgAudio" preload="auto"></audio>
 
   <!-- Универсальная модалка -->
-  <div id="modalBackdrop" class="modal-backdrop fixed inset-0 bg-black/60 z-50">
+  <div id="modalBackdrop" class="modal-backdrop fixed inset-0 bg-black/60">
     <div class="min-h-full flex items-center justify-center p-4">
       <div class="bg-gray-900 text-white rounded-2xl shadow-xl border border-gray-700 max-w-xl w-full p-6 relative">
         <button id="modalClose" class="absolute right-3 top-3 text-gray-400 hover:text-white" aria-label="Закрыть">✕</button>
@@ -216,7 +227,6 @@
 
   <script>
     const donateURL = "https://www.gofundme.com/f/your-campaign-slug";
-    document.getElementById('donateTop').href = donateURL;
     document.getElementById('donateHero').href = donateURL;
 
     // Share
@@ -228,7 +238,7 @@
       } catch {}
     });
 
-    /* ====== Аудио в шапке + языки ====== */
+    /* ====== Аудио в шапке («История в музыке») + языки ====== */
     const audio = document.getElementById('bgAudio');
     const audioBtn = document.getElementById('audioBtn');
     const langSelect = document.getElementById('lang');
@@ -237,27 +247,27 @@
       PT:"audio/ORUS-PT.mp3", DE:"audio/ORUS-DE.mp3", IT:"audio/ORUS-IT.mp3",
       RU:"audio/ORUS-RU.mp3", CN:"audio/ORUS-CN.mp3", AR:"audio/ORUS-AR.mp3"
     };
-    function setAudioForLang(l, autoplay=false){
-      const src = audioByLang[l] || audioByLang.EN;
-      if (audio.src.endsWith(src)) { if (autoplay && audio.paused) audio.play().catch(()=>{}); return; }
-      audio.pause(); audio.src = src; if (autoplay) audio.play().catch(()=>{});
+    function setAudioForLang(l,autoplay=false){
+      const src=audioByLang[l]||audioByLang.EN;
+      if(audio.src.endsWith(src)){ if(autoplay&&audio.paused) audio.play().catch(()=>{}); return; }
+      audio.pause(); audio.src=src; if(autoplay) audio.play().catch(()=>{});
     }
-    const savedLang = localStorage.getItem('site_lang') || 'RU';
-    langSelect.value = savedLang; setAudioForLang(savedLang);
-    langSelect.addEventListener('change', e => {
-      const l = e.target.value; localStorage.setItem('site_lang', l);
-      setAudioForLang(l, !audio.paused); setAnnouncementForLang(l, !announceAudio.paused);
+    const savedLang=localStorage.getItem('site_lang')||'RU';
+    langSelect.value=savedLang; setAudioForLang(savedLang);
+    langSelect.addEventListener('change',e=>{
+      const l=e.target.value; localStorage.setItem('site_lang',l);
+      setAudioForLang(l,!audio.paused); setAnnouncementForLang(l,!announceAudio.paused);
     });
-    audioBtn.addEventListener('click', async () => {
-      if (audio.paused) { setAudioForLang(langSelect.value); try { await audio.play(); audioBtn.textContent='Пауза'; } catch{} }
-      else { audio.pause(); audioBtn.textContent='Аудио'; }
+    audioBtn.addEventListener('click',async()=>{
+      if(audio.paused){ setAudioForLang(langSelect.value); try{ await audio.play(); audioBtn.textContent='Пауза'; }catch{} }
+      else{ audio.pause(); audioBtn.textContent='История в музыке'; }
     });
 
     /* ====== Модалки (тайлы + физическая помощь) ====== */
-    const modal = document.getElementById('modalBackdrop');
-    const mTitle = document.getElementById('modalTitle');
-    const mBody  = document.getElementById('modalBody');
-    const openModal = (title, html) => { mTitle.textContent = title; mBody.innerHTML = html; modal.classList.add('show'); };
+    const modal=document.getElementById('modalBackdrop');
+    const mTitle=document.getElementById('modalTitle');
+    const mBody=document.getElementById('modalBody');
+    const openModal=(title,html)=>{ mTitle.textContent=title; mBody.innerHTML=html; modal.classList.add('show'); };
     const closeModal=()=>modal.classList.remove('show');
     document.getElementById('modalClose').onclick=closeModal; document.getElementById('modalOk').onclick=closeModal;
     modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
@@ -275,8 +285,6 @@
       История Адама полна реальных неожиданностей. Были невероятные помощники — без них он бы не дожил до сегодня.
       Были и те, кто сознательно вредил. И были люди, которых будто сама вселенная приводила в нужный момент.
     `);
-
-    // Физическая помощь
     document.getElementById('wantHelp').onclick=()=>openModal('Физическая помощь', `
       Если вы готовы помочь — будь то юридическая, медицинская или физическая поддержка
       (медсёстры, сиделки), или если вы хотите организовать личную встречу — пожалуйста,
@@ -353,7 +361,7 @@
       document.getElementById('msg').value=''; selectedLatLng=null; if(previewMarker){previewMarker.remove(); previewMarker=null;} renderMarks();
     });
 
-    /* ====== Hearts + Splide (18/слайд) ====== */
+    /* ====== Hearts + Splide ====== */
     let splide;
     function chunk(a,s){const out=[];for(let i=0;i<a.length;i+=s) out.push(a.slice(i,i+s));return out;}
     function heartCard(n){return `<div class="p-4 rounded-2xl bg-gray-800 shadow-sm border border-gray-700"><div class="flex items-center gap-2"><span class="text-xl">❤️</span><div class="text-sm text-gray-300">${n||'Anon'}</div></div></div>`;}
