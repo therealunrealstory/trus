@@ -4,63 +4,64 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>The Real Unreal Story — помощь Адаму</title>
-  <meta name="description" content="The Real Unreal Story — правдивая история хирурга, который всю жизнь спасал других, а теперь сам борется за жизнь. Присоединяйтесь." />
+  <meta name="description" content="The Real Unreal Story — правдивая история хирурга, который всю жизнь спасал других, а теперь сам борется за жизнь." />
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- Splide (для карусели сердец) -->
+  <!-- Splide (карусель сердец) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
 
   <style>
-    body {
-      background-image: url('images/bg.png');
-      background-size: cover;
-      background-attachment: fixed;
-      background-position: center;
+    body{
+      background-image:url('images/bg.png');
+      background-size:cover;
+      background-attachment:fixed;
+      background-position:center;
     }
-    #map { height: 360px; }
-    section, header, footer {
-      background: rgba(0,0,0,0.85);
-      border-radius: 1rem;
-      margin-top: 1rem;
-      padding: 1rem;
-      color: #fff;
+    #map{height:360px}
+    section,header,footer{background:rgba(0,0,0,0.85);border-radius:1rem;margin-top:1rem;padding:1rem;color:#fff}
+    .modal-backdrop{display:none}.modal-backdrop.show{display:block}
+    .icon-btn{display:inline-flex;align-items:center;gap:8px}
+    .icon-btn svg{width:18px;height:18px}
+    /* тайлы с фоном */
+    .tile{
+      position:relative; overflow:hidden; border-radius:1rem; height:180px;
+      background-size:cover; background-position:center; cursor:pointer;
+      border:1px solid rgba(255,255,255,0.08)
     }
-    .modal-backdrop { display:none; }
-    .modal-backdrop.show { display:block; }
-    /* иконки-кнопки */
-    .icon-btn { display:inline-flex; align-items:center; gap:8px; }
-    .icon-btn svg { width:18px; height:18px; }
+    .tile::after{
+      content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent,rgba(0,0,0,.6));
+    }
+    .tile > span{
+      position:absolute; left:1rem; bottom:1rem; z-index:1;
+      background:rgba(0,0,0,.55); padding:.4rem .7rem; border-radius:.8rem
+    }
+    /* адаптивный плеер 16:9 */
+    .video-wrap{position:relative;width:100%;padding-top:56.25%;border-radius:1rem;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+    .video-wrap iframe{position:absolute;inset:0;width:100%;height:100%}
   </style>
 </head>
 <body class="text-white">
-  <!-- Header -->
-  <header class="max-w-5xl mx-auto px-4 py-6 flex items-center gap-3">
-    <div class="text-2xl font-bold tracking-tight">The Real Unreal Story</div>
-    <div class="ml-auto flex gap-2 items-center">
-      <!-- Language switch -->
-      <select id="lang" class="px-2 py-1 rounded bg-gray-800 text-white text-sm">
-        <option value="EN">EN</option>
-        <option value="ES">ES</option>
-        <option value="FR">FR</option>
-        <option value="PT">PT</option>
-        <option value="DE">DE</option>
-        <option value="IT">IT</option>
-        <option value="RU" selected>RU</option>
-        <option value="CN">CN</option>
-        <option value="AR">AR</option>
+
+  <!-- HEADER: на мобиле — столбиком -->
+  <header class="max-w-5xl mx-auto px-4 py-6">
+    <div class="text-3xl sm:text-4xl font-bold tracking-tight leading-tight">The Real Unreal Story</div>
+    <div class="mt-4 flex flex-wrap gap-2 items-center">
+      <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
+        <option value="EN">EN</option><option value="ES">ES</option><option value="FR">FR</option>
+        <option value="PT">PT</option><option value="DE">DE</option><option value="IT">IT</option>
+        <option value="RU" selected>RU</option><option value="CN">CN</option><option value="AR">AR</option>
       </select>
-      <button id="audioBtn" class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-sm">Аудио</button>
+      <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm">Аудио</button>
       <a id="donateTop" target="_blank" class="px-4 py-2 rounded-xl bg-green-600 text-white text-sm hover:bg-green-700">Пожертвовать</a>
     </div>
   </header>
 
-  <!-- Соцсети -->
+  <!-- Соцсети (без заголовка) -->
   <section class="max-w-5xl mx-auto px-4">
-    <h2 class="text-lg font-semibold mb-3">Соцсети</h2>
     <div class="flex items-center gap-3 flex-wrap">
       <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://instagram.com" target="_blank" rel="noreferrer">
         <!-- Instagram -->
@@ -86,50 +87,35 @@
   </section>
 
   <main class="max-w-5xl mx-auto px-4">
-    <!-- Hero -->
+    <!-- HERO -->
     <section id="hero">
-      <h1 class="text-3xl md:text-5xl font-semibold leading-tight" data-i18n="heroTitle">
-        The Real Unreal Story — помощь Адаму
+      <h1 class="text-3xl md:text-5xl font-semibold leading-tight">
+        The Real Unreal Story — помощь Адаму<span class="align-super text-green-400 text-xl">*</span>
       </h1>
-      <p class="mt-4" data-i18n="heroText">
+      <p class="mt-4">
         Правдивая история хирурга, который всю жизнь спасал других, а теперь сам борется за жизнь. Присоединяйтесь: поддержите деньгами, временем, делом или словом.
       </p>
+      <p class="mt-2 text-xs text-gray-400">
+        * «Адам» — это псевдоним реального человека с описанной историей. Имя изменено для защиты личной жизни.
+      </p>
       <div class="mt-5 flex flex-wrap items-center gap-3">
-        <a id="donateHero" target="_blank" class="px-4 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-sm font-medium" data-i18n="donateBtn">Пожертвовать</a>
-        <button id="shareBtn" class="px-4 py-2 rounded-xl bg-gray-200 text-black text-sm hover:opacity-90" data-i18n="shareBtn">Поделиться</button>
+        <a id="donateHero" target="_blank" class="px-4 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-sm font-medium">Пожертвовать</a>
+        <button id="shareBtn" class="px-4 py-2 rounded-xl bg-gray-200 text-black text-sm hover:opacity-90">Поделиться</button>
       </div>
     </section>
 
-    <!-- Как помочь -->
+    <!-- Блок вовлечённости (вместо «Подарить время») -->
     <section>
-      <h2 class="text-xl font-semibold mb-4" data-i18n="howHelpTitle">Как помочь</h2>
-      <div class="grid md:grid-cols-3 gap-4">
-        <div class="p-5 rounded-2xl bg-gray-900 shadow-sm">
-          <div class="text-2xl mb-2">💚</div>
-          <div class="font-medium mb-2" data-i18n="donateTitle">Пожертвовать средства</div>
-          <div class="flex flex-wrap gap-2">
-            <button data-amt="10" class="quick px-3 py-2 rounded-xl bg-green-600 text-white text-sm">$10</button>
-            <button data-amt="25" class="quick px-3 py-2 rounded-xl bg-green-600 text-white text-sm">$25</button>
-            <button data-amt="50" class="quick px-3 py-2 rounded-xl bg-green-600 text-white text-sm">$50</button>
-            <button data-amt="100" class="quick px-3 py-2 rounded-xl bg-green-600 text-white text-sm">$100</button>
-          </div>
-        </div>
-        <div class="p-5 rounded-2xl bg-gray-900 shadow-sm">
-          <div class="text-2xl mb-2">⏱️</div>
-          <div class="font-medium mb-2" data-i18n="timeTitle">Подарить время</div>
-          <div class="flex gap-2 flex-wrap">
-            <button data-min="5" class="pledge px-3 py-2 rounded-xl bg-gray-700 text-white text-sm">+5 мин</button>
-            <button data-min="15" class="pledge px-3 py-2 rounded-xl bg-gray-700 text-white text-sm">+15 мин</button>
-            <button data-min="60" class="pledge px-3 py-2 rounded-xl bg-gray-700 text-white text-sm">+60 мин</button>
-          </div>
-          <div class="text-xs text-gray-400 mt-2" data-i18n="timeTotal">Минут обещано: <span id="minTotal">0</span></div>
-        </div>
-        <div class="p-5 rounded-2xl bg-gray-900 shadow-sm">
-          <div class="text-2xl mb-2">👥</div>
-          <div class="font-medium mb-2" data-i18n="helpTitle">Физическая помощь</div>
-          <button id="wantHelp" class="text-sm underline" data-i18n="writeLink">Я хочу помочь</button>
-        </div>
+      <h2 class="text-xl font-semibold mb-4">Ваша вовлечённость</h2>
+      <p class="text-sm text-gray-300 mb-3">Отметьте, что вы уже сделали — это тоже поддержка ❤️</p>
+      <div id="engageWrap" class="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800 text-left">Ознакомился с краткой версией истории</button>
+        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800 text-left">Прочитал полную историю</button>
+        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800 text-left">Послушал треки о нашей истории</button>
+        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800 text-left">Подписался на канал в Telegram</button>
+        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800 text-left">Подписался на Instagram</button>
       </div>
+      <p class="mt-2 text-xs text-gray-400">Состояние сохраняется в вашем браузере. Можно включать и выключать.</p>
     </section>
 
     <!-- Лента новостей Telegram -->
@@ -145,9 +131,28 @@
       </div>
     </section>
 
-    <!-- Карта поддержки (клик обязателен) -->
+    <!-- 3 тайла-кнопки -->
     <section>
-      <h2 class="text-xl font-semibold mb-4" data-i18n="mapTitle">🌍 Карта поддержки</h2>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div id="tile1" class="tile" style="background-image:url('images/1.png')"><span>Я — Нико</span></div>
+        <div id="tile2" class="tile" style="background-image:url('images/2.png')"><span>Об Адаме</span></div>
+        <div id="tile3" class="tile" style="background-image:url('images/3.png')"><span>Другие участники истории</span></div>
+      </div>
+    </section>
+
+    <!-- YouTube-видео (анонс) -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Видео-анонс</h2>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/9bWXMziCmXk" title="YouTube video" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+      </div>
+    </section>
+
+    <!-- Карта поддержки -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">🌍 Карта поддержки</h2>
       <div id="map" class="rounded-2xl shadow-sm border"></div>
       <p class="text-xs text-gray-400 mt-2">Обязательно кликните по карте, чтобы указать точное место вашей поддержки.</p>
       <div class="mt-4 grid md:grid-cols-3 gap-3">
@@ -155,21 +160,21 @@
         <input id="msg" class="px-3 py-2 rounded-2xl border bg-gray-800 text-white md:col-span-2" placeholder="Сообщение (до 140 символов)" maxlength="140" />
       </div>
       <div class="grid md:grid-cols-3 gap-3 mt-2">
-        <button id="addMark" class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm col-span-1" data-i18n="addBtn">Добавить</button>
+        <button id="addMark" class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm col-span-1">Добавить</button>
         <div class="col-span-2 text-xs text-gray-400 flex items-center">Данные хранятся в базе</div>
       </div>
-      <div class="mt-2 text-sm text-gray-400" data-i18n="marksTotal">Всего отметок: <span id="marksCount">0</span></div>
+      <div class="mt-2 text-sm text-gray-400">Всего отметок: <span id="marksCount">0</span></div>
     </section>
 
-    <!-- Сердце поддержки (Splide 18/слайд) -->
+    <!-- Сердца поддержки (кнопка под полем на мобиле) -->
     <section id="contact">
       <div class="rounded-3xl bg-gray-900 p-6 shadow-sm border border-gray-700">
-        <div class="flex items-center justify-between gap-3 flex-wrap">
-          <div class="text-lg font-semibold" data-i18n="heartsTitle">Сердце поддержки</div>
-          <div class="flex gap-2">
-            <input id="heartName" class="px-3 py-2 rounded-xl border bg-gray-800 text-white text-sm" placeholder="Имя" />
-            <button id="addHeart" class="px-4 py-2 rounded-xl bg-pink-600 text-white text-sm" data-i18n="heartsBtn">Оставить сердце</button>
-          </div>
+        <div class="text-lg font-semibold mb-3">Сердце поддержки</div>
+
+        <!-- ввод + кнопка: в одну строку на md+, столбиком на мобиле -->
+        <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2">
+          <input id="heartName" class="px-3 py-2 rounded-xl border bg-gray-800 text-white text-sm" placeholder="Имя" />
+          <button id="addHeart" class="px-4 py-2 rounded-xl bg-pink-600 text-white text-sm">Оставить сердце</button>
         </div>
 
         <div id="heartsSplide" class="splide mt-6" aria-label="Сердца поддержки">
@@ -182,24 +187,19 @@
   </main>
 
   <footer class="max-w-5xl mx-auto px-4 text-center text-sm text-gray-400">
-    <span data-i18n="footerText">Спасибо за любую поддержку — даже репост меняет судьбу.</span>
+    Спасибо за любую поддержку — даже репост меняет судьбу.
   </footer>
 
-  <!-- Hidden audio element -->
+  <!-- Аудио -->
   <audio id="bgAudio" preload="auto"></audio>
 
-  <!-- Modal -->
+  <!-- Универсальная модалка -->
   <div id="modalBackdrop" class="modal-backdrop fixed inset-0 bg-black/60 z-50">
     <div class="min-h-full flex items-center justify-center p-4">
-      <div class="bg-gray-900 text-white rounded-2xl shadow-xl border border-gray-700 max-w-lg w-full p-6 relative">
+      <div class="bg-gray-900 text-white rounded-2xl shadow-xl border border-gray-700 max-w-xl w-full p-6 relative">
         <button id="modalClose" class="absolute right-3 top-3 text-gray-400 hover:text-white" aria-label="Закрыть">✕</button>
-        <h3 class="text-lg font-semibold mb-3">Я хочу помочь</h3>
-        <p class="text-sm text-gray-200 leading-relaxed">
-          Если вы готовы помочь — будь то юридическая, медицинская или физическая поддержка
-          (медсёстры, сиделки), или если вы хотите организовать личную встречу — пожалуйста,
-          напишите на: <a href="mailto:theRealUnrealStory@gmail.com" class="underline">theRealUnrealStory@gmail.com</a>.<br><br>
-          Искренне благодарны каждому, кто откликнется.
-        </p>
+        <h3 id="modalTitle" class="text-lg font-semibold mb-3"></h3>
+        <div id="modalBody" class="text-sm text-gray-200 leading-relaxed"></div>
         <div class="mt-5 text-right">
           <button id="modalOk" class="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600">Ок</button>
         </div>
@@ -208,276 +208,145 @@
   </div>
 
   <script>
-    const donateURL = "https://www.gofundme.com/f/your-campaign-slug";
+    const donateURL="https://www.gofundme.com/f/your-campaign-slug";
+    document.getElementById('donateTop').href=donateURL;
+    document.getElementById('donateHero').href=donateURL;
 
-    /* Donate & Share */
-    document.getElementById('donateTop').href = donateURL;
-    document.getElementById('donateHero').href = donateURL;
-    document.querySelectorAll('.quick').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const amt = btn.dataset.amt;
-        window.open(`${donateURL}/donate?amount=${amt}`, '_blank');
+    document.getElementById('shareBtn').addEventListener('click', async ()=>{
+      try{
+        const url=location.href;
+        if(navigator.share) await navigator.share({title:'The Real Unreal Story',url});
+        else { await navigator.clipboard.writeText(url); alert('Ссылка скопирована'); }
+      }catch{}
+    });
+
+    /* ====== Вовлечённость (toggle + localStorage) ====== */
+    const engageBtns=[...document.querySelectorAll('.eng-btn')];
+    const ENG_KEY='engagement_v1';
+    function loadEng(){ try{ return JSON.parse(localStorage.getItem(ENG_KEY)||'[]'); }catch{return []} }
+    function saveEng(arr){ try{ localStorage.setItem(ENG_KEY, JSON.stringify(arr)); }catch{} }
+    function applyEng(){
+      const active=loadEng();
+      engageBtns.forEach((btn,idx)=>{
+        const on=active.includes(idx);
+        btn.classList.toggle('bg-green-700', on);
+        btn.classList.toggle('border-green-400', on);
+      });
+    }
+    engageBtns.forEach((btn,idx)=>{
+      btn.addEventListener('click', ()=>{
+        const active=loadEng();
+        const pos=active.indexOf(idx);
+        if(pos>=0) active.splice(pos,1); else active.push(idx);
+        saveEng(active); applyEng();
       });
     });
-    const shareBtn = document.getElementById('shareBtn');
-    shareBtn.addEventListener('click', async () => {
-      try {
-        const url = location.href;
-        if (navigator.share) await navigator.share({ title: 'The Real Unreal Story', url });
-        else {
-          await navigator.clipboard.writeText(url);
-          shareBtn.textContent = 'Скопировано!';
-          setTimeout(() => shareBtn.textContent = 'Поделиться', 1500);
-        }
-      } catch {}
-    });
+    applyEng();
 
-    /* Helpers for local minutes */
-    function safeGet(key, fallback) { try { const v=localStorage.getItem(key); return v===null?fallback:JSON.parse(v);} catch {return fallback;} }
-    function safeSet(key, value){ try { localStorage.setItem(key, JSON.stringify(value)); } catch {} }
-
-    /* Pledge minutes (local only) */
-    const minEl = document.getElementById('minTotal');
-    let minutes = Number(safeGet('ru_minutes', 0)) || 0;
-    const updateMinutesUI = () => { if (minEl) minEl.textContent = minutes.toLocaleString(); };
-    updateMinutesUI();
-    document.querySelectorAll('.pledge').forEach(btn => {
-      btn.addEventListener('click', () => {
-        minutes += parseInt(btn.dataset.min, 10) || 0;
-        safeSet('ru_minutes', minutes);
-        updateMinutesUI();
-      });
-    });
-
-    /* Hearts via Netlify Functions + Splide (18 на слайд) */
+    /* ====== Hearts + Splide (18/слайд) ====== */
     let splide;
-    function chunk(arr, size) {
-      const out = [];
-      for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
-      return out;
-    }
-    function heartCard(name) {
-      return `
-        <div class="p-4 rounded-2xl bg-gray-800 shadow-sm border border-gray-700">
-          <div class="flex items-center gap-2">
-            <span class="text-xl">❤️</span>
-            <div class="text-sm text-gray-300">${name || 'Anon'}</div>
-          </div>
-        </div>`;
-    }
-    function renderHeartsSlides(arr) {
-      const pages = chunk(arr, 18);
-      const slidesUl = document.getElementById('heartsSlides');
-      slidesUl.innerHTML = pages.map(page => `
-        <li class="splide__slide">
-          <div class="grid md:grid-cols-3 gap-3">
-            ${page.map(x => heartCard(x.name)).join('')}
-          </div>
-        </li>
-      `).join('') || `<li class="splide__slide"><div class="text-sm text-gray-400">Пока нет сердец.</div></li>`;
-
-      if (splide) { splide.destroy(true); }
-      splide = new Splide('#heartsSplide', {
-        type: 'slide',
-        perPage: 1,
-        perMove: 1,
-        pagination: true,
-        arrows: true,
-        classes: { pagination: 'splide__pagination mt-4' }
-      });
+    function chunk(arr,size){ const out=[]; for(let i=0;i<arr.length;i+=size) out.push(arr.slice(i,i+size)); return out; }
+    function heartCard(name){ return `<div class="p-4 rounded-2xl bg-gray-800 shadow-sm border border-gray-700"><div class="flex items-center gap-2"><span class="text-xl">❤️</span><div class="text-sm text-gray-300">${name||'Anon'}</div></div></div>`;}
+    function renderHeartsSlides(arr){
+      const pages=chunk(arr,18);
+      const ul=document.getElementById('heartsSlides');
+      ul.innerHTML=pages.map(page=>`<li class="splide__slide"><div class="grid md:grid-cols-3 gap-3">${page.map(x=>heartCard(x.name)).join('')}</div></li>`).join('')
+        || `<li class="splide__slide"><div class="text-sm text-gray-400">Пока нет сердец.</div></li>`;
+      if(splide) splide.destroy(true);
+      splide=new Splide('#heartsSplide',{type:'slide',perPage:1,perMove:1,pagination:true,arrows:true,classes:{pagination:'splide__pagination mt-4'}});
       splide.mount();
     }
-    async function fetchHearts(){
-      const res = await fetch("/.netlify/functions/hearts", { cache: "no-store" });
-      const data = await res.json();
-      return Array.isArray(data) ? data : [];
-    }
-    async function renderHearts(){
-      const arr = await fetchHearts();
-      renderHeartsSlides(arr);
-    }
-    document.getElementById('addHeart').addEventListener('click', async () => {
-      const inp = document.getElementById('heartName');
-      const name = (inp.value || "").trim();
-      await fetch("/.netlify/functions/hearts", {
-        method:"POST", headers:{ "content-type":"application/json" },
-        body: JSON.stringify({ name })
-      });
-      inp.value = ""; renderHearts();
+    async function fetchHearts(){ const r=await fetch('/.netlify/functions/hearts',{cache:'no-store'}); const d=await r.json(); return Array.isArray(d)?d:[]; }
+    async function renderHearts(){ renderHeartsSlides(await fetchHearts()); }
+    document.getElementById('addHeart').addEventListener('click', async ()=>{
+      const inp=document.getElementById('heartName'); const name=(inp.value||'').trim();
+      await fetch('/.netlify/functions/hearts',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name})});
+      inp.value=''; renderHearts();
     });
     renderHearts();
 
-    /* Telegram feed */
-    async function renderTgFeed() {
-      try {
-        const res = await fetch('/.netlify/functions/news?limit=30', { cache: 'no-store' });
-        if (!res.ok) throw new Error('news API ' + res.status);
-        const arr = await res.json();
-        const box = document.getElementById('tgFeed');
-        if (!Array.isArray(arr) || !arr.length) {
-          box.innerHTML = '<div class="text-sm text-gray-400">Пока нет постов.</div>';
-          return;
-        }
-        box.innerHTML = arr.map(p => {
-          const dt = p.date ? new Date(p.date) : null;
-          const time = dt ? dt.toLocaleString() : '';
-          const link = p.link ? `<a href="${p.link}" target="_blank" class="underline text-sky-400">Открыть в Telegram</a>` : '';
-          const text = (p.text || '').replace(/\n/g, '<br>');
-          return `
-            <article class="mb-4 p-3 rounded-xl bg-gray-800 border border-gray-700">
-              <div class="text-xs text-gray-400 mb-2">${time} ${link ? ' · ' + link : ''}</div>
-              <div class="text-sm leading-relaxed">${text}</div>
-            </article>`;
+    /* ====== Telegram feed ====== */
+    async function renderTgFeed(){
+      try{
+        const res=await fetch('/.netlify/functions/news?limit=30',{cache:'no-store'});
+        if(!res.ok) throw new Error('news API '+res.status);
+        const arr=await res.json(); const box=document.getElementById('tgFeed');
+        if(!Array.isArray(arr)||!arr.length){ box.innerHTML='<div class="text-sm text-gray-400">Пока нет постов.</div>'; return; }
+        box.innerHTML=arr.map(p=>{
+          const dt=p.date?new Date(p.date):null; const time=dt?dt.toLocaleString():'';
+          const link=p.link?`<a href="${p.link}" target="_blank" class="underline text-sky-400">Открыть в Telegram</a>`:'';
+          const text=(p.text||'').replace(/\n/g,'<br>');
+          return `<article class="mb-4 p-3 rounded-xl bg-gray-800 border border-gray-700"><div class="text-xs text-gray-400 mb-2">${time} ${link?` · ${link}`:''}</div><div class="text-sm leading-relaxed">${text}</div></article>`
         }).join('');
-      } catch (e) {
-        console.error(e);
-        document.getElementById('tgFeed').innerHTML =
-          '<div class="text-sm text-red-400">Не удалось загрузить новости.</div>';
+      }catch(e){
+        console.error(e); document.getElementById('tgFeed').innerHTML='<div class="text-sm text-red-400">Не удалось загрузить новости.</div>';
       }
     }
     renderTgFeed();
 
-    /* Map (Leaflet) — click required + geolocation */
-    const map = L.map('map').setView([20, 0], 2);
+    /* ====== Карта ====== */
+    const map=L.map('map').setView([20,0],2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
-    const layer = L.layerGroup().addTo(map);
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
-          map.setView([latitude, longitude], 6);
-          L.marker([latitude, longitude]).addTo(map).bindPopup("Вы здесь").openPopup();
-        },
-        (err) => { console.warn("Геолокация недоступна:", err.message); }
-      );
-    }
-
-    let selectedLatLng = null;
-    let previewMarker = null;
-    map.on('click', (e) => {
-      selectedLatLng = e.latlng;
-      if (previewMarker) previewMarker.remove();
-      previewMarker = L.marker([selectedLatLng.lat, selectedLatLng.lng], { draggable: true })
-        .addTo(map).bindPopup('Выбранная точка (можно перетащить)').openPopup();
-      previewMarker.on('dragend', () => { selectedLatLng = previewMarker.getLatLng(); });
+    const layer=L.layerGroup().addTo(map);
+    if(navigator.geolocation){ navigator.geolocation.getCurrentPosition(pos=>{ const {latitude,longitude}=pos.coords; map.setView([latitude,longitude],6); L.marker([latitude,longitude]).addTo(map).bindPopup('Вы здесь').openPopup(); }); }
+    let selectedLatLng=null, previewMarker=null;
+    map.on('click', e=>{
+      selectedLatLng=e.latlng; if(previewMarker) previewMarker.remove();
+      previewMarker=L.marker([selectedLatLng.lat,selectedLatLng.lng],{draggable:true}).addTo(map).bindPopup('Выбранная точка (можно перетащить)').openPopup();
+      previewMarker.on('dragend',()=>{selectedLatLng=previewMarker.getLatLng();});
     });
-
-    function setMarksCount(n){ const el = document.getElementById('marksCount'); if (el) el.textContent = Number.isFinite(n)? String(n): '0'; }
+    function setMarksCount(n){ const el=document.getElementById('marksCount'); if(el) el.textContent=Number.isFinite(n)?String(n):'0'; }
     async function renderMarks(){
       try{
-        layer.clearLayers();
-        const res = await fetch('/.netlify/functions/marks', { cache:'no-store' });
-        if (!res.ok) throw new Error('API /marks ' + res.status);
-        const data = await res.json();
-        const arr = Array.isArray(data) ? data : [];
+        layer.clearLayers(); const r=await fetch('/.netlify/functions/marks',{cache:'no-store'}); if(!r.ok) throw new Error(r.status);
+        const data=await r.json(); const arr=Array.isArray(data)?data:[];
         setMarksCount(arr.length);
-        arr.forEach(m=>{
-          const lat = Number(m.lat), lon = Number(m.lon);
-          if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
-          L.circleMarker([lat, lon], { radius:4, color:'lime' })
-           .bindPopup(`<b>${m.name||'Anon'}</b><br>${m.message||''}`)
-           .addTo(layer);
-        });
-      } catch(e){
-        console.error('renderMarks error:', e);
-        setMarksCount(0);
-      }
+        arr.forEach(m=>{ const lat=Number(m.lat),lon=Number(m.lon); if(!Number.isFinite(lat)||!Number.isFinite(lon)) return;
+          L.circleMarker([lat,lon],{radius:4,color:'lime'}).bindPopup(`<b>${m.name||'Anon'}</b><br>${m.message||''}`).addTo(layer); });
+      }catch(e){ console.error(e); setMarksCount(0); }
     }
     renderMarks();
-
     document.getElementById('addMark').addEventListener('click', async ()=>{
-      try{
-        const name=document.getElementById('name').value.trim();
-        const message=document.getElementById('msg').value.trim();
-        if(!message) return alert("Введите сообщение");
-        if(!selectedLatLng) return alert("Сначала кликните по карте!");
-
-        const { lat, lng } = selectedLatLng;
-        const resp = await fetch('/.netlify/functions/marks', {
-          method:'POST', headers:{ 'content-type':'application/json' },
-          body: JSON.stringify({ name, message, lat, lon: lng })
-        });
-        if (!resp.ok) {
-          const t = await resp.text().catch(()=>'-');
-          throw new Error('POST /marks ' + resp.status + ' ' + t);
-        }
-        document.getElementById('msg').value='';
-        selectedLatLng = null;
-        if (previewMarker) { previewMarker.remove(); previewMarker = null; }
-        await renderMarks();
-      } catch(e){
-        console.error('addMark error:', e);
-      }
+      const name=document.getElementById('name').value.trim();
+      const message=document.getElementById('msg').value.trim();
+      if(!message) return alert('Введите сообщение'); if(!selectedLatLng) return alert('Сначала кликните по карте!');
+      const {lat,lng}=selectedLatLng;
+      const resp=await fetch('/.netlify/functions/marks',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name,message,lat,lon:lng})});
+      if(!resp.ok){ const t=await resp.text().catch(()=>'-'); alert('Ошибка сохранения: '+t); return; }
+      document.getElementById('msg').value=''; selectedLatLng=null; if(previewMarker){previewMarker.remove(); previewMarker=null;} renderMarks();
     });
 
-    /* i18n (RU full; others placeholders) */
-    const dict = {
-      RU: {
-        heroTitle:"The Real Unreal Story — помощь Адаму",
-        heroText:"Правдивая история хирурга, который всю жизнь спасал других, а теперь сам борется за жизнь. Присоединяйтесь: поддержите деньгами, временем, делом или словом.",
-        donateBtn:"Пожертвовать", shareBtn:"Поделиться", howHelpTitle:"Как помочь",
-        donateTitle:"Пожертвовать средства", timeTitle:"Подарить время", timeTotal:"Минут обещано:",
-        helpTitle:"Физическая помощь", writeLink:"Я хочу помочь", mapTitle:"🌍 Карта поддержки", addBtn:"Добавить",
-        localStorage:"Данные хранятся в базе", marksTotal:"Всего отметок:",
-        heartsTitle:"Сердце поддержки", heartsBtn:"Оставить сердце",
-        subscribeTitle:"Подписаться", footerText:"Спасибо за любую поддержку — даже репост меняет судьбу."
-      },
-      EN:{heroTitle:"Placeholder EN",heroText:"Placeholder EN",donateBtn:"Donate",shareBtn:"Share",howHelpTitle:"How to help",donateTitle:"Donate money",timeTitle:"Give time",timeTotal:"Minutes pledged:",helpTitle:"Physical help",writeLink:"I want to help",mapTitle:"🌍 Support map",addBtn:"Add",localStorage:"Data saved in DB",marksTotal:"Total marks:",heartsTitle:"Support Heart",heartsBtn:"Leave a heart",subscribeTitle:"Subscribe",footerText:"Thanks for any support — even sharing changes destiny."},
-      ES:{heroTitle:"Placeholder ES",heroText:"Placeholder ES"},
-      FR:{heroTitle:"Placeholder FR",heroText:"Placeholder FR"},
-      PT:{heroTitle:"Placeholder PT",heroText:"Placeholder PT"},
-      DE:{heroTitle:"Placeholder DE",heroText:"Placeholder DE"},
-      IT:{heroTitle:"Placeholder IT",heroText:"Placeholder IT"},
-      CN:{heroTitle:"Placeholder CN",heroText:"Placeholder CN"},
-      AR:{heroTitle:"Placeholder AR",heroText:"Placeholder AR"}
-    };
+    /* ====== Аудио и языки (как было) ====== */
+    const dict={RU:{},EN:{},ES:{},FR:{},PT:{},DE:{},IT:{},CN:{},AR:{}};
+    const langSelect=document.getElementById('lang'); const audio=document.getElementById('bgAudio'); const audioBtn=document.getElementById('audioBtn');
+    const audioByLang={EN:"audio/ORUS-EN.mp3",ES:"audio/ORUS-ES.mp3",FR:"audio/ORUS-FR.mp3",PT:"audio/ORUS-PT.mp3",DE:"audio/ORUS-DE.mp3",IT:"audio/ORUS-IT.mp3",RU:"audio/ORUS-RU.mp3",CN:"audio/ORUS-CN.mp3",AR:"audio/ORUS-AR.mp3"};
+    function setAudioForLang(l,autoplay=false){const src=audioByLang[l]||audioByLang['EN']; if(audio.src.endsWith(src)){ if(autoplay&&audio.paused) audio.play().catch(()=>{}); return;} audio.pause(); audio.src=src; if(autoplay) audio.play().catch(()=>{}); }
+    const savedLang=localStorage.getItem('site_lang')||'RU'; langSelect.value=savedLang; setAudioForLang(savedLang);
+    langSelect.addEventListener('change',e=>{const l=e.target.value; localStorage.setItem('site_lang',l); setAudioForLang(l,!audio.paused);});
+    audioBtn.addEventListener('click',async()=>{ if(audio.paused){ setAudioForLang(langSelect.value); try{await audio.play(); audioBtn.textContent='Пауза';}catch{ audioBtn.textContent='Аудио'; } } else { audio.pause(); audioBtn.textContent='Аудио'; } });
 
-    const langSelect = document.getElementById("lang");
-    const audio = document.getElementById("bgAudio");
-    const audioBtn = document.getElementById("audioBtn");
-    const audioByLang = {
-      EN: "audio/ORUS-EN.mp3", ES: "audio/ORUS-ES.mp3", FR: "audio/ORUS-FR.mp3",
-      PT: "audio/ORUS-PT.mp3", DE: "audio/ORUS-DE.mp3", IT: "audio/ORUS-IT.mp3",
-      RU: "audio/ORUS-RU.mp3", CN: "audio/ORUS-CN.mp3", AR: "audio/ORUS-AR.mp3"
-    };
-
-    const savedLang = localStorage.getItem("site_lang") || "RU";
-    langSelect.value = savedLang; applyLang(savedLang); setAudioForLang(savedLang);
-    langSelect.addEventListener("change", e => {
-      const l = e.target.value; localStorage.setItem("site_lang", l);
-      applyLang(l); setAudioForLang(l, !audio.paused);
-    });
-    function applyLang(l){
-      const trans=dict[l]||dict["RU"];
-      document.querySelectorAll("[data-i18n]").forEach(el=>{
-        const key=el.getAttribute("data-i18n");
-        if(trans[key]) el.innerText=trans[key];
-      });
-    }
-    function setAudioForLang(l, autoplay=false){
-      const src = audioByLang[l] || audioByLang["EN"];
-      if (audio.src.endsWith(src)) { if (autoplay && audio.paused) audio.play().catch(()=>{}); return; }
-      audio.pause(); audio.src = src; if (autoplay) audio.play().catch(()=>{});
-    }
-    audioBtn.addEventListener("click", async () => {
-      if (audio.paused) { setAudioForLang(langSelect.value);
-        try { await audio.play(); audioBtn.textContent = "Пауза"; } catch { audioBtn.textContent = "Аудио"; }
-      } else { audio.pause(); audioBtn.textContent = "Аудио"; }
-    });
-
-    /* Modal */
-    const modalBackdrop = document.getElementById('modalBackdrop');
-    const modalClose = document.getElementById('modalClose');
-    const modalOk = document.getElementById('modalOk');
-    const wantHelpBtn = document.getElementById('wantHelp');
-    function openModal(){ modalBackdrop.classList.add('show'); }
-    function closeModal(){ modalBackdrop.classList.remove('show'); }
-    wantHelpBtn.addEventListener('click', openModal);
-    modalClose.addEventListener('click', closeModal);
-    modalOk.addEventListener('click', closeModal);
-    modalBackdrop.addEventListener('click', (e)=>{ if(e.target === modalBackdrop) closeModal(); });
-    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
+    /* ====== Модалки для трёх тайлов ====== */
+    const modal=document.getElementById('modalBackdrop'), mTitle=document.getElementById('modalTitle'), mBody=document.getElementById('modalBody');
+    const openModal=(title,html)=>{ mTitle.textContent=title; mBody.innerHTML=html; modal.classList.add('show'); };
+    const closeModal=()=>modal.classList.remove('show');
+    document.getElementById('modalClose').onclick=closeModal; document.getElementById('modalOk').onclick=closeModal;
+    modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
+    document.getElementById('tile1').onclick=()=>openModal('Я — Нико', `
+      Меня зовут Нико, и я друг Адама. Я стал невольным участником этой истории, которую назвал «реально-нереальная» — из-за событий, которые будто невозможны, но происходят и по сей день.
+      Сейчас я обратился к широкой аудитории за поддержкой — сам я больше не справляюсь, а впереди полная неизвестность и рядом нет той опоры, что была раньше.
+      Поэтому я рассказываю нашу историю без вымысла и параллельно запускаю сбор средств на GoFundMe.
+    `);
+    document.getElementById('tile2').onclick=()=>openModal('Об Адаме', `
+      Адам — великолепный человек и хирург с уникальными методиками, благотворитель; спасал людей и животных.
+      С 2019 года он несколько раз сталкивался с различными формами онкологии крови. В июле 2025 — новый тяжёлый виток: другая форма лейкемии.
+      За последние 6 лет к болезням добавились колоссальные личные потрясения, давление родственников, утраты и даже несколько клинических смертей.
+    `);
+    document.getElementById('tile3').onclick=()=>openModal('Другие участники истории', `
+      История Адама полна реальных неожиданностей, которых не встретишь даже в самых драматичных фильмах.
+      Были невероятные помощники — родители, медсёстры с очень непростой судьбой, без которых он бы не дожил до сегодня.
+      Были и те, кто сознательно вредил: отдельные медработники ради выгоды, а также родственники, блокировавшие имущество в попытках уничтожить его и получить наследство.
+      И были люди, которых будто сама вселенная приводила в нужный момент — так, как трудно поверить.
+    `);
   </script>
 </body>
 </html>
