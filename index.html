@@ -111,7 +111,7 @@
     <!-- 3 ТАЙЛА -->
     <section>
       <div class="grid md:grid-cols-3 gap-4">
-        <div id="tile1" class="tile" style="background-image:url('images/1.png')"><span data-i18n="tiles.me">I’m Niko</span></div>
+        <div id="tile1" class="tile" style="background-image:url('images/1.png')"><span data-i18n="tiles.me">I’m Nico</span></div>
         <div id="tile2" class="tile" style="background-image:url('images/2.png')"><span data-i18n="tiles.about">About Adam</span></div>
         <div id="tile3" class="tile" style="background-image:url('images/3.png')"><span data-i18n="tiles.others">Other people in the story</span></div>
       </div>
@@ -309,9 +309,9 @@
     function t(key, fallback){ return (window.I18N && I18N[key]) || fallback; }
 
     document.getElementById('tile1').onclick=()=>openModal(
-      t('tiles.me','I’m Niko'),
+      t('tiles.me','I’m Nico'),
       t('modal.tile1.body', `
-        My name is Niko, and I’m Adam’s friend. I became an involuntary participant in this “real-unreal” story.
+        My name is Nico, and I’m Adam’s friend. I became an involuntary participant in this “real-unreal” story.
         I’ve reached out to a wide audience for support — I can’t manage alone anymore.
         So I’m telling our story without embellishment and launching a fundraiser on GoFundMe in parallel.
       `)
@@ -603,3 +603,4 @@
   </script>
 </body>
 </html>
+
