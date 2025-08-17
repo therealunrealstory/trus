@@ -17,7 +17,8 @@
   <style>
     body{ background:#000 url('images/bg.png') center/cover fixed no-repeat; }
     #map{ height:360px }
-    header{ background:#000; border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
+    /* Шапка теперь с прозрачностью как у секций */
+    header{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
     section, footer{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
     .icon-btn{ display:inline-flex; align-items:center; gap:8px }
     .icon-btn svg{ width:18px; height:18px }
@@ -57,11 +58,11 @@
         Instagram
       </a>
       <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 shadow-sm" href="https://t.me/theRealUnrealStory" target="_blank" rel="noreferrer">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.96 15.47l-.4 5.63c.57 0 .81-.24 1.1-.53l2.64-2.53 5.47 4c1.01.56 1.73.27 2-.93l3.62-16.97c.32-1.5-.54-2.08-1.52-1.72L1.2 9.65c-1.46.57-1.44 1.39-.25 1.76l5.54 1.73 12.85-8.11c.6-.39 1.15-.17.7.22"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.96 15.47l-.4 5.63c.57 0 .81-.24 1.1-.53 л2.64-2.53 5.47 4c1.01.56 1.73.27 2-.93l3.62-16.97c.32-1.5-.54-2.08-1.52-1.72L1.2 9.65c-1.46.57-1.44 1.39-.25 1.76l5.54 1.73 12.85-8.11c.6-.39 1.15-.17.7.22"/></svg>
         Telegram
       </a>
       <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 shadow-sm" href="https://www.youtube.com/@theRealUnrealStory" target="_blank" rel="noreferrer">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .6 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.3.6 9.3.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.6-5.8zM9.6 15.5v-7l6.2 3.5-6.2 3.5z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .6 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.3.6 9.3.6s7.5 0  9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.6-5.8zM9.6 15.5v-7л6.2 3.5-6.2 3.5z"/></svg>
         YouTube
       </a>
       <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 shadow-sm" href="https://open.spotify.com" target="_blank" rel="noreferrer">
@@ -393,12 +394,12 @@
       loadAllMarksPaged();
     });
 
-    /* ====== Hearts + Splide (постраничная подгрузка) ====== */
+    /* ====== Hearts + Splide (постраничная подгрузка, 12 на слайд) ====== */
     let splide;
     function chunk(a,s){const out=[];for(let i=0;i<a.length;i+=s) out.push(a.slice(i,i+s));return out;}
     function heartCard(n){return `<div class="p-4 rounded-2xl bg-gray-900/50 shadow-sm border border-gray-700"><div class="flex items-center gap-2"><span class="text-xl">❤️</span><div class="text-sm text-gray-200">${n||'Anon'}</div></div></div>`;}
     function renderHeartsSlides(arr){
-      const pages=chunk(arr,18), ul=document.getElementById('heartsSlides');
+      const pages=chunk(arr,12), ul=document.getElementById('heartsSlides'); /* было 18 */
       ul.innerHTML=pages.map(p=>`<li class="splide__slide"><div class="grid md:grid-cols-3 gap-3">${p.map(x=>heartCard(x.name)).join('')}</div></li>`).join('')
         || `<li class="splide__slide"><div class="text-sm text-gray-300">Пока нет сердец.</div></li>`;
       if(splide) splide.destroy(true);
