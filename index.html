@@ -17,7 +17,8 @@
   <style>
     body{ background:#000 url('images/bg.png') center/cover fixed no-repeat; }
     #map{ height:360px }
-    section,header,footer{ background:rgba(0,0,0,.85); border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff }
+    header{ background:#000; border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
+    section, footer{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
     .icon-btn{ display:inline-flex; align-items:center; gap:8px }
     .icon-btn svg{ width:18px; height:18px }
     .tile{ position:relative; overflow:hidden; border-radius:1rem; height:180px; background-size:cover; background-position:center; cursor:pointer; border:1px solid rgba(255,255,255,.08) }
@@ -25,9 +26,8 @@
     .tile>span{ position:absolute; left:1rem; bottom:1rem; z-index:1; background:rgba(0,0,0,.55); padding:.4rem .7rem; border-radius:.8rem }
     .video-wrap{ position:relative; width:100%; padding-top:56.25%; border-radius:1rem; overflow:hidden; border:1px solid rgba(255,255,255,.08) }
     .video-wrap iframe{ position:absolute; inset:0; width:100%; height:100% }
-    .modal-backdrop{ display:none; z-index:9999; } /* поверх Leaflet */
-    .modal-backdrop.show{ display:block }
-    /* Пульсирующая кнопка */
+    .modal-backdrop{ display:none; z-index:9999; } .modal-backdrop.show{ display:block }
+    /* пульсирующие кнопки */
     @keyframes pulse {
       0% { transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,.6); }
       70%{ transform:scale(1.03); box-shadow:0 0 0 12px rgba(99,102,241,0); }
@@ -37,40 +37,39 @@
   </style>
 </head>
 <body class="text-white">
-
   <!-- HEADER -->
   <header class="max-w-5xl mx-auto px-4 py-6">
     <div class="text-3xl sm:text-4xl font-bold tracking-tight leading-tight">The Real Unreal Story</div>
-    <!-- панель справа -->
     <div class="mt-4 flex flex-wrap gap-2 items-center justify-end">
       <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
         <option value="EN">EN</option><option value="ES">ES</option><option value="FR">FR</option>
         <option value="PT">PT</option><option value="DE">DE</option><option value="IT">IT</option>
         <option value="RU" selected>RU</option><option value="CN">CN</option><option value="AR">AR</option>
       </select>
-      <button id="audioBtn" class="pulse px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm">
-        История в музыке
-      </button>
-      <!-- Убрали кнопку доната в шапке -->
+      <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse">История в музыке</button>
     </div>
   </header>
 
-  <!-- Соцсети (без заголовка) -->
+  <!-- Соцсети -->
   <section class="max-w-5xl mx-auto px-4">
     <div class="flex items-center gap-3 flex-wrap">
-      <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://instagram.com" target="_blank" rel="noreferrer">
+      <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 shadow-sm" href="https://instagram.com/theRealUnrealStory" target="_blank" rel="noreferrer">
+        <!-- Instagram SVG -->
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2.2A2.8 2.8 0 1 0 12 15.8 2.8 2.8 0 0 0 12 9.2zm4.8-2.5a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2z"/></svg>
         Instagram
       </a>
-      <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://t.me/therealunrealstory" target="_blank" rel="noreferrer">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.96 15.47l-.4 5.63c.57 0 .81-.24 1.1-.53l2.64-2.53 5.47 4c1.01.56 1.73.27 2-.93l3.62-16.97c.32-1.5-.54-2.08-1.52-1.72L1.2 9.65c-1.46.57-1.44 1.39-.25 1.76l5.54 1.73 12.85-8.11c.6-.39 1.15-.17.7.22"/></svg>
+      <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 shadow-sm" href="https://t.me/theRealUnrealStory" target="_blank" rel="noreferrer">
+        <!-- Telegram -->
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.96 15.47l-.4 5.63c.57 0 .81-.24 1.1-.53l2.64-2.53 5.47 4c1.01.56 1.73.27 2-.93l3.62-16.97.01-.01c.32-1.5-.54-2.08-1.52-1.72L1.2 9.65c-1.46.57-1.44 1.39-.25 1.76l5.54 1.73 12.85-8.11c.6-.39 1.15-.17.7.22"/></svg>
         Telegram
       </a>
-      <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://www.youtube.com" target="_blank" rel="noreferrer">
+      <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 shadow-sm" href="https://www.youtube.com/@theRealUnrealStory" target="_blank" rel="noreferrer">
+        <!-- YouTube -->
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .6 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.3.6 9.3.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.6-5.8zM9.6 15.5v-7l6.2 3.5-6.2 3.5z"/></svg>
         YouTube
       </a>
-      <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://open.spotify.com" target="_blank" rel="noreferrer">
+      <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 shadow-sm" href="https://open.spotify.com" target="_blank" rel="noreferrer">
+        <!-- Spotify -->
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5a10.5 10.5 0 1 0 0 21 10.5 10.5 0 0 0 0-21zm4.84 15.2c-.19.3-.6.39-.9.2-2.44-1.5-5.52-1.84-9.13-1-.35.08-.7-.14-.78-.5-.08-.35.14-.7.5-.78 3.93-.9 7.34-.51 10.02 1.15.3.18.4.6.2.92zm1.28-2.88c-.24.38-.75.5-1.13.26-2.8-1.72-7.08-2.23-10.4-1.2-.43.13-.88-.11-1-.54-.13-.43.1-.88.54-1 3.76-1.12 8.45-.54 11.67 1.4.4.24.52.76.3 1.08zm.1-3.1c-3.23-1.92-8.6-2.1-11.69-1.14-.5.15-1.04-.14-1.2-.66-.15-.5.14-1.04.66-1.2 3.57-1.1 9.46-.86 13.2 1.37.47.28.63.9.35 1.36-.28.48-.9.63-1.32.27z"/></svg>
         Spotify
       </a>
@@ -78,13 +77,18 @@
   </section>
 
   <main class="max-w-5xl mx-auto px-4">
-    <!-- HERO -->
+    <!-- HERO (текст — строго как ты просил) -->
     <section id="hero">
       <h1 class="text-3xl md:text-5xl font-semibold leading-tight">
         The Real Unreal Story — помощь Адаму<span class="align-super text-green-400 text-xl">*</span>
       </h1>
-      <p class="mt-4">Правдивая история хирурга, который всю жизнь спасал других, а теперь сам борется за жизнь. Присоединяйтесь: поддержите деньгами, временем, делом или словом.</p>
-      <p class="mt-2 text-xs text-gray-400">* «Адам» — это псевдоним реального человека. Имя изменено для защиты личной жизни.</p>
+      <p class="mt-4">
+        Правдивая история хирурга, который всю жизнь спасал других, а теперь сам борется за жизнь.
+        Присоединяйтесь: поддержите деньгами, временем, делом или словом.
+      </p>
+      <p class="mt-2 text-xs text-gray-300">
+        * «Адам» — это псевдоним реального человека. Имя изменено для защиты личной жизни.
+      </p>
       <div class="mt-5 flex flex-wrap items-center gap-3">
         <a id="donateHero" target="_blank" class="px-4 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-sm font-medium">Пожертвовать</a>
         <button id="shareBtn" class="px-4 py-2 rounded-xl bg-gray-200 text-black text-sm hover:opacity-90">Поделиться</button>
@@ -103,15 +107,15 @@
     <!-- МИНИ-ПЛЕЕР АУДИО-АНОНСА -->
     <section>
       <h2 class="text-xl font-semibold mb-4">Анонс нашей истории</h2>
-      <div class="rounded-2xl bg-gray-900 border border-gray-700 p-4 flex items-center gap-3">
-        <button id="announceBtn" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm">▶︎ Воспроизвести</button>
+      <div class="rounded-2xl border border-gray-700 p-4 flex items-center gap-3" style="background:rgba(0,0,0,0.35)">
+        <button id="announceBtn" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm pulse">▶︎ Воспроизвести</button>
         <div class="text-sm text-gray-200">Короткий аудио-анонс</div>
-        <div id="announceStatus" class="ml-auto text-xs text-gray-400"></div>
+        <div id="announceStatus" class="ml-auto text-xs text-gray-300"></div>
       </div>
       <audio id="announceAudio" preload="auto"></audio>
     </section>
 
-    <!-- YouTube -->
+    <!-- ВИДЕО -->
     <section>
       <h2 class="text-xl font-semibold mb-4">Видео-анонс</h2>
       <div class="video-wrap">
@@ -121,12 +125,12 @@
       </div>
     </section>
 
-    <!-- ПОДДЕРЖАТЬ СЕЙЧАС (перенесён перед новостями) -->
+    <!-- ПОДДЕРЖАТЬ СЕЙЧАС (перед новостями) -->
     <section>
       <h2 class="text-xl font-semibold mb-4">Поддержать сейчас</h2>
       <div class="grid md:grid-cols-2 gap-4">
         <!-- Донаты -->
-        <div class="p-5 rounded-2xl bg-gray-900 shadow-sm border border-gray-700">
+        <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
           <div class="text-2xl mb-2">💚</div>
           <div class="font-medium mb-2">Пожертвовать средства</div>
           <div class="flex flex-wrap gap-2">
@@ -140,7 +144,7 @@
           </div>
         </div>
         <!-- Физическая помощь -->
-        <div class="p-5 rounded-2xl bg-gray-900 shadow-sm border border-gray-700">
+        <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
           <div class="text-2xl mb-2">👥</div>
           <div class="font-medium mb-2">Физическая помощь</div>
           <button id="wantHelp" class="text-sm underline">Я хочу помочь</button>
@@ -151,52 +155,52 @@
     <!-- НОВОСТИ -->
     <section>
       <h2 class="text-xl font-semibold mb-4">Новости</h2>
-      <div id="tgFeed" class="rounded-2xl bg-gray-900 border border-gray-700 p-4" style="max-height:560px;overflow-y:auto;">
-        <div class="text-sm text-gray-400">Загрузка новостей…</div>
+      <div id="tgFeed" class="rounded-2xl border border-gray-700 p-4" style="background:rgba(0,0,0,0.35); max-height:560px; overflow-y:auto;">
+        <div class="text-sm text-gray-300">Загрузка новостей…</div>
       </div>
       <div class="mt-4">
-        <a href="https://t.me/therealunrealstory" target="_blank" rel="noreferrer" class="px-4 py-2 rounded-xl bg-sky-600 text-white text-sm hover:bg-sky-700">
+        <a href="https://t.me/theRealUnrealStory" target="_blank" rel="noreferrer" class="px-4 py-2 rounded-xl bg-sky-600 text-white text-sm hover:bg-sky-700">
           Следите за нашей историей в Telegram
         </a>
       </div>
     </section>
 
-    <!-- ВАША ВОВЛЕЧЁННОСТЬ -->
+    <!-- ВОВЛЕЧЁННОСТЬ -->
     <section>
       <h2 class="text-xl font-semibold mb-4">Ваша вовлечённость</h2>
-      <p class="text-sm text-gray-300 mb-3">Отметьте, что вы уже сделали — это тоже поддержка ❤️</p>
+      <p class="text-sm text-gray-200 mb-3">Отметьте, что вы уже сделали — это тоже поддержка ❤️</p>
       <div id="engageWrap" class="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800 text-left">Ознакомился с краткой версией истории</button>
-        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800 text-left">Прочитал полную историю</button>
-        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800 text-left">Послушал треки о нашей истории</button>
-        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800 text-left">Подписался на канал в Telegram</button>
-        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800 text-left">Подписался на Instagram</button>
+        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left">Ознакомился с краткой версией истории</button>
+        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left">Прочитал полную историю</button>
+        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left">Послушал треки о нашей истории</button>
+        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left">Подписался на канал в Telegram</button>
+        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left">Подписался на Instagram</button>
       </div>
-      <p class="mt-2 text-xs text-gray-400">Состояние сохраняется в вашем браузере.</p>
+      <p class="mt-2 text-xs text-gray-300">Состояние сохраняется в вашем браузере.</p>
     </section>
 
-    <!-- КАРТА ПОДДЕРЖКИ -->
+    <!-- КАРТА -->
     <section>
       <h2 class="text-xl font-semibold mb-4">🌍 Карта поддержки</h2>
-      <div id="map" class="rounded-2xl shadow-sm border"></div>
-      <p class="text-xs text-gray-400 mt-2">Обязательно кликните по карте, чтобы указать точное место вашей поддержки.</p>
+      <div id="map" class="rounded-2xl shadow-sm border" style="background:#0b0b0b"></div>
+      <p class="text-xs text-gray-300 mt-2">Обязательно кликните по карте, чтобы указать точное место вашей поддержки.</p>
       <div class="mt-4 grid md:grid-cols-3 gap-3">
-        <input id="name" class="px-3 py-2 rounded-xl border bg-gray-800 text-white" placeholder="Имя" />
-        <input id="msg" class="px-3 py-2 rounded-2xl border bg-gray-800 text-white md:col-span-2" placeholder="Сообщение (до 140 символов)" maxlength="140" />
+        <input id="name" class="px-3 py-2 rounded-xl border bg-gray-800/70 text-white" placeholder="Имя" />
+        <input id="msg" class="px-3 py-2 rounded-2xl border bg-gray-800/70 text-white md:col-span-2" placeholder="Сообщение (до 140 символов)" maxlength="140" />
       </div>
       <div class="grid md:grid-cols-3 gap-3 mt-2">
         <button id="addMark" class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm col-span-1">Добавить</button>
-        <div class="col-span-2 text-xs text-gray-400 flex items-center">Данные хранятся в базе</div>
+        <div class="col-span-2 text-xs text-gray-300 flex items-center">Данные хранятся в базе</div>
       </div>
-      <div class="mt-2 text-sm text-gray-400">Всего отметок: <span id="marksCount">0</span></div>
+      <div class="mt-2 text-sm text-gray-300">Всего отметок: <span id="marksCount">0</span></div>
     </section>
 
     <!-- СЕРДЦА -->
     <section id="contact">
-      <div class="rounded-3xl bg-gray-900 p-6 shadow-sm border border-gray-700">
+      <div class="rounded-3xl p-6 shadow-sm border border-gray-700" style="background:rgba(0,0,0,0.35)">
         <div class="text-lg font-semibold mb-3">Сердце поддержки</div>
         <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2">
-          <input id="heartName" class="px-3 py-2 rounded-xl border bg-gray-800 text-white text-sm" placeholder="Имя" />
+          <input id="heartName" class="px-3 py-2 rounded-xl border bg-gray-800/70 text-white text-sm" placeholder="Имя" />
           <button id="addHeart" class="px-4 py-2 rounded-xl bg-pink-600 text-white text-sm">Оставить сердце</button>
         </div>
         <div id="heartsSplide" class="splide mt-6" aria-label="Сердца поддержки">
@@ -206,7 +210,7 @@
     </section>
   </main>
 
-  <footer class="max-w-5xl mx-auto px-4 text-center text-sm text-gray-400">
+  <footer class="max-w-5xl mx-auto px-4 text-center text-sm text-gray-300">
     Спасибо за любую поддержку — даже репост меняет судьбу.
   </footer>
 
@@ -307,12 +311,15 @@
         const res=await fetch('/.netlify/functions/news?limit=30',{cache:'no-store'});
         if(!res.ok) throw new Error('news API '+res.status);
         const arr=await res.json(), box=document.getElementById('tgFeed');
-        if(!Array.isArray(arr)||!arr.length){ box.innerHTML='<div class="text-sm text-gray-400">Пока нет постов.</div>'; return; }
+        if(!Array.isArray(arr)||!arr.length){ box.innerHTML='<div class="text-sm text-gray-300">Пока нет постов.</div>'; return; }
         box.innerHTML=arr.map(p=>{
           const dt=p.date?new Date(p.date):null, time=dt?dt.toLocaleString():'';
           const link=p.link?`<a href="${p.link}" target="_blank" class="underline text-sky-400">Открыть в Telegram</a>`:'';
           const text=(p.text||'').replace(/\n/g,'<br>');
-          return `<article class="mb-4 p-3 rounded-xl bg-gray-800 border border-gray-700"><div class="text-xs text-gray-400 mb-2">${time}${link?` · ${link}`:''}</div><div class="text-sm leading-relaxed">${text}</div></article>`;
+          return `<article class="mb-4 p-3 rounded-xl bg-gray-900/50 border border-gray-700">
+                    <div class="text-xs text-gray-300 mb-2">${time}${link?` · ${link}`:''}</div>
+                    <div class="text-sm leading-relaxed">${text}</div>
+                  </article>`;
         }).join('');
       }catch(e){
         console.error(e); document.getElementById('tgFeed').innerHTML='<div class="text-sm text-red-400">Не удалось загрузить новости.</div>';
@@ -361,14 +368,14 @@
       document.getElementById('msg').value=''; selectedLatLng=null; if(previewMarker){previewMarker.remove(); previewMarker=null;} renderMarks();
     });
 
-    /* ====== Hearts + Splide ====== */
+    /* ====== Hearts + Splide (18/слайд) ====== */
     let splide;
     function chunk(a,s){const out=[];for(let i=0;i<a.length;i+=s) out.push(a.slice(i,i+s));return out;}
-    function heartCard(n){return `<div class="p-4 rounded-2xl bg-gray-800 shadow-sm border border-gray-700"><div class="flex items-center gap-2"><span class="text-xl">❤️</span><div class="text-sm text-gray-300">${n||'Anon'}</div></div></div>`;}
+    function heartCard(n){return `<div class="p-4 rounded-2xl bg-gray-900/50 shadow-sm border border-gray-700"><div class="flex items-center gap-2"><span class="text-xl">❤️</span><div class="text-sm text-gray-200">${n||'Anon'}</div></div></div>`;}
     function renderHeartsSlides(arr){
       const pages=chunk(arr,18), ul=document.getElementById('heartsSlides');
       ul.innerHTML=pages.map(p=>`<li class="splide__slide"><div class="grid md:grid-cols-3 gap-3">${p.map(x=>heartCard(x.name)).join('')}</div></li>`).join('')
-        || `<li class="splide__slide"><div class="text-sm text-gray-400">Пока нет сердец.</div></li>`;
+        || `<li class="splide__slide"><div class="text-sm text-gray-300">Пока нет сердец.</div></li>`;
       if(splide) splide.destroy(true);
       splide=new Splide('#heartsSplide',{type:'slide',perPage:1,perMove:1,pagination:true,arrows:true,classes:{pagination:'splide__pagination mt-4'}}); splide.mount();
     }
@@ -397,7 +404,9 @@
       announceStatus.textContent = `Язык: ${l}`;
       if(autoplay) announceAudio.play().catch(()=>{});
     }
+    const savedLang = localStorage.getItem('site_lang') || 'RU';
     setAnnouncementForLang(savedLang);
+    langSelect.addEventListener('change', e => setAnnouncementForLang(e.target.value, !announceAudio.paused));
     announceBtn.addEventListener('click', async ()=>{
       if(announceAudio.paused){
         setAnnouncementForLang(langSelect.value);
