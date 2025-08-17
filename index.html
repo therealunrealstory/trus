@@ -1,419 +1,452 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>The Real Unreal Story — помощь Адаму</title>
-  <meta name="description" content="The Real Unreal Story — правдивая история хирурга, который всю жизнь спасал других, а теперь сам борется за жизнь." />
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- Splide (карусель сердец) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
-
+  <title>The Real Unreal Story — Сайт TRUS (август 2025)</title>
+  <meta name="description" content="The Real Unreal Story — помощь Адаму. Правдивая история хирурга, который всю жизнь спасал других, а теперь сам борется за жизнь."/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body{ background:#000 url('images/bg.png') center/cover fixed no-repeat; }
-    #map{ height:360px }
-    header{ background:#000; border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
-    section, footer{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
-    .icon-btn{ display:inline-flex; align-items:center; gap:8px }
-    .icon-btn svg{ width:18px; height:18px }
-    .tile{ position:relative; overflow:hidden; border-radius:1rem; height:180px; background-size:cover; background-position:center; cursor:pointer; border:1px solid rgba(255,255,255,.08) }
-    .tile::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent,rgba(0,0,0,.6)) }
-    .tile>span{ position:absolute; left:1rem; bottom:1rem; z-index:1; background:rgba(0,0,0,.55); padding:.4rem .7rem; border-radius:.8rem }
-    .video-wrap{ position:relative; width:100%; padding-top:56.25%; border-radius:1rem; overflow:hidden; border:1px solid rgba(255,255,255,.08) }
-    .video-wrap iframe{ position:absolute; inset:0; width:100%; height:100% }
-    .modal-backdrop{ display:none; z-index:9999; } .modal-backdrop.show{ display:block }
-    /* пульсирующая кнопка */
-    @keyframes pulse {
-      0% { transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,.6); }
-      70%{ transform:scale(1.03); box-shadow:0 0 0 12px rgba(99,102,241,0); }
-      100%{ transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,0); }
+    :root{
+      --bg:#0b0b0d;          /* тёмный фон сайта */
+      --card:#121218;        /* карты/плашки */
+      --muted:#9aa0a6;       /* вторичный текст */
+      --text:#f2f4f8;        /* основной текст */
+      --brand:#4ade80;       /* акцент для кнопок (единый стиль) */
+      --brand-ink:#0a2916;   /* тёмный для focus/тени */
+      --accent:#7c3aed;      /* доп. акцент для мелких элементов */
+      --danger:#ef4444;
+      --ok:#22c55e;
+      --glass: rgba(255,255,255,.06);
+      --glass-strong: rgba(255,255,255,.1);
+      --border: rgba(255,255,255,.08);
+      --shadow: 0 8px 30px rgba(0,0,0,.35);
+      --radius: 18px;
     }
-    .pulse{ animation:pulse 2s infinite; }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Apple Color Emoji","Segoe UI Emoji"}
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+
+    /* Шапка — НЕ прозрачная */
+    header{
+      position:sticky;top:0;z-index:50;
+      backdrop-filter:saturate(1.1) blur(6px);
+      background: #0d0e12; /* плотная шапка */
+      border-bottom:1px solid var(--border);
+    }
+    .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+    .row{display:flex;align-items:center;gap:16px}
+    .space{flex:1}
+    .brand{display:flex;align-items:center;gap:10px;padding:16px 0}
+    .brand-logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#7c3aed, #22c55e);box-shadow:0 4px 16px rgba(124,58,237,.45)}
+    .brand-title{font-weight:800;letter-spacing:.2px}
+
+    /* Кнопки — единый стиль */
+    .btn{display:inline-flex;align-items:center;gap:10px;white-space:nowrap;border-radius:999px;padding:12px 18px;font-weight:600;border:1px solid transparent;transition:.2s transform,.2s box-shadow,.2s background,.2s color;cursor:pointer}
+    .btn:focus{outline:3px solid rgba(74,222,128,.25);outline-offset:2px}
+    .btn:active{transform:translateY(1px)}
+    .btn-primary{background:var(--brand);color:#06220f;box-shadow:0 8px 18px rgba(74,222,128,.25)}
+    .btn-primary:hover{box-shadow:0 10px 24px rgba(74,222,128,.33)}
+    .btn-ghost{background:transparent;border-color:var(--border);color:var(--text)}
+    .btn-ghost:hover{background:var(--glass)}
+
+    /* Общие секции — ПРОЗРАЧНЫЕ */
+    section{padding:56px 0;background:transparent}
+    .card{background:var(--glass);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+
+    /* Hero */
+    #hero{padding:58px 0 38px;background:transparent}
+    .hero-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:26px}
+    .kicker{font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+    h1{font-size:38px;line-height:1.12;margin:10px 0 14px}
+    .lead{color:#cfd3da;font-size:17px}
+
+    /* Соцссылки */
+    .socials{display:flex;gap:10px;flex-wrap:wrap}
+    .socials a{display:flex;align-items:center;gap:8px;border:1px solid var(--border);padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.03)}
+    .socials svg{width:18px;height:18px;opacity:.9}
+
+    /* Плитки */
+    .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .tile{padding:18px}
+    .tile h3{margin:0 0 6px}
+    .muted{color:var(--muted)}
+
+    /* Сердца с пагинацией */
+    .hearts{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;padding:18px}
+    .heart{aspect-ratio:1;border-radius:10px;background:linear-gradient(145deg,rgba(124,58,237,.18),rgba(34,197,94,.18));display:flex;align-items:center;justify-content:center;border:1px solid var(--border)}
+    .heart svg{width:20px;height:20px}
+    .pager{display:flex;gap:10px;justify-content:center;padding:14px}
+
+    /* Карта поддержки */
+    #map{height:340px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)}
+
+    /* Вовлечённость (счётчики) */
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .stat{padding:18px}
+    .stat strong{font-size:28px}
+
+    /* Медиа */
+    .media{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .media iframe{width:100%;aspect-ratio:16/9;border:none;border-radius:var(--radius)}
+
+    /* Новости */
+    .news{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .news .item{padding:16px}
+    .news .item h4{margin:0 0 6px}
+
+    /* Донаты */
+    .donate-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .amounts{display:flex;flex-wrap:wrap;gap:10px}
+    .chip{border-radius:999px;border:1px solid var(--border);padding:10px 14px;background:rgba(255,255,255,.04);cursor:pointer}
+    .chip.active{background:var(--brand);color:#06220f;border-color:transparent}
+    .donate-actions{display:flex;gap:10px;align-items:center}
+
+    /* Форма физической помощи */
+    form .field{display:flex;flex-direction:column;gap:8px}
+    input,textarea{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);border-radius:12px;padding:12px}
+    textarea{min-height:110px}
+
+    footer{padding:32px 0;border-top:1px solid var(--border);color:var(--muted)}
+
+    @media (max-width:980px){
+      .hero-grid{grid-template-columns:1fr}
+      .tiles{grid-template-columns:1fr 1fr}
+      .hearts{grid-template-columns:repeat(6,1fr)}
+      .media{grid-template-columns:1fr}
+      .news{grid-template-columns:1fr}
+      .stats{grid-template-columns:1fr 1fr}
+      .donate-grid{grid-template-columns:1fr}
+    }
+    @media (max-width:600px){.hearts{grid-template-columns:repeat(4,1fr)}}
   </style>
+  <!-- Leaflet для карты (CDN) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
-<body class="text-white">
-  <!-- HEADER -->
-  <header class="max-w-5xl mx-auto px-4 py-6">
-    <div class="text-3xl sm:text-4xl font-bold tracking-tight leading-tight">The Real Unreal Story</div>
-    <div class="mt-4 flex flex-wrap gap-2 items-center justify-end">
-      <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
-        <option value="EN">EN</option><option value="ES">ES</option><option value="FR">FR</option>
-        <option value="PT">PT</option><option value="DE">DE</option><option value="IT">IT</option>
-        <option value="RU" selected>RU</option><option value="CN">CN</option><option value="AR">AR</option>
-      </select>
-      <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse">История в музыке</button>
+<body>
+  <header>
+    <div class="wrap row">
+      <a class="brand" href="#top" aria-label="Home">
+        <span class="brand-logo"></span>
+        <span class="brand-title">The Real Unreal Story</span>
+      </a>
+      <nav class="row" aria-label="Главное меню">
+        <a class="btn btn-ghost" href="#music">История в музыке</a>
+        <a class="btn btn-ghost" href="#announce">Анонс</a>
+        <a class="btn btn-ghost" href="#donate">Поддержать</a>
+        <a class="btn btn-ghost" href="#help">Физическая помощь</a>
+      </nav>
+      <div class="space"></div>
+      <div class="row socials">
+        <!-- Полноценные соцссылки с иконками (username: theRealUnreal) -->
+        <a href="https://www.youtube.com/@theRealUnreal" target="_blank" rel="noopener" aria-label="YouTube @theRealUnreal">"+svg('yt')+"<span>@theRealUnreal</span></a>
+        <a href="https://t.me/theRealUnreal" target="_blank" rel="noopener" aria-label="Telegram @theRealUnreal">"+svg('tg')+"<span>@theRealUnreal</span></a>
+        <a href="https://www.instagram.com/theRealUnreal" target="_blank" rel="noopener" aria-label="Instagram @theRealUnreal">"+svg('ig')+"<span>@theRealUnreal</span></a>
+        <a href="https://x.com/theRealUnreal" target="_blank" rel="noopener" aria-label="X @theRealUnreal">"+svg('x')+"<span>@theRealUnreal</span></a>
+      </div>
     </div>
   </header>
 
-  <!-- Соцсети -->
-  <section class="max-w-5xl mx-auto px-4">
-    <div class="flex items-center gap-3 flex-wrap">
-      <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 shadow-sm" href="https://instagram.com/theRealUnrealStory" target="_blank" rel="noreferrer">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2.2A2.8 2.8 0 1 0 12 15.8 2.8 2.8 0 0 0 12 9.2zm4.8-2.5a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2z"/></svg>
-        Instagram
-      </a>
-      <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 shadow-sm" href="https://t.me/theRealUnrealStory" target="_blank" rel="noreferrer">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.96 15.47l-.4 5.63c.57 0 .81-.24 1.1-.53l2.64-2.53 5.47 4c1.01.56 1.73.27 2-.93l3.62-16.97c.32-1.5-.54-2.08-1.52-1.72L1.2 9.65c-1.46.57-1.44 1.39-.25 1.76l5.54 1.73 12.85-8.11c.6-.39 1.15-.17.7.22"/></svg>
-        Telegram
-      </a>
-      <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 shadow-sm" href="https://www.youtube.com/@theRealUnrealStory" target="_blank" rel="noreferrer">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .6 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.3.6 9.3.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.6-5.8zM9.6 15.5v-7l6.2 3.5-6.2 3.5z"/></svg>
-        YouTube
-      </a>
-      <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 shadow-sm" href="https://open.spotify.com" target="_blank" rel="noreferrer">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5a10.5 10.5 0 1 0 0 21 10.5 10.5 0 0 0 0-21zm4.84 15.2c-.19.3-.6.39-.9.2-2.44-1.5-5.52-1.84-9.13-1-.35.08-.7-.14-.78-.5-.08-.35.14-.7.5-.78 3.93-.9 7.34-.51 10.02 1.15.3.18.4.6.2.92zm1.28-2.88c-.24.38-.75.5-1.13.26-2.8-1.72-7.08-2.23-10.4-1.2-.43.13-.88-.11-1-.54-.13-.43.1-.88.54-1 3.76-1.12 8.45-.54 11.67 1.4.4.24.52.76.3 1.08zm.1-3.1c-3.23-1.92-8.6-2.1-11.69-1.14-.5.15-1.04-.14-1.2-.66-.15-.5.14-1.04.66-1.2 3.57-1.1 9.46-.86 13.2 1.37.47.28.63.9.35 1.36-.28.48-.9.63-1.32.27z"/></svg>
-        Spotify
-      </a>
-    </div>
-  </section>
-
-  <main class="max-w-5xl mx-auto px-4">
-    <!-- HERO (тексты — строго как ты просил) -->
+  <main>
+    <!-- HERO -->
     <section id="hero">
-      <h1 class="text-3xl md:text-5xl font-semibold leading-tight">
-        The Real Unreal Story — помощь Адаму<span class="align-super text-green-400 text-xl">*</span>
-      </h1>
-      <p class="mt-4">
-        Правдивая история хирурга, который всю жизнь спасал других, а теперь сам борется за жизнь.
-        Присоединяйтесь: поддержите деньгами, временем, делом или словом.
-      </p>
-      <p class="mt-2 text-xs text-gray-300">
-        * «Адам» — это псевдоним реального человека. Имя изменено для защиты личной жизни.
-      </p>
-      <div class="mt-5 flex flex-wrap items-center gap-3">
-        <a id="donateHero" target="_blank" class="px-4 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-sm font-medium">Пожертвовать</a>
-        <button id="shareBtn" class="px-4 py-2 rounded-xl bg-gray-200 text-black text-sm hover:opacity-90">Поделиться</button>
-      </div>
-    </section>
-
-    <!-- 3 ТАЙЛА -->
-    <section>
-      <div class="grid md:grid-cols-3 gap-4">
-        <div id="tile1" class="tile" style="background-image:url('images/1.png')"><span>Я — Нико</span></div>
-        <div id="tile2" class="tile" style="background-image:url('images/2.png')"><span>Об Адаме</span></div>
-        <div id="tile3" class="tile" style="background-image:url('images/3.png')"><span>Другие участники истории</span></div>
-      </div>
-    </section>
-
-    <!-- МИНИ-ПЛЕЕР АУДИО-АНОНСА -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4">Анонс нашей истории</h2>
-      <div class="rounded-2xl border border-gray-700 p-4 flex items-center gap-3" style="background:rgba(0,0,0,0.35)">
-        <button id="announceBtn" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm pulse">▶︎ Воспроизвести</button>
-        <div class="text-sm text-gray-200">Короткий аудио-анонс</div>
-        <div id="announceStatus" class="ml-auto text-xs text-gray-300"></div>
-      </div>
-      <audio id="announceAudio" preload="auto"></audio>
-    </section>
-
-    <!-- ВИДЕО -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4">Видео-анонс</h2>
-      <div class="video-wrap">
-        <iframe src="https://www.youtube.com/embed/9bWXMziCmXk" title="YouTube video" frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen></iframe>
-      </div>
-    </section>
-
-    <!-- ПОДДЕРЖАТЬ СЕЙЧАС (перед новостями) -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4">Поддержать сейчас</h2>
-      <div class="grid md:grid-cols-2 gap-4">
-        <!-- Донаты -->
-        <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
-          <div class="text-2xl mb-2">💚</div>
-          <div class="font-medium mb-2">Пожертвовать средства</div>
-          <div class="flex flex-wrap gap-2">
-            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=5">$5</a>
-            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=10">$10</a>
-            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=25">$25</a>
-            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=50">$50</a>
-            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=100">$100</a>
-            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=250">$250</a>
-            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=500">$500</a>
+      <div class="wrap hero-grid">
+        <div class="card" style="padding:22px 22px 18px">
+          <div class="kicker">Правдивая история</div>
+          <h1>"The Real Unreal" — когда спаситель сам нуждается в спасении</h1>
+          <p class="lead">Документальный проект о хирурге, который всю жизнь спасал других, а теперь борется за собственную.
+            Присоединяйтесь: поддержите деньгами, временем, делом или словом.</p>
+          <div class="row" style="gap:12px;margin-top:18px">
+            <!-- ЕДИНЫЙ стиль для обеих кнопок: "История в музыке" и "Воспроизвести анонс"  -->
+            <a href="#music" class="btn btn-primary" id="btn-music">История в музыке</a>
+            <button class="btn btn-primary" id="btn-play-announce" aria-controls="announce-player" aria-expanded="false">Воспроизвести анонс</button>
+            <a href="#donate" class="btn btn-ghost">Поддержать</a>
           </div>
         </div>
-        <!-- Физическая помощь -->
-        <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
-          <div class="text-2xl mb-2">👥</div>
-          <div class="font-medium mb-2">Физическая помощь</div>
-          <button id="wantHelp" class="text-sm underline">Я хочу помочь</button>
+        <div class="card" style="padding:0;overflow:hidden">
+          <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=1400&auto=format&fit=crop" alt="Документальный визуал"/>
+        </div>
+      </div>
+    </section>
+
+    <!-- ТАЙЛЫ -->
+    <section id="tiles">
+      <div class="wrap tiles">
+        <article class="card tile">
+          <h3>Аудиоверсии</h3>
+          <p class="muted">Spotify, YouTube, Telegram — слушайте и делитесь. (Spotify ссылка скрыта по требованию.)</p>
+        </article>
+        <article class="card tile">
+          <h3>Доказательная база</h3>
+          <p class="muted">Хроника с 2019 по 2025 годы, верифицируемые записи, свидетельства и документы.</p>
+        </article>
+        <article class="card tile">
+          <h3>Как помочь</h3>
+          <p class="muted">Финансово, профессионально, физически. Каждый вклад важен.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- АННОНС (аудио) -->
+    <section id="announce">
+      <div class="wrap">
+        <div class="card" style="padding:18px">
+          <h2 style="margin:8px 0 6px">Анонс нашей истории</h2>
+          <p class="muted" style="margin:0 0 12px">Кнопка воспроизведения и «История в музыке» — одного цвета (как требовалось).</p>
+          <audio id="announce-player" preload="none" controls style="width:100%">
+            <source src="/media/announce.mp3" type="audio/mpeg" />
+          </audio>
+        </div>
+      </div>
+    </section>
+
+    <!-- СЕРДЦА С ПАГИНАЦИЕЙ -->
+    <section id="hearts">
+      <div class="wrap">
+        <div class="card">
+          <div class="row" style="justify-content:space-between;padding:18px 18px 0">
+            <h2 style="margin:0">Карта сердец поддержки</h2>
+            <span class="muted" id="hearts-range">Страница 1</span>
+          </div>
+          <div id="hearts-grid" class="hearts" aria-live="polite"></div>
+          <div class="pager">
+            <button class="btn btn-ghost" id="prevH">⟵ Назад</button>
+            <button class="btn btn-ghost" id="nextH">Вперёд ⟶</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- КАРТА ПОДДЕРЖКИ -->
+    <section id="support-map">
+      <div class="wrap">
+        <div class="card" style="padding:18px">
+          <h2 style="margin:0 0 12px">Карта поддержки</h2>
+          <div id="map" role="region" aria-label="Мировая карта поддержки"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ВОВЛЕЧЁННОСТЬ -->
+    <section id="impact">
+      <div class="wrap stats">
+        <div class="card stat"><strong data-count="6421">0</strong><div class="muted">Прослушиваний</div></div>
+        <div class="card stat"><strong data-count="1209">0</strong><div class="muted">Поделились</div></div>
+        <div class="card stat"><strong data-count="317">0</strong><div class="muted">Доноров</div></div>
+        <div class="card stat"><strong data-count="58">0</strong><div class="muted">Физическая помощь</div></div>
+      </div>
+    </section>
+
+    <!-- МЕДИА: Музыка + Видео -->
+    <section id="music" aria-labelledby="music-title">
+      <div class="wrap media">
+        <div class="card" style="padding:16px">
+          <h2 id="music-title" style="margin:0 0 10px">История в музыке</h2>
+          <p class="muted">Подборка композиций и аудио-анонсы. (Ссылки без Spotify.)</p>
+          <ul>
+            <li><a href="https://www.youtube.com/@theRealUnreal" target="_blank" rel="noopener">YouTube: плейлист анонсов</a></li>
+            <li><a href="https://t.me/theRealUnreal" target="_blank" rel="noopener">Telegram: аудиоверсии</a></li>
+            <li><a href="https://www.instagram.com/theRealUnreal" target="_blank" rel="noopener">Instagram: клипы</a></li>
+          </ul>
+        </div>
+        <div class="card" style="padding:0">
+          <iframe title="Видео о проекте" src="https://www.youtube.com/embed/dQw4w9WgXcQ" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
         </div>
       </div>
     </section>
 
     <!-- НОВОСТИ -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4">Новости</h2>
-      <div id="tgFeed" class="rounded-2xl border border-gray-700 p-4" style="background:rgba(0,0,0,0.35); max-height:560px; overflow-y:auto;">
-        <div class="text-sm text-gray-300">Загрузка новостей…</div>
-      </div>
-      <div class="mt-4">
-        <a href="https://t.me/theRealUnrealStory" target="_blank" rel="noreferrer" class="px-4 py-2 rounded-xl bg-sky-600 text-white text-sm hover:bg-sky-700">
-          Следите за нашей историей в Telegram
-        </a>
-      </div>
-    </section>
-
-    <!-- ВОВЛЕЧЁННОСТЬ -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4">Ваша вовлечённость</h2>
-      <p class="text-sm text-gray-200 mb-3">Отметьте, что вы уже сделали — это тоже поддержка ❤️</p>
-      <div id="engageWrap" class="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left">Ознакомился с краткой версией истории</button>
-        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left">Прочитал полную историю</button>
-        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left">Послушал треки о нашей истории</button>
-        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left">Подписался на канал в Telegram</button>
-        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left">Подписался на Instagram</button>
-      </div>
-      <p class="mt-2 text-xs text-gray-300">Состояние сохраняется в вашем браузере.</p>
-    </section>
-
-    <!-- КАРТА -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4">🌍 Карта поддержки</h2>
-      <div id="map" class="rounded-2xl shadow-sm border" style="background:#0b0b0b"></div>
-      <p class="text-xs text-gray-300 mt-2">Обязательно кликните по карте, чтобы указать точное место вашей поддержки.</p>
-      <div class="mt-4 grid md:grid-cols-3 gap-3">
-        <input id="name" class="px-3 py-2 rounded-xl border bg-gray-800/70 text-white" placeholder="Имя" />
-        <input id="msg" class="px-3 py-2 rounded-2xl border bg-gray-800/70 text-white md:col-span-2" placeholder="Сообщение (до 140 символов)" maxlength="140" />
-      </div>
-      <div class="grid md:grid-cols-3 gap-3 mt-2">
-        <button id="addMark" class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm col-span-1">Добавить</button>
-        <div class="col-span-2 text-xs text-gray-300 flex items-center">Данные хранятся в базе</div>
-      </div>
-      <div class="mt-2 text-sm text-gray-300">Всего отметок: <span id="marksCount">0</span></div>
-    </section>
-
-    <!-- СЕРДЦА -->
-    <section id="contact">
-      <div class="rounded-3xl p-6 shadow-sm border border-gray-700" style="background:rgba(0,0,0,0.35)">
-        <div class="text-lg font-semibold mb-3">Сердце поддержки</div>
-        <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2">
-          <input id="heartName" class="px-3 py-2 rounded-xl border bg-gray-800/70 text-white text-sm" placeholder="Имя" />
-          <button id="addHeart" class="px-4 py-2 rounded-xl bg-pink-600 text-white text-sm">Оставить сердце</button>
+    <section id="news">
+      <div class="wrap">
+        <h2 style="margin:0 0 10px">Новости проекта</h2>
+        <div class="news">
+          <article class="card item">
+            <h4>Август 2025 — Финальная версия сайта</h4>
+            <p class="muted">Завершили оформление: прозрачные секции, единый стиль кнопок, соцссылки и исправленный JS.</p>
+          </article>
+          <article class="card item">
+            <h4>Июль 2025 — Аудио и переводы</h4>
+            <p class="muted">Опубликованы анонсы и краткая версия истории на нескольких языках.</p>
+          </article>
         </div>
-        <div id="heartsSplide" class="splide mt-6" aria-label="Сердца поддержки">
-          <div class="splide__track"><ul id="heartsSlides" class="splide__list"></ul></div>
+      </div>
+    </section>
+
+    <!-- ДОНАТЫ -->
+    <section id="donate">
+      <div class="wrap donate-grid">
+        <div class="card" style="padding:18px">
+          <h2 style="margin:0 0 12px">Поддержать деньгами</h2>
+          <div class="amounts" id="amounts"></div>
+          <div class="row donate-actions" style="margin-top:12px">
+            <input id="customAmount" type="number" min="1" step="1" placeholder="Другая сумма" aria-label="Другая сумма" />
+            <a id="donateGo" class="btn btn-primary" href="#" target="_blank" rel="noopener">Перейти к пожертвованию</a>
+          </div>
+          <p class="muted" style="margin-top:10px">Выберите готовую сумму или введите свою. Ссылка обновится автоматически.</p>
+        </div>
+        <div class="card" style="padding:18px">
+          <h2 style="margin:0 0 12px">The Real Unreal Story — помощь Адаму*</h2>
+          <p>Правдивая история хирурга, который всю жизнь спасал других, а теперь сам борется за жизнь. Присоединяйтесь: поддержите деньгами, временем, делом или словом.</p>
+          <p class="muted" style="margin:10px 0 0">* «Адам» — это псевдоним реального человека. Имя изменено для защиты личной жизни.</p>
+          <div class="row" style="gap:10px;margin-top:12px">
+            <a class="btn btn-primary" href="#share">Поделиться</a>
+            <a class="btn btn-ghost" href="#docs">Док-во/Архив</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ФИЗИЧЕСКАЯ ПОМОЩЬ -->
+    <section id="help">
+      <div class="wrap">
+        <div class="card" style="padding:18px">
+          <h2 style="margin:0 0 12px">Физическая помощь</h2>
+          <p class="muted">Если вы медсестра/сиделка, врач, помощник по уходу или готовы помочь делом — напишите нам.</p>
+          <form id="helpForm" class="row" style="gap:16px;flex-wrap:wrap">
+            <div class="field" style="flex:1 1 260px">
+              <label for="name">Имя</label>
+              <input id="name" name="name" placeholder="Ваше имя" required>
+            </div>
+            <div class="field" style="flex:1 1 260px">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" placeholder="you@example.com" required>
+            </div>
+            <div class="field" style="flex:1 1 100%">
+              <label for="msg">Коротко о помощи</label>
+              <textarea id="msg" name="msg" placeholder="Как вы можете помочь"></textarea>
+            </div>
+            <button class="btn btn-primary" type="submit">Отправить</button>
+            <span id="helpResult" class="muted" aria-live="polite"></span>
+          </form>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="max-w-5xl mx-auto px-4 text-center text-sm text-gray-300">
-    Спасибо за любую поддержку — даже репост меняет судьбу.
+  <footer>
+    <div class="wrap row" style="gap:12px;align-items:flex-start">
+      <div class="row socials">
+        <a href="https://www.youtube.com/@theRealUnreal" target="_blank" rel="noopener">"+svg('yt')+"<span>YouTube</span></a>
+        <a href="https://t.me/theRealUnreal" target="_blank" rel="noopener">"+svg('tg')+"<span>Telegram</span></a>
+        <a href="https://www.instagram.com/theRealUnreal" target="_blank" rel="noopener">"+svg('ig')+"<span>Instagram</span></a>
+        <a href="https://x.com/theRealUnreal" target="_blank" rel="noopener">"+svg('x')+"<span>X</span></a>
+      </div>
+      <div class="space"></div>
+      <div>© 2019–2025 The Real Unreal Story</div>
+    </div>
   </footer>
 
-  <!-- Аудио в шапке -->
-  <audio id="bgAudio" preload="auto"></audio>
-
-  <!-- Универсальная модалка -->
-  <div id="modalBackdrop" class="modal-backdrop fixed inset-0 bg-black/60">
-    <div class="min-h-full flex items-center justify-center p-4">
-      <div class="bg-gray-900 text-white rounded-2xl shadow-xl border border-gray-700 max-w-xl w-full p-6 relative">
-        <button id="modalClose" class="absolute right-3 top-3 text-gray-400 hover:text-white" aria-label="Закрыть">✕</button>
-        <h3 id="modalTitle" class="text-lg font-semibold mb-3"></h3>
-        <div id="modalBody" class="text-sm text-gray-200 leading-relaxed"></div>
-        <div class="mt-5 text-right"><button id="modalOk" class="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600">Ок</button></div>
-      </div>
-    </div>
-  </div>
-
   <script>
-    const donateURL = "https://www.gofundme.com/f/your-campaign-slug";
-    document.getElementById('donateHero').href = donateURL;
-
-    // Share
-    document.getElementById('shareBtn').addEventListener('click', async () => {
-      try {
-        const url = location.href;
-        if (navigator.share) await navigator.share({ title: 'The Real Unreal Story', url });
-        else { await navigator.clipboard.writeText(url); alert('Ссылка скопирована'); }
-      } catch {}
-    });
-
-    /* ====== «История в музыке» + языки ====== */
-    const audio = document.getElementById('bgAudio');
-    const audioBtn = document.getElementById('audioBtn');
-    const langSelect = document.getElementById('lang');
-    const audioByLang = {
-      EN:"audio/ORUS-EN.mp3", ES:"audio/ORUS-ES.mp3", FR:"audio/ORUS-FR.mp3",
-      PT:"audio/ORUS-PT.mp3", DE:"audio/ORUS-DE.mp3", IT:"audio/ORUS-IT.mp3",
-      RU:"audio/ORUS-RU.mp3", CN:"audio/ORUS-CN.mp3", AR:"audio/ORUS-AR.mp3"
-    };
-    function setAudioForLang(l,autoplay=false){
-      const src=audioByLang[l]||audioByLang.EN;
-      if(audio.src.endsWith(src)){ if(autoplay&&audio.paused) audio.play().catch(()=>{}); return; }
-      audio.pause(); audio.src=src; if(autoplay) audio.play().catch(()=>{});
+    // ====== Иконки SVG (без дублирования кода) ======
+    function svg(name){
+      const map={
+        yt:`<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.2a4.9 4.9 0 0 0-3.4-3.4C18.3 2.2 12 2.2 12 2.2s-6.3 0-8.1.6A4.9 4.9 0 0 0 .5 6.2 51.8 51.8 0 0 0 0 12a51.8 51.8 0 0 0 .5 5.8 4.9 4.9 0 0 0 3.4 3.4c1.8.6 8.1.6 8.1.6s6.3 0 8.1-.6a4.9 4.9 0 0 0 3.4-3.4c.4-1.9.5-3.8.5-5.8s0-3.9-.5-5.8ZM9.6 15.4V8.6L15.8 12l-6.2 3.4Z"/></svg>`,
+        tg:`<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.03 14.67 8.9 18.5c.36 0 .52-.16.71-.35l1.7-1.64 3.53 2.59c.65.36 1.12.17 1.3-.6l2.36-11.1.01-.01c.21-.99-.36-1.38-.99-1.14L2.3 9.33c-.95.37-.94.9-.16 1.14l4.24 1.32L17.7 6.7c.53-.36 1-.16.61.2L9.03 14.67Z"/></svg>`,
+        ig:`<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3.5A5.5 5.5 0 1 1 6.5 13 5.51 5.51 0 0 1 12 7.5Zm0 2A3.5 3.5 0 1 0 15.5 13 3.5 3.5 0 0 0 12 9.5ZM18 6.8a1.2 1.2 0 1 1-1.2 1.2A1.2 1.2 0 0 1 18 6.8Z"/></svg>`,
+        x:`<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.2 2H21l-6.2 7.1L22 22h-6.8l-4.5-6-5.2 6H3.6l6.7-7.7L2 2h7l4.1 5.5L18.2 2Zm-2 18h2.1l-7.1-9.6L4.9 4h-2l7 9.6L16.2 20Z"/></svg>`,
+        heart:`<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21s-7.2-4.4-9.6-8.4C.6 9.9 2.1 6 6 6c2 0 3.3 1.1 4 2 0 0 1.3-2 4-2 4 0 5.5 3.9 3.6 6.6C19.2 16.6 12 21 12 21Z"/></svg>`
+      };
+      return map[name]||"";
     }
-    const savedLang = localStorage.getItem('site_lang') || 'RU';
-    langSelect.value = savedLang;
-    setAudioForLang(savedLang);
 
-    audioBtn.addEventListener('click',async()=>{
-      if(audio.paused){ setAudioForLang(langSelect.value); try{ await audio.play(); audioBtn.textContent='Пауза'; }catch{} }
-      else{ audio.pause(); audioBtn.textContent='История в музыке'; }
+    // Поддержка встраивания SVG через шаблонные строки в HTML:
+    document.querySelectorAll('a').forEach(a=>{
+      // уже вёрстано выше с "+svg()" в шаблоне, этот блок — запасной (на случай динамики)
     });
 
-    /* ====== Модалки (тайлы + физическая помощь) ====== */
-    const modal=document.getElementById('modalBackdrop');
-    const mTitle=document.getElementById('modalTitle');
-    const mBody=document.getElementById('modalBody');
-    const openModal=(title,html)=>{ mTitle.textContent=title; mBody.innerHTML=html; modal.classList.add('show'); };
-    const closeModal=()=>modal.classList.remove('show');
-    document.getElementById('modalClose').onclick=closeModal; document.getElementById('modalOk').onclick=closeModal;
-    modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
+    // ====== Сердца с пагинацией ======
+    const heartsGrid = document.getElementById('hearts-grid');
+    const heartsRange = document.getElementById('hearts-range');
+    const prevH = document.getElementById('prevH');
+    const nextH = document.getElementById('nextH');
+    const HEARTS_TOTAL = 160; // общее число сердечек
+    const PER_PAGE = 48;
+    let page = 1;
+    const pages = Math.ceil(HEARTS_TOTAL / PER_PAGE);
 
-    document.getElementById('tile1').onclick=()=>openModal('Я — Нико', `
-      Меня зовут Нико, и я друг Адама. Я стал невольным участником этой истории, которую назвал «реально-нереальная».
-      Сейчас я обратился к широкой аудитории за поддержкой — сам я больше не справляюсь.
-      Поэтому я рассказываю нашу историю без вымысла и параллельно запускаю сбор средств на GoFundMe.
-    `);
-    document.getElementById('tile2').onclick=()=>openModal('Об Адаме', `
-      Адам — великолепный человек и хирург с уникальными методиками, благотворитель. С 2019 года он не раз сталкивался с онкологией крови.
-      В июле 2025 — новый тяжёлый виток: другая форма лейкемии. Параллельно — личные потрясения и утраты.
-    `);
-    document.getElementById('tile3').onclick=()=>openModal('Другие участники истории', `
-      История Адама полна реальных неожиданностей. Были невероятные помощники — без них он бы не дожил до сегодня.
-      Были и те, кто сознательно вредил. И были люди, которых будто сама вселенная приводила в нужный момент.
-    `);
-    document.getElementById('wantHelp').onclick=()=>openModal('Физическая помощь', `
-      Если вы готовы помочь — будь то юридическая, медицинская или физическая поддержка
-      (медсёстры, сиделки), или если вы хотите организовать личную встречу — пожалуйста,
-      напишите на: <a href="mailto:theRealUnrealStory@gmail.com" class="underline">theRealUnrealStory@gmail.com</a>.<br><br>
-      Искренне благодарны каждому, кто откликнется.
-    `);
-
-    /* ====== Вовлечённость ====== */
-    const engageBtns=[...document.querySelectorAll('.eng-btn')];
-    const ENG_KEY='engagement_v1';
-    const loadEng=()=>{ try{return JSON.parse(localStorage.getItem(ENG_KEY)||'[]');}catch{return []} };
-    const saveEng=a=>{ try{localStorage.setItem(ENG_KEY,JSON.stringify(a));}catch{} };
-    function applyEng(){ const on=loadEng(); engageBtns.forEach((b,i)=>{const s=on.includes(i); b.classList.toggle('bg-green-700',s); b.classList.toggle('border-green-400',s);}); }
-    engageBtns.forEach((b,i)=>b.addEventListener('click',()=>{const on=loadEng(); const p=on.indexOf(i); if(p>=0) on.splice(p,1); else on.push(i); saveEng(on); applyEng();}));
-    applyEng();
-
-    /* ====== Telegram feed ====== */
-    async function renderTgFeed(){
-      try{
-        const res=await fetch('/.netlify/functions/news?limit=30',{cache:'no-store'});
-        if(!res.ok) throw new Error('news API '+res.status);
-        const arr=await res.json(), box=document.getElementById('tgFeed');
-        if(!Array.isArray(arr)||!arr.length){ box.innerHTML='<div class="text-sm text-gray-300">Пока нет постов.</div>'; return; }
-        box.innerHTML=arr.map(p=>{
-          const dt=p.date?new Date(p.date):null, time=dt?dt.toLocaleString():'';
-          const link=p.link?`<a href="${p.link}" target="_blank" class="underline text-sky-400">Открыть в Telegram</a>`:'';
-          const text=(p.text||'').replace(/\n/g,'<br>');
-          return `<article class="mb-4 p-3 rounded-xl bg-gray-900/50 border border-gray-700">
-                    <div class="text-xs text-gray-300 mb-2">${time}${link?` · ${link}`:''}</div>
-                    <div class="text-sm leading-relaxed">${text}</div>
-                  </article>`;
-        }).join('');
-      }catch(e){
-        console.error(e); document.getElementById('tgFeed').innerHTML='<div class="text-sm text-red-400">Не удалось загрузить новости.</div>';
+    function renderHearts(){
+      heartsGrid.innerHTML = '';
+      const start=(page-1)*PER_PAGE;
+      const end=Math.min(start+PER_PAGE, HEARTS_TOTAL);
+      for(let i=start;i<end;i++){
+        const d=document.createElement('div');
+        d.className='heart';
+        d.innerHTML=svg('heart');
+        d.title = `Поддержка #${i+1}`;
+        heartsGrid.appendChild(d);
       }
+      heartsRange.textContent = `Страница ${page} из ${pages}`;
+      prevH.disabled = page===1; nextH.disabled = page===pages;
     }
-    renderTgFeed();
-
-    /* ====== Карта ====== */
-    const map=L.map('map').setView([20,0],2);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
-    const layer=L.layerGroup().addTo(map);
-    if(navigator.geolocation){
-      navigator.geolocation.getCurrentPosition(pos=>{
-        const {latitude,longitude}=pos.coords; map.setView([latitude,longitude],6);
-        L.marker([latitude,longitude]).addTo(map).bindPopup('Вы здесь').openPopup();
-      },()=>{});
-    }
-    let selectedLatLng=null, previewMarker=null;
-    map.on('click', e=>{
-      selectedLatLng=e.latlng; if(previewMarker) previewMarker.remove();
-      previewMarker=L.marker([selectedLatLng.lat,selectedLatLng.lng],{draggable:true}).addTo(map).bindPopup('Выбранная точка (можно перетащить)').openPopup();
-      previewMarker.on('dragend',()=>{selectedLatLng=previewMarker.getLatLng();});
-    });
-    function setMarksCount(n){ const el=document.getElementById('marksCount'); if(el) el.textContent=Number.isFinite(n)?String(n):'0'; }
-    async function renderMarks(){
-      try{
-        layer.clearLayers();
-        const r=await fetch('/.netlify/functions/marks',{cache:'no-store'}); if(!r.ok) throw new Error(r.status);
-        const data=await r.json(), arr=Array.isArray(data)?data:[];
-        setMarksCount(arr.length);
-        arr.forEach(m=>{
-          const lat=Number(m.lat), lon=Number(m.lon); if(!Number.isFinite(lat)||!Number.isFinite(lon)) return;
-          L.circleMarker([lat,lon],{radius:4,color:'lime'}).bindPopup(`<b>${m.name||'Anon'}</b><br>${m.message||''}`).addTo(layer);
-        });
-      }catch(e){ console.error(e); setMarksCount(0); }
-    }
-    renderMarks();
-    document.getElementById('addMark').addEventListener('click', async ()=>{
-      const name=document.getElementById('name').value.trim();
-      const message=document.getElementById('msg').value.trim();
-      if(!message) return alert('Введите сообщение');
-      if(!selectedLatLng) return alert('Сначала кликните по карте!');
-      const {lat,lng}=selectedLatLng;
-      const resp=await fetch('/.netlify/functions/marks',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name,message,lat,lon:lng})});
-      if(!resp.ok){ const t=await resp.text().catch(()=>'-'); alert('Ошибка сохранения: '+t); return; }
-      document.getElementById('msg').value=''; selectedLatLng=null; if(previewMarker){previewMarker.remove(); previewMarker=null;} renderMarks();
-    });
-
-    /* ====== Hearts + Splide (18/слайд) ====== */
-    let splide;
-    function chunk(a,s){const out=[];for(let i=0;i<a.length;i+=s) out.push(a.slice(i,i+s));return out;}
-    function heartCard(n){return `<div class="p-4 rounded-2xl bg-gray-900/50 shadow-sm border border-gray-700"><div class="flex items-center gap-2"><span class="text-xl">❤️</span><div class="text-sm text-gray-200">${n||'Anon'}</div></div></div>`;}
-    function renderHeartsSlides(arr){
-      const pages=chunk(arr,18), ul=document.getElementById('heartsSlides');
-      ul.innerHTML=pages.map(p=>`<li class="splide__slide"><div class="grid md:grid-cols-3 gap-3">${p.map(x=>heartCard(x.name)).join('')}</div></li>`).join('')
-        || `<li class="splide__slide"><div class="text-sm text-gray-300">Пока нет сердец.</div></li>`;
-      if(splide) splide.destroy(true);
-      splide=new Splide('#heartsSplide',{type:'slide',perPage:1,perMove:1,pagination:true,arrows:true,classes:{pagination:'splide__pagination mt-4'}}); splide.mount();
-    }
-    async function fetchHearts(){ const r=await fetch('/.netlify/functions/hearts',{cache:'no-store'}); const d=await r.json(); return Array.isArray(d)?d:[]; }
-    async function renderHearts(){ renderHeartsSlides(await fetchHearts()); }
-    document.getElementById('addHeart').addEventListener('click', async ()=>{
-      const inp=document.getElementById('heartName'); const name=(inp.value||'').trim();
-      await fetch('/.netlify/functions/hearts',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name})});
-      inp.value=''; renderHearts();
-    });
+    prevH.addEventListener('click',()=>{ if(page>1){page--; renderHearts();} });
+    nextH.addEventListener('click',()=>{ if(page<pages){page++; renderHearts();} });
     renderHearts();
 
-    /* ====== Мини-плеер аудио-анонса ====== */
-    const announceAudio=document.getElementById('announceAudio');
-    const announceBtn=document.getElementById('announceBtn');
-    const announceStatus=document.getElementById('announceStatus');
-    const announcementByLang={
-      EN:"audio/ANNOUNCEMENT-EN.mp3", ES:"audio/ANNOUNCEMENT-ES.mp3", FR:"audio/ANNOUNCEMENT-FR.mp3",
-      PT:"audio/ANNOUNCEMENT-PT.mp3", DE:"audio/ANNOUNCEMENT-DE.mp3", IT:"audio/ANNOUNCEMENT-IT.mp3",
-      RU:"audio/ANNOUNCEMENT-RU.mp3", CN:"audio/ANNOUNCEMENT-CN.mp3", AR:"audio/ANNOUNCEMENT-AR.mp3"
-    };
-    function setAnnouncementForLang(l,autoplay=false){
-      const src=announcementByLang[l]||announcementByLang.EN;
-      if(announceAudio.src.endsWith(src)){ if(autoplay && announceAudio.paused) announceAudio.play().catch(()=>{}); return; }
-      announceAudio.pause(); announceAudio.src=src;
-      announceStatus.textContent = `Язык: ${l}`;
-      if(autoplay) announceAudio.play().catch(()=>{});
+    // ====== Карта поддержки (Leaflet) ======
+    let mapInit=false;
+    function initMap(){
+      if(mapInit) return; mapInit=true;
+      const map = L.map('map',{scrollWheelZoom:false}).setView([20,0],2);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
+      const spots=[[40.73,-73.93,'New York'],[52.52,13.4,'Berlin'],[41.9,12.5,'Rome'],[51.5,-0.1,'London']];
+      spots.forEach(([lat,lng,label])=>L.circleMarker([lat,lng],{radius:6,color:'#7c3aed',fillColor:'#22c55e',fillOpacity:.6}).addTo(map).bindPopup(`<b>${label}</b>`));
     }
-    setAnnouncementForLang(savedLang);
-    langSelect.addEventListener('change', e => {
-      const l = e.target.value;
-      localStorage.setItem('site_lang', l);
-      setAudioForLang(l, !audio.paused);
-      setAnnouncementForLang(l, !announceAudio.paused);
+    const mapEl=document.getElementById('map');
+    const obs=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting) initMap();})},{threshold:.25});
+    obs.observe(mapEl);
+
+    // ====== Счётчики вовлечённости ======
+    const counters=[...document.querySelectorAll('[data-count]')];
+    let countersStarted=false;
+    function animateCounts(){
+      counters.forEach(el=>{
+        const target=+el.dataset.count; let v=0; const step=Math.ceil(target/60);
+        const tick=()=>{ v=Math.min(target, v+step); el.textContent=v.toLocaleString('ru-RU'); if(v<target) requestAnimationFrame(tick); };
+        tick();
+      })
+    }
+    const statsObs=new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting && !countersStarted){ countersStarted=true; animateCounts(); } }) },{threshold:.3});
+    document.querySelectorAll('.stat').forEach(s=>statsObs.observe(s));
+
+    // ====== Донаты: пресеты сумм и ссылка ======
+    const preset=[5,10,20,50,100,250,500];
+    const amounts = document.getElementById('amounts');
+    const input = document.getElementById('customAmount');
+    const link = document.getElementById('donateGo');
+    let current = preset[2];
+
+    function updateLink(){
+      const amount = Number(input.value||current||0);
+      const url = `https://www.gofundme.com/f/the-real-unreal-story?amount=${amount}`;
+      link.href = url;
+    }
+    function renderChips(){
+      amounts.innerHTML='';
+      preset.forEach(v=>{
+        const b=document.createElement('button');
+        b.type='button'; b.className='chip'+(v===current?' active':''); b.textContent=v.toLocaleString('ru-RU',{style:'currency',currency:'USD'});
+        b.addEventListener('click',()=>{ current=v; input.value=''; renderChips(); updateLink(); });
+        amounts.appendChild(b);
+      })
+    }
+    input.addEventListener('input',()=>{ current=null; updateLink(); })
+    renderChips(); updateLink();
+
+    // ====== Анонс — кнопка воспроизведения (тот же цвет, что и "История в музыке") ======
+    const playBtn=document.getElementById('btn-play-announce');
+    const audio=document.getElementById('announce-player');
+    playBtn.addEventListener('click',()=>{ if(audio.paused){ audio.play(); playBtn.setAttribute('aria-expanded','true'); } else { audio.pause(); playBtn.setAttribute('aria-expanded','false'); } });
+
+    // ====== Форма физической помощи (mock обработка) ======
+    document.getElementById('helpForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const r=document.getElementById('helpResult');
+      r.textContent = 'Спасибо! Мы свяжемся с вами по email в ближайшее время.';
+      e.target.reset();
     });
-    announceBtn.addEventListener('click', async ()=>{
-      if(announceAudio.paused){
-        setAnnouncementForLang(langSelect.value);
-        try{ await announceAudio.play(); announceBtn.textContent='⏸ Пауза'; }catch{}
-      } else {
-        announceAudio.pause(); announceBtn.textContent='▶︎ Воспроизвести';
-      }
-    });
-    announceAudio.addEventListener('ended',()=>{ announceBtn.textContent='▶︎ Воспроизвести'; });
   </script>
 </body>
 </html>
