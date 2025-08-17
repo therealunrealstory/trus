@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Real Unreal Story — помощь Адаму</title>
+  <meta name="description" content="The Real Unreal Story — правдивая история хирурга, который всю жизнь спасал других, а теперь сам борется за жизнь. Присоединяйтесь." />
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    body {
+      background-image: url('images/bg.png');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+    }
+    #map { height: 360px; }
+    section, header, footer {
+      background: rgba(0,0,0,0.85);
+      border-radius: 1rem;
+      margin-top: 1rem;
+      padding: 1rem;
+      color: #fff;
+    }
+    .modal-backdrop { display:none; }
+    .modal-backdrop.show { display:block; }
+  </style>
+</head>
+<body class="text-white">
+  <!-- Header -->
+  <header class="max-w-5xl mx-auto px-4 py-6 flex items-center gap-3">
+    <div class="text-2xl font-bold tracking-tight">The Real Unreal Story</div>
+    <div class="ml-auto flex gap-2 items-center">
+      <!-- Language switch (EN, ES, FR, PT, DE, IT, RU, CN, AR) -->
+      <select id="lang" class="px-2 py-1 rounded bg-gray-800 text-white text-sm">
+        <option value="EN">EN</option>
+        <option value="ES">ES</option>
+        <option value="FR">FR</option>
+        <option value="PT">PT</option>
+        <option value="DE">DE</option>
+        <option value="IT">IT</option>
+        <option value="RU" selected>RU</option>
+        <option value="CN">CN</option>
+        <option value="AR">AR</option>
+      </select>
+      <button id="audioBtn" class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-sm">Аудио</button>
+      <a id="donateTop" target="_blank" class="px-4 py-2 rounded-xl bg-green-600 text-white text-sm hover:bg-green-700">Пожертвовать</a>
+    </div>
+  </header>
+
+  <!-- Socials just under header -->
+  <section class="max-w-5xl mx-auto px-4">
+    <h2 class="text-lg font-semibold mb-3">Соцсети</h2>
+    <div class="flex items-center gap-3 flex-wrap">
+      <a class="px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://instagram.com" target="_blank" rel="noreferrer">Instagram</a>
+      <a class="px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://t.me" target="_blank" rel="noreferrer">Telegram</a>
+      <a class="px-4 py-2 rounded-xl border border-gray-700 bg-gray-900 shadow-sm" href="https://www.youtube.com" target="_blank" rel="noreferrer">YouTube</a>
+    </div>
+  </section>
+
+  <main class="max-w-5xl mx-auto px-4">
+    <!-- Hero -->
+    <section id="hero">
+      <h1 class="text-3xl md:text-5xl font-semibold leading-tight" data-i18n="heroTitle">
+        The Real Unreal Story — помощь Адаму
+      </h1>
+      <p class="mt-4" data-i18n="heroText">
+        Правдивая история хирурга, который всю жизнь спасал других, а теперь сам борется за жизнь. Присоединяйтесь: поддержите деньгами, временем, делом или словом.
+      </p>
+      <div class="mt-5 flex flex-wrap items-center gap-3">
+        <a id="donateHero" target="_blank" class="px-4 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-sm font-medium" data-i18n="donateBtn">Пожертвовать</a>
+        <button id="shareBtn" class="px-4 py-2 rounded-xl bg-gray-200 text-black text-sm hover:opacity-90" data-i18n="shareBtn">Поделиться</button>
+      </div>
+    </section>
+
+    <!-- How to help -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4" data-i18n="howHelpTitle">Как помочь</h2>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="p-5 rounded-2xl bg-gray-900 shadow-sm">
+          <div class="text-2xl mb-2">💚</div>
+          <div class="font-medium mb-2" data-i18n="donateTitle">Пожертвовать средства</div>
+          <div class="flex flex-wrap gap-2">
+            <button data-amt="10" class="quick px-3 py-2 rounded-xl bg-green-600 text-white text-sm">$10</button>
+            <button data-amt="25" class="quick px-3 py-2 rounded-xl bg-green-600 text-white text-sm">$25</button>
+            <button data-amt="50" class="quick px-3 py-2 rounded-xl bg-green-600 text-white text-sm">$50</button>
+            <button data-amt="100" class="quick px-3 py-2 rounded-xl bg-green-600 text-white text-sm">$100</button>
+          </div>
+        </div>
+        <div class="p-5 rounded-2xl bg-gray-900 shadow-sm">
+          <div class="text-2xl mb-2">⏱️</div>
+          <div class="font-medium mb-2" data-i18n="timeTitle">Подарить время</div>
+          <div class="flex gap-2 flex-wrap">
+            <button data-min="5" class="pledge px-3 py-2 rounded-xl bg-gray-700 text-white text-sm">+5 мин</button>
+            <button data-min="15" class="pledge px-3 py-2 rounded-xl bg-gray-700 text-white text-sm">+15 мин</button>
+            <button data-min="60" class="pledge px-3 py-2 rounded-xl bg-gray-700 text-white text-sm">+60 мин</button>
+          </div>
+          <div class="text-xs text-gray-400 mt-2" data-i18n="timeTotal">Минут обещано: <span id="minTotal">0</span></div>
+        </div>
+        <div class="p-5 rounded-2xl bg-gray-900 shadow-sm">
+          <div class="text-2xl mb-2">👥</div>
+          <div class="font-medium mb-2" data-i18n="helpTitle">Физическая помощь</div>
+          <button id="wantHelp" class="text-sm underline" data-i18n="writeLink">Я хочу помочь</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Support Map -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4" data-i18n="mapTitle">🌍 Карта поддержки</h2>
+      <div id="map" class="rounded-2xl shadow-sm border"></div>
+      <div class="mt-4 grid md:grid-cols-3 gap-3">
+        <input id="name" class="px-3 py-2 rounded-xl border bg-gray-800 text-white" placeholder="Имя" />
+        <input id="msg" class="px-3 py-2 rounded-2xl border bg-gray-800 text-white md:col-span-2" placeholder="Сообщение (до 140 символов)" maxlength="140" />
+      </div>
+      <div class="grid md:grid-cols-3 gap-3 mt-2">
+        <select id="country" class="px-3 py-2 rounded-xl border bg-gray-800 text-white">
+          <option value="DE">Germany</option>
+          <option value="US">United States</option>
+          <option value="GB">United Kingdom</option>
+          <option value="ES">Spain</option>
+          <option value="IT">Italy</option>
+          <option value="PL">Poland</option>
+        </select>
+        <button id="addMark" class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" data-i18n="addBtn">Добавить</button>
+        <div class="text-xs text-gray-400" data-i18n="localStorage">Данные хранятся в базе</div>
+      </div>
+      <div class="mt-2 text-sm text-gray-400" data-i18n="marksTotal">Всего отметок: <span id="marksCount">0</span></div>
+    </section>
+
+    <!-- Support Hearts (name only) -->
+    <section id="contact">
+      <div class="rounded-3xl bg-gray-900 p-6 shadow-sm border border-gray-700">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div class="text-lg font-semibold" data-i18n="heartsTitle">Сердце поддержки</div>
+          <div class="flex gap-2">
+            <input id="heartName" class="px-3 py-2 rounded-xl border bg-gray-800 text-white text-sm" placeholder="Имя" />
+            <button id="addHeart" class="px-4 py-2 rounded-xl bg-pink-600 text-white text-sm" data-i18n="heartsBtn">Оставить сердце</button>
+          </div>
+        </div>
+        <div id="heartsWall" class="mt-6 grid md:grid-cols-3 gap-3"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="max-w-5xl mx-auto px-4 text-center text-sm text-gray-400">
+    <span data-i18n="footerText">Спасибо за любую поддержку — даже репост меняет судьбу.</span>
+  </footer>
+
+  <!-- Hidden audio element -->
+  <audio id="bgAudio" preload="auto"></audio>
+
+  <!-- Modal -->
+  <div id="modalBackdrop" class="modal-backdrop fixed inset-0 bg-black/60 z-50">
+    <div class="min-h-full flex items-center justify-center p-4">
+      <div class="bg-gray-900 text-white rounded-2xl shadow-xl border border-gray-700 max-w-lg w-full p-6 relative">
+        <button id="modalClose" class="absolute right-3 top-3 text-gray-400 hover:text-white" aria-label="Закрыть">✕</button>
+        <h3 class="text-lg font-semibold mb-3">Я хочу помочь</h3>
+        <p class="text-sm text-gray-200 leading-relaxed">
+          Если вы готовы помочь — будь то юридическая, медицинская или физическая поддержка
+          (медсёстры, сиделки), или если вы хотите организовать личную встречу — пожалуйста,
+          напишите на: <a href="mailto:theRealUnrealStory@gmail.com" class="underline">theRealUnrealStory@gmail.com</a>.<br><br>
+          Искренне благодарны каждому, кто откликнется.
+        </p>
+        <div class="mt-5 text-right">
+          <button id="modalOk" class="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600">Ок</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const donateURL = "https://www.gofundme.com/f/your-campaign-slug";
+
+    /* -------- Donate & Share -------- */
+    document.getElementById('donateTop').href = donateURL;
+    document.getElementById('donateHero').href = donateURL;
+
+    document.querySelectorAll('.quick').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const amt = btn.dataset.amt;
+        window.open(`${donateURL}/donate?amount=${amt}`, '_blank');
+      });
+    });
+
+    const shareBtn = document.getElementById('shareBtn');
+    shareBtn.addEventListener('click', async () => {
+      try {
+        const url = location.href;
+        if (navigator.share) await navigator.share({ title: 'The Real Unreal Story', url });
+        else {
+          await navigator.clipboard.writeText(url);
+          shareBtn.textContent = 'Скопировано!';
+          setTimeout(() => shareBtn.textContent = 'Поделиться', 1500);
+        }
+      } catch {}
+    });
+
+    /* -------- Helpers -------- */
+    function safeGet(key, fallback) {
+      try { const v = localStorage.getItem(key); return v === null ? fallback : JSON.parse(v); }
+      catch { return fallback; }
+    }
+    function safeSet(key, value) {
+      try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+    }
+
+    /* -------- Pledge minutes (локально, символика) -------- */
+    const minEl = document.getElementById('minTotal');
+    let minutes = Number(safeGet('ru_minutes', 0)) || 0;
+    const updateMinutesUI = () => { if (minEl) minEl.textContent = minutes.toLocaleString(); };
+    updateMinutesUI();
+    document.querySelectorAll('.pledge').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const inc = parseInt(btn.dataset.min, 10) || 0;
+        minutes += inc;
+        safeSet('ru_minutes', minutes);
+        updateMinutesUI();
+      });
+    });
+
+    /* -------- Hearts via Netlify Functions -------- */
+    async function renderHearts(){
+      const res = await fetch("/.netlify/functions/hearts");
+      const arr = await res.json();
+      document.getElementById('heartsWall').innerHTML = arr.map(x => `
+        <div class="p-4 rounded-2xl bg-gray-800 shadow-sm border border-gray-700">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">❤️</span>
+            <div class="text-sm text-gray-300">${x.name || 'Anon'}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+    document.getElementById('addHeart').addEventListener('click', async () => {
+      const inp = document.getElementById('heartName');
+      const name = (inp.value || "").trim();
+      await fetch("/.netlify/functions/hearts", {
+        method:"POST",
+        headers:{ "content-type":"application/json" },
+        body: JSON.stringify({ name })
+      });
+      inp.value = "";
+      renderHearts();
+    });
+    renderHearts();
+
+    /* -------- Map (Leaflet) -------- */
+    const coordsByCountry = {"US":[-98.57,39.82],"GB":[-3.43,55.37],"DE":[10.45,51.16],"ES":[-3.74,40.46],"IT":[12.56,41.87],"PL":[19.14,51.91]};
+    const map = L.map('map').setView([20,0], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
+    const layer = L.layerGroup().addTo(map);
+
+    async function renderMarks(){
+      layer.clearLayers();
+      const res = await fetch("/.netlify/functions/marks");
+      const arr = await res.json();
+      document.getElementById('marksCount').textContent = arr.length;
+      arr.forEach(m=>{
+        L.circleMarker([m.lat, m.lon], { radius:4, color:"lime" })
+         .bindPopup(`<b>${m.name||'Anon'}</b><br>${m.message||''}`)
+         .addTo(layer);
+      });
+    }
+    renderMarks();
+
+    document.getElementById('addMark').addEventListener('click', async ()=>{
+      const name=document.getElementById('name').value.trim();
+      const message=document.getElementById('msg').value.trim();
+      const country=document.getElementById('country').value;
+      if(!message) return;
+      const [lon,lat] = coordsByCountry[country] || [10.45,51.16];
+
+      await fetch("/.netlify/functions/marks", {
+        method:"POST",
+        headers:{ "content-type":"application/json" },
+        body: JSON.stringify({ name, message, lat, lon })
+      });
+      document.getElementById('msg').value='';
+      renderMarks();
+    });
+
+    /* -------- i18n (RU full; остальные — заглушки) -------- */
+    const dict = {
+      RU: {
+        heroTitle:"The Real Unreal Story — помощь Адаму",
+        heroText:"Правдивая история хирурга, который всю жизнь спасал других, а теперь сам борется за жизнь. Присоединяйтесь: поддержите деньгами, временем, делом или словом.",
+        donateBtn:"Пожертвовать", shareBtn:"Поделиться", howHelpTitle:"Как помочь",
+        donateTitle:"Пожертвовать средства", timeTitle:"Подарить время", timeTotal:"Минут обещано:",
+        helpTitle:"Физическая помощь", writeLink:"Я хочу помочь", mapTitle:"🌍 Карта поддержки", addBtn:"Добавить",
+        localStorage:"Данные хранятся в базе", marksTotal:"Всего отметок:",
+        heartsTitle:"Сердце поддержки", heartsBtn:"Оставить сердце",
+        subscribeTitle:"Подписаться", footerText:"Спасибо за любую поддержку — даже репост меняет судьбу."
+      },
+      EN:{heroTitle:"Placeholder EN",heroText:"Placeholder EN",donateBtn:"Donate",shareBtn:"Share",howHelpTitle:"How to help",donateTitle:"Donate money",timeTitle:"Give time",timeTotal:"Minutes pledged:",helpTitle:"Physical help",writeLink:"I want to help",mapTitle:"🌍 Support map",addBtn:"Add",localStorage:"Data saved in DB",marksTotal:"Total marks:",heartsTitle:"Support Heart",heartsBtn:"Leave a heart",subscribeTitle:"Subscribe",footerText:"Thanks for any support — even sharing changes destiny."},
+      ES:{heroTitle:"Placeholder ES",heroText:"Placeholder ES"},
+      FR:{heroTitle:"Placeholder FR",heroText:"Placeholder FR"},
+      PT:{heroTitle:"Placeholder PT",heroText:"Placeholder PT"},
+      DE:{heroTitle:"Placeholder DE",heroText:"Placeholder DE"},
+      IT:{heroTitle:"Placeholder IT",heroText:"Placeholder IT"},
+      CN:{heroTitle:"Placeholder CN",heroText:"Placeholder CN"},
+      AR:{heroTitle:"Placeholder AR",heroText:"Placeholder AR"}
+    };
+
+    const langSelect = document.getElementById("lang");
+    const audio = document.getElementById("bgAudio");
+    const audioBtn = document.getElementById("audioBtn");
+
+    const audioByLang = {
+      EN: "audio/ORUS-EN.mp3", ES: "audio/ORUS-ES.mp3", FR: "audio/ORUS-FR.mp3",
+      PT: "audio/ORUS-PT.mp3", DE: "audio/ORUS-DE.mp3", IT: "audio/ORUS-IT.mp3",
+      RU: "audio/ORUS-RU.mp3", CN: "audio/ORUS-CN.mp3", AR: "audio/ORUS-AR.mp3"
+    };
+
+    const savedLang = localStorage.getItem("site_lang") || "RU";
+    langSelect.value = savedLang;
+    applyLang(savedLang);
+    setAudioForLang(savedLang);
+
+    langSelect.addEventListener("change", e => {
+      const l = e.target.value;
+      localStorage.setItem("site_lang", l);
+      applyLang(l);
+      setAudioForLang(l, /*autoplayIfPlaying=*/!audio.paused);
+    });
+
+    function applyLang(l){
+      const trans=dict[l]||dict["RU"];
+      document.querySelectorAll("[data-i18n]").forEach(el=>{
+        const key=el.getAttribute("data-i18n");
+        if(trans[key]) el.innerText=trans[key];
+      });
+    }
+    function setAudioForLang(l, autoplay=false){
+      const src = audioByLang[l] || audioByLang["EN"];
+      if (audio.src.endsWith(src)) { if (autoplay && audio.paused) audio.play().catch(()=>{}); return; }
+      audio.pause();
+      audio.src = src;
+      if (autoplay) audio.play().catch(()=>{});
+    }
+    audioBtn.addEventListener("click", async () => {
+      if (audio.paused) {
+        setAudioForLang(langSelect.value);
+        try { await audio.play(); audioBtn.textContent = "Пауза"; }
+        catch { audioBtn.textContent = "Аудио"; }
+      } else {
+        audio.pause();
+        audioBtn.textContent = "Аудио";
+      }
+    });
+
+    /* -------- Modal (Я хочу помочь) -------- */
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const modalClose = document.getElementById('modalClose');
+    const modalOk = document.getElementById('modalOk');
+    const wantHelpBtn = document.getElementById('wantHelp');
+
+    function openModal(){ modalBackdrop.classList.add('show'); }
+    function closeModal(){ modalBackdrop.classList.remove('show'); }
+
+    wantHelpBtn.addEventListener('click', openModal);
+    modalClose.addEventListener('click', closeModal);
+    modalOk.addEventListener('click', closeModal);
+    modalBackdrop.addEventListener('click', (e)=>{ if(e.target === modalBackdrop) closeModal(); });
+    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
+  </script>
+</body>
+</html>
