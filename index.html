@@ -204,10 +204,14 @@
         <!-- Физическая помощь -->
         <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
           <div class="text-2xl mb-2">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M16 21v-2a4 4 0 0 0-8 0v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
+<svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+     stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true">
+  <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>
+  <circle cx="9" cy="7" r="4"/>
+  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+</svg>
           </div>
           <div class="font-medium mb-2" data-i18n="support.physical">Practical help</div>
           <button id="wantHelp" class="text-sm underline" data-i18n="btn.wantHelp">I want to help</button>
@@ -273,7 +277,14 @@
     <!-- СЕРДЦА -->
     <section id="contact">
       <div class="rounded-3xl p-6 shadow-sm border border-gray-700" style="background:rgba(0,0,0,0.35)">
-        <div class="text-lg font-semibold mb-3" data-i18n="hearts.title">Hearts of support</div>
+<div class="text-lg font-semibold mb-3 flex items-center gap-2">
+  <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+       stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+       aria-hidden="true">
+    <path d="M12 21s-6-4.35-8.28-8A5 5 0 0 1 12 5a5 5 0 0 1 8.28 8C18 16.65 12 21 12 21Z"/>
+  </svg>
+  <span data-i18n="hearts.title">Hearts of support</span>
+</div>
         <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2">
           <input id="heartName" class="px-3 py-2 rounded-xl border bg-gray-800/70 text-white text-sm" placeholder="Name" data-i18n-placeholder="placeholder.name" />
           <button id="addHeart" class="px-4 py-2 rounded-xl bg-pink-600 text-white text-sm" data-i18n="btn.addHeart">Leave a heart</button>
