@@ -52,5 +52,9 @@
   "audio.pause": "Pause",
   "announce.play": "▶︎ Lire",
   "announce.pause": "⏸ Pause",
-  "announce.langLabel": "Langue : "
+  "announce.langLabel": "Langue : ",
+  "modal.tile1.body": "Je m’appelle Nico et je suis l’ami d’Adam. Je suis devenu, malgré moi, participant de cette histoire « réelle-irréelle ». J’ai fait appel à un large public pour obtenir du soutien — je ne peux plus y faire face seul. Je raconte donc notre histoire sans fard et, en parallèle, je lance une collecte sur GoFundMe.",
+"modal.tile2.body": "Adam est une personne merveilleuse et un chirurgien aux techniques uniques, philanthrope. Depuis 2019, il s’est retrouvé à plusieurs reprises confronté à une hémopathie maligne. En juillet 2025 — nouveau tournant difficile : une autre forme de leucémie. En parallèle — des chocs personnels et des pertes.",
+"modal.tile3.body": "L’histoire d’Adam est pleine de vraies surprises. Il y a eu des aides incroyables — sans elles, il ne serait pas arrivé jusqu’à aujourd’hui. Il y a aussi eu des personnes qui ont sciemment nui. Et il y a eu ces rencontres amenées par l’univers au bon moment.",
+"modal.help.body": "Si vous êtes prêt(e) à aider — soutien juridique, médical ou pratique (infirmier·ère·s, aidant·e·s) — ou si vous souhaitez organiser une rencontre, écrivez à : <a href=\"mailto:theRealUnrealStory@gmail.com\" class=\"underline\">theRealUnrealStory@gmail.com</a>.<br><br>Nous remercions sincèrement toutes celles et ceux qui répondront."
 }
