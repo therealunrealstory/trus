@@ -145,6 +145,18 @@
       </div>
     </section>
 
+    <!-- НОВЫЙ БЛОК: КРАТКАЯ АУДИО-ВЕРСИЯ ИСТОРИИ -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4" data-i18n="short.title">Short version of our story</h2>
+      <div class="rounded-2xl border border-gray-700 p-4 flex items-center gap-3" style="background:rgba(0,0,0,0.35)">
+        <!-- статус языка СЛЕВА -->
+        <div id="shortStatus" class="text-xs text-gray-300"></div>
+        <button id="shortBtn" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm pulse" data-i18n="short.play">▶︎ Play</button>
+        <div class="text-sm text-gray-200" data-i18n="short.note">About the events from early 2019 to mid-2025.</div>
+      </div>
+      <audio id="shortAudio" preload="auto"></audio>
+    </section>
+
     <!-- ПОДДЕРЖАТЬ СЕЙЧАС -->
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="support.title">Support now</h2>
@@ -288,6 +300,19 @@
       if(autoplay) announceAudio.play().catch(()=>{});
     }
 
+    /* ====== Short-story mini-player ====== */
+    const shortAudio = document.getElementById('shortAudio');
+    const shortBtn   = document.getElementById('shortBtn');
+    const shortStatus= document.getElementById('shortStatus');
+
+    function setShortForLang(l, autoplay=false){
+      const src = `audio/SHORTSTORY-${l}.mp3`;
+      if(shortAudio.src.endsWith(src)){ if(autoplay && shortAudio.paused) shortAudio.play().catch(()=>{}); return; }
+      shortAudio.pause(); shortAudio.src = src;
+      shortStatus.textContent = ((I18N && I18N["short.langLabel"]) || "Language: ") + l;
+      if(autoplay) shortAudio.play().catch(()=>{});
+    }
+
     // ===== Modals
     const modal = document.getElementById('modalBackdrop');
     const mTitle = document.getElementById('modalTitle');
@@ -341,40 +366,35 @@
     applyEng();
 
     // ===== Telegram feed
-async function renderTgFeed(){
-  try{
-    const box=document.getElementById('tgFeed');
-    box.innerHTML = `<div class="text-sm text-gray-300">${t("feed.loading","Loading news…")}</div>`;
-    const res=await fetch('/.netlify/functions/news?limit=30',{cache:'no-store'});
-    if(!res.ok) throw new Error('news API '+res.status);
-    const arr=await res.json();
-    if(!Array.isArray(arr)||!arr.length){ 
-      box.innerHTML=`<div class="text-sm text-gray-300">${t("feed.empty","No posts yet.")}</div>`;
-      return;
+    async function renderTgFeed(){
+      try{
+        const box=document.getElementById('tgFeed');
+        box.innerHTML = `<div class="text-sm text-gray-300">${t("feed.loading","Loading news…")}</div>`;
+        const res=await fetch('/.netlify/functions/news?limit=30',{cache:'no-store'});
+        if(!res.ok) throw new Error('news API '+res.status);
+        const arr=await res.json();
+        if(!Array.isArray(arr)||!arr.length){ box.innerHTML=`<div class="text-sm text-gray-300">${t("feed.empty","No posts yet.")}</div>`; return; }
+        box.innerHTML=arr.map(p=>{
+          const dt=p.date?new Date(p.date):null, time=dt?dt.toLocaleString():'';
+          const link=p.link?`<a href="${p.link}" target="_blank" class="underline text-sky-400">${t("feed.openTelegram","Open in Telegram")}</a>`:'';
+          const text=(p.text||'').replace(/\n/g,'<br>');
+          const _img = (p.media_type==='photo' && p.media_path) ? `/.netlify/functions/tg-file?path=${encodeURIComponent(p.media_path)}` : null;
+          const mediaHtml = _img
+            ? `<img src="${_img}"
+                     alt=""
+                     class="mt-2 rounded-xl border border-gray-700 max-w-full max-h-52 sm:max-h-52 w-auto object-contain block cursor-zoom-in"
+                     onclick="openModal('', '<img src=&quot;${_img}&quot; class=&quot;w-full h-auto rounded-xl&quot;>')">`
+            : '';
+          return `<article class="mb-4 p-3 rounded-xl bg-gray-900/50 border border-gray-700">
+                    <div class="text-xs text-gray-300 mb-2">${time}${link?` · ${link}`:''}</div>
+                    ${text ? `<div class="text-sm leading-relaxed">${text}</div>` : ''}
+                    ${mediaHtml}
+                  </article>`;
+        }).join('');
+      }catch(e){
+        console.error(e); document.getElementById('tgFeed').innerHTML=`<div class="text-sm text-red-400">${t("feed.error","Failed to load news.")}</div>`;
+      }
     }
-    box.innerHTML=arr.map(p=>{
-      const dt=p.date?new Date(p.date):null, time=dt?dt.toLocaleString():'';
-      const link=p.link?`<a href="${p.link}" target="_blank" class="underline text-sky-400">${t("feed.openTelegram","Open in Telegram")}</a>`:'';
-      const textHtml=(p.text||'').replace(/\n/g,'<br>');
-const _img = `/.netlify/functions/tg-file?path=${encodeURIComponent(p.media_path)}`;
-const mediaHtml = (p.media_type==='photo' && p.media_path)
-  ? `<img src="${_img}"
-           alt=""
-           class="mt-2 rounded-xl border border-gray-700 max-w-full max-h-52 sm:max-h-52 w-auto object-contain block cursor-zoom-in"
-           onclick="openModal('', '<img src=&quot;${_img}&quot; class=&quot;w-full h-auto rounded-xl&quot;>')">`
-  : '';
-      return `<article class="mb-4 p-3 rounded-xl bg-gray-900/50 border border-gray-700">
-                <div class="text-xs text-gray-300 mb-2">${time}${link?` · ${link}`:''}</div>
-                ${textHtml ? `<div class="text-sm leading-relaxed">${textHtml}</div>` : ''}
-                ${mediaHtml}
-              </article>`;
-    }).join('');
-  }catch(e){
-    console.error(e);
-    document.getElementById('tgFeed').innerHTML=
-      `<div class="text-sm text-red-400">${t("feed.error","Failed to load news.")}</div>`;
-  }
-}
     renderTgFeed();
 
     // ===== Map (paged)
@@ -593,9 +613,20 @@ const mediaHtml = (p.media_type==='photo' && p.media_path)
         announceStatus.textContent = (I18N["announce.langLabel"] || DEFAULT_I18N["announce.langLabel"] || "Language: ") + lang;
       }
 
+      // новый блок: подписи и язык
+      if (shortBtn) {
+        shortBtn.textContent = shortAudio.paused
+          ? (I18N["short.play"] || DEFAULT_I18N["short.play"] || "▶︎ Play")
+          : (I18N["short.pause"] || "⏸ Pause");
+      }
+      if (shortStatus) {
+        shortStatus.textContent = (I18N["short.langLabel"] || DEFAULT_I18N["short.langLabel"] || "Language: ") + lang;
+      }
+
       // треки под язык (сохраняя состояние)
       setAudioForLang(lang, !audio.paused);
       setAnnouncementForLang(lang, !announceAudio.paused);
+      setShortForLang(lang, !shortAudio.paused);
     }
 
     // ===== Init on DOM ready
@@ -640,13 +671,18 @@ const mediaHtml = (p.media_type==='photo' && p.media_path)
         }
       });
       announceAudio.addEventListener('ended',()=>{ announceBtn.textContent=(I18N && I18N["announce.play"]) || (DEFAULT_I18N["announce.play"] || "▶︎ Play"); });
+
+      // события для короткой версии
+      shortBtn.addEventListener('click', async ()=>{
+        if(shortAudio.paused){
+          setShortForLang(langSelect.value);
+          try{ await shortAudio.play(); shortBtn.textContent=(I18N && I18N["short.pause"]) || "⏸ Pause"; }catch{}
+        } else {
+          shortAudio.pause(); shortBtn.textContent=(I18N && I18N["short.play"]) || (DEFAULT_I18N["short.play"] || "▶︎ Play");
+        }
+      });
+      shortAudio.addEventListener('ended',()=>{ shortBtn.textContent=(I18N && I18N["short.play"]) || (DEFAULT_I18N["short.play"] || "▶︎ Play"); });
     });
   </script>
 </body>
 </html>
-
-
-
-
-
-
