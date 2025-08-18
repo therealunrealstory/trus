@@ -53,29 +53,18 @@
       background:linear-gradient(180deg,transparent,rgba(0,0,0,var(--tile-overlay)));
       opacity:1; transition:opacity .25s ease;
     }
-    /* hover снимает плёнку только на устройствах с курсором */
     @media (hover:hover) and (pointer:fine){
       .tile:hover::after{ opacity:0; }
     }
-    /* активный тайл без плёнки (когда открыта модалка) */
     .tile.no-overlay::after{ opacity:0 !important; }
     .tile>span{ position:absolute; left:1rem; bottom:1rem; z-index:1; background:rgba(0,0,0,.55); padding:.4rem .7rem; border-radius:.8rem }
     .video-wrap{ position:relative; width:100%; padding-top:56.25%; border-radius:1rem; overflow:hidden; border:1px solid rgba(255,255,255,.08) }
     .video-wrap iframe{ position:absolute; inset:0; width:100%; height:100% }
     .modal-backdrop{ display:none; z-index:9999; } .modal-backdrop.show{ display:block }
-    /* пульсирующая кнопка */
-    @keyframes pulse {
-      0% { transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,.6); }
-      70%{ transform:scale(1.03); box-shadow:0 0 0 12px rgba(99,102,241,0); }
-      100%{ transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,0); }
-    }
+    @keyframes pulse { 0% { transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,.6); } 70%{ transform:scale(1.03); box-shadow:0 0 0 12px rgba(99,102,241,0); } 100%{ transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,0); } }
     .pulse{ animation:pulse 2s infinite; }
-
-    /* RTL косметика */
     html[dir="rtl"] .icon-btn { flex-direction: row-reverse; }
     html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
-
-    /* caret для хэштега */
     .hashtag-caret { animation: hashblink 1s step-start infinite; }
     @keyframes hashblink { 50% { opacity: 0; } }
   </style>
@@ -84,25 +73,12 @@
   <!-- HEADER: слева — хэштег; справа — install + аудио + язык -->
   <header class="max-w-5xl mx-auto px-4 py-6">
     <div class="flex items-center justify-between gap-3">
-      <!-- ЛЕВО: хэштег с эффектом печати -->
       <div id="hashtagBtn" class="font-mono text-xs sm:text-sm text-white/90 cursor-pointer select-none flex items-center" title="#TheRealUnrealStory" aria-label="#TheRealUnrealStory">
         <span id="hashtagType">#TheRealUnrealStory</span><span class="hashtag-caret ml-0.5">|</span>
       </div>
-      <!-- ПРАВО: на мобиле — столбцом, на ≥sm — в строку -->
       <div class="flex gap-2 items-end sm:items-center sm:flex-row flex-col">
-        <!-- 1) мобиле — первой строкой; десктоп — слева -->
-        <button id="installBtn"
-                class="px-4 py-2 rounded-xl border border-indigo-500 text-indigo-300 hover:bg-indigo-600/10 text-sm hidden"
-                data-i18n="btn.install">
-          Install app
-        </button>
-        <!-- 2) мобиле — второй строкой; десктоп — посередине -->
-        <button id="audioBtn"
-                class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse"
-                data-i18n="audio.play">
-          Story in music
-        </button>
-        <!-- 3) мобиле — третьей строкой; десктоп — справа -->
+        <button id="installBtn" class="px-4 py-2 rounded-xl border border-indigo-500 text-indigo-300 hover:bg-indigo-600/10 text-sm hidden" data-i18n="btn.install">Install app</button>
+        <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse" data-i18n="audio.play">Story in music</button>
         <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
           <option value="EN" selected>EN</option>
           <option value="ES">ES</option><option value="FR">FR</option>
@@ -200,7 +176,6 @@
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="support.title">Support now</h2>
       <div class="grid md:grid-cols-2 gap-4">
-        <!-- Донаты -->
         <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
           <div class="text-2xl mb-2">💚</div>
           <div class="font-medium mb-2" data-i18n="support.money">Donate funds</div>
@@ -214,7 +189,6 @@
             <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=500">$500</a>
           </div>
         </div>
-        <!-- Физическая помощь -->
         <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
           <div class="text-2xl mb-2">👥</div>
           <div class="font-medium mb-2" data-i18n="support.physical">Practical help</div>
@@ -421,8 +395,19 @@
     const ENG_KEY='engagement_v1';
     const loadEng=()=>{ try{return JSON.parse(localStorage.getItem(ENG_KEY)||'[]');}catch{return []} };
     const saveEng=a=>{ try{localStorage.setItem(ENG_KEY,JSON.stringify(a));}catch{} };
-    function applyEng(){ const on=loadEng(); engageBtns.forEach((b,i)=>{const s=on.includes(i); b.classList.toggle('bg-green-700',s); b.classList.toggle('border-green-4 00',s);}); }
-    engageBtns.forEach((b,i)=>b.addEventListener('click',()=>{const on=loadEng(); const p=on.indexOf(i); if(p>=0) on.splice(p,1); else on.push(i); saveEng(on); applyEng();}));
+    function applyEng(){
+      const on=loadEng();
+      engageBtns.forEach((b,i)=>{
+        const s=on.includes(i);
+        b.classList.toggle('bg-green-700',s);
+        b.classList.toggle('border-green-400',s); // ← фикс
+      });
+    }
+    engageBtns.forEach((b,i)=>b.addEventListener('click',()=>{
+      const on=loadEng(); const p=on.indexOf(i);
+      if(p>=0) on.splice(p,1); else on.push(i);
+      saveEng(on); applyEng();
+    }));
     applyEng();
 
     // ===== Telegram feed
@@ -598,7 +583,6 @@
     const LOCALE_DIRS = { AR:"rtl", CN:"ltr", DE:"ltr", EN:"ltr", ES:"ltr", FR:"ltr", IT:"ltr", PT:"ltr", RU:"ltr" };
     let I18N = {};
 
-    // дефолты из DOM как универсальный fallback
     const DEFAULT_I18N = {};
     (function captureDefaultI18n(){
       document.querySelectorAll("[data-i18n]").forEach(el=>{
@@ -612,12 +596,10 @@
     })();
 
     async function fetchLocaleJson(lang){
-      // 1) относительный путь (работает в подпапках)
       try {
         const r1 = await fetch(`i18n/${lang}.json`, { cache: 'no-store' });
         if (r1.ok) return await r1.json();
       } catch {}
-      // 2) абсолютный путь (на домене)
       try {
         const r2 = await fetch(`/i18n/${lang}.json`, { cache: 'no-store' });
         if (r2.ok) return await r2.json();
@@ -646,7 +628,6 @@
         m.setAttribute('content', I18N["meta.description"]);
       }
 
-      // применяем переводы/дефолты
       document.querySelectorAll("[data-i18n]").forEach(el=>{
         const key = el.getAttribute("data-i18n");
         const val = (I18N[key] ?? DEFAULT_I18N[key]);
@@ -658,7 +639,6 @@
         if (val != null) el.setAttribute('placeholder', val);
       });
 
-      // кнопки/лейблы с учётом состояния плееров
       if (audioBtn) {
         audioBtn.textContent = audio.paused
           ? (I18N["audio.play"] || DEFAULT_I18N["audio.play"] || "Story in music")
@@ -673,7 +653,6 @@
         announceStatus.textContent = (I18N["announce.langLabel"] || DEFAULT_I18N["announce.langLabel"] || "Language: ") + lang;
       }
 
-      // новый блок: подписи и язык
       if (shortBtn) {
         shortBtn.textContent = shortAudio.paused
           ? (I18N["short.play"] || DEFAULT_I18N["short.play"] || "▶︎ Play")
@@ -683,13 +662,12 @@
         shortStatus.textContent = (I18N["short.langLabel"] || DEFAULT_I18N["short.langLabel"] || "Language: ") + lang;
       }
 
-      // треки под язык (сохраняя состояние)
       setAudioForLang(lang, !audio.paused);
       setAnnouncementForLang(lang, !announceAudio.paused);
       setShortForLang(lang, !shortAudio.paused);
     }
 
-    // ===== PWA install: слушаем ранние события (до DOMContentLoaded)
+    // ===== PWA install
     let deferredPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -745,7 +723,6 @@
       });
       announceAudio.addEventListener('ended',()=>{ announceBtn.textContent=(I18N && I18N["announce.play"]) || (DEFAULT_I18N["announce.play"] || "▶︎ Play"); });
 
-      // события для короткой версии
       shortBtn.addEventListener('click', async ()=>{
         if(shortAudio.paused){
           setShortForLang(langSelect.value);
@@ -756,7 +733,6 @@
       });
       shortAudio.addEventListener('ended',()=>{ shortBtn.textContent=(I18N && I18N["short.play"]) || (DEFAULT_I18N["short.play"] || "▶︎ Play"); });
 
-      // Хэштег: эффект печати по кругу + клик = модалка-CTA
       (function initHashtag() {
         const el = document.getElementById('hashtagType');
         const btn = document.getElementById('hashtagBtn');
@@ -792,7 +768,7 @@
         });
       })();
 
-      // Кнопка установки PWA
+      // PWA install button
       const installBtn = document.getElementById('installBtn');
       if (window.matchMedia('(display-mode: standalone)').matches) {
         installBtn?.classList.add('hidden');
