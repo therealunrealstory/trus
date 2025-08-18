@@ -73,16 +73,16 @@
       <div id="hashtagBtn" class="font-mono text-xs sm:text-sm text-white/90 cursor-pointer select-none flex items-center" title="#TheRealUnrealStory" aria-label="#TheRealUnrealStory">
         <span id="hashtagType">#TheRealUnrealStory</span><span class="hashtag-caret ml-0.5">|</span>
       </div>
-      <!-- ПРАВО: как было — кнопка аудио и селектор языка -->
-<div class="flex gap-2 items-end sm:items-center sm:flex-row flex-col">
-  <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse" data-i18n="audio.play">Story in music</button>
-  <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
-    <option value="EN" selected>EN</option>
-    <option value="ES">ES</option><option value="FR">FR</option>
-    <option value="PT">PT</option><option value="DE">DE</option><option value="IT">IT</option>
-    <option value="RU">RU</option><option value="CN">CN</option><option value="AR">AR</option>
-  </select>
-</div>
+      <!-- ПРАВО: на мобиле — столбцом, на ≥sm — в строку -->
+      <div class="flex gap-2 items-end sm:items-center sm:flex-row flex-col">
+        <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse" data-i18n="audio.play">Story in music</button>
+        <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
+          <option value="EN" selected>EN</option>
+          <option value="ES">ES</option><option value="FR">FR</option>
+          <option value="PT">PT</option><option value="DE">DE</option><option value="IT">IT</option>
+          <option value="RU">RU</option><option value="CN">CN</option><option value="AR">AR</option>
+        </select>
+      </div>
     </div>
   </header>
 
@@ -123,6 +123,12 @@
       <div class="mt-5 flex flex-wrap items-center gap-3">
         <a id="donateHero" target="_blank" class="px-4 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-sm font-medium" data-i18n="btn.donate">Donate</a>
         <button id="shareBtn" class="px-4 py-2 rounded-xl bg-gray-200 text-black text-sm hover:opacity-90" data-i18n="btn.share">Share</button>
+        <!-- НОВОЕ: своя кнопка установки PWA (скрыта по умолчанию; показывается при поддержке) -->
+        <button id="installBtn"
+                class="px-4 py-2 rounded-xl border border-indigo-500 text-indigo-300 hover:bg-indigo-600/10 text-sm hidden"
+                data-i18n="btn.install">
+          Install app
+        </button>
       </div>
     </section>
 
@@ -156,7 +162,7 @@
       </div>
     </section>
 
-    <!-- НОВЫЙ БЛОК: КРАТКАЯ АУДИО-ВЕРСИЯ ИСТОРИИ -->
+    <!-- КРАТКАЯ АУДИО-ВЕРСИЯ ИСТОРИИ -->
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="short.title">Short version of our story</h2>
       <div class="rounded-2xl border border-gray-700 p-4 flex items-center gap-3" style="background:rgba(0,0,0,0.35)">
@@ -640,6 +646,19 @@
       setShortForLang(lang, !shortAudio.paused);
     }
 
+    // ===== PWA install: слушаем ранние события (до DOMContentLoaded)
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const b = document.getElementById('installBtn');
+      if (b) b.classList.remove('hidden');
+    });
+    window.addEventListener('appinstalled', () => {
+      const b = document.getElementById('installBtn');
+      b?.classList.add('hidden');
+    });
+
     // ===== Init on DOM ready
     document.addEventListener('DOMContentLoaded', () => {
       const d = document.getElementById('donateHero'); if (d) d.href = donateURL;
@@ -668,7 +687,7 @@
       audioBtn.addEventListener('click', async ()=>{
         if(audio.paused){
           setAudioForLang(langSelect.value);
-          try{ await audio.play(); audioBtn.textContent = (I18N && I18N["audio.pause"]) || "Pause"; }catch{}
+          try{ await audio.play(); audioBtn.textContent = (I18N && I18N["audio.pause"]) || "⏸ Pause"; }catch{}
         } else {
           audio.pause(); audioBtn.textContent = (I18N && I18N["audio.play"]) || (DEFAULT_I18N["audio.play"] || "Story in music");
         }
@@ -729,6 +748,25 @@
           );
         });
       })();
+
+      // Кнопка установки PWA
+      const installBtn = document.getElementById('installBtn');
+      // Если уже standalone — не показываем
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        installBtn?.classList.add('hidden');
+      }
+      installBtn?.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          openModal(
+            t('pwa.installedTitle', 'Installed'),
+            t('pwa.installedBody', 'The app has been added to your Home screen / app list.')
+          );
+        }
+        deferredPrompt = null;
+      });
     });
   </script>
 </body>
