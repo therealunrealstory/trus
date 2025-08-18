@@ -40,6 +40,7 @@
   "feed.loading": "Loading news…",
   "feed.empty": "No posts yet.",
   "feed.error": "Failed to load news.",
+  "feed.openTelegram": "Open in Telegram",
   "hearts.empty": "No hearts yet.",
   "map.youAreHere": "You are here",
   "map.selectedPoint": "Selected point (you can drag)",
