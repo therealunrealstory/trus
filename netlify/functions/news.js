@@ -6,7 +6,7 @@ export default async (req) => {
     const url = new URL(req.url);
     const limit = Math.min(parseInt(url.searchParams.get("limit") || "20", 10), 50);
     const { rows } = await query(
-      `select chat_id, message_id, date, username, text, link
+      `select chat_id, message_id, date, username, text, link, media_type, media_path
        from tg_posts
        order by date desc
        limit $1`,
