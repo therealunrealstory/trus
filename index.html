@@ -43,7 +43,16 @@
     .icon-btn{ display:inline-flex; align-items:center; gap:8px }
     .icon-btn svg{ width:18px; height:18px }
     .tile{ position:relative; overflow:hidden; border-radius:1rem; height:180px; background-size:cover; background-position:center; cursor:pointer; border:1px solid rgba(255,255,255,.08) }
-    .tile::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent,rgba(0,0,0,.6)) }
+    /* ПЛЁНКА + эффекты */
+    .tile::after{
+      content:""; position:absolute; inset:0;
+      background:linear-gradient(180deg,transparent,rgba(0,0,0,.6));
+      opacity:.95; transition:opacity .25s ease;
+      pointer-events:none; /* не перехватывать клики */
+    }
+    .tile:hover::after{ opacity:0; }
+    .tile.no-overlay::after{ opacity:0 !important; }
+
     .tile>span{ position:absolute; left:1rem; bottom:1rem; z-index:1; background:rgba(0,0,0,.55); padding:.4rem .7rem; border-radius:.8rem }
     .video-wrap{ position:relative; width:100%; padding-top:56.25%; border-radius:1rem; overflow:hidden; border:1px solid rgba(255,255,255,.08) }
     .video-wrap iframe{ position:absolute; inset:0; width:100%; height:100% }
@@ -129,7 +138,7 @@
     <!-- HERO -->
     <section id="hero">
       <h1 class="text-3xl md:text-5xl font-semibold leading-tight">
-        The Real Unreal Story — <span class="text-indigo-600" data-i18n="hero.titleRest">support for Adam</span><span class="align-super text-green-400 text-xl">*</span>
+        The Real Unreal Story — <span class="text-indigo-600" data-i18n="hero.titleRest">support for Adam</span><span class="align-super text-xl">*</span>
       </h1>
       <p class="mt-4" data-i18n="hero.lead1">
         The true story of a surgeon who spent his life saving others and is now fighting for his own life.
@@ -190,13 +199,7 @@
       <div class="grid md:grid-cols-2 gap-4">
         <!-- Донаты -->
         <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
-          <div class="mb-2" aria-hidden="true">
-            <svg width="28" height="28" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.5"
-                 stroke-linecap="round" stroke-linejoin="round" class="opacity-90">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/>
-            </svg>
-          </div>
+          <div class="text-2xl mb-2">💚</div>
           <div class="font-medium mb-2" data-i18n="support.money">Donate funds</div>
           <div class="flex flex-wrap gap-2">
             <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=5">$5</a>
@@ -210,16 +213,7 @@
         </div>
         <!-- Физическая помощь -->
         <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
-          <div class="mb-2" aria-hidden="true">
-            <svg width="28" height="28" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.5"
-                 stroke-linecap="round" stroke-linejoin="round" class="opacity-90">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-          </div>
+          <div class="text-2xl mb-2">👥</div>
           <div class="font-medium mb-2" data-i18n="support.physical">Practical help</div>
           <button id="wantHelp" class="text-sm underline" data-i18n="btn.wantHelp">I want to help</button>
         </div>
@@ -242,16 +236,7 @@
     <!-- ВОВЛЕЧЁННОСТЬ -->
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="engage.title">Your engagement</h2>
-      <p class="text-sm text-gray-200 mb-3">
-        <span data-i18n="engage.desc">Mark what you've already done — that’s support too</span>
-        <span aria-hidden="true" class="inline-block align-[-1px] ml-1">
-          <svg width="16" height="16" viewBox="0 0 24 24"
-               fill="none" stroke="currentColor" stroke-width="1.5"
-               stroke-linecap="round" stroke-linejoin="round" class="opacity-90">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
-        </span>
-      </p>
+      <p class="text-sm text-gray-200 mb-3" data-i18n="engage.desc">Mark what you've already done — that’s support too ❤️</p>
       <div id="engageWrap" class="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
         <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b1">Read/listened to the short version</button>
         <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b2">Read/listened to the full story</button>
@@ -265,16 +250,7 @@
 
     <!-- КАРТА -->
     <section>
-      <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-        <svg width="20" height="20" viewBox="0 0 24 24"
-             fill="none" stroke="currentColor" stroke-width="1.5"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="opacity-90">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M2 12h20"/>
-          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10"/>
-        </svg>
-        <span data-i18n="map.title">Support map</span>
-      </h2>
+      <h2 class="text-xl font-semibold mb-4" data-i18n="map.title">🌍 Support map</h2>
       <div id="map" class="rounded-2xl shadow-sm border" style="background:#0b0b0b"></div>
       <p class="text-xs text-gray-300 mt-2" data-i18n="map.tip">Be sure to click on the map to specify the exact place of your support.</p>
       <div class="mt-4 grid md:grid-cols-3 gap-3">
@@ -378,35 +354,52 @@
     const modal = document.getElementById('modalBackdrop');
     const mTitle = document.getElementById('modalTitle');
     const mBody  = document.getElementById('modalBody');
-    const openModal = (title, html)=>{ mTitle.innerHTML = title; mBody.innerHTML = html; modal.classList.add('show'); };
-    const closeModal=()=>modal.classList.remove('show');
+
+    const tilesEls = [...document.querySelectorAll('.tile')];
+
+    const openModal = (title, html)=>{
+      mTitle.innerHTML = title; mBody.innerHTML = html; modal.classList.add('show');
+    };
+    const closeModal=()=>{
+      modal.classList.remove('show');
+      tilesEls.forEach(t => t.classList.remove('no-overlay')); // вернуть плёнку
+    };
     document.getElementById('modalClose').onclick=closeModal; document.getElementById('modalOk').onclick=closeModal;
     modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
 
     function t(key, fallback){ return (window.I18N && I18N[key]) || fallback; }
 
-    document.getElementById('tile1').onclick=()=>openModal(
-      t('tiles.me','I’m Nico'),
-      t('modal.tile1.body', `
-        My name is Nico, and I’m Adam’s friend. I became an involuntary participant in this “real-unreal” story.
-        I’ve reached out to a wide audience for support — I can’t manage alone anymore.
-        So I’m telling our story without embellishment and launching a fundraiser on GoFundMe in parallel.
-      `)
-    );
-    document.getElementById('tile2').onclick=()=>openModal(
-      t('tiles.about','About Adam'),
-      t('modal.tile2.body', `
-        Adam is a wonderful person and a surgeon with unique techniques, a philanthropist. Since 2019, he has faced blood oncology several times.
-        In July 2025 — a new severe turn: another form of leukemia. At the same time — personal shocks and losses.
-      `)
-    );
-    document.getElementById('tile3').onclick=()=>openModal(
-      t('tiles.others','Other people in the story'),
-      t('modal.tile3.body', `
-        Adam’s story is full of real surprises. There were incredible helpers — without them he wouldn’t have survived to this day.
-        There were also those who deliberately harmed. And there were people whom the universe seemed to bring at the right moment.
-      `)
-    );
+    document.getElementById('tile1').onclick=()=>{
+      const el=document.getElementById('tile1'); el.classList.add('no-overlay');
+      openModal(
+        t('tiles.me','I’m Nico'),
+        t('modal.tile1.body', `
+          My name is Nico, and I’m Adam’s friend. I became an involuntary participant in this “real-unreal” story.
+          I’ve reached out to a wide audience for support — I can’t manage alone anymore.
+          So I’m telling our story without embellishment and launching a fundraiser on GoFundMe in parallel.
+        `)
+      );
+    };
+    document.getElementById('tile2').onclick=()=>{
+      const el=document.getElementById('tile2'); el.classList.add('no-overlay');
+      openModal(
+        t('tiles.about','About Adam'),
+        t('modal.tile2.body', `
+          Adam is a wonderful person and a surgeon with unique techniques, a philanthropist. Since 2019, he has faced blood oncology several times.
+          In July 2025 — a new severe turn: another form of leukemia. At the same time — personal shocks and losses.
+        `)
+      );
+    };
+    document.getElementById('tile3').onclick=()=>{
+      const el=document.getElementById('tile3'); el.classList.add('no-overlay');
+      openModal(
+        t('tiles.others','Other people in the story'),
+        t('modal.tile3.body', `
+          Adam’s story is full of real surprises. There were incredible helpers — without them he wouldn’t have survived to this day.
+          There were also those who deliberately harmed. And there were people whom the universe seemed to bring at the right moment.
+        `)
+      );
+    };
     document.getElementById('wantHelp').onclick=()=>openModal(
       t('support.physical','Practical help'),
       t('modal.help.body', `
@@ -811,6 +804,19 @@
         }
         deferredPrompt = null;
       });
+    });
+
+    // ===== PWA install (глобальные слушатели)
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const b = document.getElementById('installBtn');
+      if (b) b.classList.remove('hidden');
+    });
+    window.addEventListener('appinstalled', () => {
+      const b = document.getElementById('installBtn');
+      b?.classList.add('hidden');
     });
   </script>
 </body>
