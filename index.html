@@ -6,17 +6,24 @@
   <title>The Real Unreal Story — support for Adam</title>
   <meta name="description" content="The Real Unreal Story — the true story of a surgeon who saved others all his life and is now fighting for his own." />
 
-  <!-- Hreflang (клиентский вариант через ?lang=) -->
-  <link rel="alternate" hreflang="x-default" href="/?lang=EN">
-  <link rel="alternate" hreflang="en" href="/?lang=EN">
-  <link rel="alternate" hreflang="es" href="/?lang=ES">
-  <link rel="alternate" hreflang="fr" href="/?lang=FR">
-  <link rel="alternate" hreflang="it" href="/?lang=IT">
-  <link rel="alternate" hreflang="de" href="/?lang=DE">
-  <link rel="alternate" hreflang="pt" href="/?lang=PT">
-  <link rel="alternate" hreflang="ru" href="/?lang=RU">
-  <link rel="alternate" hreflang="zh" href="/?lang=CN">
-  <link rel="alternate" hreflang="ar" href="/?lang=AR">
+  <!-- Hreflang (относительные ссылки, чтобы работать и из подпапки) -->
+  <link rel="alternate" hreflang="x-default" href="?lang=EN">
+  <link rel="alternate" hreflang="en" href="?lang=EN">
+  <link rel="alternate" hreflang="es" href="?lang=ES">
+  <link rel="alternate" hreflang="fr" href="?lang=FR">
+  <link rel="alternate" hreflang="it" href="?lang=IT">
+  <link rel="alternate" hreflang="de" href="?lang=DE">
+  <link rel="alternate" hreflang="pt" href="?lang=PT">
+  <link rel="alternate" hreflang="ru" href="?lang=RU">
+  <link rel="alternate" hreflang="zh" href="?lang=CN">
+  <link rel="alternate" hreflang="ar" href="?lang=AR">
+
+  <!-- Icons / PWA -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="theme-color" content="#0b0b0b">
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -49,16 +56,16 @@
     }
     .pulse{ animation:pulse 2s infinite; }
 
-    /* Небольшая косметика для RTL */
+    /* RTL косметика */
     html[dir="rtl"] .icon-btn { flex-direction: row-reverse; }
     html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
   </style>
 </head>
 <body class="text-white">
-  <!-- HEADER: только кнопки справа: сначала "Story in music", затем выбор языка -->
+  <!-- HEADER: справа — кнопка аудио и селектор языка -->
   <header class="max-w-5xl mx-auto px-4 py-6">
     <div class="flex flex-wrap gap-2 items-center justify-end">
-      <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse">Story in music</button>
+      <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse" data-i18n="audio.play">Story in music</button>
       <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
         <option value="EN" selected>EN</option>
         <option value="ES">ES</option><option value="FR">FR</option>
@@ -94,7 +101,7 @@
     <!-- HERO -->
     <section id="hero">
       <h1 class="text-3xl md:text-5xl font-semibold leading-tight">
-        The Real Unreal Story — <span data-i18n="hero.titleRest">support for Adam</span><span class="align-super text-green-400 text-xl">*</span>
+        The Real Unreal Story — <span class="text-indigo-600" data-i18n="hero.titleRest">support for Adam</span><span class="align-super text-green-400 text-xl">*</span>
       </h1>
       <p class="mt-4" data-i18n="hero.lead1">
         The true story of a surgeon who spent his life saving others and is now fighting for his own life.
@@ -121,7 +128,7 @@
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="announce.title">Our story announcement</h2>
       <div class="rounded-2xl border border-gray-700 p-4 flex items-center gap-3" style="background:rgba(0,0,0,0.35)">
-        <button id="announceBtn" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm pulse">▶︎ Play</button>
+        <button id="announceBtn" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm pulse" data-i18n="announce.play">▶︎ Play</button>
         <div class="text-sm text-gray-200" data-i18n="announce.short">Short audio announcement</div>
         <div id="announceStatus" class="ml-auto text-xs text-gray-300"></div>
       </div>
@@ -169,7 +176,7 @@
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="news.title">News</h2>
       <div id="tgFeed" class="rounded-2xl border border-gray-700 p-4" style="background:rgba(0,0,0,0.35); max-height:560px; overflow-y:auto;">
-        <div class="text-sm text-gray-300">Loading news…</div>
+        <div class="text-sm text-gray-300" data-i18n="feed.loading">Loading news…</div>
       </div>
       <div class="mt-4">
         <a href="https://t.me/theRealUnrealStory" target="_blank" rel="noreferrer" class="px-4 py-2 rounded-xl bg-sky-600 text-white text-sm hover:bg-sky-700" data-i18n="news.follow">
@@ -247,13 +254,7 @@
 
   <script>
     const donateURL = "https://www.gofundme.com/f/your-campaign-slug";
-    // проставим href сразу
-    document.addEventListener('DOMContentLoaded', ()=> {
-      const d = document.getElementById('donateHero');
-      if (d) d.href = donateURL;
-    });
 
-    // ===== LANGUAGE from ?lang= + Share keeps lang in URL =====
     function getLangFromQuery() {
       try {
         const u = new URL(location.href);
@@ -263,22 +264,7 @@
       } catch { return null; }
     }
 
-    // Share (вставляем текущий язык в ссылку)
-    document.getElementById('shareBtn').addEventListener('click', async () => {
-      try {
-        const u = new URL(location.href);
-        u.searchParams.set('lang', document.getElementById('lang').value);
-        const url = u.toString();
-        if (navigator.share) {
-          await navigator.share({ title: 'The Real Unreal Story', url });
-        } else {
-          await navigator.clipboard.writeText(url);
-          alert((I18N && I18N["share.copied"]) || 'Link copied');
-        }
-      } catch {}
-    });
-
-    /* ====== AUDIO (переключается по языку, файлы по шаблону) ====== */
+    // ===== AUDIO SOURCES by language =====
     const audio = document.getElementById('bgAudio');
     const audioBtn = document.getElementById('audioBtn');
     const langSelect = document.getElementById('lang');
@@ -288,16 +274,21 @@
       if(audio.src.endsWith(src)){ if(autoplay && audio.paused) audio.play().catch(()=>{}); return; }
       audio.pause(); audio.src = src; if(autoplay) audio.play().catch(()=>{});
     }
-    audioBtn.addEventListener('click', async ()=>{
-      if(audio.paused){
-        setAudioForLang(langSelect.value);
-        try{ await audio.play(); audioBtn.textContent = (I18N && I18N["audio.pause"]) || 'Pause'; }catch{}
-      } else {
-        audio.pause(); audioBtn.textContent = (I18N && I18N["audio.play"]) || 'Story in music';
-      }
-    });
 
-    /* ====== Модалки (тайлы + физическая помощь) с i18n ====== */
+    /* ====== Announcement mini-player ====== */
+    const announceAudio=document.getElementById('announceAudio');
+    const announceBtn=document.getElementById('announceBtn');
+    const announceStatus=document.getElementById('announceStatus');
+
+    function setAnnouncementForLang(l,autoplay=false){
+      const src=`audio/ANNOUNCEMENT-${l}.mp3`;
+      if(announceAudio.src.endsWith(src)){ if(autoplay && announceAudio.paused) announceAudio.play().catch(()=>{}); return; }
+      announceAudio.pause(); announceAudio.src=src;
+      announceStatus.textContent = ((I18N && I18N["announce.langLabel"]) || "Language: ") + l;
+      if(autoplay) announceAudio.play().catch(()=>{});
+    }
+
+    // ===== Modals
     const modal = document.getElementById('modalBackdrop');
     const mTitle = document.getElementById('modalTitle');
     const mBody  = document.getElementById('modalBody');
@@ -340,7 +331,7 @@
       `)
     );
 
-    /* ====== Вовлечённость (локальное состояние) ====== */
+    // ===== Engagement local state
     const engageBtns=[...document.querySelectorAll('.eng-btn')];
     const ENG_KEY='engagement_v1';
     const loadEng=()=>{ try{return JSON.parse(localStorage.getItem(ENG_KEY)||'[]');}catch{return []} };
@@ -349,7 +340,7 @@
     engageBtns.forEach((b,i)=>b.addEventListener('click',()=>{const on=loadEng(); const p=on.indexOf(i); if(p>=0) on.splice(p,1); else on.push(i); saveEng(on); applyEng();}));
     applyEng();
 
-    /* ====== Telegram feed ====== */
+    // ===== Telegram feed
     async function renderTgFeed(){
       try{
         const box=document.getElementById('tgFeed');
@@ -373,7 +364,7 @@
     }
     renderTgFeed();
 
-    /* ====== Карта (постраничная загрузка меток) ====== */
+    // ===== Map (paged)
     const map=L.map('map').setView([20,0],2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
     const layer=L.layerGroup().addTo(map);
@@ -391,7 +382,6 @@
     });
     function setMarksCount(n){ const el=document.getElementById('marksCount'); if(el) el.textContent=Number.isFinite(n)?String(n):'0'; }
 
-    // Пагинация для marks
     let marksOffset = 0;
     const marksPageSize = 500;
     async function fetchMarksPage() {
@@ -424,7 +414,7 @@
         total += chunk.length;
         drawMarksBatch(chunk, 300);
         marksOffset += chunk.length;
-        if (chunk.length < marksPageSize) break; // конец
+        if (chunk.length < marksPageSize) break;
       }
       setMarksCount(total);
     }
@@ -443,7 +433,7 @@
       loadAllMarksPaged();
     });
 
-    /* ====== Hearts + Splide (12 на слайд, постраничная подгрузка) ====== */
+    // ===== Hearts + Splide (12 per slide, paged)
     let splide;
     function chunk(a,s){const out=[];for(let i=0;i<a.length;i+=s) out.push(a.slice(i,i+s));return out;}
     function heartCard(n){return `<div class="p-4 rounded-2xl bg-gray-900/50 shadow-sm border border-gray-700"><div class="flex items-center gap-2"><span class="text-xl">❤️</span><div class="text-sm text-gray-200">${n||'Anon'}</div></div></div>`;}
@@ -484,10 +474,8 @@
     }
 
     document.getElementById('loadMoreHearts')?.addEventListener('click', loadMoreHearts);
-    // первая порция сердец
-    loadMoreHearts();
+    loadMoreHearts(); // первая порция
 
-    // добавление сердца
     document.getElementById('addHeart').addEventListener('click', async ()=>{
       const inp=document.getElementById('heartName'); const name=(inp.value||'').trim();
       await fetch('/.netlify/functions/hearts',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name})});
@@ -498,46 +486,65 @@
       loadMoreHearts();
     });
 
-    /* ====== Announcement mini-player ====== */
-    const announceAudio=document.getElementById('announceAudio');
-    const announceBtn=document.getElementById('announceBtn');
-    const announceStatus=document.getElementById('announceStatus');
-
-    function setAnnouncementForLang(l,autoplay=false){
-      const src=`audio/ANNOUNCEMENT-${l}.mp3`;
-      if(announceAudio.src.endsWith(src)){ if(autoplay && announceAudio.paused) announceAudio.play().catch(()=>{}); return; }
-      announceAudio.pause(); announceAudio.src=src;
-      announceStatus.textContent = ((I18N && I18N["announce.langLabel"]) || "Language: ") + l;
-      if(autoplay) announceAudio.play().catch(()=>{});
-    }
-    announceBtn.addEventListener('click', async ()=>{
-      if(announceAudio.paused){
-        setAnnouncementForLang(langSelect.value);
-        try{ await announceAudio.play(); announceBtn.textContent=(I18N && I18N["announce.pause"]) || '⏸ Pause'; }catch{}
-      } else {
-        announceAudio.pause(); announceBtn.textContent=(I18N && I18N["announce.play"]) || '▶︎ Play';
-      }
+    // ===== Share (вставляем текущий язык)
+    document.getElementById('shareBtn').addEventListener('click', async () => {
+      try {
+        const u = new URL(location.href);
+        u.searchParams.set('lang', document.getElementById('lang').value);
+        const url = u.toString();
+        if (navigator.share) {
+          await navigator.share({ title: 'The Real Unreal Story', url });
+        } else {
+          await navigator.clipboard.writeText(url);
+          alert((I18N && I18N["share.copied"]) || 'Link copied');
+        }
+      } catch {}
     });
-    announceAudio.addEventListener('ended',()=>{ announceBtn.textContent=(I18N && I18N["announce.play"]) || '▶︎ Play'; });
 
-    /* ====== I18N loader (brand stays "The Real Unreal Story") ====== */
+    // ===== I18N loader
     const LOCALE_DIRS = { AR:"rtl", CN:"ltr", DE:"ltr", EN:"ltr", ES:"ltr", FR:"ltr", IT:"ltr", PT:"ltr", RU:"ltr" };
     let I18N = {};
 
+    // дефолты из DOM как универсальный fallback
+    const DEFAULT_I18N = {};
+    (function captureDefaultI18n(){
+      document.querySelectorAll("[data-i18n]").forEach(el=>{
+        const key = el.getAttribute("data-i18n");
+        if (!(key in DEFAULT_I18N)) DEFAULT_I18N[key] = el.innerHTML;
+      });
+      document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{
+        const key = el.getAttribute("data-i18n-placeholder");
+        if (!(key in DEFAULT_I18N)) DEFAULT_I18N[key] = el.getAttribute("placeholder") || "";
+      });
+    })();
+
+    async function fetchLocaleJson(lang){
+      // 1) относительный путь (работает в подпапках)
+      try {
+        const r1 = await fetch(`i18n/${lang}.json`, { cache: 'no-store' });
+        if (r1.ok) return await r1.json();
+      } catch {}
+      // 2) абсолютный путь (на домене)
+      try {
+        const r2 = await fetch(`/i18n/${lang}.json`, { cache: 'no-store' });
+        if (r2.ok) return await r2.json();
+      } catch {}
+      return null;
+    }
+
     async function loadLocale(lang) {
       try {
-        const res = await fetch(`/i18n/${lang}.json`, { cache: 'no-store' });
-        I18N = await res.json();
-        window.I18N = I18N; // синхронизируем глобал для обработчиков
+        const data = await fetchLocaleJson(lang);
+        I18N = data || {};
+        window.I18N = I18N;
       } catch {
-        I18N = {};
-        window.I18N = {};
+        I18N = {}; window.I18N = {};
       }
 
       document.documentElement.lang = (lang || 'en').toLowerCase();
       document.documentElement.dir  = LOCALE_DIRS[lang] || 'ltr';
 
-      const titleRest = I18N["meta.titleRest"] || "support for Adam";
+      const titleRest = I18N["meta.titleRest"] || DEFAULT_I18N["hero.titleRest"] || "support for Adam";
       document.title = `The Real Unreal Story — ${titleRest}`;
 
       if (I18N["meta.description"]) {
@@ -546,51 +553,54 @@
         m.setAttribute('content', I18N["meta.description"]);
       }
 
+      // применяем переводы/дефолты
       document.querySelectorAll("[data-i18n]").forEach(el=>{
         const key = el.getAttribute("data-i18n");
-        if (I18N[key]) el.innerHTML = I18N[key];
+        const val = (I18N[key] ?? DEFAULT_I18N[key]);
+        if (val != null) el.innerHTML = val;
       });
       document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{
         const key = el.getAttribute("data-i18n-placeholder");
-        if (I18N[key]) el.setAttribute('placeholder', I18N[key]);
+        const val = (I18N[key] ?? DEFAULT_I18N[key]);
+        if (val != null) el.setAttribute('placeholder', val);
       });
 
-      // кнопки/лейблы с учётом текущего состояния плееров
+      // кнопки/лейблы с учётом состояния плееров
       if (audioBtn) {
         audioBtn.textContent = audio.paused
-          ? (I18N["audio.play"] || "Story in music")
+          ? (I18N["audio.play"] || DEFAULT_I18N["audio.play"] || "Story in music")
           : (I18N["audio.pause"] || "Pause");
       }
       if (announceBtn) {
         announceBtn.textContent = announceAudio.paused
-          ? (I18N["announce.play"] || "▶︎ Play")
+          ? (I18N["announce.play"] || DEFAULT_I18N["announce.play"] || "▶︎ Play")
           : (I18N["announce.pause"] || "⏸ Pause");
       }
       if (announceStatus) {
-        announceStatus.textContent = (I18N["announce.langLabel"] || "Language: ") + lang;
+        announceStatus.textContent = (I18N["announce.langLabel"] || DEFAULT_I18N["announce.langLabel"] || "Language: ") + lang;
       }
 
-      // Переключить треки под язык (сохраняя текущее состояние)
+      // треки под язык (сохраняя состояние)
       setAudioForLang(lang, !audio.paused);
       setAnnouncementForLang(lang, !announceAudio.paused);
     }
 
-    // ===== default language: EN, но уважаем ?lang= и localStorage
-    (function initLanguage(){
+    // ===== Init on DOM ready
+    document.addEventListener('DOMContentLoaded', () => {
+      const d = document.getElementById('donateHero'); if (d) d.href = donateURL;
+
       const fromQuery = getLangFromQuery();
       const initialLang = fromQuery || localStorage.getItem('site_lang') || 'EN';
       langSelect.value = initialLang;
       localStorage.setItem('site_lang', initialLang);
       loadLocale(initialLang);
 
-      // если был ?lang= — убираем его из адресной строки
       if (fromQuery) {
         const u = new URL(location.href);
         u.searchParams.delete('lang');
         history.replaceState({}, '', u);
       }
 
-      // смена языка: сохраняем, меняем URL (без перезагрузки) и перезагружаем тексты
       langSelect.addEventListener('change', e => {
         const l = e.target.value;
         localStorage.setItem('site_lang', l);
@@ -599,7 +609,25 @@
         history.replaceState({}, '', u);
         loadLocale(l);
       });
-    })();
+
+      audioBtn.addEventListener('click', async ()=>{
+        if(audio.paused){
+          setAudioForLang(langSelect.value);
+          try{ await audio.play(); audioBtn.textContent = (I18N && I18N["audio.pause"]) || "Pause"; }catch{}
+        } else {
+          audio.pause(); audioBtn.textContent = (I18N && I18N["audio.play"]) || (DEFAULT_I18N["audio.play"] || "Story in music");
+        }
+      });
+      announceBtn.addEventListener('click', async ()=>{
+        if(announceAudio.paused){
+          setAnnouncementForLang(langSelect.value);
+          try{ await announceAudio.play(); announceBtn.textContent=(I18N && I18N["announce.pause"]) || "⏸ Pause"; }catch{}
+        } else {
+          announceAudio.pause(); announceBtn.textContent=(I18N && I18N["announce.play"]) || (DEFAULT_I18N["announce.play"] || "▶︎ Play");
+        }
+      });
+      announceAudio.addEventListener('ended',()=>{ announceBtn.textContent=(I18N && I18N["announce.play"]) || (DEFAULT_I18N["announce.play"] || "▶︎ Play"); });
+    });
   </script>
 </body>
 </html>
