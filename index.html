@@ -74,15 +74,25 @@
         <span id="hashtagType">#TheRealUnrealStory</span><span class="hashtag-caret ml-0.5">|</span>
       </div>
       <!-- ПРАВО: на мобиле — столбцом, на ≥sm — в строку -->
-      <div class="flex gap-2 items-end sm:items-center sm:flex-row flex-col">
-        <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse" data-i18n="audio.play">Story in music</button>
-        <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
-          <option value="EN" selected>EN</option>
-          <option value="ES">ES</option><option value="FR">FR</option>
-          <option value="PT">PT</option><option value="DE">DE</option><option value="IT">IT</option>
-          <option value="RU">RU</option><option value="CN">CN</option><option value="AR">AR</option>
-        </select>
-      </div>
+<div class="flex gap-2 items-end sm:items-center sm:flex-row flex-col">
+  <!-- 1) сверху/слева: музыка -->
+  <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse" data-i18n="audio.play">Story in music</button>
+
+  <!-- 2) по центру на десктопе, под музыкой на мобиле: Установить приложение -->
+  <button id="installBtn"
+          class="px-4 py-2 rounded-xl border border-indigo-500 text-indigo-300 hover:bg-indigo-600/10 text-sm hidden"
+          data-i18n="btn.install">
+    Install app
+  </button>
+
+  <!-- 3) снизу/справа: выбор языка -->
+  <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
+    <option value="EN" selected>EN</option>
+    <option value="ES">ES</option><option value="FR">FR</option>
+    <option value="PT">PT</option><option value="DE">DE</option><option value="IT">IT</option>
+    <option value="RU">RU</option><option value="CN">CN</option><option value="AR">AR</option>
+  </select>
+</div>
     </div>
   </header>
 
@@ -108,13 +118,6 @@
         Spotify
       </a>
     </div>
-
-    <!-- справа: кнопка установки -->
-    <button id="installBtn"
-            class="ml-auto shrink-0 px-4 py-2 rounded-xl border border-indigo-500 text-indigo-300 hover:bg-indigo-600/10 text-sm hidden"
-            data-i18n="btn.install">
-      Install app
-    </button>
   </div>
 </section>
 
@@ -133,7 +136,6 @@
       <div class="mt-5 flex flex-wrap items-center gap-3">
         <a id="donateHero" target="_blank" class="px-4 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-sm font-medium" data-i18n="btn.donate">Donate</a>
         <button id="shareBtn" class="px-4 py-2 rounded-xl bg-gray-200 text-black text-sm hover:opacity-90" data-i18n="btn.share">Share</button>
-        <!-- НОВОЕ: своя кнопка установки PWA (скрыта по умолчанию; показывается при поддержке) -->
       </div>
     </section>
 
