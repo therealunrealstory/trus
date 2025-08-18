@@ -43,16 +43,9 @@
     .icon-btn{ display:inline-flex; align-items:center; gap:8px }
     .icon-btn svg{ width:18px; height:18px }
     .tile{ position:relative; overflow:hidden; border-radius:1rem; height:180px; background-size:cover; background-position:center; cursor:pointer; border:1px solid rgba(255,255,255,.08) }
-    /* ПЛЁНКА + эффекты */
-    .tile::after{
-      content:""; position:absolute; inset:0;
-      background:linear-gradient(180deg,transparent,rgba(0,0,0,.6));
-      opacity:.95; transition:opacity .25s ease;
-      pointer-events:none; /* не перехватывать клики */
-    }
-    .tile:hover::after{ opacity:0; }
-    .tile.no-overlay::after{ opacity:0 !important; }
-
+    .tile::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent,rgba(0,0,0,.6)); transition:opacity .2s ease }
+    .tile:hover::after{ opacity:0 }
+    .tile.overlay-off::after{ opacity:0 }
     .tile>span{ position:absolute; left:1rem; bottom:1rem; z-index:1; background:rgba(0,0,0,.55); padding:.4rem .7rem; border-radius:.8rem }
     .video-wrap{ position:relative; width:100%; padding-top:56.25%; border-radius:1rem; overflow:hidden; border:1px solid rgba(255,255,255,.08) }
     .video-wrap iframe{ position:absolute; inset:0; width:100%; height:100% }
@@ -75,7 +68,7 @@
   </style>
 </head>
 <body class="text-white">
-  <!-- HEADER: слева — хэштег; справа — кнопка аудио, кнопка установки и селектор языка -->
+  <!-- HEADER: слева — хэштег; справа — install / audio / язык -->
   <header class="max-w-5xl mx-auto px-4 py-6">
     <div class="flex items-center justify-between gap-3">
       <!-- ЛЕВО: хэштег с эффектом печати -->
@@ -84,8 +77,15 @@
       </div>
       <!-- ПРАВО: на мобиле — столбцом, на ≥sm — в строку -->
       <div class="flex gap-2 items-end sm:items-center sm:flex-row flex-col">
-        <button id="installBtn" class="px-4 py-2 rounded-xl border border-indigo-500 text-indigo-300 hover:bg-indigo-600/10 text-sm hidden" data-i18n="btn.install">Install app</button>
+        <!-- 1) мобайл — первая строка; десктоп — слева -->
+        <button id="installBtn"
+                class="px-4 py-2 rounded-xl border border-indigo-500 text-indigo-300 hover:bg-indigo-600/10 text-sm hidden"
+                data-i18n="btn.install">
+          Install app
+        </button>
+        <!-- 2) мобайл — вторая строка; десктоп — по центру -->
         <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse" data-i18n="audio.play">Story in music</button>
+        <!-- 3) мобайл — третья строка; десктоп — справа -->
         <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
           <option value="EN" selected>EN</option>
           <option value="ES">ES</option><option value="FR">FR</option>
@@ -124,7 +124,7 @@
     <!-- HERO -->
     <section id="hero">
       <h1 class="text-3xl md:text-5xl font-semibold leading-tight">
-        The Real Unreal Story — <span class="text-indigo-600" data-i18n="hero.titleRest">support for Adam</span><span class="align-super text-xl">*</span>
+        The Real Unreal Story — <span class="text-indigo-600" data-i18n="hero.titleRest">support for Adam</span><span class="align-super text-white/80 text-xl">*</span>
       </h1>
       <p class="mt-4" data-i18n="hero.lead1">
         The true story of a surgeon who spent his life saving others and is now fighting for his own life.
@@ -184,11 +184,10 @@
       <h2 class="text-xl font-semibold mb-4" data-i18n="support.title">Support now</h2>
       <div class="grid md:grid-cols-2 gap-4">
         <!-- Донаты -->
-        <div class="px-5 py-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
-          <div class="text-2xl mb-2 text-white">
-            <!-- тонкое сердце -->
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/>
+        <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
+          <div class="text-2xl mb-2">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 21s-6-4.35-8.28-8A5 5 0 0 1 12 5a5 5 0 0 1 8.28 8C18 16.65 12 21 12 21Z"/>
             </svg>
           </div>
           <div class="font-medium mb-2" data-i18n="support.money">Donate funds</div>
@@ -203,14 +202,11 @@
           </div>
         </div>
         <!-- Физическая помощь -->
-        <div class="px-5 py-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
-          <div class="text-2xl mb-2 text-white">
-            <!-- тонкие «два пользователя» -->
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
+          <div class="text-2xl mb-2">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M16 21v-2a4 4 0 0 0-8 0v2"/>
+              <circle cx="12" cy="7" r="4"/>
             </svg>
           </div>
           <div class="font-medium mb-2" data-i18n="support.physical">Practical help</div>
@@ -235,12 +231,7 @@
     <!-- ВОВЛЕЧЁННОСТЬ -->
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="engage.title">Your engagement</h2>
-      <p class="text-sm text-gray-200 mb-3">
-        <span data-i18n="engage.desc">Mark what you've already done — that’s support too</span>
-        <svg viewBox="0 0 24 24" width="16" height="16" class="inline align-[-2px] ml-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/>
-        </svg>
-      </p>
+      <p class="text-sm text-gray-200 mb-3" data-i18n="engage.desc">Mark what you've already done — that’s support too ❤️</p>
       <div id="engageWrap" class="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
         <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b1">Read/listened to the short version</button>
         <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b2">Read/listened to the full story</button>
@@ -255,9 +246,12 @@
     <!-- КАРТА -->
     <section>
       <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 10c0 5.523-4.477 10-10 10S1 15.523 1 10 5.477 0 11 0s10 4.477 10 10z" transform="translate(1 2) scale(.9)"/>
-          <path d="M2 12h20M12 2v20M4 5c2 1 4 1 6-1s4-2 6 0 4 1 6-1" opacity=".35"/>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+             stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M2 12h20" />
+          <path d="M12 2a15.3 15.3 0 0 1 0 20" />
+          <path d="M12 2a15.3 15.3 0 0 0 0 20" />
         </svg>
         <span data-i18n="map.title">Support map</span>
       </h2>
@@ -323,20 +317,7 @@
       } catch { return null; }
     }
 
-    // ===== PWA install: слушаем ранние события (единожды)
-    let deferredPrompt = null;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const b = document.getElementById('installBtn');
-      if (b) b.classList.remove('hidden');
-    });
-    window.addEventListener('appinstalled', () => {
-      const b = document.getElementById('installBtn');
-      b?.classList.add('hidden');
-    });
-
-    // ===== AUDIO SOURCES by language (ленивая подгрузка: src ставим только по клику)
+    // ===== AUDIO SOURCES by language =====
     const audio = document.getElementById('bgAudio');
     const audioBtn = document.getElementById('audioBtn');
     const langSelect = document.getElementById('lang');
@@ -377,52 +358,45 @@
     const modal = document.getElementById('modalBackdrop');
     const mTitle = document.getElementById('modalTitle');
     const mBody  = document.getElementById('modalBody');
-
-    const tilesEls = [...document.querySelectorAll('.tile')];
-
-    const openModal = (title, html)=>{
-      mTitle.innerHTML = title; mBody.innerHTML = html; modal.classList.add('show');
-    };
-    const closeModal=()=>{
-      modal.classList.remove('show');
-      tilesEls.forEach(t => t.classList.remove('no-overlay')); // вернуть плёнку
-    };
+    const openModal = (title, html)=>{ mTitle.innerHTML = title; mBody.innerHTML = html; modal.classList.add('show'); };
+    const closeModal=()=>modal.classList.remove('show');
     document.getElementById('modalClose').onclick=closeModal; document.getElementById('modalOk').onclick=closeModal;
     modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
 
     function t(key, fallback){ return (window.I18N && I18N[key]) || fallback; }
 
-    document.getElementById('tile1').onclick=()=>{
-      const el=document.getElementById('tile1'); el.classList.add('no-overlay');
-      openModal(
-        t('tiles.me','I’m Nico'),
-        t('modal.tile1.body', `
-          My name is Nico, and I’m Adam’s friend. I became an involuntary participant in this “real-unreal” story.
-          I’ve reached out to a wide audience for support — I can’t manage alone anymore.
-          So I’m telling our story without embellishment and launching a fundraiser on GoFundMe in parallel.
-        `)
-      );
-    };
-    document.getElementById('tile2').onclick=()=>{
-      const el=document.getElementById('tile2'); el.classList.add('no-overlay');
-      openModal(
-        t('tiles.about','About Adam'),
-        t('modal.tile2.body', `
-          Adam is a wonderful person and a surgeon with unique techniques, a philanthropist. Since 2019, he has faced blood oncology several times.
-          In July 2025 — a new severe turn: another form of leukemia. At the same time — personal shocks and losses.
-        `)
-      );
-    };
-    document.getElementById('tile3').onclick=()=>{
-      const el=document.getElementById('tile3'); el.classList.add('no-overlay');
-      openModal(
-        t('tiles.others','Other people in the story'),
-        t('modal.tile3.body', `
-          Adam’s story is full of real surprises. There were incredible helpers — without them he wouldn’t have survived to this day.
-          There were also those who deliberately harmed. And there were people whom the universe seemed to bring at the right moment.
-        `)
-      );
-    };
+    // тайлы
+    const tileEls = [document.getElementById('tile1'), document.getElementById('tile2'), document.getElementById('tile3')];
+    function lockOverlay(idx, lock){ const el = tileEls[idx]; if(!el) return; el.classList.toggle('overlay-off', !!lock); }
+
+    document.getElementById('tile1').onclick=()=>{ lockOverlay(0, true); openModal(
+      t('tiles.me','I’m Nico'),
+      t('modal.tile1.body', `
+        My name is Nico, and I’m Adam’s friend. I became an involuntary participant in this “real-unreal” story.
+        I’ve reached out to a wide audience for support — I can’t manage alone anymore.
+        So I’m telling our story without embellishment and launching a fundraiser on GoFundMe in parallel.
+      `)
+    ); };
+    document.getElementById('tile2').onclick=()=>{ lockOverlay(1, true); openModal(
+      t('tiles.about','About Adam'),
+      t('modal.tile2.body', `
+        Adam is a wonderful person and a surgeon with unique techniques, a philanthropist. Since 2019, he has faced blood oncology several times.
+        In July 2025 — a new severe turn: another form of leukemia. At the same time — personal shocks and losses.
+      `)
+    ); };
+    document.getElementById('tile3').onclick=()=>{ lockOverlay(2, true); openModal(
+      t('tiles.others','Other people in the story'),
+      t('modal.tile3.body', `
+        Adam’s story is full of real surprises. There were incredible helpers — without them he wouldn’t have survived to this day.
+        There were also those who deliberately harmed. And there were people whom the universe seemed to bring at the right moment.
+      `)
+    ); };
+
+    // возвращаем плёнку после закрытия модалки
+    document.getElementById('modalClose').addEventListener('click', () => tileEls.forEach(el=>el.classList.remove('overlay-off')));
+    document.getElementById('modalOk').addEventListener('click', () => tileEls.forEach(el=>el.classList.remove('overlay-off')));
+    document.getElementById('modalBackdrop').addEventListener('click', (e)=>{ if(e.target===document.getElementById('modalBackdrop')) tileEls.forEach(el=>el.classList.remove('overlay-off')); });
+
     document.getElementById('wantHelp').onclick=()=>openModal(
       t('support.physical','Practical help'),
       t('modal.help.body', `
@@ -629,10 +603,12 @@
     })();
 
     async function fetchLocaleJson(lang){
+      // 1) относительный путь (работает в подпапках)
       try {
         const r1 = await fetch(`i18n/${lang}.json`, { cache: 'no-store' });
         if (r1.ok) return await r1.json();
       } catch {}
+      // 2) абсолютный путь (на домене)
       try {
         const r2 = await fetch(`/i18n/${lang}.json`, { cache: 'no-store' });
         if (r2.ok) return await r2.json();
@@ -673,16 +649,16 @@
         if (val != null) el.setAttribute('placeholder', val);
       });
 
-      // подписи кнопок без автоподстановки src (ленивая загрузка)
+      // кнопки/лейблы с учётом состояния плееров
       if (audioBtn) {
         audioBtn.textContent = audio.paused
           ? (I18N["audio.play"] || DEFAULT_I18N["audio.play"] || "Story in music")
-          : (I18N["audio.pause"] || "Pause");
+          : (I18N["audio.pause"] || "‖ Pause");
       }
       if (announceBtn) {
         announceBtn.textContent = announceAudio.paused
           ? (I18N["announce.play"] || DEFAULT_I18N["announce.play"] || "▶︎ Play")
-          : (I18N["announce.pause"] || "⏸ Pause");
+          : (I18N["announce.pause"] || "‖ Pause");
       }
       if (announceStatus) {
         announceStatus.textContent = (I18N["announce.langLabel"] || DEFAULT_I18N["announce.langLabel"] || "Language: ") + lang;
@@ -690,12 +666,30 @@
       if (shortBtn) {
         shortBtn.textContent = shortAudio.paused
           ? (I18N["short.play"] || DEFAULT_I18N["short.play"] || "▶︎ Play")
-          : (I18N["short.pause"] || "⏸ Pause");
+          : (I18N["short.pause"] || "‖ Pause");
       }
       if (shortStatus) {
         shortStatus.textContent = (I18N["short.langLabel"] || DEFAULT_I18N["short.langLabel"] || "Language: ") + lang;
       }
+
+      // треки под язык (сохраняя состояние; лениво — src только когда нужно)
+      setAudioForLang(lang, !audio.paused);
+      setAnnouncementForLang(lang, !announceAudio.paused);
+      setShortForLang(lang, !shortAudio.paused);
     }
+
+    // ===== PWA install: слушаем ранние события (до DOMContentLoaded)
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const b = document.getElementById('installBtn');
+      if (b) b.classList.remove('hidden');
+    });
+    window.addEventListener('appinstalled', () => {
+      const b = document.getElementById('installBtn');
+      b?.classList.add('hidden');
+    });
 
     // ===== Init on DOM ready
     document.addEventListener('DOMContentLoaded', () => {
@@ -720,12 +714,17 @@
         u.searchParams.set('lang', l);
         history.replaceState({}, '', u);
         loadLocale(l);
+
+        // ВАЖНО: если что-то играет — моментально переключаем дорожку на новый язык
+        if (!audio.paused)         setAudioForLang(l, true);
+        if (!announceAudio.paused) setAnnouncementForLang(l, true);
+        if (!shortAudio.paused)    setShortForLang(l, true);
       });
 
       audioBtn.addEventListener('click', async ()=>{
         if(audio.paused){
           setAudioForLang(langSelect.value);
-          try{ await audio.play(); audioBtn.textContent = (I18N && I18N["audio.pause"]) || "⏸ Pause"; }catch{}
+          try{ await audio.play(); audioBtn.textContent = (I18N && I18N["audio.pause"]) || "‖ Pause"; }catch{}
         } else {
           audio.pause(); audioBtn.textContent = (I18N && I18N["audio.play"]) || (DEFAULT_I18N["audio.play"] || "Story in music");
         }
@@ -733,37 +732,46 @@
       announceBtn.addEventListener('click', async ()=>{
         if(announceAudio.paused){
           setAnnouncementForLang(langSelect.value);
-          try{ await announceAudio.play(); announceBtn.textContent=(I18N && I18N["announce.pause"]) || "⏸ Pause"; }catch{}
+          try{ await announceAudio.play(); announceBtn.textContent=(I18N && I18N["announce.pause"]) || "‖ Pause"; }catch{}
         } else {
           announceAudio.pause(); announceBtn.textContent=(I18N && I18N["announce.play"]) || (DEFAULT_I18N["announce.play"] || "▶︎ Play");
         }
       });
       announceAudio.addEventListener('ended',()=>{ announceBtn.textContent=(I18N && I18N["announce.play"]) || (DEFAULT_I18N["announce.play"] || "▶︎ Play"); });
 
+      // события для короткой версии
       shortBtn.addEventListener('click', async ()=>{
         if(shortAudio.paused){
           setShortForLang(langSelect.value);
-          try{ await shortAudio.play(); shortBtn.textContent=(I18N && I18N["short.pause"]) || "⏸ Pause"; }catch{}
+          try{ await shortAudio.play(); shortBtn.textContent=(I18N && I18N["short.pause"]) || "‖ Pause"; }catch{}
         } else {
           shortAudio.pause(); shortBtn.textContent=(I18N && I18N["short.play"]) || (DEFAULT_I18N["short.play"] || "▶︎ Play");
         }
       });
       shortAudio.addEventListener('ended',()=>{ shortBtn.textContent=(I18N && I18N["short.play"]) || (DEFAULT_I18N["short.play"] || "▶︎ Play"); });
 
-      // Хэштег: эффект печати + CTA
+      // Хэштег: эффект печати по кругу + клик = модалка-CTA
       (function initHashtag() {
         const el = document.getElementById('hashtagType');
         const btn = document.getElementById('hashtagBtn');
         if (!el || !btn) return;
+
         const TEXT = '#TheRealUnrealStory';
         let i = 0, dir = 1;
         const typeDelay = 90, eraseDelay = 45, pause = 900;
+
         function step() {
           el.textContent = TEXT.slice(0, i);
-          if (dir > 0) { if (i < TEXT.length) { i++; setTimeout(step, typeDelay); } else { setTimeout(() => { dir = -1; step(); }, pause); } }
-          else { if (i > 0) { i--; setTimeout(step, eraseDelay); } else { setTimeout(() => { dir = 1; step(); }, pause); } }
+          if (dir > 0) {
+            if (i < TEXT.length) { i++; setTimeout(step, typeDelay); }
+            else { setTimeout(() => { dir = -1; step(); }, pause); }
+          } else {
+            if (i > 0) { i--; setTimeout(step, eraseDelay); }
+            else { setTimeout(() => { dir = 1; step(); }, pause); }
+          }
         }
         step();
+
         btn.addEventListener('click', () => {
           openModal(
             t('hashtag.title', '#TheRealUnrealStory'),
@@ -779,6 +787,7 @@
       })();
 
       // Кнопка установки PWA
+      let deferredPrompt = window.deferredPrompt || null;
       const installBtn = document.getElementById('installBtn');
       if (window.matchMedia('(display-mode: standalone)').matches) {
         installBtn?.classList.add('hidden');
@@ -795,6 +804,8 @@
         }
         deferredPrompt = null;
       });
+      window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn?.classList.remove('hidden'); });
+      window.addEventListener('appinstalled', () => installBtn?.classList.add('hidden'));
     });
   </script>
 </body>
