@@ -42,31 +42,18 @@
     section, footer{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
     .icon-btn{ display:inline-flex; align-items:center; gap:8px }
     .icon-btn svg{ width:18px; height:18px }
-
-    /* Тайлы */
-    .tile{
-      position:relative; overflow:hidden; border-radius:1rem; height:180px;
-      background-size:cover; background-position:center; cursor:pointer;
-      border:1px solid rgba(255,255,255,.08);
-      --tile-overlay: .6;
-    }
-    .tile::after{
-      content:""; position:absolute; inset:0;
-      background:linear-gradient(180deg,transparent,rgba(0,0,0,var(--tile-overlay)));
-      opacity:1; transition:opacity .25s ease;
-    }
-    @media (hover:hover) and (pointer:fine){
-      .tile:hover::after{ opacity:0; }
-    }
-    .tile.no-overlay::after{ opacity:0 !important; }
+    .tile{ position:relative; overflow:hidden; border-radius:1rem; height:180px; background-size:cover; background-position:center; cursor:pointer; border:1px solid rgba(255,255,255,.08) }
+    .tile::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent,rgba(0,0,0,.6)) }
     .tile>span{ position:absolute; left:1rem; bottom:1rem; z-index:1; background:rgba(0,0,0,.55); padding:.4rem .7rem; border-radius:.8rem }
-
     .video-wrap{ position:relative; width:100%; padding-top:56.25%; border-radius:1rem; overflow:hidden; border:1px solid rgba(255,255,255,.08) }
     .video-wrap iframe{ position:absolute; inset:0; width:100%; height:100% }
     .modal-backdrop{ display:none; z-index:9999; } .modal-backdrop.show{ display:block }
-
     /* пульсирующая кнопка */
-    @keyframes pulse { 0% { transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,.6); } 70%{ transform:scale(1.03); box-shadow:0 0 0 12px rgba(99,102,241,0); } 100%{ transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,0); } }
+    @keyframes pulse {
+      0% { transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,.6); }
+      70%{ transform:scale(1.03); box-shadow:0 0 0 12px rgba(99,102,241,0); }
+      100%{ transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,0); }
+    }
     .pulse{ animation:pulse 2s infinite; }
 
     /* RTL косметика */
@@ -79,15 +66,30 @@
   </style>
 </head>
 <body class="text-white">
-  <!-- HEADER: слева — хэштег; справа — install + аудио + язык -->
+  <!-- HEADER: слева — хэштег; справа — кнопка аудио и селектор языка -->
   <header class="max-w-5xl mx-auto px-4 py-6">
     <div class="flex items-center justify-between gap-3">
+      <!-- ЛЕВО: хэштег с эффектом печати -->
       <div id="hashtagBtn" class="font-mono text-xs sm:text-sm text-white/90 cursor-pointer select-none flex items-center" title="#TheRealUnrealStory" aria-label="#TheRealUnrealStory">
         <span id="hashtagType">#TheRealUnrealStory</span><span class="hashtag-caret ml-0.5">|</span>
       </div>
+      <!-- ПРАВО: на мобиле — столбцом, на ≥sm — в строку -->
       <div class="flex gap-2 items-end sm:items-center sm:flex-row flex-col">
-        <button id="installBtn" class="px-4 py-2 rounded-xl border border-indigo-500 text-indigo-300 hover:bg-indigo-600/10 text-sm hidden" data-i18n="btn.install">Install app</button>
-        <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse" data-i18n="audio.play">Story in music</button>
+        <!-- 1) на мобиле — первой строкой; на десктопе — слева -->
+        <button id="installBtn"
+                class="px-4 py-2 rounded-xl border border-indigo-500 text-indigo-300 hover:bg-indigo-600/10 text-sm hidden"
+                data-i18n="btn.install">
+          Install app
+        </button>
+
+        <!-- 2) на мобиле — второй строкой; на десктопе — посередине -->
+        <button id="audioBtn"
+                class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse"
+                data-i18n="audio.play">
+          Story in music
+        </button>
+
+        <!-- 3) на мобиле — третьей строкой; на десктопе — справа -->
         <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
           <option value="EN" selected>EN</option>
           <option value="ES">ES</option><option value="FR">FR</option>
@@ -101,6 +103,7 @@
   <!-- Соцсети -->
   <section class="max-w-5xl mx-auto px-4">
     <div class="flex items-center gap-3">
+      <!-- слева: соцсети -->
       <div class="flex items-center gap-3 flex-wrap grow">
         <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 shadow-sm" href="https://instagram.com/theRealUnrealStory" target="_blank" rel="noreferrer">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2.2A2.8 2.8 0 1 0 12 15.8 2.8 2.8 0 0 0 12 9.2zm4.8-2.5a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2z"/></svg>
@@ -126,7 +129,7 @@
     <!-- HERO -->
     <section id="hero">
       <h1 class="text-3xl md:text-5xl font-semibold leading-tight">
-        The Real Unreal Story — <span class="text-indigo-600" data-i18n="hero.titleRest">support for Adam</span><span class="align-super text-xl text-current">*</span>
+        The Real Unreal Story — <span class="text-indigo-600" data-i18n="hero.titleRest">support for Adam</span><span class="align-super text-green-400 text-xl">*</span>
       </h1>
       <p class="mt-4" data-i18n="hero.lead1">
         The true story of a surgeon who spent his life saving others and is now fighting for his own life.
@@ -157,7 +160,7 @@
         <div class="text-sm text-gray-200" data-i18n="announce.short">Short audio announcement</div>
         <div id="announceStatus" class="ml-auto text-xs text-gray-300"></div>
       </div>
-      <audio id="announceAudio" preload="none"></audio>
+      <audio id="announceAudio" preload="auto"></audio>
     </section>
 
     <!-- ВИДЕО -->
@@ -178,15 +181,22 @@
         <div class="text-sm text-gray-200" data-i18n="short.note">About the events from early 2019 to mid-2025.</div>
         <div id="shortStatus" class="ml-auto text-xs text-gray-300"></div>
       </div>
-      <audio id="shortAudio" preload="none"></audio>
+      <audio id="shortAudio" preload="auto"></audio>
     </section>
 
     <!-- ПОДДЕРЖАТЬ СЕЙЧАС -->
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="support.title">Support now</h2>
       <div class="grid md:grid-cols-2 gap-4">
+        <!-- Донаты -->
         <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
-          <div class="text-2xl mb-2">💚</div>
+          <div class="mb-2" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="1.5"
+                 stroke-linecap="round" stroke-linejoin="round" class="opacity-90">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </div>
           <div class="font-medium mb-2" data-i18n="support.money">Donate funds</div>
           <div class="flex flex-wrap gap-2">
             <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=5">$5</a>
@@ -198,8 +208,18 @@
             <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=500">$500</a>
           </div>
         </div>
+        <!-- Физическая помощь -->
         <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
-          <div class="text-2xl mb-2">👥</div>
+          <div class="mb-2" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="1.5"
+                 stroke-linecap="round" stroke-linejoin="round" class="opacity-90">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
           <div class="font-medium mb-2" data-i18n="support.physical">Practical help</div>
           <button id="wantHelp" class="text-sm underline" data-i18n="btn.wantHelp">I want to help</button>
         </div>
@@ -222,7 +242,16 @@
     <!-- ВОВЛЕЧЁННОСТЬ -->
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="engage.title">Your engagement</h2>
-      <p class="text-sm text-gray-200 mb-3" data-i18n="engage.desc">Mark what you've already done — that’s support too ❤️</p>
+      <p class="text-sm text-gray-200 mb-3">
+        <span data-i18n="engage.desc">Mark what you've already done — that’s support too</span>
+        <span aria-hidden="true" class="inline-block align-[-1px] ml-1">
+          <svg width="16" height="16" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="1.5"
+               stroke-linecap="round" stroke-linejoin="round" class="opacity-90">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </span>
+      </p>
       <div id="engageWrap" class="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
         <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b1">Read/listened to the short version</button>
         <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b2">Read/listened to the full story</button>
@@ -236,7 +265,16 @@
 
     <!-- КАРТА -->
     <section>
-      <h2 class="text-xl font-semibold mb-4" data-i18n="map.title">🌍 Support map</h2>
+      <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+        <svg width="20" height="20" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="1.5"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="opacity-90">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M2 12h20"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10"/>
+        </svg>
+        <span data-i18n="map.title">Support map</span>
+      </h2>
       <div id="map" class="rounded-2xl shadow-sm border" style="background:#0b0b0b"></div>
       <p class="text-xs text-gray-300 mt-2" data-i18n="map.tip">Be sure to click on the map to specify the exact place of your support.</p>
       <div class="mt-4 grid md:grid-cols-3 gap-3">
@@ -273,7 +311,7 @@
   </footer>
 
   <!-- Аудио в шапке -->
-  <audio id="bgAudio" preload="none"></audio>
+  <audio id="bgAudio" preload="auto"></audio>
 
   <!-- Универсальная модалка -->
   <div id="modalBackdrop" class="modal-backdrop fixed inset-0 bg-black/60">
@@ -299,58 +337,84 @@
       } catch { return null; }
     }
 
-    // ===== AUDIO elements =====
-    const audio = document.getElementById('bgAudio');           // Story in music
+    // ===== AUDIO SOURCES by language =====
+    const audio = document.getElementById('bgAudio');
     const audioBtn = document.getElementById('audioBtn');
     const langSelect = document.getElementById('lang');
 
-    const announceAudio = document.getElementById('announceAudio');
-    const announceBtn   = document.getElementById('announceBtn');
-    const announceStatus= document.getElementById('announceStatus');
+    function setAudioForLang(l, autoplay=false){
+      const src = `audio/ORUS-${l}.mp3`;
+      if(audio.src.endsWith(src)){ if(autoplay && audio.paused) audio.play().catch(()=>{}); return; }
+      audio.pause(); audio.src = src; if(autoplay) audio.play().catch(()=>{});
+    }
 
+    /* ====== Announcement mini-player ====== */
+    const announceAudio=document.getElementById('announceAudio');
+    const announceBtn=document.getElementById('announceBtn');
+    const announceStatus=document.getElementById('announceStatus');
+
+    function setAnnouncementForLang(l,autoplay=false){
+      const src=`audio/ANNOUNCEMENT-${l}.mp3`;
+      if(announceAudio.src.endsWith(src)){ if(autoplay && announceAudio.paused) announceAudio.play().catch(()=>{}); return; }
+      announceAudio.pause(); announceAudio.src=src;
+      announceStatus.textContent = ((I18N && I18N["announce.langLabel"]) || "Language: ") + l;
+      if(autoplay) announceAudio.play().catch(()=>{});
+    }
+
+    /* ====== Short-story mini-player ====== */
     const shortAudio = document.getElementById('shortAudio');
     const shortBtn   = document.getElementById('shortBtn');
     const shortStatus= document.getElementById('shortStatus');
+
+    function setShortForLang(l, autoplay=false){
+      const src = `audio/SHORTSTORY-${l}.mp3`;
+      if(shortAudio.src.endsWith(src)){ if(autoplay && shortAudio.paused) shortAudio.play().catch(()=>{}); return; }
+      shortAudio.pause(); shortAudio.src = src;
+      shortStatus.textContent = ((I18N && I18N["short.langLabel"]) || "Language: ") + l;
+      if(autoplay) shortAudio.play().catch(()=>{});
+    }
 
     // ===== Modals
     const modal = document.getElementById('modalBackdrop');
     const mTitle = document.getElementById('modalTitle');
     const mBody  = document.getElementById('modalBody');
     const openModal = (title, html)=>{ mTitle.innerHTML = title; mBody.innerHTML = html; modal.classList.add('show'); };
-    const closeModal=()=>{ modal.classList.remove('show'); clearTileOverlay(); };
+    const closeModal=()=>modal.classList.remove('show');
     document.getElementById('modalClose').onclick=closeModal; document.getElementById('modalOk').onclick=closeModal;
     modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
 
     function t(key, fallback){ return (window.I18N && I18N[key]) || fallback; }
 
-    // ===== Тайлы: управление плёнкой
-    const tiles = [document.getElementById('tile1'), document.getElementById('tile2'), document.getElementById('tile3')];
-    function clearTileOverlay(){ tiles.forEach(el => el && el.classList.remove('no-overlay')); }
-    function activateTile(el){ clearTileOverlay(); el && el.classList.add('no-overlay'); }
-
-    document.getElementById('tile1').onclick=()=>{ activateTile(tiles[0]); openModal(
+    document.getElementById('tile1').onclick=()=>openModal(
       t('tiles.me','I’m Nico'),
-      t('modal.tile1.body', `My name is Nico, and I’m Adam’s friend. I became an involuntary participant in this “real-unreal” story.
-      I’ve reached out to a wide audience for support — I can’t manage alone anymore.
-      So I’m telling our story without embellishment and launching a fundraiser on GoFundMe in parallel.`)
-    ); };
-    document.getElementById('tile2').onclick=()=>{ activateTile(tiles[1]); openModal(
+      t('modal.tile1.body', `
+        My name is Nico, and I’m Adam’s friend. I became an involuntary participant in this “real-unreal” story.
+        I’ve reached out to a wide audience for support — I can’t manage alone anymore.
+        So I’m telling our story without embellishment and launching a fundraiser on GoFundMe in parallel.
+      `)
+    );
+    document.getElementById('tile2').onclick=()=>openModal(
       t('tiles.about','About Adam'),
-      t('modal.tile2.body', `Adam is a wonderful person and a surgeon with unique techniques, a philanthropist. Since 2019, he has faced blood oncology several times.
-      In July 2025 — a new severe turn: another form of leukemia. At the same time — personal shocks and losses.`)
-    ); };
-    document.getElementById('tile3').onclick=()=>{ activateTile(tiles[2]); openModal(
+      t('modal.tile2.body', `
+        Adam is a wonderful person and a surgeon with unique techniques, a philanthropist. Since 2019, he has faced blood oncology several times.
+        In July 2025 — a new severe turn: another form of leukemia. At the same time — personal shocks and losses.
+      `)
+    );
+    document.getElementById('tile3').onclick=()=>openModal(
       t('tiles.others','Other people in the story'),
-      t('modal.tile3.body', `Adam’s story is full of real surprises. There were incredible helpers — without them he wouldn’t have survived to this day.
-      There were also those who deliberately harmed. And there were people whom the universe seemed to bring at the right moment.`)
-    ); };
-
+      t('modal.tile3.body', `
+        Adam’s story is full of real surprises. There were incredible helpers — without them he wouldn’t have survived to this day.
+        There were also those who deliberately harmed. And there were people whom the universe seemed to bring at the right moment.
+      `)
+    );
     document.getElementById('wantHelp').onclick=()=>openModal(
       t('support.physical','Practical help'),
-      t('modal.help.body', `If you are ready to help — whether legal, medical or practical support
-      (nurses, caregivers), or if you want to arrange a personal meeting — please write to:
-      <a href="mailto:theRealUnrealStory@gmail.com" class="underline">theRealUnrealStory@gmail.com</a>.<br><br>
-      We are sincerely grateful to everyone who responds.`)
+      t('modal.help.body', `
+        If you are ready to help — whether legal, medical or practical support
+        (nurses, caregivers), or if you want to arrange a personal meeting — please write to:
+        <a href="mailto:theRealUnrealStory@gmail.com" class="underline">theRealUnrealStory@gmail.com</a>.<br><br>
+        We are sincerely grateful to everyone who responds.
+      `)
     );
 
     // ===== Engagement local state
@@ -358,19 +422,8 @@
     const ENG_KEY='engagement_v1';
     const loadEng=()=>{ try{return JSON.parse(localStorage.getItem(ENG_KEY)||'[]');}catch{return []} };
     const saveEng=a=>{ try{localStorage.setItem(ENG_KEY,JSON.stringify(a));}catch{} };
-    function applyEng(){
-      const on=loadEng();
-      engageBtns.forEach((b,i)=>{
-        const s=on.includes(i);
-        b.classList.toggle('bg-green-700',s);
-        b.classList.toggle('border-green-400',s);
-      });
-    }
-    engageBtns.forEach((b,i)=>b.addEventListener('click',()=>{
-      const on=loadEng(); const p=on.indexOf(i);
-      if(p>=0) on.splice(p,1); else on.push(i);
-      saveEng(on); applyEng();
-    }));
+    function applyEng(){ const on=loadEng(); engageBtns.forEach((b,i)=>{const s=on.includes(i); b.classList.toggle('bg-green-700',s); b.classList.toggle('border-green-400',s);}); }
+    engageBtns.forEach((b,i)=>b.addEventListener('click',()=>{const on=loadEng(); const p=on.indexOf(i); if(p>=0) on.splice(p,1); else on.push(i); saveEng(on); applyEng();}));
     applyEng();
 
     // ===== Telegram feed
@@ -388,9 +441,10 @@
           const text=(p.text||'').replace(/\n/g,'<br>');
           const _img = (p.media_type==='photo' && p.media_path) ? `/.netlify/functions/tg-file?path=${encodeURIComponent(p.media_path)}` : null;
           const mediaHtml = _img
-            ? `<img src="${_img}" alt=""
-                 class="mt-2 rounded-xl border border-gray-700 max-w-full max-h-52 sm:max-h-52 w-auto object-contain block cursor-zoom-in"
-                 onclick="openModal('', '<img src=&quot;${_img}&quot; class=&quot;w-full h-auto rounded-xl&quot;>')">`
+            ? `<img src="${_img}"
+                     alt=""
+                     class="mt-2 rounded-xl border border-gray-700 max-w-full max-h-52 sm:max-h-52 w-auto object-contain block cursor-zoom-in"
+                     onclick="openModal('', '<img src=&quot;${_img}&quot; class=&quot;w-full h-auto rounded-xl&quot;>')">`
             : '';
           return `<article class="mb-4 p-3 rounded-xl bg-gray-900/50 border border-gray-700">
                     <div class="text-xs text-gray-300 mb-2">${time}${link?` · ${link}`:''}</div>
@@ -545,6 +599,7 @@
     const LOCALE_DIRS = { AR:"rtl", CN:"ltr", DE:"ltr", EN:"ltr", ES:"ltr", FR:"ltr", IT:"ltr", PT:"ltr", RU:"ltr" };
     let I18N = {};
 
+    // дефолты из DOM как универсальный fallback
     const DEFAULT_I18N = {};
     (function captureDefaultI18n(){
       document.querySelectorAll("[data-i18n]").forEach(el=>{
@@ -557,16 +612,28 @@
       });
     })();
 
-    function srcMusic(lang){ return `audio/ORUS-${lang}.mp3`; }
-    function srcAnn(lang){ return `audio/ANNOUNCEMENT-${lang}.mp3`; }
-    function srcShort(lang){ return `audio/SHORTSTORY-${lang}.mp3`; }
+    async function fetchLocaleJson(lang){
+      // 1) относительный путь (работает в подпапках)
+      try {
+        const r1 = await fetch(`i18n/${lang}.json`, { cache: 'no-store' });
+        if (r1.ok) return await r1.json();
+      } catch {}
+      // 2) абсолютный путь (на домене)
+      try {
+        const r2 = await fetch(`/i18n/${lang}.json`, { cache: 'no-store' });
+        if (r2.ok) return await r2.json();
+      } catch {}
+      return null;
+    }
 
     async function loadLocale(lang) {
       try {
-        const r1 = await fetch(`i18n/${lang}.json`, { cache: 'no-store' });
-        I18N = r1.ok ? await r1.json() : {};
-      } catch { I18N = {}; }
-      window.I18N = I18N;
+        const data = await fetchLocaleJson(lang);
+        I18N = data || {};
+        window.I18N = I18N;
+      } catch {
+        I18N = {}; window.I18N = {};
+      }
 
       document.documentElement.lang = (lang || 'en').toLowerCase();
       document.documentElement.dir  = LOCALE_DIRS[lang] || 'ltr';
@@ -580,6 +647,7 @@
         m.setAttribute('content', I18N["meta.description"]);
       }
 
+      // применяем переводы/дефолты
       document.querySelectorAll("[data-i18n]").forEach(el=>{
         const key = el.getAttribute("data-i18n");
         const val = (I18N[key] ?? DEFAULT_I18N[key]);
@@ -591,30 +659,48 @@
         if (val != null) el.setAttribute('placeholder', val);
       });
 
-      // Подписи статуса языков — без установки src
-      if (announceStatus) announceStatus.textContent = (I18N["announce.langLabel"] || DEFAULT_I18N["announce.langLabel"] || "Language: ") + lang;
-      if (shortStatus)    shortStatus.textContent    = (I18N["short.langLabel"]    || DEFAULT_I18N["short.langLabel"]    || "Language: ") + lang;
+      // кнопки/лейблы с учётом состояния плееров
+      if (audioBtn) {
+        audioBtn.textContent = audio.paused
+          ? (I18N["audio.play"] || DEFAULT_I18N["audio.play"] || "Story in music")
+          : (I18N["audio.pause"] || "Pause");
+      }
+      if (announceBtn) {
+        announceBtn.textContent = announceAudio.paused
+          ? (I18N["announce.play"] || DEFAULT_I18N["announce.play"] || "▶︎ Play")
+          : (I18N["announce.pause"] || "⏸ Pause");
+      }
+      if (announceStatus) {
+        announceStatus.textContent = (I18N["announce.langLabel"] || DEFAULT_I18N["announce.langLabel"] || "Language: ") + lang;
+      }
 
-      // Тексты на кнопках
-      if (audioBtn)   audioBtn.textContent   = audio.paused   ? (I18N["audio.play"]   || DEFAULT_I18N["audio.play"]   || "Story in music") : (I18N["audio.pause"]   || "Pause");
-      if (announceBtn)announceBtn.textContent= announceAudio.paused ? (I18N["announce.play"]|| DEFAULT_I18N["announce.play"]|| "▶︎ Play") : (I18N["announce.pause"] || "⏸ Pause");
-      if (shortBtn)   shortBtn.textContent   = shortAudio.paused ? (I18N["short.play"]  || DEFAULT_I18N["short.play"]  || "▶︎ Play") : (I18N["short.pause"]  || "⏸ Pause");
+      // новый блок: подписи и язык
+      if (shortBtn) {
+        shortBtn.textContent = shortAudio.paused
+          ? (I18N["short.play"] || DEFAULT_I18N["short.play"] || "▶︎ Play")
+          : (I18N["short.pause"] || "⏸ Pause");
+      }
+      if (shortStatus) {
+        shortStatus.textContent = (I18N["short.langLabel"] || DEFAULT_I18N["short.langLabel"] || "Language: ") + lang;
+      }
 
-      // Если что-то играет — переключаем трек на новый язык и продолжаем
-      if (!audio.paused)        { const s=srcMusic(lang);  if (!audio.src.endsWith(s))        { audio.src=s;        audio.play().catch(()=>{}); } }
-      if (!announceAudio.paused){ const s=srcAnn(lang);    if (!announceAudio.src.endsWith(s)){ announceAudio.src=s;announceAudio.play().catch(()=>{}); } }
-      if (!shortAudio.paused)   { const s=srcShort(lang);  if (!shortAudio.src.endsWith(s))   { shortAudio.src=s;   shortAudio.play().catch(()=>{}); } }
+      // треки под язык (сохраняя состояние)
+      setAudioForLang(lang, !audio.paused);
+      setAnnouncementForLang(lang, !announceAudio.paused);
+      setShortForLang(lang, !shortAudio.paused);
     }
 
-    // ===== PWA install
+    // ===== PWA install: слушаем ранние события (до DOMContentLoaded)
     let deferredPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      document.getElementById('installBtn')?.classList.remove('hidden');
+      const b = document.getElementById('installBtn');
+      if (b) b.classList.remove('hidden');
     });
     window.addEventListener('appinstalled', () => {
-      document.getElementById('installBtn')?.classList.add('hidden');
+      const b = document.getElementById('installBtn');
+      b?.classList.add('hidden');
     });
 
     // ===== Init on DOM ready
@@ -642,38 +728,31 @@
         loadLocale(l);
       });
 
-      // === Play/Pause handlers — назначаем src ТОЛЬКО при проигрывании
       audioBtn.addEventListener('click', async ()=>{
         if(audio.paused){
-          const s = srcMusic(langSelect.value);
-          if (!audio.src.endsWith(s)) audio.src = s;
+          setAudioForLang(langSelect.value);
           try{ await audio.play(); audioBtn.textContent = (I18N && I18N["audio.pause"]) || "⏸ Pause"; }catch{}
         } else {
-          audio.pause();
-          audioBtn.textContent = (I18N && I18N["audio.play"]) || (DEFAULT_I18N["audio.play"] || "Story in music");
+          audio.pause(); audioBtn.textContent = (I18N && I18N["audio.play"]) || (DEFAULT_I18N["audio.play"] || "Story in music");
         }
       });
-
       announceBtn.addEventListener('click', async ()=>{
         if(announceAudio.paused){
-          const s = srcAnn(langSelect.value);
-          if (!announceAudio.src.endsWith(s)) announceAudio.src = s;
+          setAnnouncementForLang(langSelect.value);
           try{ await announceAudio.play(); announceBtn.textContent=(I18N && I18N["announce.pause"]) || "⏸ Pause"; }catch{}
         } else {
-          announceAudio.pause();
-          announceBtn.textContent=(I18N && I18N["announce.play"]) || (DEFAULT_I18N["announce.play"] || "▶︎ Play");
+          announceAudio.pause(); announceBtn.textContent=(I18N && I18N["announce.play"]) || (DEFAULT_I18N["announce.play"] || "▶︎ Play");
         }
       });
       announceAudio.addEventListener('ended',()=>{ announceBtn.textContent=(I18N && I18N["announce.play"]) || (DEFAULT_I18N["announce.play"] || "▶︎ Play"); });
 
+      // события для короткой версии
       shortBtn.addEventListener('click', async ()=>{
         if(shortAudio.paused){
-          const s = srcShort(langSelect.value);
-          if (!shortAudio.src.endsWith(s)) shortAudio.src = s;
+          setShortForLang(langSelect.value);
           try{ await shortAudio.play(); shortBtn.textContent=(I18N && I18N["short.pause"]) || "⏸ Pause"; }catch{}
         } else {
-          shortAudio.pause();
-          shortBtn.textContent=(I18N && I18N["short.play"]) || (DEFAULT_I18N["short.play"] || "▶︎ Play");
+          shortAudio.pause(); shortBtn.textContent=(I18N && I18N["short.play"]) || (DEFAULT_I18N["short.play"] || "▶︎ Play");
         }
       });
       shortAudio.addEventListener('ended',()=>{ shortBtn.textContent=(I18N && I18N["short.play"]) || (DEFAULT_I18N["short.play"] || "▶︎ Play"); });
@@ -714,8 +793,9 @@
         });
       })();
 
-      // PWA install button
+      // Кнопка установки PWA
       const installBtn = document.getElementById('installBtn');
+      // Если уже standalone — не показываем
       if (window.matchMedia('(display-mode: standalone)').matches) {
         installBtn?.classList.add('hidden');
       }
