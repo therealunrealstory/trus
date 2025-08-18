@@ -40,6 +40,7 @@
   "feed.loading": "Загрузка новостей…",
   "feed.empty": "Пока нет постов.",
   "feed.error": "Не удалось загрузить новости.",
+  "feed.openTelegram": "Открыть в Telegram",
   "hearts.empty": "Пока нет сердец.",
   "map.youAreHere": "Вы здесь",
   "map.selectedPoint": "Выбранная точка (можно перетащить)",
