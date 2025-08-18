@@ -341,27 +341,37 @@
     applyEng();
 
     // ===== Telegram feed
-    async function renderTgFeed(){
-      try{
-        const box=document.getElementById('tgFeed');
-        box.innerHTML = `<div class="text-sm text-gray-300">${t("feed.loading","Loading news…")}</div>`;
-        const res=await fetch('/.netlify/functions/news?limit=30',{cache:'no-store'});
-        if(!res.ok) throw new Error('news API '+res.status);
-        const arr=await res.json();
-        if(!Array.isArray(arr)||!arr.length){ box.innerHTML=`<div class="text-sm text-gray-300">${t("feed.empty","No posts yet.")}</div>`; return; }
-        box.innerHTML=arr.map(p=>{
-          const dt=p.date?new Date(p.date):null, time=dt?dt.toLocaleString():'';
-          const link=p.link?`<a href="${p.link}" target="_blank" class="underline text-sky-400">${t("feed.openTelegram","Open in Telegram")}</a>`:'';
-          const text=(p.text||'').replace(/\n/g,'<br>');
-          return `<article class="mb-4 p-3 rounded-xl bg-gray-900/50 border border-gray-700">
-                    <div class="text-xs text-gray-300 mb-2">${time}${link?` · ${link}`:''}</div>
-                    <div class="text-sm leading-relaxed">${text}</div>
-                  </article>`;
-        }).join('');
-      }catch(e){
-        console.error(e); document.getElementById('tgFeed').innerHTML=`<div class="text-sm text-red-400">${t("feed.error","Failed to load news.")}</div>`;
-      }
+async function renderTgFeed(){
+  try{
+    const box=document.getElementById('tgFeed');
+    box.innerHTML = `<div class="text-sm text-gray-300">${t("feed.loading","Loading news…")}</div>`;
+    const res=await fetch('/.netlify/functions/news?limit=30',{cache:'no-store'});
+    if(!res.ok) throw new Error('news API '+res.status);
+    const arr=await res.json();
+    if(!Array.isArray(arr)||!arr.length){ 
+      box.innerHTML=`<div class="text-sm text-gray-300">${t("feed.empty","No posts yet.")}</div>`;
+      return;
     }
+    box.innerHTML=arr.map(p=>{
+      const dt=p.date?new Date(p.date):null, time=dt?dt.toLocaleString():'';
+      const link=p.link?`<a href="${p.link}" target="_blank" class="underline text-sky-400">${t("feed.openTelegram","Open in Telegram")}</a>`:'';
+      const textHtml=(p.text||'').replace(/\n/g,'<br>');
+      const mediaHtml=(p.media_type==='photo' && p.media_path)
+        ? `<img src="/.netlify/functions/tg-file?path=${encodeURIComponent(p.media_path)}"
+                 alt="" class="mt-2 rounded-xl border border-gray-700 max-w-full">`
+        : '';
+      return `<article class="mb-4 p-3 rounded-xl bg-gray-900/50 border border-gray-700">
+                <div class="text-xs text-gray-300 mb-2">${time}${link?` · ${link}`:''}</div>
+                ${textHtml ? `<div class="text-sm leading-relaxed">${textHtml}</div>` : ''}
+                ${mediaHtml}
+              </article>`;
+    }).join('');
+  }catch(e){
+    console.error(e);
+    document.getElementById('tgFeed').innerHTML=
+      `<div class="text-sm text-red-400">${t("feed.error","Failed to load news.")}</div>`;
+  }
+}
     renderTgFeed();
 
     // ===== Map (paged)
@@ -631,3 +641,4 @@
   </script>
 </body>
 </html>
+
