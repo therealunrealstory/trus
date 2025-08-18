@@ -6,23 +6,23 @@
   <title>The Real Unreal Story — support for Adam</title>
   <meta name="description" content="The Real Unreal Story — the true story of a surgeon who saved others all his life and is now fighting for his own." />
 
-  <!-- Hreflang (клиентский вариант через ?lang=) -->
-  <link rel="alternate" hreflang="x-default" href="/?lang=EN">
-  <link rel="alternate" hreflang="en" href="/?lang=EN">
-  <link rel="alternate" hreflang="es" href="/?lang=ES">
-  <link rel="alternate" hreflang="fr" href="/?lang=FR">
-  <link rel="alternate" hreflang="it" href="/?lang=IT">
-  <link rel="alternate" hreflang="de" href="/?lang=DE">
-  <link rel="alternate" hreflang="pt" href="/?lang=PT">
-  <link rel="alternate" hreflang="ru" href="/?lang=RU">
-  <link rel="alternate" hreflang="zh" href="/?lang=CN">
-  <link rel="alternate" hreflang="ar" href="/?lang=AR">
+  <!-- Hreflang (относительные ссылки, чтобы работать и из подпапки) -->
+  <link rel="alternate" hreflang="x-default" href="?lang=EN">
+  <link rel="alternate" hreflang="en" href="?lang=EN">
+  <link rel="alternate" hreflang="es" href="?lang=ES">
+  <link rel="alternate" hreflang="fr" href="?lang=FR">
+  <link rel="alternate" hreflang="it" href="?lang=IT">
+  <link rel="alternate" hreflang="de" href="?lang=DE">
+  <link rel="alternate" hreflang="pt" href="?lang=PT">
+  <link rel="alternate" hreflang="ru" href="?lang=RU">
+  <link rel="alternate" hreflang="zh" href="?lang=CN">
+  <link rel="alternate" hreflang="ar" href="?lang=AR">
 
   <!-- Icons / PWA -->
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="icon" sizes="32x32" href="/favicon-32.png">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
   <meta name="theme-color" content="#0b0b0b">
 
   <!-- Tailwind -->
@@ -56,7 +56,7 @@
     }
     .pulse{ animation:pulse 2s infinite; }
 
-    /* Небольшая косметика для RTL */
+    /* RTL косметика */
     html[dir="rtl"] .icon-btn { flex-direction: row-reverse; }
     html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
   </style>
@@ -255,7 +255,6 @@
   <script>
     const donateURL = "https://www.gofundme.com/f/your-campaign-slug";
 
-    // ===== LANGUAGE from ?lang= + Share keeps lang in URL =====
     function getLangFromQuery() {
       try {
         const u = new URL(location.href);
@@ -502,11 +501,11 @@
       } catch {}
     });
 
-    // ===== I18N loader (brand stays "The Real Unreal Story")
+    // ===== I18N loader
     const LOCALE_DIRS = { AR:"rtl", CN:"ltr", DE:"ltr", EN:"ltr", ES:"ltr", FR:"ltr", IT:"ltr", PT:"ltr", RU:"ltr" };
     let I18N = {};
 
-    // захват дефолтных значений из DOM как универсальный fallback
+    // дефолты из DOM как универсальный fallback
     const DEFAULT_I18N = {};
     (function captureDefaultI18n(){
       document.querySelectorAll("[data-i18n]").forEach(el=>{
@@ -519,14 +518,27 @@
       });
     })();
 
+    async function fetchLocaleJson(lang){
+      // 1) относительный путь (работает в подпапках)
+      try {
+        const r1 = await fetch(`i18n/${lang}.json`, { cache: 'no-store' });
+        if (r1.ok) return await r1.json();
+      } catch {}
+      // 2) абсолютный путь (на домене)
+      try {
+        const r2 = await fetch(`/i18n/${lang}.json`, { cache: 'no-store' });
+        if (r2.ok) return await r2.json();
+      } catch {}
+      return null;
+    }
+
     async function loadLocale(lang) {
       try {
-        const res = await fetch(`/i18n/${lang}.json`, { cache: 'no-store' });
-        I18N = await res.json();
+        const data = await fetchLocaleJson(lang);
+        I18N = data || {};
         window.I18N = I18N;
       } catch {
-        I18N = {};
-        window.I18N = {};
+        I18N = {}; window.I18N = {};
       }
 
       document.documentElement.lang = (lang || 'en').toLowerCase();
@@ -541,7 +553,7 @@
         m.setAttribute('content', I18N["meta.description"]);
       }
 
-      // применяем переводы или дефолты — всегда перезаписываем (чтобы не залипали старые)
+      // применяем переводы/дефолты
       document.querySelectorAll("[data-i18n]").forEach(el=>{
         const key = el.getAttribute("data-i18n");
         const val = (I18N[key] ?? DEFAULT_I18N[key]);
@@ -568,32 +580,27 @@
         announceStatus.textContent = (I18N["announce.langLabel"] || DEFAULT_I18N["announce.langLabel"] || "Language: ") + lang;
       }
 
-      // Переключить треки под язык (сохраняя текущее состояние)
+      // треки под язык (сохраняя состояние)
       setAudioForLang(lang, !audio.paused);
       setAnnouncementForLang(lang, !announceAudio.paused);
     }
 
-    // ===== Init on DOM ready (важно для стабильности)
+    // ===== Init on DOM ready
     document.addEventListener('DOMContentLoaded', () => {
-      // donate link
-      const d = document.getElementById('donateHero');
-      if (d) d.href = donateURL;
+      const d = document.getElementById('donateHero'); if (d) d.href = donateURL;
 
-      // инициализация языка: уважаем ?lang= и localStorage, дефолт EN
       const fromQuery = getLangFromQuery();
       const initialLang = fromQuery || localStorage.getItem('site_lang') || 'EN';
       langSelect.value = initialLang;
       localStorage.setItem('site_lang', initialLang);
       loadLocale(initialLang);
 
-      // убираем ?lang= из адресной строки после применения
       if (fromQuery) {
         const u = new URL(location.href);
         u.searchParams.delete('lang');
         history.replaceState({}, '', u);
       }
 
-      // смена языка
       langSelect.addEventListener('change', e => {
         const l = e.target.value;
         localStorage.setItem('site_lang', l);
@@ -603,7 +610,6 @@
         loadLocale(l);
       });
 
-      // обработчики плееров
       audioBtn.addEventListener('click', async ()=>{
         if(audio.paused){
           setAudioForLang(langSelect.value);
