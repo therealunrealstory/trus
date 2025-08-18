@@ -75,7 +75,7 @@
   </style>
 </head>
 <body class="text-white">
-  <!-- HEADER: слева — хэштег; справа — кнопка аудио и селектор языка -->
+  <!-- HEADER: слева — хэштег; справа — кнопка аудио, кнопка установки и селектор языка -->
   <header class="max-w-5xl mx-auto px-4 py-6">
     <div class="flex items-center justify-between gap-3">
       <!-- ЛЕВО: хэштег с эффектом печати -->
@@ -84,21 +84,8 @@
       </div>
       <!-- ПРАВО: на мобиле — столбцом, на ≥sm — в строку -->
       <div class="flex gap-2 items-end sm:items-center sm:flex-row flex-col">
-        <!-- 1) на мобиле — первой строкой; на десктопе — слева -->
-        <button id="installBtn"
-                class="px-4 py-2 rounded-xl border border-indigo-500 text-indigo-300 hover:bg-indigo-600/10 text-sm hidden"
-                data-i18n="btn.install">
-          Install app
-        </button>
-
-        <!-- 2) на мобиле — второй строкой; на десктопе — посередине -->
-        <button id="audioBtn"
-                class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse"
-                data-i18n="audio.play">
-          Story in music
-        </button>
-
-        <!-- 3) на мобиле — третьей строкой; на десктопе — справа -->
+        <button id="installBtn" class="px-4 py-2 rounded-xl border border-indigo-500 text-indigo-300 hover:bg-indigo-600/10 text-sm hidden" data-i18n="btn.install">Install app</button>
+        <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse" data-i18n="audio.play">Story in music</button>
         <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
           <option value="EN" selected>EN</option>
           <option value="ES">ES</option><option value="FR">FR</option>
@@ -112,7 +99,6 @@
   <!-- Соцсети -->
   <section class="max-w-5xl mx-auto px-4">
     <div class="flex items-center gap-3">
-      <!-- слева: соцсети -->
       <div class="flex items-center gap-3 flex-wrap grow">
         <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 shadow-sm" href="https://instagram.com/theRealUnrealStory" target="_blank" rel="noreferrer">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2.2A2.8 2.8 0 1 0 12 15.8 2.8 2.8 0 0 0 12 9.2zm4.8-2.5a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2z"/></svg>
@@ -198,8 +184,13 @@
       <h2 class="text-xl font-semibold mb-4" data-i18n="support.title">Support now</h2>
       <div class="grid md:grid-cols-2 gap-4">
         <!-- Донаты -->
-        <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
-          <div class="text-2xl mb-2">💚</div>
+        <div class="px-5 py-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
+          <div class="text-2xl mb-2 text-white">
+            <!-- тонкое сердце -->
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </div>
           <div class="font-medium mb-2" data-i18n="support.money">Donate funds</div>
           <div class="flex flex-wrap gap-2">
             <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=5">$5</a>
@@ -212,8 +203,16 @@
           </div>
         </div>
         <!-- Физическая помощь -->
-        <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
-          <div class="text-2xl mb-2">👥</div>
+        <div class="px-5 py-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
+          <div class="text-2xl mb-2 text-white">
+            <!-- тонкие «два пользователя» -->
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
           <div class="font-medium mb-2" data-i18n="support.physical">Practical help</div>
           <button id="wantHelp" class="text-sm underline" data-i18n="btn.wantHelp">I want to help</button>
         </div>
@@ -236,7 +235,12 @@
     <!-- ВОВЛЕЧЁННОСТЬ -->
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="engage.title">Your engagement</h2>
-      <p class="text-sm text-gray-200 mb-3" data-i18n="engage.desc">Mark what you've already done — that’s support too ❤️</p>
+      <p class="text-sm text-gray-200 mb-3">
+        <span data-i18n="engage.desc">Mark what you've already done — that’s support too</span>
+        <svg viewBox="0 0 24 24" width="16" height="16" class="inline align-[-2px] ml-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+      </p>
       <div id="engageWrap" class="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
         <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b1">Read/listened to the short version</button>
         <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b2">Read/listened to the full story</button>
@@ -250,7 +254,13 @@
 
     <!-- КАРТА -->
     <section>
-      <h2 class="text-xl font-semibold mb-4" data-i18n="map.title">🌍 Support map</h2>
+      <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 10c0 5.523-4.477 10-10 10S1 15.523 1 10 5.477 0 11 0s10 4.477 10 10z" transform="translate(1 2) scale(.9)"/>
+          <path d="M2 12h20M12 2v20M4 5c2 1 4 1 6-1s4-2 6 0 4 1 6-1" opacity=".35"/>
+        </svg>
+        <span data-i18n="map.title">Support map</span>
+      </h2>
       <div id="map" class="rounded-2xl shadow-sm border" style="background:#0b0b0b"></div>
       <p class="text-xs text-gray-300 mt-2" data-i18n="map.tip">Be sure to click on the map to specify the exact place of your support.</p>
       <div class="mt-4 grid md:grid-cols-3 gap-3">
@@ -313,7 +323,20 @@
       } catch { return null; }
     }
 
-    // ===== AUDIO SOURCES by language =====
+    // ===== PWA install: слушаем ранние события (единожды)
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const b = document.getElementById('installBtn');
+      if (b) b.classList.remove('hidden');
+    });
+    window.addEventListener('appinstalled', () => {
+      const b = document.getElementById('installBtn');
+      b?.classList.add('hidden');
+    });
+
+    // ===== AUDIO SOURCES by language (ленивая подгрузка: src ставим только по клику)
     const audio = document.getElementById('bgAudio');
     const audioBtn = document.getElementById('audioBtn');
     const langSelect = document.getElementById('lang');
@@ -606,12 +629,10 @@
     })();
 
     async function fetchLocaleJson(lang){
-      // 1) относительный путь (работает в подпапках)
       try {
         const r1 = await fetch(`i18n/${lang}.json`, { cache: 'no-store' });
         if (r1.ok) return await r1.json();
       } catch {}
-      // 2) абсолютный путь (на домене)
       try {
         const r2 = await fetch(`/i18n/${lang}.json`, { cache: 'no-store' });
         if (r2.ok) return await r2.json();
@@ -652,7 +673,7 @@
         if (val != null) el.setAttribute('placeholder', val);
       });
 
-      // кнопки/лейблы с учётом состояния плееров
+      // подписи кнопок без автоподстановки src (ленивая загрузка)
       if (audioBtn) {
         audioBtn.textContent = audio.paused
           ? (I18N["audio.play"] || DEFAULT_I18N["audio.play"] || "Story in music")
@@ -666,8 +687,6 @@
       if (announceStatus) {
         announceStatus.textContent = (I18N["announce.langLabel"] || DEFAULT_I18N["announce.langLabel"] || "Language: ") + lang;
       }
-
-      // новый блок: подписи и язык
       if (shortBtn) {
         shortBtn.textContent = shortAudio.paused
           ? (I18N["short.play"] || DEFAULT_I18N["short.play"] || "▶︎ Play")
@@ -676,25 +695,7 @@
       if (shortStatus) {
         shortStatus.textContent = (I18N["short.langLabel"] || DEFAULT_I18N["short.langLabel"] || "Language: ") + lang;
       }
-
-      // треки под язык (сохраняя состояние)
-      setAudioForLang(lang, !audio.paused);
-      setAnnouncementForLang(lang, !announceAudio.paused);
-      setShortForLang(lang, !shortAudio.paused);
     }
-
-    // ===== PWA install: слушаем ранние события (до DOMContentLoaded)
-    let deferredPrompt = null;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const b = document.getElementById('installBtn');
-      if (b) b.classList.remove('hidden');
-    });
-    window.addEventListener('appinstalled', () => {
-      const b = document.getElementById('installBtn');
-      b?.classList.add('hidden');
-    });
 
     // ===== Init on DOM ready
     document.addEventListener('DOMContentLoaded', () => {
@@ -739,7 +740,6 @@
       });
       announceAudio.addEventListener('ended',()=>{ announceBtn.textContent=(I18N && I18N["announce.play"]) || (DEFAULT_I18N["announce.play"] || "▶︎ Play"); });
 
-      // события для короткой версии
       shortBtn.addEventListener('click', async ()=>{
         if(shortAudio.paused){
           setShortForLang(langSelect.value);
@@ -750,28 +750,20 @@
       });
       shortAudio.addEventListener('ended',()=>{ shortBtn.textContent=(I18N && I18N["short.play"]) || (DEFAULT_I18N["short.play"] || "▶︎ Play"); });
 
-      // Хэштег: эффект печати по кругу + клик = модалка-CTA
+      // Хэштег: эффект печати + CTA
       (function initHashtag() {
         const el = document.getElementById('hashtagType');
         const btn = document.getElementById('hashtagBtn');
         if (!el || !btn) return;
-
         const TEXT = '#TheRealUnrealStory';
         let i = 0, dir = 1;
         const typeDelay = 90, eraseDelay = 45, pause = 900;
-
         function step() {
           el.textContent = TEXT.slice(0, i);
-          if (dir > 0) {
-            if (i < TEXT.length) { i++; setTimeout(step, typeDelay); }
-            else { setTimeout(() => { dir = -1; step(); }, pause); }
-          } else {
-            if (i > 0) { i--; setTimeout(step, eraseDelay); }
-            else { setTimeout(() => { dir = 1; step(); }, pause); }
-          }
+          if (dir > 0) { if (i < TEXT.length) { i++; setTimeout(step, typeDelay); } else { setTimeout(() => { dir = -1; step(); }, pause); } }
+          else { if (i > 0) { i--; setTimeout(step, eraseDelay); } else { setTimeout(() => { dir = 1; step(); }, pause); } }
         }
         step();
-
         btn.addEventListener('click', () => {
           openModal(
             t('hashtag.title', '#TheRealUnrealStory'),
@@ -788,7 +780,6 @@
 
       // Кнопка установки PWA
       const installBtn = document.getElementById('installBtn');
-      // Если уже standalone — не показываем
       if (window.matchMedia('(display-mode: standalone)').matches) {
         installBtn?.classList.add('hidden');
       }
@@ -804,19 +795,6 @@
         }
         deferredPrompt = null;
       });
-    });
-
-    // ===== PWA install (глобальные слушатели)
-    let deferredPrompt = null;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const b = document.getElementById('installBtn');
-      if (b) b.classList.remove('hidden');
-    });
-    window.addEventListener('appinstalled', () => {
-      const b = document.getElementById('installBtn');
-      b?.classList.add('hidden');
     });
   </script>
 </body>
