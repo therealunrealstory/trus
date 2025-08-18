@@ -356,10 +356,13 @@ async function renderTgFeed(){
       const dt=p.date?new Date(p.date):null, time=dt?dt.toLocaleString():'';
       const link=p.link?`<a href="${p.link}" target="_blank" class="underline text-sky-400">${t("feed.openTelegram","Open in Telegram")}</a>`:'';
       const textHtml=(p.text||'').replace(/\n/g,'<br>');
-      const mediaHtml=(p.media_type==='photo' && p.media_path)
-        ? `<img src="/.netlify/functions/tg-file?path=${encodeURIComponent(p.media_path)}"
-                 alt="" class="mt-2 rounded-xl border border-gray-700 max-w-full">`
-        : '';
+const _img = `/.netlify/functions/tg-file?path=${encodeURIComponent(p.media_path)}`;
+const mediaHtml = (p.media_type==='photo' && p.media_path)
+  ? `<img src="${_img}"
+           alt=""
+           class="mt-2 rounded-xl border border-gray-700 max-w-full max-h-72 sm:max-h-96 w-auto mx-auto object-contain cursor-zoom-in"
+           onclick="openModal('', '<img src=&quot;${_img}&quot; class=&quot;w-full h-auto rounded-xl&quot;>')">`
+  : '';
       return `<article class="mb-4 p-3 rounded-xl bg-gray-900/50 border border-gray-700">
                 <div class="text-xs text-gray-300 mb-2">${time}${link?` · ${link}`:''}</div>
                 ${textHtml ? `<div class="text-sm leading-relaxed">${textHtml}</div>` : ''}
@@ -641,4 +644,5 @@ async function renderTgFeed(){
   </script>
 </body>
 </html>
+
 
