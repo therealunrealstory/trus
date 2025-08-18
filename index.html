@@ -59,19 +59,30 @@
     /* RTL косметика */
     html[dir="rtl"] .icon-btn { flex-direction: row-reverse; }
     html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
+
+    /* caret для хэштега */
+    .hashtag-caret { animation: hashblink 1s step-start infinite; }
+    @keyframes hashblink { 50% { opacity: 0; } }
   </style>
 </head>
 <body class="text-white">
-  <!-- HEADER: справа — кнопка аудио и селектор языка -->
+  <!-- HEADER: слева — хэштег; справа — кнопка аудио и селектор языка -->
   <header class="max-w-5xl mx-auto px-4 py-6">
-    <div class="flex flex-wrap gap-2 items-center justify-end">
-      <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse" data-i18n="audio.play">Story in music</button>
-      <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
-        <option value="EN" selected>EN</option>
-        <option value="ES">ES</option><option value="FR">FR</option>
-        <option value="PT">PT</option><option value="DE">DE</option><option value="IT">IT</option>
-        <option value="RU">RU</option><option value="CN">CN</option><option value="AR">AR</option>
-      </select>
+    <div class="flex items-center justify-between gap-3">
+      <!-- ЛЕВО: хэштег с эффектом печати -->
+      <div id="hashtagBtn" class="font-mono text-xs sm:text-sm text-white/90 cursor-pointer select-none flex items-center" title="#TheRealUnrealStory" aria-label="#TheRealUnrealStory">
+        <span id="hashtagType">#TheRealUnrealStory</span><span class="hashtag-caret ml-0.5">|</span>
+      </div>
+      <!-- ПРАВО: как было — кнопка аудио и селектор языка -->
+      <div class="flex flex-wrap gap-2 items-center justify-end">
+        <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse" data-i18n="audio.play">Story in music</button>
+        <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
+          <option value="EN" selected>EN</option>
+          <option value="ES">ES</option><option value="FR">FR</option>
+          <option value="PT">PT</option><option value="DE">DE</option><option value="IT">IT</option>
+          <option value="RU">RU</option><option value="CN">CN</option><option value="AR">AR</option>
+        </select>
+      </div>
     </div>
   </header>
 
@@ -132,7 +143,7 @@
         <div class="text-sm text-gray-200" data-i18n="announce.short">Short audio announcement</div>
         <div id="announceStatus" class="ml-auto text-xs text-gray-300"></div>
       </div>
-      <audio id="announceAudio" preload="none"></audio>
+      <audio id="announceAudio" preload="auto"></audio>
     </section>
 
     <!-- ВИДЕО -->
@@ -148,12 +159,12 @@
     <!-- НОВЫЙ БЛОК: КРАТКАЯ АУДИО-ВЕРСИЯ ИСТОРИИ -->
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="short.title">Short version of our story</h2>
-<div class="rounded-2xl border border-gray-700 p-4 flex items-center gap-3" style="background:rgba(0,0,0,0.35)">
-  <button id="shortBtn" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm pulse" data-i18n="short.play">▶︎ Play</button>
-  <div class="text-sm text-gray-200" data-i18n="short.note">About the events from early 2019 to mid-2025.</div>
-  <div id="shortStatus" class="ml-auto text-xs text-gray-300"></div>
-</div>
-      <audio id="shortAudio" preload="none"></audio>
+      <div class="rounded-2xl border border-gray-700 p-4 flex items-center gap-3" style="background:rgba(0,0,0,0.35)">
+        <button id="shortBtn" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm pulse" data-i18n="short.play">▶︎ Play</button>
+        <div class="text-sm text-gray-200" data-i18n="short.note">About the events from early 2019 to mid-2025.</div>
+        <div id="shortStatus" class="ml-auto text-xs text-gray-300"></div>
+      </div>
+      <audio id="shortAudio" preload="auto"></audio>
     </section>
 
     <!-- ПОДДЕРЖАТЬ СЕЙЧАС -->
@@ -199,18 +210,15 @@
     <!-- ВОВЛЕЧЁННОСТЬ -->
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="engage.title">Your engagement</h2>
-<p class="text-sm text-gray-200 mb-3" data-i18n="engage.desc">
-  Mark what you've already done — that’s support too ❤️
-</p>
+      <p class="text-sm text-gray-200 mb-3" data-i18n="engage.desc">Mark what you've already done — that’s support too ❤️</p>
       <div id="engageWrap" class="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
         <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b1">Read/listened to the short version</button>
         <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b2">Read/listened to the full story</button>
         <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b3">Listened to tracks about our story</button>
         <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b4">Subscribed to the Telegram channel</button>
         <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b5">Subscribed to Instagram</button>
-      <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b6">Shared the story</button>
-
-	  </div>
+        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b6">Shared the story</button>
+      </div>
       <p class="mt-2 text-xs text-gray-300" data-i18n="engage.note">Your selections are saved in your browser.</p>
     </section>
 
@@ -253,7 +261,7 @@
   </footer>
 
   <!-- Аудио в шапке -->
-  <audio id="bgAudio" preload="none"></audio>
+  <audio id="bgAudio" preload="auto"></audio>
 
   <!-- Универсальная модалка -->
   <div id="modalBackdrop" class="modal-backdrop fixed inset-0 bg-black/60">
@@ -627,9 +635,9 @@
       }
 
       // треки под язык (сохраняя состояние)
-if (!audio.paused) setAudioForLang(lang, true);
-if (!announceAudio.paused) setAnnouncementForLang(lang, true);
-if (!shortAudio.paused) setShortForLang(lang, true);
+      setAudioForLang(lang, !audio.paused);
+      setAnnouncementForLang(lang, !announceAudio.paused);
+      setShortForLang(lang, !shortAudio.paused);
     }
 
     // ===== Init on DOM ready
@@ -685,6 +693,42 @@ if (!shortAudio.paused) setShortForLang(lang, true);
         }
       });
       shortAudio.addEventListener('ended',()=>{ shortBtn.textContent=(I18N && I18N["short.play"]) || (DEFAULT_I18N["short.play"] || "▶︎ Play"); });
+
+      // Хэштег: эффект печати по кругу + клик = модалка-CTA
+      (function initHashtag() {
+        const el = document.getElementById('hashtagType');
+        const btn = document.getElementById('hashtagBtn');
+        if (!el || !btn) return;
+
+        const TEXT = '#TheRealUnrealStory';
+        let i = 0, dir = 1;
+        const typeDelay = 90, eraseDelay = 45, pause = 900;
+
+        function step() {
+          el.textContent = TEXT.slice(0, i);
+          if (dir > 0) {
+            if (i < TEXT.length) { i++; setTimeout(step, typeDelay); }
+            else { setTimeout(() => { dir = -1; step(); }, pause); }
+          } else {
+            if (i > 0) { i--; setTimeout(step, eraseDelay); }
+            else { setTimeout(() => { dir = 1; step(); }, pause); }
+          }
+        }
+        step();
+
+        btn.addEventListener('click', () => {
+          openModal(
+            t('hashtag.title', '#TheRealUnrealStory'),
+            t('hashtag.body',
+              `Thank you for using <b>#TheRealUnrealStory</b> when you post or share our story.
+               It helps people find and follow the thread.<br><br>
+               Use it on Instagram (posts/reels/stories), Telegram, YouTube (titles/descriptions/comments),
+               TikTok, X/Twitter, Facebook, blogs & Medium, forums & Reddit, LinkedIn,
+               newsletters and even email signatures. Every mention matters — thank you!`
+            )
+          );
+        });
+      })();
     });
   </script>
 </body>
