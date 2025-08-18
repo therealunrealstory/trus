@@ -75,17 +75,21 @@
       </div>
       <!-- ПРАВО: на мобиле — столбцом, на ≥sm — в строку -->
 <div class="flex gap-2 items-end sm:items-center sm:flex-row flex-col">
-  <!-- 1) сверху/слева: музыка -->
-  <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse" data-i18n="audio.play">Story in music</button>
-
-  <!-- 2) по центру на десктопе, под музыкой на мобиле: Установить приложение -->
+  <!-- 1) на мобиле — первой строкой; на десктопе — слева -->
   <button id="installBtn"
           class="px-4 py-2 rounded-xl border border-indigo-500 text-indigo-300 hover:bg-indigo-600/10 text-sm hidden"
           data-i18n="btn.install">
     Install app
   </button>
 
-  <!-- 3) снизу/справа: выбор языка -->
+  <!-- 2) на мобиле — второй строкой; на десктопе — посередине -->
+  <button id="audioBtn"
+          class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse"
+          data-i18n="audio.play">
+    Story in music
+  </button>
+
+  <!-- 3) на мобиле — третьей строкой; на десктопе — справа -->
   <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
     <option value="EN" selected>EN</option>
     <option value="ES">ES</option><option value="FR">FR</option>
