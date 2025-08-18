@@ -132,7 +132,7 @@
         <div class="text-sm text-gray-200" data-i18n="announce.short">Short audio announcement</div>
         <div id="announceStatus" class="ml-auto text-xs text-gray-300"></div>
       </div>
-      <audio id="announceAudio" preload="auto"></audio>
+      <audio id="announceAudio" preload="none"></audio>
     </section>
 
     <!-- ВИДЕО -->
@@ -153,7 +153,7 @@
   <div class="text-sm text-gray-200" data-i18n="short.note">About the events from early 2019 to mid-2025.</div>
   <div id="shortStatus" class="ml-auto text-xs text-gray-300"></div>
 </div>
-      <audio id="shortAudio" preload="auto"></audio>
+      <audio id="shortAudio" preload="none"></audio>
     </section>
 
     <!-- ПОДДЕРЖАТЬ СЕЙЧАС -->
@@ -251,7 +251,7 @@
   </footer>
 
   <!-- Аудио в шапке -->
-  <audio id="bgAudio" preload="auto"></audio>
+  <audio id="bgAudio" preload="none"></audio>
 
   <!-- Универсальная модалка -->
   <div id="modalBackdrop" class="modal-backdrop fixed inset-0 bg-black/60">
@@ -625,9 +625,9 @@
       }
 
       // треки под язык (сохраняя состояние)
-      setAudioForLang(lang, !audio.paused);
-      setAnnouncementForLang(lang, !announceAudio.paused);
-      setShortForLang(lang, !shortAudio.paused);
+if (!audio.paused) setAudioForLang(lang, true);
+if (!announceAudio.paused) setAnnouncementForLang(lang, true);
+if (!shortAudio.paused) setShortForLang(lang, true);
     }
 
     // ===== Init on DOM ready
