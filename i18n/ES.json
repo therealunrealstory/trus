@@ -52,5 +52,9 @@
   "audio.pause": "Pausa",
   "announce.play": "▶︎ Reproducir",
   "announce.pause": "⏸ Pausa",
-  "announce.langLabel": "Idioma: "
+  "announce.langLabel": "Idioma: ",
+  "modal.tile1.body": "Me llamo Nico y soy amigo de Adam. Me convertí en participante involuntario de esta historia “real-irreal”. He acudido a una amplia audiencia en busca de apoyo — ya no puedo con esto solo. Por eso cuento nuestra historia sin adornos y, en paralelo, lanzo una recaudación en GoFundMe.",
+"modal.tile2.body": "Adam es una gran persona y un cirujano con técnicas únicas, filántropo. Desde 2019 se ha enfrentado varias veces a un cáncer de la sangre. En julio de 2025 — un nuevo y duro giro: otra forma de leucemia. Al mismo tiempo — golpes personales y pérdidas.",
+"modal.tile3.body": "La historia de Adam está llena de sorpresas reales. Hubo ayudantes increíbles — sin ellos no habría llegado hasta hoy. También hubo quienes dañaron deliberadamente. Y hubo personas que el universo pareció traer en el momento justo.",
+"modal.help.body": "Si estás dispuesto a ayudar — apoyo legal, médico o práctico (enfermeras, cuidadores) — o si quieres organizar un encuentro personal, escribe a: <a href=\"mailto:theRealUnrealStory@gmail.com\" class=\"underline\">theRealUnrealStory@gmail.com</a>.<br><br>Estamos sinceramente agradecidos a todos los que respondan."
 }
