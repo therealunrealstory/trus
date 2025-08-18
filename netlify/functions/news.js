@@ -8,6 +8,7 @@ export default async (req) => {
     const { rows } = await query(
       `select chat_id, message_id, date, username, text, link, media_type, media_path
        from tg_posts
+       where coalesce(is_deleted, false) = false
        order by date desc
        limit $1`,
       [limit]
