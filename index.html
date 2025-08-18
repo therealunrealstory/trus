@@ -148,12 +148,11 @@
     <!-- НОВЫЙ БЛОК: КРАТКАЯ АУДИО-ВЕРСИЯ ИСТОРИИ -->
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="short.title">Short version of our story</h2>
-      <div class="rounded-2xl border border-gray-700 p-4 flex items-center gap-3" style="background:rgba(0,0,0,0.35)">
-        <!-- статус языка СЛЕВА -->
-        <div id="shortStatus" class="text-xs text-gray-300"></div>
-        <button id="shortBtn" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm pulse" data-i18n="short.play">▶︎ Play</button>
-        <div class="text-sm text-gray-200" data-i18n="short.note">About the events from early 2019 to mid-2025.</div>
-      </div>
+<div class="rounded-2xl border border-gray-700 p-4 flex items-center gap-3" style="background:rgba(0,0,0,0.35)">
+  <button id="shortBtn" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm pulse" data-i18n="short.play">▶︎ Play</button>
+  <div class="text-sm text-gray-200" data-i18n="short.note">About the events from early 2019 to mid-2025.</div>
+  <div id="shortStatus" class="ml-auto text-xs text-gray-300"></div>
+</div>
       <audio id="shortAudio" preload="auto"></audio>
     </section>
 
