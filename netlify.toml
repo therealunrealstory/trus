@@ -1,10 +1,28 @@
 [build]
-  functions = "netlify/functions"
+  publish = "."
+  command = ""
 
-[[headers]]
-  for = "/.netlify/functions/*"
-  [headers.values]
-    Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
-    Access-Control-Allow-Headers = "Content-Type"
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["pg"]
 
+# Проксируем «чистые» пути на функции (если нужно)
+[[redirects]]
+  from = "/api/marks"
+  to   = "/.netlify/functions/marks"
+  status = 200
+
+[[redirects]]
+  from = "/api/hearts"
+  to   = "/.netlify/functions/hearts"
+  status = 200
+
+[[redirects]]
+  from = "/api/news"
+  to   = "/.netlify/functions/news"
+  status = 200
+
+[[redirects]]
+  from = "/tg-file/*"
+  to   = "/.netlify/functions/tg-file"
+  status = 200

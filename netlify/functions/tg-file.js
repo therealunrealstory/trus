@@ -1,35 +1,27 @@
-// netlify/functions/tg-file.js
-export default async (req) => {
+// Прокси к файлам Telegram по ранее полученному media_path
+exports.handler = async (event) => {
   try {
-    if (req.method === "OPTIONS") {
-      return new Response("", {
-        status: 204,
-        headers: {
-          "access-control-allow-origin": "*",
-          "access-control-allow-methods": "GET, OPTIONS",
-          "access-control-allow-headers": "Content-Type",
-        },
-      });
-    }
-    const url = new URL(req.url);
-    const filePath = url.searchParams.get("path");
-    if (!filePath) return new Response("Bad request", { status: 400 });
+    const path = new URL(event.rawUrl).searchParams.get('path') || '';
+    if (!/^[\w\-/.]{5,200}$/.test(path)) return { statusCode: 400, body: 'Bad path' };
 
     const token = process.env.TELEGRAM_NOWADAYS_BOT_TOKEN;
-    if (!token) return new Response("Not configured", { status: 500 });
+    if (!token) return { statusCode: 500, body: 'Missing token' };
 
-    const upstream = await fetch(`https://api.telegram.org/file/bot${token}/${filePath}`);
-    if (!upstream.ok) return new Response("Upstream error", { status: upstream.status });
+    const url = `https://api.telegram.org/file/bot${token}/${path}`;
+    const r = await fetch(url);
+    if (!r.ok) return { statusCode: r.status, body: 'Not found' };
 
-    // Проксируем тело + контент-тайп, добавляем CORS и кэш
-    const headers = new Headers(upstream.headers);
-    headers.set("access-control-allow-origin", "*");
-    if (!headers.has("cache-control")) {
-      headers.set("cache-control", "public, max-age=31536000, immutable");
-    }
-    return new Response(upstream.body, { status: 200, headers });
+    const buf = Buffer.from(await r.arrayBuffer());
+    // content-type может отсутствовать — отдадим как octet-stream
+    const ct = r.headers.get('content-type') || 'application/octet-stream';
+    return {
+      statusCode: 200,
+      headers: { 'content-type': ct, 'cache-control': 'public, max-age=31536000, immutable', 'access-control-allow-origin':'*' },
+      body: buf.toString('base64'),
+      isBase64Encoded: true
+    };
   } catch (e) {
-    console.error("tg-file error:", e);
-    return new Response("server error", { status: 500 });
+    console.error(e);
+    return { statusCode: 500, body: 'Server error' };
   }
 };

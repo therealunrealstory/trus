@@ -1,34 +1,25 @@
 {
   "name": "The Real Unreal Story",
   "short_name": "TRUS",
-  "icons": [
-    {
-      "src": "/android-chrome-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/android-chrome-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    },
-    {
-      "src": "/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
-    },
-    {
-      "src": "/favicon-32x32.png",
-      "sizes": "32x32",
-      "type": "image/png"
-    },
-    {
-      "src": "/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
-    }
-  ],
+  "description": "The true story of a surgeon who spent his life saving others and is now fighting for his own.",
+  "lang": "en",
+  "dir": "ltr",
+  "id": "/?source=pwa",
+  "start_url": "/?utm_source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
   "theme_color": "#0b0b0b",
   "background_color": "#0b0b0b",
-  "display": "standalone"
+  "icons": [
+    { "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/android-chrome-512x512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Donate", "short_name": "Donate", "url": "/#donateHero", "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "News", "short_name": "News", "url": "/#tgFeed", "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "Support map", "short_name": "Map", "url": "/#map", "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" }] }
+  ],
+  "categories": ["charity", "health", "nonprofit"]
 }

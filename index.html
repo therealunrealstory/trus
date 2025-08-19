@@ -42,14 +42,18 @@
     section, footer{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
     .icon-btn{ display:inline-flex; align-items:center; gap:8px }
     .icon-btn svg{ width:18px; height:18px }
+
     .tile{ position:relative; overflow:hidden; border-radius:1rem; height:180px; background-size:cover; background-position:center; cursor:pointer; border:1px solid rgba(255,255,255,.08) }
     .tile::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent,rgba(0,0,0,.6)); transition:opacity .2s ease }
     .tile:hover::after{ opacity:0 }
     .tile.overlay-off::after{ opacity:0 }
     .tile>span{ position:absolute; left:1rem; bottom:1rem; z-index:1; background:rgba(0,0,0,.55); padding:.4rem .7rem; border-radius:.8rem }
+
     .video-wrap{ position:relative; width:100%; padding-top:56.25%; border-radius:1rem; overflow:hidden; border:1px solid rgba(255,255,255,.08) }
     .video-wrap iframe{ position:absolute; inset:0; width:100%; height:100% }
+
     .modal-backdrop{ display:none; z-index:9999; } .modal-backdrop.show{ display:block }
+
     /* пульсирующая кнопка */
     @keyframes pulse {
       0% { transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,.6); }
@@ -204,14 +208,14 @@
         <!-- Физическая помощь -->
         <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
           <div class="text-2xl mb-2">
-<svg viewBox="0 0 24 24" width="22" height="22" fill="none"
-     stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
-     aria-hidden="true">
-  <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>
-  <circle cx="9" cy="7" r="4"/>
-  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-</svg>
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+                aria-hidden="true">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
           </div>
           <div class="font-medium mb-2" data-i18n="support.physical">Practical help</div>
           <button id="wantHelp" class="text-sm underline" data-i18n="btn.wantHelp">I want to help</button>
@@ -259,8 +263,17 @@
         </svg>
         <span data-i18n="map.title">Support map</span>
       </h2>
+
+      <!-- КНОПКА геолокации -->
+      <div class="mb-3">
+        <button id="locateMe" class="px-3 py-2 rounded-xl bg-gray-800/60 border border-gray-700 text-sm" data-i18n="map.locateMe">
+          Show my location
+        </button>
+      </div>
+
       <div id="map" class="rounded-2xl shadow-sm border" style="background:#0b0b0b"></div>
       <p class="text-xs text-gray-300 mt-2" data-i18n="map.tip">Be sure to click on the map to specify the exact place of your support.</p>
+
       <div class="mt-4 grid md:grid-cols-3 gap-3">
         <input id="name" class="px-3 py-2 rounded-xl border bg-gray-800/70 text-white" data-i18n-placeholder="placeholder.name" placeholder="Name" />
         <input id="msg" class="px-3 py-2 rounded-2xl border bg-gray-800/70 text-white md:col-span-2" data-i18n-placeholder="placeholder.msg" placeholder="Message (up to 140 characters)" maxlength="140" />
@@ -277,14 +290,14 @@
     <!-- СЕРДЦА -->
     <section id="contact">
       <div class="rounded-3xl p-6 shadow-sm border border-gray-700" style="background:rgba(0,0,0,0.35)">
-<div class="text-lg font-semibold mb-3 flex items-center gap-2">
-  <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
-       stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
-       aria-hidden="true">
-    <path d="M12 21s-6-4.35-8.28-8A5 5 0 0 1 12 5a5 5 0 0 1 8.28 8C18 16.65 12 21 12 21Z"/>
-  </svg>
-  <span data-i18n="hearts.title">Hearts of support</span>
-</div>
+        <div class="text-lg font-semibold mb-3 flex items-center gap-2">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+               stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <path d="M12 21s-6-4.35-8.28-8A5 5 0 0 1 12 5a5 5 0 0 1 8.28 8C18 16.65 12 21 12 21Z"/>
+          </svg>
+          <span data-i18n="hearts.title">Hearts of support</span>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2">
           <input id="heartName" class="px-3 py-2 rounded-xl border bg-gray-800/70 text-white text-sm" placeholder="Name" data-i18n-placeholder="placeholder.name" />
           <button id="addHeart" class="px-4 py-2 rounded-xl bg-pink-600 text-white text-sm" data-i18n="btn.addHeart">Leave a heart</button>
@@ -317,6 +330,11 @@
   </div>
 
   <script>
+    /* Service Worker: безопасная регистрация без top-level await */
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js?ver=1.0.0').catch(()=>{});
+    }
+
     const donateURL = "https://www.gofundme.com/f/your-campaign-slug";
 
     function getLangFromQuery() {
@@ -369,7 +387,14 @@
     const modal = document.getElementById('modalBackdrop');
     const mTitle = document.getElementById('modalTitle');
     const mBody  = document.getElementById('modalBody');
-    const openModal = (title, html)=>{ mTitle.innerHTML = title; mBody.innerHTML = html; modal.classList.add('show'); };
+
+    function openModal(title, html){
+      mTitle.innerHTML = title;
+      mBody.innerHTML = html;
+      modal.classList.add('show');
+    }
+    window.openModal = openModal; // для inline-обработчиков в сгенерированном HTML
+
     const closeModal=()=>modal.classList.remove('show');
     document.getElementById('modalClose').onclick=closeModal; document.getElementById('modalOk').onclick=closeModal;
     modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
@@ -463,18 +488,15 @@
     const map=L.map('map').setView([20,0],2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
     const layer=L.layerGroup().addTo(map);
-    if(navigator.geolocation){
-      navigator.geolocation.getCurrentPosition(pos=>{
-        const {latitude,longitude}=pos.coords; map.setView([latitude,longitude],6);
-        L.marker([latitude,longitude]).addTo(map).bindPopup(t("map.youAreHere","You are here")).openPopup();
-      },()=>{});
-    }
+
+    // (авто-геолокация УБРАНА) — теперь только по кнопке:
     let selectedLatLng=null, previewMarker=null;
     map.on('click', e=>{
       selectedLatLng=e.latlng; if(previewMarker) previewMarker.remove();
       previewMarker=L.marker([selectedLatLng.lat,selectedLatLng.lng],{draggable:true}).addTo(map).bindPopup(t("map.selectedPoint","Selected point (you can drag)")).openPopup();
       previewMarker.on('dragend',()=>{selectedLatLng=previewMarker.getLatLng();});
     });
+
     function setMarksCount(n){ const el=document.getElementById('marksCount'); if(el) el.textContent=Number.isFinite(n)?String(n):'0'; }
 
     let marksOffset = 0;
@@ -526,6 +548,37 @@
       document.getElementById('msg').value=''; selectedLatLng=null; if(previewMarker){previewMarker.remove(); previewMarker=null;}
       marksOffset = 0;
       loadAllMarksPaged();
+    });
+
+    // ===== Кнопка геолокации по запросу
+    let myMarker = null;
+    const locateBtn = document.getElementById('locateMe');
+    locateBtn?.addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        alert(t("map.geoUnsupported","Geolocation is not supported on this device/browser."));
+        return;
+      }
+      const original = locateBtn.textContent;
+      locateBtn.disabled = true;
+      locateBtn.textContent = t("map.locating","Locating…");
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          map.setView([latitude, longitude], 12);
+          if (myMarker) myMarker.remove();
+          myMarker = L.marker([latitude, longitude]).addTo(map)
+            .bindPopup(t("map.youAreHere","You are here")).openPopup();
+          locateBtn.disabled = false;
+          locateBtn.textContent = original;
+        },
+        () => {
+          alert(t("map.geoDenied","Geolocation permission denied or unavailable."));
+          locateBtn.disabled = false;
+          locateBtn.textContent = original;
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+      );
     });
 
     // ===== Hearts + Splide (12 per slide, paged)
@@ -725,7 +778,6 @@
         u.searchParams.set('lang', l);
         history.replaceState({}, '', u);
         loadLocale(l);
-
         // ВАЖНО: если что-то играет — моментально переключаем дорожку на новый язык
         if (!audio.paused)         setAudioForLang(l, true);
         if (!announceAudio.paused) setAnnouncementForLang(l, true);
@@ -740,6 +792,7 @@
           audio.pause(); audioBtn.textContent = (I18N && I18N["audio.play"]) || (DEFAULT_I18N["audio.play"] || "Story in music");
         }
       });
+
       announceBtn.addEventListener('click', async ()=>{
         if(announceAudio.paused){
           setAnnouncementForLang(langSelect.value);
@@ -798,24 +851,24 @@
       })();
 
       // Кнопка установки PWA
-      let deferredPrompt = window.deferredPrompt || null;
+      let dp = window.deferredPrompt || null;
       const installBtn = document.getElementById('installBtn');
       if (window.matchMedia('(display-mode: standalone)').matches) {
         installBtn?.classList.add('hidden');
       }
       installBtn?.addEventListener('click', async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
+        if (!dp) return;
+        dp.prompt();
+        const { outcome } = await dp.userChoice;
         if (outcome === 'accepted') {
           openModal(
             t('pwa.installedTitle', 'Installed'),
             t('pwa.installedBody', 'The app has been added to your Home screen / app list.')
           );
         }
-        deferredPrompt = null;
+        dp = null;
       });
-      window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn?.classList.remove('hidden'); });
+      window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); dp = e; installBtn?.classList.remove('hidden'); });
       window.addEventListener('appinstalled', () => installBtn?.classList.add('hidden'));
     });
   </script>
