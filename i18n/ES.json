@@ -12,6 +12,9 @@
   "btn.install": "Instalar app",
   "pwa.installedTitle": "Instalada",
   "pwa.installedBody": "La aplicación se ha añadido a tu pantalla de inicio / lista de apps.",
+  "pwa.installTitle": "Instalar esta app",
+  "pwa.installBody": "Puedes añadir The Real Unreal Story a tu pantalla de inicio para una experiencia más rápida, como una app.",
+  "map.geoError": "No se pudo obtener tu ubicación. Inténtalo de nuevo.",
 
   "announce.title": "Anuncio de nuestra historia",
   "announce.short": "Anuncio de audio corto",

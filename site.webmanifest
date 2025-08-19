@@ -1,25 +1,40 @@
 {
   "name": "The Real Unreal Story",
   "short_name": "TRUS",
-  "description": "The true story of a surgeon who spent his life saving others and is now fighting for his own.",
+  "description": "The true story of a surgeon who saved others all his life and is now fighting for his own.",
   "lang": "en",
   "dir": "ltr",
-  "id": "/?source=pwa",
-  "start_url": "/?utm_source=pwa",
-  "scope": "/",
+  "start_url": "./?source=pwa",
+  "scope": "./",
   "display": "standalone",
-  "orientation": "portrait-primary",
+  "background_color": "#000000",
   "theme_color": "#0b0b0b",
-  "background_color": "#0b0b0b",
   "icons": [
-    { "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/android-chrome-512x512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ],
   "shortcuts": [
-    { "name": "Donate", "short_name": "Donate", "url": "/#donateHero", "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" }] },
-    { "name": "News", "short_name": "News", "url": "/#tgFeed", "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" }] },
-    { "name": "Support map", "short_name": "Map", "url": "/#map", "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" }] }
-  ],
-  "categories": ["charity", "health", "nonprofit"]
+    {
+      "name": "Support now",
+      "short_name": "Support",
+      "url": "./#support",
+      "description": "Go to the support section"
+    }
+  ]
 }

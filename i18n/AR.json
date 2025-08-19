@@ -12,6 +12,9 @@
   "btn.install": "تثبيت التطبيق",
   "pwa.installedTitle": "تم التثبيت",
   "pwa.installedBody": "تمت إضافة التطبيق إلى الشاشة الرئيسية / قائمة التطبيقات.",
+  "pwa.installTitle": "ثبّت هذا التطبيق",
+  "pwa.installBody": "يمكنك إضافة The Real Unreal Story إلى الشاشة الرئيسية للحصول على تجربة أسرع تشبه التطبيقات.",
+  "map.geoError": "تعذّر الحصول على موقعك. يُرجى المحاولة مرة أخرى.",
 
   "announce.title": "إعلان قصتنا",
   "announce.short": "إعلان صوتي قصير",

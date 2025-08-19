@@ -1,29 +1,47 @@
-body{ background:#000 url('images/bg.png') center/cover fixed no-repeat; }
+/* ---------- Global background ---------- */
+body{
+  /* ВЫНЕСЕНО: путь теперь относительно assets/styles.css */
+  background:#000 url('../images/bg.png') center/cover fixed no-repeat;
+}
+
+/* ---------- Map ---------- */
 #map{ height:360px }
 
-/* секции */
+/* ---------- Containers with translucent bg ---------- */
 header{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
 section, footer{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
 
+/* ---------- Icon buttons ---------- */
 .icon-btn{ display:inline-flex; align-items:center; gap:8px }
 .icon-btn svg{ width:18px; height:18px }
 
-/* тайлы */
-.tile{ position:relative; overflow:hidden; border-radius:1rem; height:180px; background-size:cover; background-position:center; cursor:pointer; border:1px solid rgba(255,255,255,.08) }
-.tile::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent,rgba(0,0,0,.6)); transition:opacity .2s ease }
+/* ---------- Tiles with overlay ---------- */
+.tile{
+  position:relative; overflow:hidden; border-radius:1rem;
+  height:180px; background-size:cover; background-position:center;
+  cursor:pointer; border:1px solid rgba(255,255,255,.08)
+}
+.tile::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.6));
+  transition:opacity .2s ease
+}
 .tile:hover::after{ opacity:0 }
 .tile.overlay-off::after{ opacity:0 }
-.tile>span{ position:absolute; left:1rem; bottom:1rem; z-index:1; background:rgba(0,0,0,.55); padding:.4rem .7rem; border-radius:.8rem }
+.tile>span{
+  position:absolute; left:1rem; bottom:1rem; z-index:1;
+  background:rgba(0,0,0,.55); padding:.4rem .7rem; border-radius:.8rem
+}
 
-/* видео */
+/* ---------- Video wrapper ---------- */
 .video-wrap{ position:relative; width:100%; padding-top:56.25%; border-radius:1rem; overflow:hidden; border:1px solid rgba(255,255,255,.08) }
 .video-wrap iframe{ position:absolute; inset:0; width:100%; height:100% }
 
-/* модалка */
+/* ---------- Modal ---------- */
 .modal-backdrop{ display:none; z-index:9999; }
 .modal-backdrop.show{ display:block }
 
-/* пульс кнопок */
+/* ---------- Pulse button ---------- */
 @keyframes pulse {
   0% { transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,.6); }
   70%{ transform:scale(1.03); box-shadow:0 0 0 12px rgba(99,102,241,0); }
@@ -31,10 +49,10 @@ section, footer{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem
 }
 .pulse{ animation:pulse 2s infinite; }
 
-/* RTL косметика */
+/* ---------- RTL cosmetics ---------- */
 html[dir="rtl"] .icon-btn { flex-direction: row-reverse; }
 html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
 
-/* caret для хэштега */
+/* ---------- Hashtag caret ---------- */
 .hashtag-caret { animation: hashblink 1s step-start infinite; }
 @keyframes hashblink { 50% { opacity: 0; } }

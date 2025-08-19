@@ -12,6 +12,9 @@
   "btn.install": "Install app",
   "pwa.installedTitle": "Installed",
   "pwa.installedBody": "The app has been added to your Home screen / app list.",
+  "pwa.installTitle": "Install this app",
+  "pwa.installBody": "You can add The Real Unreal Story to your Home Screen for a faster, app-like experience.",
+  "map.geoError": "Couldn’t get your location. Please try again.",
 
   "announce.title": "Our story announcement",
   "announce.short": "Short audio announcement",

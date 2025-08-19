@@ -12,6 +12,9 @@
   "btn.install": "安装应用",
   "pwa.installedTitle": "已安装",
   "pwa.installedBody": "应用已添加到主屏 / 应用列表。",
+  "pwa.installTitle": "安装此应用",
+  "pwa.installBody": "你可以将 The Real Unreal Story 添加到主屏幕，获得更快、近似原生应用的体验。",
+  "map.geoError": "无法获取你的位置。请重试。",
 
   "announce.title": "我们的故事预告",
   "announce.short": "简短音频预告",
