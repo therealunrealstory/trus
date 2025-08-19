@@ -61,6 +61,9 @@
   "map.totalLabel": "إجمالي العلامات:",
   "map.youAreHere": "أنت هنا",
   "map.selectedPoint": "نقطة محددة (يمكن سحبها)",
+  "map.locate": "أظهر موقعي",
+  "map.noGeo": "خدمة تحديد الموقع غير مدعومة على هذا الجهاز.",
+
 
   "hearts.title": "قلوب الدعم",
   "hearts.empty": "لا توجد قلوب بعد.",

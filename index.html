@@ -6,7 +6,7 @@
   <title>The Real Unreal Story — support for Adam</title>
   <meta name="description" content="The Real Unreal Story — the true story of a surgeon who saved others all his life and is now fighting for his own." />
 
-  <!-- Hreflang (относительные ссылки, чтобы работать и из подпапки) -->
+  <!-- Hreflang -->
   <link rel="alternate" hreflang="x-default" href="?lang=EN">
   <link rel="alternate" hreflang="en" href="?lang=EN">
   <link rel="alternate" hreflang="es" href="?lang=ES">
@@ -18,83 +18,45 @@
   <link rel="alternate" hreflang="zh" href="?lang=CN">
   <link rel="alternate" hreflang="ar" href="?lang=AR">
 
-  <!-- Icons / PWA -->
+  <!-- PWA / Icons -->
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="icon" sizes="32x32" href="favicon-32.png">
+  <!-- ✅ фикс имени файла: -->
+  <link rel="icon" sizes="32x32" href="favicon-32x32.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
   <meta name="theme-color" content="#0b0b0b">
 
+  <!-- iOS A2HS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Leaflet -->
+
+  <!-- CSS библиотек (лёгкие) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- Splide (карусель сердец) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
 
-  <style>
-    body{ background:#000 url('images/bg.png') center/cover fixed no-repeat; }
-    #map{ height:360px }
-    /* шапка с прозрачностью как у секций */
-    header{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
-    section, footer{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
-    .icon-btn{ display:inline-flex; align-items:center; gap:8px }
-    .icon-btn svg{ width:18px; height:18px }
-
-    .tile{ position:relative; overflow:hidden; border-radius:1rem; height:180px; background-size:cover; background-position:center; cursor:pointer; border:1px solid rgba(255,255,255,.08) }
-    .tile::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent,rgba(0,0,0,.6)); transition:opacity .2s ease }
-    .tile:hover::after{ opacity:0 }
-    .tile.overlay-off::after{ opacity:0 }
-    .tile>span{ position:absolute; left:1rem; bottom:1rem; z-index:1; background:rgba(0,0,0,.55); padding:.4rem .7rem; border-radius:.8rem }
-
-    .video-wrap{ position:relative; width:100%; padding-top:56.25%; border-radius:1rem; overflow:hidden; border:1px solid rgba(255,255,255,.08) }
-    .video-wrap iframe{ position:absolute; inset:0; width:100%; height:100% }
-
-    .modal-backdrop{ display:none; z-index:9999; } .modal-backdrop.show{ display:block }
-
-    /* пульсирующая кнопка */
-    @keyframes pulse {
-      0% { transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,.6); }
-      70%{ transform:scale(1.03); box-shadow:0 0 0 12px rgba(99,102,241,0); }
-      100%{ transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,0); }
-    }
-    .pulse{ animation:pulse 2s infinite; }
-
-    /* RTL косметика */
-    html[dir="rtl"] .icon-btn { flex-direction: row-reverse; }
-    html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
-
-    /* caret для хэштега */
-    .hashtag-caret { animation: hashblink 1s step-start infinite; }
-    @keyframes hashblink { 50% { opacity: 0; } }
-  </style>
+  <!-- Наши стили -->
+  <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body class="text-white">
-  <!-- HEADER: слева — хэштег; справа — install / audio / язык -->
+
+  <!-- HEADER -->
   <header class="max-w-5xl mx-auto px-4 py-6">
     <div class="flex items-center justify-between gap-3">
-      <!-- ЛЕВО: хэштег с эффектом печати -->
       <div id="hashtagBtn" class="font-mono text-xs sm:text-sm text-white/90 cursor-pointer select-none flex items-center" title="#TheRealUnrealStory" aria-label="#TheRealUnrealStory">
         <span id="hashtagType">#TheRealUnrealStory</span><span class="hashtag-caret ml-0.5">|</span>
       </div>
-      <!-- ПРАВО: на мобиле — столбцом, на ≥sm — в строку -->
       <div class="flex gap-2 items-end sm:items-center sm:flex-row flex-col">
-        <!-- 1) мобайл — первая строка; десктоп — слева -->
-        <button id="installBtn"
-                class="px-4 py-2 rounded-xl border border-indigo-500 text-indigo-300 hover:bg-indigo-600/10 text-sm hidden"
-                data-i18n="btn.install">
-          Install app
-        </button>
-        <!-- 2) мобайл — вторая строка; десктоп — по центру -->
+        <button id="installBtn" class="px-4 py-2 rounded-xl border border-indigo-500 text-indigo-300 hover:bg-indigo-600/10 text-sm hidden" data-i18n="btn.install">Install app</button>
         <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse" data-i18n="audio.play">Story in music</button>
-        <!-- 3) мобайл — третья строка; десктоп — справа -->
         <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
-          <option value="EN" selected>EN</option>
-          <option value="ES">ES</option><option value="FR">FR</option>
-          <option value="PT">PT</option><option value="DE">DE</option><option value="IT">IT</option>
-          <option value="RU">RU</option><option value="CN">CN</option><option value="AR">AR</option>
+          <optgroup label="Languages">
+            <option value="EN" selected>EN</option><option value="ES">ES</option><option value="FR">FR</option>
+            <option value="PT">PT</option><option value="DE">DE</option><option value="IT">IT</option>
+            <option value="RU">RU</option><option value="CN">CN</option><option value="AR">AR</option>
+          </optgroup>
         </select>
       </div>
     </div>
@@ -127,13 +89,15 @@
   <main class="max-w-5xl mx-auto px-4">
     <!-- HERO -->
     <section id="hero">
-		<h1 class="text-2xl md:text-4xl font-semibold leading-tight tracking-tight">
+      <h1 class="text-2xl md:text-4xl font-semibold leading-tight">
+        <!-- маленькая иконка слева от заголовка -->
 			<img
 			  src="android-chrome-192x192.png"
 			  alt=""
 			  class="inline align-middle h-[0.9em] w-auto mr-0.5 md:mr-1 select-none pointer-events-none"
-			/>The Real Unreal Story — <span class="text-indigo-600" data-i18n="hero.titleRest">support for Adam</span><span class="align-super text-white/80 text-xl">*</span>
-		</h1>
+			/>
+			The Real Unreal Story — <span class="text-indigo-600" data-i18n="hero.titleRest">support for Adam</span><span class="align-super text-white/80 text-xl">*</span>
+      </h1>
       <p class="mt-4" data-i18n="hero.lead1">
         The true story of a surgeon who spent his life saving others and is now fighting for his own life.
       </p>
@@ -146,7 +110,7 @@
       </div>
     </section>
 
-    <!-- 3 ТАЙЛА -->
+    <!-- ТАЙЛЫ -->
     <section>
       <div class="grid md:grid-cols-3 gap-4">
         <div id="tile1" class="tile" style="background-image:url('images/1.png')"><span data-i18n="tiles.me">I’m Nico</span></div>
@@ -155,7 +119,7 @@
       </div>
     </section>
 
-    <!-- МИНИ-ПЛЕЕР АУДИО-АНОНСА -->
+    <!-- АУДИО-АНОНС -->
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="announce.title">Our story announcement</h2>
       <div class="rounded-2xl border border-gray-700 p-4 flex items-center gap-3" style="background:rgba(0,0,0,0.35)">
@@ -163,7 +127,7 @@
         <div class="text-sm text-gray-200" data-i18n="announce.short">Short audio announcement</div>
         <div id="announceStatus" class="ml-auto text-xs text-gray-300"></div>
       </div>
-      <audio id="announceAudio" preload="auto"></audio>
+      <audio id="announceAudio" preload="none"></audio>
     </section>
 
     <!-- ВИДЕО -->
@@ -176,7 +140,7 @@
       </div>
     </section>
 
-    <!-- КРАТКАЯ АУДИО-ВЕРСИЯ ИСТОРИИ -->
+    <!-- КРАТКАЯ АУДИО-ВЕРСИЯ -->
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="short.title">Short version of our story</h2>
       <div class="rounded-2xl border border-gray-700 p-4 flex items-center gap-3" style="background:rgba(0,0,0,0.35)">
@@ -184,14 +148,13 @@
         <div class="text-sm text-gray-200" data-i18n="short.note">About the events from early 2019 to mid-2025.</div>
         <div id="shortStatus" class="ml-auto text-xs text-gray-300"></div>
       </div>
-      <audio id="shortAudio" preload="auto"></audio>
+      <audio id="shortAudio" preload="none"></audio>
     </section>
 
     <!-- ПОДДЕРЖАТЬ СЕЙЧАС -->
     <section>
       <h2 class="text-xl font-semibold mb-4" data-i18n="support.title">Support now</h2>
       <div class="grid md:grid-cols-2 gap-4">
-        <!-- Донаты -->
         <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
           <div class="text-2xl mb-2">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -209,12 +172,10 @@
             <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=500">$500</a>
           </div>
         </div>
-        <!-- Физическая помощь -->
+
         <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
           <div class="text-2xl mb-2">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
-                stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
-                aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>
               <circle cx="9" cy="7" r="4"/>
               <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
@@ -258,8 +219,7 @@
     <!-- КАРТА -->
     <section>
       <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
-             stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="10" />
           <path d="M2 12h20" />
           <path d="M12 2a15.3 15.3 0 0 1 0 20" />
@@ -268,16 +228,13 @@
         <span data-i18n="map.title">Support map</span>
       </h2>
 
-      <!-- КНОПКА геолокации -->
-      <div class="mb-3">
-        <button id="locateMe" class="px-3 py-2 rounded-xl bg-gray-800/60 border border-gray-700 text-sm" data-i18n="map.locateMe">
-          Show my location
-        </button>
+      <!-- кнопка геолокации -->
+      <div class="mb-2">
+        <button id="locateBtn" class="px-3 py-2 rounded-xl bg-gray-800/70 border border-gray-700 text-sm" data-i18n="map.locate">Show my location</button>
       </div>
 
-      <div id="map" class="rounded-2xl shadow-sm border" style="background:#0b0b0b"></div>
+      <div id="map" class="rounded-2xl shadow-sm border" style="background:#0b0b0b; height:360px"></div>
       <p class="text-xs text-gray-300 mt-2" data-i18n="map.tip">Be sure to click on the map to specify the exact place of your support.</p>
-
       <div class="mt-4 grid md:grid-cols-3 gap-3">
         <input id="name" class="px-3 py-2 rounded-xl border bg-gray-800/70 text-white" data-i18n-placeholder="placeholder.name" placeholder="Name" />
         <input id="msg" class="px-3 py-2 rounded-2xl border bg-gray-800/70 text-white md:col-span-2" data-i18n-placeholder="placeholder.msg" placeholder="Message (up to 140 characters)" maxlength="140" />
@@ -295,9 +252,7 @@
     <section id="contact">
       <div class="rounded-3xl p-6 shadow-sm border border-gray-700" style="background:rgba(0,0,0,0.35)">
         <div class="text-lg font-semibold mb-3 flex items-center gap-2">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
-               stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
-               aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 21s-6-4.35-8.28-8A5 5 0 0 1 12 5a5 5 0 0 1 8.28 8C18 16.65 12 21 12 21Z"/>
           </svg>
           <span data-i18n="hearts.title">Hearts of support</span>
@@ -318,10 +273,10 @@
     Thank you for any support—even a repost can change a life.
   </footer>
 
-  <!-- Аудио в шапке -->
-  <audio id="bgAudio" preload="auto"></audio>
+  <!-- Аудио -->
+  <audio id="bgAudio" preload="none"></audio>
 
-  <!-- Универсальная модалка -->
+  <!-- Модалка -->
   <div id="modalBackdrop" class="modal-backdrop fixed inset-0 bg-black/60">
     <div class="min-h-full flex items-center justify-center p-4">
       <div class="bg-gray-900 text-white rounded-2xl shadow-xl border border-gray-700 max-w-xl w-full p-6 relative">
@@ -333,548 +288,16 @@
     </div>
   </div>
 
+  <!-- Наш JS (ленивая инициализация библиотек, аудио, карта, сплайд) -->
+  <script type="module" src="assets/app.js"></script>
+
   <script>
-    /* Service Worker: безопасная регистрация без top-level await */
+    // Service Worker (версия синхронизирована с sw.js)
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js?ver=1.0.0').catch(()=>{});
-    }
-
-    const donateURL = "https://www.gofundme.com/f/your-campaign-slug";
-
-    function getLangFromQuery() {
-      try {
-        const u = new URL(location.href);
-        const p = (u.searchParams.get('lang') || '').toUpperCase();
-        const ok = ['EN','ES','FR','IT','DE','PT','RU','CN','AR'];
-        return ok.includes(p) ? p : null;
-      } catch { return null; }
-    }
-
-    // ===== AUDIO SOURCES by language =====
-    const audio = document.getElementById('bgAudio');
-    const audioBtn = document.getElementById('audioBtn');
-    const langSelect = document.getElementById('lang');
-
-    function setAudioForLang(l, autoplay=false){
-      const src = `audio/ORUS-${l}.mp3`;
-      if(audio.src.endsWith(src)){ if(autoplay && audio.paused) audio.play().catch(()=>{}); return; }
-      audio.pause(); audio.src = src; if(autoplay) audio.play().catch(()=>{});
-    }
-
-    /* ====== Announcement mini-player ====== */
-    const announceAudio=document.getElementById('announceAudio');
-    const announceBtn=document.getElementById('announceBtn');
-    const announceStatus=document.getElementById('announceStatus');
-
-    function setAnnouncementForLang(l,autoplay=false){
-      const src=`audio/ANNOUNCEMENT-${l}.mp3`;
-      if(announceAudio.src.endsWith(src)){ if(autoplay && announceAudio.paused) announceAudio.play().catch(()=>{}); return; }
-      announceAudio.pause(); announceAudio.src=src;
-      announceStatus.textContent = ((I18N && I18N["announce.langLabel"]) || "Language: ") + l;
-      if(autoplay) announceAudio.play().catch(()=>{});
-    }
-
-    /* ====== Short-story mini-player ====== */
-    const shortAudio = document.getElementById('shortAudio');
-    const shortBtn   = document.getElementById('shortBtn');
-    const shortStatus= document.getElementById('shortStatus');
-
-    function setShortForLang(l, autoplay=false){
-      const src = `audio/SHORTSTORY-${l}.mp3`;
-      if(shortAudio.src.endsWith(src)){ if(autoplay && shortAudio.paused) shortAudio.play().catch(()=>{}); return; }
-      shortAudio.pause(); shortAudio.src = src;
-      shortStatus.textContent = ((I18N && I18N["short.langLabel"]) || "Language: ") + l;
-      if(autoplay) shortAudio.play().catch(()=>{});
-    }
-
-    // ===== Modals
-    const modal = document.getElementById('modalBackdrop');
-    const mTitle = document.getElementById('modalTitle');
-    const mBody  = document.getElementById('modalBody');
-
-    function openModal(title, html){
-      mTitle.innerHTML = title;
-      mBody.innerHTML = html;
-      modal.classList.add('show');
-    }
-    window.openModal = openModal; // для inline-обработчиков в сгенерированном HTML
-
-    const closeModal=()=>modal.classList.remove('show');
-    document.getElementById('modalClose').onclick=closeModal; document.getElementById('modalOk').onclick=closeModal;
-    modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
-
-    function t(key, fallback){ return (window.I18N && I18N[key]) || fallback; }
-
-    // тайлы
-    const tileEls = [document.getElementById('tile1'), document.getElementById('tile2'), document.getElementById('tile3')];
-    function lockOverlay(idx, lock){ const el = tileEls[idx]; if(!el) return; el.classList.toggle('overlay-off', !!lock); }
-
-    document.getElementById('tile1').onclick=()=>{ lockOverlay(0, true); openModal(
-      t('tiles.me','I’m Nico'),
-      t('modal.tile1.body', `
-        My name is Nico, and I’m Adam’s friend. I became an involuntary participant in this “real-unreal” story.
-        I’ve reached out to a wide audience for support — I can’t manage alone anymore.
-        So I’m telling our story without embellishment and launching a fundraiser on GoFundMe in parallel.
-      `)
-    ); };
-    document.getElementById('tile2').onclick=()=>{ lockOverlay(1, true); openModal(
-      t('tiles.about','About Adam'),
-      t('modal.tile2.body', `
-        Adam is a wonderful person and a surgeon with unique techniques, a philanthropist. Since 2019, he has faced blood oncology several times.
-        In July 2025 — a new severe turn: another form of leukemia. At the same time — personal shocks and losses.
-      `)
-    ); };
-    document.getElementById('tile3').onclick=()=>{ lockOverlay(2, true); openModal(
-      t('tiles.others','Other people in the story'),
-      t('modal.tile3.body', `
-        Adam’s story is full of real surprises. There were incredible helpers — without them he wouldn’t have survived to this day.
-        There were also those who deliberately harmed. And there were people whom the universe seemed to bring at the right moment.
-      `)
-    ); };
-
-    // возвращаем плёнку после закрытия модалки
-    document.getElementById('modalClose').addEventListener('click', () => tileEls.forEach(el=>el.classList.remove('overlay-off')));
-    document.getElementById('modalOk').addEventListener('click', () => tileEls.forEach(el=>el.classList.remove('overlay-off')));
-    document.getElementById('modalBackdrop').addEventListener('click', (e)=>{ if(e.target===document.getElementById('modalBackdrop')) tileEls.forEach(el=>el.classList.remove('overlay-off')); });
-
-    document.getElementById('wantHelp').onclick=()=>openModal(
-      t('support.physical','Practical help'),
-      t('modal.help.body', `
-        If you are ready to help — whether legal, medical or practical support
-        (nurses, caregivers), or if you want to arrange a personal meeting — please write to:
-        <a href="mailto:theRealUnrealStory@gmail.com" class="underline">theRealUnrealStory@gmail.com</a>.<br><br>
-        We are sincerely grateful to everyone who responds.
-      `)
-    );
-
-    // ===== Engagement local state
-    const engageBtns=[...document.querySelectorAll('.eng-btn')];
-    const ENG_KEY='engagement_v1';
-    const loadEng=()=>{ try{return JSON.parse(localStorage.getItem(ENG_KEY)||'[]');}catch{return []} };
-    const saveEng=a=>{ try{localStorage.setItem(ENG_KEY,JSON.stringify(a));}catch{} };
-    function applyEng(){ const on=loadEng(); engageBtns.forEach((b,i)=>{const s=on.includes(i); b.classList.toggle('bg-green-700',s); b.classList.toggle('border-green-400',s);}); }
-    engageBtns.forEach((b,i)=>b.addEventListener('click',()=>{const on=loadEng(); const p=on.indexOf(i); if(p>=0) on.splice(p,1); else on.push(i); saveEng(on); applyEng();}));
-    applyEng();
-
-    // ===== Telegram feed
-    async function renderTgFeed(){
-      try{
-        const box=document.getElementById('tgFeed');
-        box.innerHTML = `<div class="text-sm text-gray-300">${t("feed.loading","Loading news…")}</div>`;
-        const res=await fetch('/.netlify/functions/news?limit=30',{cache:'no-store'});
-        if(!res.ok) throw new Error('news API '+res.status);
-        const arr=await res.json();
-        if(!Array.isArray(arr)||!arr.length){ box.innerHTML=`<div class="text-sm text-gray-300">${t("feed.empty","No posts yet.")}</div>`; return; }
-        box.innerHTML=arr.map(p=>{
-          const dt=p.date?new Date(p.date):null, time=dt?dt.toLocaleString():'';
-          const link=p.link?`<a href="${p.link}" target="_blank" class="underline text-sky-400">${t("feed.openTelegram","Open in Telegram")}</a>`:'';
-          const text=(p.text||'').replace(/\n/g,'<br>');
-          const _img = (p.media_type==='photo' && p.media_path) ? `/.netlify/functions/tg-file?path=${encodeURIComponent(p.media_path)}` : null;
-          const mediaHtml = _img
-            ? `<img src="${_img}"
-                     alt=""
-                     class="mt-2 rounded-xl border border-gray-700 max-w-full max-h-52 sm:max-h-52 w-auto object-contain block cursor-zoom-in"
-                     onclick="openModal('', '<img src=&quot;${_img}&quot; class=&quot;w-full h-auto rounded-xl&quot;>')">`
-            : '';
-          return `<article class="mb-4 p-3 rounded-xl bg-gray-900/50 border border-gray-700">
-                    <div class="text-xs text-gray-300 mb-2">${time}${link?` · ${link}`:''}</div>
-                    ${text ? `<div class="text-sm leading-relaxed">${text}</div>` : ''}
-                    ${mediaHtml}
-                  </article>`;
-        }).join('');
-      }catch(e){
-        console.error(e); document.getElementById('tgFeed').innerHTML=`<div class="text-sm text-red-400">${t("feed.error","Failed to load news.")}</div>`;
-      }
-    }
-    renderTgFeed();
-
-    // ===== Map (paged)
-    const map=L.map('map').setView([20,0],2);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
-    const layer=L.layerGroup().addTo(map);
-
-    // (авто-геолокация УБРАНА) — теперь только по кнопке:
-    let selectedLatLng=null, previewMarker=null;
-    map.on('click', e=>{
-      selectedLatLng=e.latlng; if(previewMarker) previewMarker.remove();
-      previewMarker=L.marker([selectedLatLng.lat,selectedLatLng.lng],{draggable:true}).addTo(map).bindPopup(t("map.selectedPoint","Selected point (you can drag)")).openPopup();
-      previewMarker.on('dragend',()=>{selectedLatLng=previewMarker.getLatLng();});
-    });
-
-    function setMarksCount(n){ const el=document.getElementById('marksCount'); if(el) el.textContent=Number.isFinite(n)?String(n):'0'; }
-
-    let marksOffset = 0;
-    const marksPageSize = 500;
-    async function fetchMarksPage() {
-      const r = await fetch(`/.netlify/functions/marks?limit=${marksPageSize}&offset=${marksOffset}`, { cache: 'no-store' });
-      const chunk = await r.json();
-      return Array.isArray(chunk) ? chunk : [];
-    }
-    function drawMarksBatch(points, batch=300) {
-      let i = 0;
-      function step() {
-        const end = Math.min(i + batch, points.length);
-        for (; i < end; i++) {
-          const m = points[i];
-          const lat = Number(m.lat), lon = Number(m.lon);
-          if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
-          L.circleMarker([lat, lon], { radius:4, color:'lime' })
-            .bindPopup(`<b>${m.name||'Anon'}</b><br>${m.message||''}`)
-            .addTo(layer);
-        }
-        if (i < points.length) requestAnimationFrame(step);
-      }
-      step();
-    }
-    async function loadAllMarksPaged() {
-      layer.clearLayers();
-      let total = 0;
-      while (true) {
-        const chunk = await fetchMarksPage();
-        if (!chunk.length) break;
-        total += chunk.length;
-        drawMarksBatch(chunk, 300);
-        marksOffset += chunk.length;
-        if (chunk.length < marksPageSize) break;
-      }
-      setMarksCount(total);
-    }
-    loadAllMarksPaged();
-
-    document.getElementById('addMark').addEventListener('click', async ()=>{
-      const name=document.getElementById('name').value.trim();
-      const message=document.getElementById('msg').value.trim();
-      if(!message) return alert(t("alert.enterMessage","Enter a message"));
-      if(!selectedLatLng) return alert(t("alert.clickMapFirst","Click on the map first!"));
-      const {lat,lng}=selectedLatLng;
-      const resp=await fetch('/.netlify/functions/marks',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name,message,lat,lon:lng})});
-      if(!resp.ok){ const tt=await resp.text().catch(()=>'-'); alert((t("error.saveFailed","Save error: ")) + tt); return; }
-      document.getElementById('msg').value=''; selectedLatLng=null; if(previewMarker){previewMarker.remove(); previewMarker=null;}
-      marksOffset = 0;
-      loadAllMarksPaged();
-    });
-
-    // ===== Кнопка геолокации по запросу
-    let myMarker = null;
-    const locateBtn = document.getElementById('locateMe');
-    locateBtn?.addEventListener('click', () => {
-      if (!navigator.geolocation) {
-        alert(t("map.geoUnsupported","Geolocation is not supported on this device/browser."));
-        return;
-      }
-      const original = locateBtn.textContent;
-      locateBtn.disabled = true;
-      locateBtn.textContent = t("map.locating","Locating…");
-
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
-          map.setView([latitude, longitude], 12);
-          if (myMarker) myMarker.remove();
-          myMarker = L.marker([latitude, longitude]).addTo(map)
-            .bindPopup(t("map.youAreHere","You are here")).openPopup();
-          locateBtn.disabled = false;
-          locateBtn.textContent = original;
-        },
-        () => {
-          alert(t("map.geoDenied","Geolocation permission denied or unavailable."));
-          locateBtn.disabled = false;
-          locateBtn.textContent = original;
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
-      );
-    });
-
-    // ===== Hearts + Splide (12 per slide, paged)
-    let splide;
-    function chunk(a,s){const out=[];for(let i=0;i<a.length;i+=s) out.push(a.slice(i,i+s));return out;}
-    function heartCard(n){return `<div class="p-4 rounded-2xl bg-gray-900/50 shadow-sm border border-gray-700"><div class="flex items-center gap-2"><span class="text-xl">❤️</span><div class="text-sm text-gray-200">${n||'Anon'}</div></div></div>`;}
-    function renderHeartsSlides(arr){
-      const pages=chunk(arr,12), ul=document.getElementById('heartsSlides');
-      ul.innerHTML=pages.map(p=>`<li class="splide__slide"><div class="grid md:grid-cols-3 gap-3">${p.map(x=>heartCard(x.name)).join('')}</div></li>`).join('')
-        || `<li class="splide__slide"><div class="text-sm text-gray-300">${t("hearts.empty","No hearts yet.")}</div></li>`;
-      if(splide) splide.destroy(true);
-      splide=new Splide('#heartsSplide',{type:'slide',perPage:1,perMove:1,pagination:true,arrows:true,classes:{pagination:'splide__pagination mt-4'}}); splide.mount();
-    }
-
-    let heartsOffset = 0;
-    const heartsPageSize = 200;
-    let allHearts = [];
-
-    async function fetchHeartsPage() {
-      const r = await fetch(`/.netlify/functions/hearts?limit=${heartsPageSize}&offset=${heartsOffset}`, { cache: 'no-store' });
-      const chunk = await r.json();
-      if (!Array.isArray(chunk)) return [];
-      return chunk;
-    }
-
-    async function loadMoreHearts() {
-      const chunk = await fetchHeartsPage();
-      const btn = document.getElementById('loadMoreHearts');
-      if (!chunk.length) {
-        btn?.setAttribute('disabled','disabled');
-        btn?.classList.add('opacity-50','cursor-not-allowed');
-        return;
-      }
-      allHearts = allHearts.concat(chunk);
-      heartsOffset += chunk.length;
-      renderHeartsSlides(allHearts);
-      if (chunk.length < heartsPageSize) {
-        btn?.setAttribute('disabled','disabled');
-        btn?.classList.add('opacity-50','cursor-not-allowed');
-      }
-    }
-
-    document.getElementById('loadMoreHearts')?.addEventListener('click', loadMoreHearts);
-    loadMoreHearts(); // первая порция
-
-    document.getElementById('addHeart').addEventListener('click', async ()=>{
-      const inp=document.getElementById('heartName'); const name=(inp.value||'').trim();
-      await fetch('/.netlify/functions/hearts',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name})});
-      inp.value='';
-      allHearts = []; heartsOffset = 0;
-      const btn = document.getElementById('loadMoreHearts');
-      btn?.removeAttribute('disabled'); btn?.classList.remove('opacity-50','cursor-not-allowed');
-      loadMoreHearts();
-    });
-
-    // ===== Share (вставляем текущий язык)
-    document.getElementById('shareBtn').addEventListener('click', async () => {
-      try {
-        const u = new URL(location.href);
-        u.searchParams.set('lang', document.getElementById('lang').value);
-        const url = u.toString();
-        if (navigator.share) {
-          await navigator.share({ title: 'The Real Unreal Story', url });
-        } else {
-          await navigator.clipboard.writeText(url);
-          alert((I18N && I18N["share.copied"]) || 'Link copied');
-        }
-      } catch {}
-    });
-
-    // ===== I18N loader
-    const LOCALE_DIRS = { AR:"rtl", CN:"ltr", DE:"ltr", EN:"ltr", ES:"ltr", FR:"ltr", IT:"ltr", PT:"ltr", RU:"ltr" };
-    let I18N = {};
-
-    // дефолты из DOM как универсальный fallback
-    const DEFAULT_I18N = {};
-    (function captureDefaultI18n(){
-      document.querySelectorAll("[data-i18n]").forEach(el=>{
-        const key = el.getAttribute("data-i18n");
-        if (!(key in DEFAULT_I18N)) DEFAULT_I18N[key] = el.innerHTML;
-      });
-      document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{
-        const key = el.getAttribute("data-i18n-placeholder");
-        if (!(key in DEFAULT_I18N)) DEFAULT_I18N[key] = el.getAttribute("placeholder") || "";
-      });
-    })();
-
-    async function fetchLocaleJson(lang){
-      // 1) относительный путь (работает в подпапках)
-      try {
-        const r1 = await fetch(`i18n/${lang}.json`, { cache: 'no-store' });
-        if (r1.ok) return await r1.json();
-      } catch {}
-      // 2) абсолютный путь (на домене)
-      try {
-        const r2 = await fetch(`/i18n/${lang}.json`, { cache: 'no-store' });
-        if (r2.ok) return await r2.json();
-      } catch {}
-      return null;
-    }
-
-    async function loadLocale(lang) {
-      try {
-        const data = await fetchLocaleJson(lang);
-        I18N = data || {};
-        window.I18N = I18N;
-      } catch {
-        I18N = {}; window.I18N = {};
-      }
-
-      document.documentElement.lang = (lang || 'en').toLowerCase();
-      document.documentElement.dir  = LOCALE_DIRS[lang] || 'ltr';
-
-      const titleRest = I18N["meta.titleRest"] || DEFAULT_I18N["hero.titleRest"] || "support for Adam";
-      document.title = `The Real Unreal Story — ${titleRest}`;
-
-      if (I18N["meta.description"]) {
-        let m = document.querySelector('meta[name="description"]');
-        if (!m) { m = document.createElement('meta'); m.setAttribute('name','description'); document.head.appendChild(m); }
-        m.setAttribute('content', I18N["meta.description"]);
-      }
-
-      // применяем переводы/дефолты
-      document.querySelectorAll("[data-i18n]").forEach(el=>{
-        const key = el.getAttribute("data-i18n");
-        const val = (I18N[key] ?? DEFAULT_I18N[key]);
-        if (val != null) el.innerHTML = val;
-      });
-      document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{
-        const key = el.getAttribute("data-i18n-placeholder");
-        const val = (I18N[key] ?? DEFAULT_I18N[key]);
-        if (val != null) el.setAttribute('placeholder', val);
-      });
-
-      // кнопки/лейблы с учётом состояния плееров
-      if (audioBtn) {
-        audioBtn.textContent = audio.paused
-          ? (I18N["audio.play"] || DEFAULT_I18N["audio.play"] || "Story in music")
-          : (I18N["audio.pause"] || "‖ Pause");
-      }
-      if (announceBtn) {
-        announceBtn.textContent = announceAudio.paused
-          ? (I18N["announce.play"] || DEFAULT_I18N["announce.play"] || "▶︎ Play")
-          : (I18N["announce.pause"] || "‖ Pause");
-      }
-      if (announceStatus) {
-        announceStatus.textContent = (I18N["announce.langLabel"] || DEFAULT_I18N["announce.langLabel"] || "Language: ") + lang;
-      }
-      if (shortBtn) {
-        shortBtn.textContent = shortAudio.paused
-          ? (I18N["short.play"] || DEFAULT_I18N["short.play"] || "▶︎ Play")
-          : (I18N["short.pause"] || "‖ Pause");
-      }
-      if (shortStatus) {
-        shortStatus.textContent = (I18N["short.langLabel"] || DEFAULT_I18N["short.langLabel"] || "Language: ") + lang;
-      }
-
-      // треки под язык (сохраняя состояние; лениво — src только когда нужно)
-      setAudioForLang(lang, !audio.paused);
-      setAnnouncementForLang(lang, !announceAudio.paused);
-      setShortForLang(lang, !shortAudio.paused);
-    }
-
-    // ===== PWA install: слушаем ранние события (до DOMContentLoaded)
-    let deferredPrompt = null;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const b = document.getElementById('installBtn');
-      if (b) b.classList.remove('hidden');
-    });
-    window.addEventListener('appinstalled', () => {
-      const b = document.getElementById('installBtn');
-      b?.classList.add('hidden');
-    });
-
-    // ===== Init on DOM ready
-    document.addEventListener('DOMContentLoaded', () => {
-      const d = document.getElementById('donateHero'); if (d) d.href = donateURL;
-
-      const fromQuery = getLangFromQuery();
-      const initialLang = fromQuery || localStorage.getItem('site_lang') || 'EN';
-      langSelect.value = initialLang;
-      localStorage.setItem('site_lang', initialLang);
-      loadLocale(initialLang);
-
-      if (fromQuery) {
-        const u = new URL(location.href);
-        u.searchParams.delete('lang');
-        history.replaceState({}, '', u);
-      }
-
-      langSelect.addEventListener('change', e => {
-        const l = e.target.value;
-        localStorage.setItem('site_lang', l);
-        const u = new URL(location.href);
-        u.searchParams.set('lang', l);
-        history.replaceState({}, '', u);
-        loadLocale(l);
-        // ВАЖНО: если что-то играет — моментально переключаем дорожку на новый язык
-        if (!audio.paused)         setAudioForLang(l, true);
-        if (!announceAudio.paused) setAnnouncementForLang(l, true);
-        if (!shortAudio.paused)    setShortForLang(l, true);
-      });
-
-      audioBtn.addEventListener('click', async ()=>{
-        if(audio.paused){
-          setAudioForLang(langSelect.value);
-          try{ await audio.play(); audioBtn.textContent = (I18N && I18N["audio.pause"]) || "‖ Pause"; }catch{}
-        } else {
-          audio.pause(); audioBtn.textContent = (I18N && I18N["audio.play"]) || (DEFAULT_I18N["audio.play"] || "Story in music");
-        }
-      });
-
-      announceBtn.addEventListener('click', async ()=>{
-        if(announceAudio.paused){
-          setAnnouncementForLang(langSelect.value);
-          try{ await announceAudio.play(); announceBtn.textContent=(I18N && I18N["announce.pause"]) || "‖ Pause"; }catch{}
-        } else {
-          announceAudio.pause(); announceBtn.textContent=(I18N && I18N["announce.play"]) || (DEFAULT_I18N["announce.play"] || "▶︎ Play");
-        }
-      });
-      announceAudio.addEventListener('ended',()=>{ announceBtn.textContent=(I18N && I18N["announce.play"]) || (DEFAULT_I18N["announce.play"] || "▶︎ Play"); });
-
-      // события для короткой версии
-      shortBtn.addEventListener('click', async ()=>{
-        if(shortAudio.paused){
-          setShortForLang(langSelect.value);
-          try{ await shortAudio.play(); shortBtn.textContent=(I18N && I18N["short.pause"]) || "‖ Pause"; }catch{}
-        } else {
-          shortAudio.pause(); shortBtn.textContent=(I18N && I18N["short.play"]) || (DEFAULT_I18N["short.play"] || "▶︎ Play");
-        }
-      });
-      shortAudio.addEventListener('ended',()=>{ shortBtn.textContent=(I18N && I18N["short.play"]) || (DEFAULT_I18N["short.play"] || "▶︎ Play"); });
-
-      // Хэштег: эффект печати по кругу + клик = модалка-CTA
-      (function initHashtag() {
-        const el = document.getElementById('hashtagType');
-        const btn = document.getElementById('hashtagBtn');
-        if (!el || !btn) return;
-
-        const TEXT = '#TheRealUnrealStory';
-        let i = 0, dir = 1;
-        const typeDelay = 90, eraseDelay = 45, pause = 900;
-
-        function step() {
-          el.textContent = TEXT.slice(0, i);
-          if (dir > 0) {
-            if (i < TEXT.length) { i++; setTimeout(step, typeDelay); }
-            else { setTimeout(() => { dir = -1; step(); }, pause); }
-          } else {
-            if (i > 0) { i--; setTimeout(step, eraseDelay); }
-            else { setTimeout(() => { dir = 1; step(); }, pause); }
-          }
-        }
-        step();
-
-        btn.addEventListener('click', () => {
-          openModal(
-            t('hashtag.title', '#TheRealUnrealStory'),
-            t('hashtag.body',
-              `Thank you for using <b>#TheRealUnrealStory</b> when you post or share our story.
-               It helps people find and follow the thread.<br><br>
-               Use it on Instagram (posts/reels/stories), Telegram, YouTube (titles/descriptions/comments),
-               TikTok, X/Twitter, Facebook, blogs & Medium, forums & Reddit, LinkedIn,
-               newsletters and even email signatures. Every mention matters — thank you!`
-            )
-          );
-        });
+      (async () => {
+        try { await navigator.serviceWorker.register('/sw.js?ver=v1.3.0'); } catch {}
       })();
-
-      // Кнопка установки PWA
-      let dp = window.deferredPrompt || null;
-      const installBtn = document.getElementById('installBtn');
-      if (window.matchMedia('(display-mode: standalone)').matches) {
-        installBtn?.classList.add('hidden');
-      }
-      installBtn?.addEventListener('click', async () => {
-        if (!dp) return;
-        dp.prompt();
-        const { outcome } = await dp.userChoice;
-        if (outcome === 'accepted') {
-          openModal(
-            t('pwa.installedTitle', 'Installed'),
-            t('pwa.installedBody', 'The app has been added to your Home screen / app list.')
-          );
-        }
-        dp = null;
-      });
-      window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); dp = e; installBtn?.classList.remove('hidden'); });
-      window.addEventListener('appinstalled', () => installBtn?.classList.add('hidden'));
-    });
+    }
   </script>
 </body>
 </html>

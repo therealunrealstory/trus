@@ -61,6 +61,9 @@
   "map.totalLabel": "Marcas totais:",
   "map.youAreHere": "Você está aqui",
   "map.selectedPoint": "Ponto selecionado (você pode arrastar)",
+  "map.locate": "Mostrar minha localização",
+  "map.noGeo": "A geolocalização não é suportada neste dispositivo.",
+
 
   "hearts.title": "Corações de apoio",
   "hearts.empty": "Ainda não há corações.",

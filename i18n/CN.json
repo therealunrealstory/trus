@@ -61,6 +61,9 @@
   "map.totalLabel": "总标记数：",
   "map.youAreHere": "你在这里",
   "map.selectedPoint": "已选位置（可拖动）",
+  "map.locate": "显示我的位置",
+  "map.noGeo": "此设备不支持定位功能。",
+
 
   "hearts.title": "支持之心",
   "hearts.empty": "还没有心形标记。",

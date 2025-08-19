@@ -1,52 +1,71 @@
-/* Simple offline cache & runtime SW */
-const VERSION = 'v1.0.0';
-const CORE = [
-  '/',
-  '/index.html',
-  '/site.webmanifest'
+// sw.js — v1.3.0
+const VERSION = 'v1.3.0';
+const CORE_CACHE = `core-${VERSION}`;
+const RUNTIME_CACHE = `rt-${VERSION}`;
+
+const CORE_ASSETS = [
+  '/', '/index.html', '/site.webmanifest',
+  '/assets/styles.css', '/assets/app.js',
+  '/favicon.svg', '/favicon-32x32.png', '/apple-touch-icon.png'
 ];
 
+// install: precache core
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(CORE)));
+  e.waitUntil(caches.open(CORE_CACHE).then(cache => cache.addAll(CORE_ASSETS)));
   self.skipWaiting();
 });
 
+// activate: clean old
 self.addEventListener('activate', (e) => {
   e.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k)));
+    await Promise.all(keys.filter(k => ![CORE_CACHE, RUNTIME_CACHE].includes(k)).map(k => caches.delete(k)));
     await self.clients.claim();
   })());
 });
 
-// network-first для функций, cache-first для остального
-self.addEventListener('fetch', (e) => {
-  const req = e.request;
-  if (req.method !== 'GET') return;
+// fetch: 
+//  1) i18n -> stale-while-revalidate
+//  2) same-origin GET -> network-first fallback to cache
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  if (request.method !== 'GET') return;
 
-  const url = new URL(req.url);
-  const isFunction = url.pathname.startsWith('/.netlify/functions/');
+  const url = new URL(request.url);
 
-  if (isFunction) {
-    e.respondWith((async () => {
-      try {
-        const fresh = await fetch(req);
-        const cache = await caches.open(VERSION);
-        cache.put(req, fresh.clone());
-        return fresh;
-      } catch {
-        const cache = await caches.open(VERSION);
-        return (await cache.match(req)) || new Response(JSON.stringify([]), { headers:{'content-type':'application/json'} });
-      }
+  // i18n JSON – stale-while-revalidate
+  if (url.pathname.startsWith('/i18n/') && url.pathname.endsWith('.json')) {
+    event.respondWith((async () => {
+      const cache = await caches.open(RUNTIME_CACHE);
+      const cached = await cache.match(request);
+      const fetchPromise = fetch(request).then(resp => {
+        if (resp && resp.status === 200) cache.put(request, resp.clone());
+        return resp;
+      }).catch(()=> cached);
+      return cached || fetchPromise;
     })());
-  } else {
-    e.respondWith((async () => {
-      const cache = await caches.open(VERSION);
-      const cached = await cache.match(req);
-      if (cached) return cached;
-      const fresh = await fetch(req);
-      cache.put(req, fresh.clone());
-      return fresh;
+    return;
+  }
+
+  // core assets -> cache-first
+  if (CORE_ASSETS.includes(url.pathname)) {
+    event.respondWith(caches.match(request).then(r => r || fetch(request)));
+    return;
+  }
+
+  // same-origin network-first
+  if (url.origin === location.origin) {
+    event.respondWith((async () => {
+      try {
+        const net = await fetch(request);
+        const cache = await caches.open(RUNTIME_CACHE);
+        cache.put(request, net.clone());
+        return net;
+      } catch {
+        const cached = await caches.match(request);
+        if (cached) return cached;
+        throw new Error('offline');
+      }
     })());
   }
 });
