@@ -8,6 +8,10 @@
 
   "audio.play": "Story in music",
   "audio.pause": "‖ Pause",
+  
+  "btn.install": "Install app",
+  "pwa.installedTitle": "Installed",
+  "pwa.installedBody": "The app has been added to your Home screen / app list.",
 
   "announce.title": "Our story announcement",
   "announce.short": "Short audio announcement",
@@ -70,7 +74,6 @@
 
   "share.copied": "Link copied",
 
-  "btn.install": "Install app",
   "btn.donate": "Donate",
   "btn.share": "Share",
   "btn.wantHelp": "I want to help",

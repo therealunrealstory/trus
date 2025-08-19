@@ -8,6 +8,10 @@
 
   "audio.play": "История в музыке",
   "audio.pause": "‖ Пауза",
+  
+  "btn.install": "Приложение",
+  "pwa.installedTitle": "Установлено",
+  "pwa.installedBody": "Приложение добавлено на главный экран / в список приложений.",
 
   "announce.title": "Наше объявление",
   "announce.short": "Короткий аудио-анонс",
@@ -70,7 +74,6 @@
 
   "share.copied": "Ссылка скопирована",
 
-  "btn.install": "Приложение",
   "btn.donate": "Поддержать",
   "btn.share": "Поделиться",
   "btn.wantHelp": "Хочу помочь",
