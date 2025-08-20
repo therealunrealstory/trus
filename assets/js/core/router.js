@@ -63,10 +63,10 @@ async function runRoute(name, token) {
   }
   current = { name, destroy: null };
 
-  // Обновить состояние навигации
+  // Подсветить активную кнопку
   setActiveNav(`#/` + name);
 
-  // Если есть partial — грузим и вставляем его HTML перед инициализацией модуля
+  // Подложка
   let mount = qs('#subpage');
   if (cfg.partial) {
     const partial = await fetchPartial(cfg.partial, token);
@@ -76,7 +76,7 @@ async function runRoute(name, token) {
     if (mount) mount.innerHTML = '';
   }
 
-  // Lazy-импорт и init()
+  // Lazy-импорт страницы
   const mod = await cfg.module();
   if (token !== navToken) return;
   if (typeof mod?.init === 'function') {
@@ -85,8 +85,6 @@ async function runRoute(name, token) {
   if (typeof mod?.destroy === 'function') {
     current.destroy = mod.destroy;
   }
-
-  // Заголовок оставляем как есть (titleKey не используем здесь)
 }
 
 export async function navigate(hash) {
@@ -94,10 +92,10 @@ export async function navigate(hash) {
 }
 
 async function onHashChange() {
-  // Если пустой хеш — установим дефолтный
+  // если пусто — проставим дефолт
   if (!location.hash || location.hash === '#/' || location.hash === '#') {
     location.hash = '#/story';
-    return; // дождёмся следующего события
+    return;
   }
   const name = parseRoute();
   navToken++;
@@ -106,7 +104,7 @@ async function onHashChange() {
 }
 
 export function init() {
-  // Делегирование кликов по [data-route]
+  // Делегирование кликов по data-route (чтобы кнопки работали)
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-route]');
     if (!btn) return;
@@ -117,12 +115,10 @@ export function init() {
   });
 
   window.addEventListener('hashchange', onHashChange);
-
-  // Первый запуск
-  onHashChange();
+  onHashChange(); // первый запуск
 }
 
-// Авто-инициализация, если роутер подключён напрямую (на всякий случай)
+// Авто-инициализация при прямом подключении
 if (document.currentScript && !window.__TRUS_ROUTER_BOOTSTRAPPED__) {
   window.__TRUS_ROUTER_BOOTSTRAPPED__ = true;
   init();
