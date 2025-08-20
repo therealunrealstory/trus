@@ -8,6 +8,10 @@
 
   "audio.play": "Histoire en musique",
   "audio.pause": "‖ Pause",
+  
+  "menu.story": "L’histoire",
+  "menu.support": "Soutien",
+  "menu.storyNow": "L’histoire maintenant",
 
   "btn.install": "Installer l’app",
   "pwa.installedTitle": "Installée",

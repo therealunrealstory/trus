@@ -9,6 +9,10 @@
   "audio.play": "История в музыке",
   "audio.pause": "‖ Пауза",
   
+  "menu.story": "История",
+  "menu.support": "Поддержка",
+  "menu.storyNow": "История сейчас",
+  
   "btn.install": "Приложение",
   "pwa.installedTitle": "Установлено",
   "pwa.installedBody": "Приложение добавлено на главный экран / в список приложений.",

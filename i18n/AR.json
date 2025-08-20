@@ -8,6 +8,10 @@
 
   "audio.play": "القصة بالموسيقى",
   "audio.pause": "‖ إيقاف مؤقت",
+  
+  "menu.story": "القصة",
+  "menu.support": "الدعم",
+  "menu.storyNow": "القصة الآن",
 
   "btn.install": "تثبيت التطبيق",
   "pwa.installedTitle": "تم التثبيت",

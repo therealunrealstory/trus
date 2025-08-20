@@ -9,6 +9,10 @@
   "audio.play": "Story in music",
   "audio.pause": "‖ Pause",
   
+  "menu.story": "The Story",
+  "menu.support": "Support",
+  "menu.storyNow": "The Story Now",
+
   "btn.install": "Install app",
   "pwa.installedTitle": "Installed",
   "pwa.installedBody": "The app has been added to your Home screen / app list.",

@@ -56,3 +56,66 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
 /* ---------- Hashtag caret ---------- */
 .hashtag-caret { animation: hashblink 1s step-start infinite; }
 @keyframes hashblink { 50% { opacity: 0; } }
+
+/* --- Subnav (3 mode buttons) --- */
+.subnav-wrap{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.5rem;           /* как у соц-кнопок */
+  margin:0.5rem 0 1rem; /* лёгкий воздуx сверху/снизу */
+}
+
+.subnav-btn{
+  /* светлее, чем соц-кнопки; полупрозрачный фон */
+  --subnav-bg: rgba(255,255,255,0.10);
+  --subnav-bg-hover: rgba(255,255,255,0.18);
+  --subnav-bg-active: rgba(255,255,255,0.24);
+  --subnav-border: rgba(255,255,255,0.22);
+  --subnav-text: #fff;
+
+  background: var(--subnav-bg);
+  border: 1px solid var(--subnav-border);
+  color: var(--subnav-text);
+
+  /* размеры и типографика как у соц-кнопок */
+  padding: 0.5rem 1rem;       /* ~ py-2 px-4 */
+  border-radius: 0.75rem;     /* ~ rounded-xl */
+  font-weight: 500;
+  font-size: 0.875rem;        /* text-sm */
+  line-height: 1.2;
+  white-space: nowrap;
+
+  cursor: pointer;
+  user-select: none;
+
+  /* лёгкое стекляшко без явной подложки на всю ширину */
+  backdrop-filter: saturate(120%) blur(2px);
+  -webkit-backdrop-filter: saturate(120%) blur(2px);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.02) inset,
+    0 1px 2px rgba(0,0,0,0.35);
+
+  transition:
+    background-color .2s ease,
+    border-color .2s ease,
+    box-shadow .2s ease,
+    transform .02s ease;
+}
+
+.subnav-btn:hover{
+  background: var(--subnav-bg-hover); /* светлее, но не белая */
+}
+
+.subnav-btn:active{
+  background: var(--subnav-bg-active);
+  transform: translateY(1px);
+}
+
+.subnav-btn:focus-visible{
+  outline: 2px solid rgba(99,102,241,0.75); /* индиго, как на сайте */
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .subnav-btn{ transition:none; }
+}
