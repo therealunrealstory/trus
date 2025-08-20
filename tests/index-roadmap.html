@@ -36,7 +36,7 @@
     .title{font-weight:600}
     .when{color:var(--muted);font-size:13px}
     .badges{display:flex;gap:6px;flex-wrap:wrap}
-    .badge{font-size:11px;border:1px solid var(--border);padding:2px 6px;border-radius:999px;color:var(--muted)}
+    .badge{font-size:11px;border:1px solid var(--border);padding:2px 6px;border-radius:999px;color:#muted}
     .badge.status-current{border-color:#3b82f6;color:#cfe0ff}
     .badge.status-done{color:#9cc59c;border-color:#355a35}
     .badge.status-planned{color:#e7c37a;border-color:#6a5520}
@@ -130,6 +130,19 @@
       section.classList.toggle('collapsed', expanded); // if was open -> collapse
     });
 
+    function enforceDefaultAccordionState(){
+      // Collapse Completed + Plans; expand Now. This runs after render to override any accidental state.
+      const done = document.getElementById('col-done');
+      const now = document.getElementById('col-current');
+      const plans = document.getElementById('col-plans');
+      done.classList.add('collapsed');
+      plans.classList.add('collapsed');
+      now.classList.remove('collapsed');
+      done.querySelector('.toggle')?.setAttribute('aria-expanded','false');
+      plans.querySelector('.toggle')?.setAttribute('aria-expanded','false');
+      now.querySelector('.toggle')?.setAttribute('aria-expanded','true');
+    }
+
     function render(data){
       // Meta
       const m = data.meta || {};
@@ -146,21 +159,23 @@
       mountList('list-current', current);
       mountList('list-plans', plans);
 
-      // Deep link to item
+      enforceDefaultAccordionState(); // <- ключевая строка
+
+      // Deep link to item: раскрываем только нужное (оставляя Now открытым)
       const hash = location.hash.replace('#','');
       if(hash){
-        openAll(); // ensure sections visible to scroll to item
+        // Определим, в какой колонке элемент, и раскроем её точечно
         const el = document.querySelector(`[data-id="${CSS.escape(hash)}"]`);
-        if(el){ el.scrollIntoView({behavior:'smooth', block:'center'}); el.classList.add('highlight'); }
+        if(el){
+          const col = el.closest('.col');
+          if(col){
+            col.classList.remove('collapsed');
+            col.querySelector('.toggle')?.setAttribute('aria-expanded','true');
+          }
+          el.scrollIntoView({behavior:'smooth', block:'center'});
+          el.classList.add('highlight');
+        }
       }
-    }
-
-    function openAll(){
-      document.querySelectorAll('.col').forEach(col=>{
-        col.classList.remove('collapsed');
-        const btn = col.querySelector('.toggle');
-        if(btn) btn.setAttribute('aria-expanded', 'true');
-      });
     }
 
     function sortByTime(a,b){

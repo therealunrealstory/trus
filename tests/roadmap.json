@@ -1,8 +1,8 @@
 {
   "meta": {
-    "updated_at": "2025-08-20T22:40:00Z",
+    "updated_at": "2025-08-20T23:20:00Z",
     "updated_by": "Nico",
-    "version": "v1.5",
+    "version": "v1.6",
     "lang_default": "en"
   },
   "items": [
@@ -127,25 +127,25 @@
       "details": "Engraftment phase under strict infection control; outpatient recovery thereafter."
     },
     {
-      "id": "2024-02-abdominal-mass-hl",
+      "id": "2024-07-abdominal-mass-hl",
       "year": 2024,
       "type": "diagnosis",
       "status": "done",
-      "date_start": "2024-02-01",
-      "date_end": "2024-03-31",
-      "when_label": "Early 2024",
+      "date_start": "2024-07-01",
+      "date_end": "2024-07-31",
+      "when_label": "July 2024",
       "title": "Large abdominal mass; aggressive Hodgkin lymphoma",
       "summary": "New HL diagnosed, distinct from earlier disease; therapy plan adjusted.",
       "details": "Considered possibly related to prior immunotherapy background; oncology proposed a new chemotherapy strategy."
     },
     {
-      "id": "2024-08-chemo-switch-sepsis",
+      "id": "2024-08-2025-06-chemo-switch-sepsis",
       "year": 2024,
       "type": "chemotherapy",
       "status": "done",
       "date_start": "2024-08-01",
-      "date_end": "2024-12-31",
-      "when_label": "Aug–Dec 2024",
+      "date_end": "2025-06-30",
+      "when_label": "Aug 2024–Jun 2025",
       "title": "Escalated chemo → septic complication → switch to effective regimen; radiotherapy ×30",
       "summary": "Initial heavy dose caused sepsis; switched to better‑tolerated regimen; adjuvant radiotherapy (30 sessions).",
       "details": "After septic episode, regimen adjusted; subsequent cycles showed effect. Radiotherapy added for consolidation."
@@ -204,7 +204,7 @@
       "id": "plan-2025-re-irradiation",
       "year": 2025,
       "type": "other",
-      "status": "tentative",
+      "status": "planned",
       "confidence": "high",
       "date_start": null,
       "date_end": null,
@@ -254,6 +254,6 @@
     }
   ],
   "changelog": [
-    { "date": "2025-08-20", "note": "Adjusted 2019 chemo title (no R-CHOP); made T‑lymphoblasts explicit in initial diagnosis; kept BRADONOR at Jan 2024 after CAR‑T; updated confidence levels; added potential chemo protocol switch and possible additional chemo line; Now section to be open by default in UI." }
+    { "date": "2025-08-20", "note": "Set HL discovery to July 2024; extended chemo/radiation block to Aug 2024–Jun 2025; marked repeat radiotherapy as planned (high). Enforced 'Now open only' behavior in UI." }
   ]
 }
