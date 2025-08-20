@@ -29,12 +29,17 @@
     .toggle{
       display:block;width:100%;box-sizing:border-box;
       background:transparent;color:#cfe0ff;
-      border:2px solid transparent;border-radius:12px;
-      padding:14px 16px;font-size:16px;letter-spacing:.3px;cursor:pointer;margin:0;
+      border:1.75px solid transparent; /* тонкая постоянная рамка */
+      border-radius:12px;padding:14px 16px;font-size:16px;letter-spacing:.3px;cursor:pointer;margin:0;
     }
-    .toggle:focus{outline:none;box-shadow:0 0 0 2px var(--indigo)}
-    /* Подсветка активной секции рамкой Indigo 600 */
+    /* открытая секция — тонкая рамка Indigo */
     .col:not(.collapsed) .toggle{border-color:var(--indigo)}
+    /* фокус без утолщения */
+    .toggle:focus{outline:none;box-shadow:none}
+    .toggle:focus-visible{outline:1.75px solid var(--indigo);outline-offset:2px}
+    /* закрытая — рамка убирается */
+    .col.collapsed .toggle{border-color:transparent}
+
     .caret{transition:transform .2s ease}
     .col.collapsed .caret{transform:rotate(-90deg)}
     .list{padding:10px;display:block}
@@ -146,7 +151,7 @@
         console.error(err);
       });
 
-    // Переключение аккордеона + постоянная подсветка открытого заголовка
+    // Переключение аккордеона
     document.addEventListener('click', (e)=>{
       const btn = e.target.closest('.toggle');
       if(!btn) return;
