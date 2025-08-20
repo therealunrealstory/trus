@@ -1,6 +1,6 @@
-import { $, $$ } from '../core/dom.js';
-import { t, I18N, DEFAULT_I18N } from '../core/i18n.js';
-import { openModal } from '../core/modal.js';
+import { $, $$ } from '../dom.js';
+import { t, I18N, DEFAULT_I18N } from '../i18n.js';
+import { openModal } from '../modal.js';
 
 let announceAudio, shortAudio;
 let announceBtn, shortBtn, announceStatus, shortStatus;
@@ -28,7 +28,6 @@ function setShortForLang(l, autoplay=false){
 }
 
 export function init(root){
-  // Мини‑плееры (если есть в разметке)
   announceAudio  = root.querySelector('#announceAudio') || new Audio();
   shortAudio     = root.querySelector('#shortAudio')    || new Audio();
   announceBtn    = root.querySelector('#announceBtn');
@@ -60,7 +59,6 @@ export function init(root){
   }
   updateMiniLabels();
 
-  // Реакция на глобальное «pause-others»
   onPauseOthers = (e)=>{
     const ex = e.detail?.except;
     [announceAudio, shortAudio].forEach(a => { if (a && a !== ex && !a.paused) a.pause(); });
@@ -68,12 +66,10 @@ export function init(root){
   };
   document.addEventListener('pause-others', onPauseOthers);
 
-  // Тайлы/модалки (если присутствуют)
   root.querySelector('#tile1')?.addEventListener('click', ()=> openModal(t('tiles.me','I’m Nico'), t('modal.tile1.body','…')));
   root.querySelector('#tile2')?.addEventListener('click', ()=> openModal(t('tiles.about','About Adam'), t('modal.tile2.body','…')));
   root.querySelector('#tile3')?.addEventListener('click', ()=> openModal(t('tiles.others','Other people in the story'), t('modal.tile3.body','…')));
 
-  // Share (если есть)
   root.querySelector('#shareBtn')?.addEventListener('click', async () => {
     try {
       const u = new URL(location.href);

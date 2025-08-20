@@ -1,6 +1,6 @@
-import { $ } from '../core/dom.js';
-import { t } from '../core/i18n.js';
-import { openModal } from '../core/modal.js';
+import { $ } from '../dom.js';
+import { t } from '../i18n.js';
+import { openModal } from '../modal.js';
 
 let onOpenImage;
 

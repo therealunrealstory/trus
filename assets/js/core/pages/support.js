@@ -1,6 +1,6 @@
-import { $, loadScript } from '../core/dom.js';
-import { t } from '../core/i18n.js';
-import { openModal } from '../core/modal.js';
+import { $, loadScript } from '../dom.js';
+import { t } from '../i18n.js';
+import { openModal } from '../modal.js';
 
 let L;                  // Leaflet
 let map = null;
@@ -84,10 +84,8 @@ function initEngagement(root){
 }
 
 export async function init(root){
-  // Engagement
   initEngagement(root);
 
-  // Карта
   const mapEl = root.querySelector('#map');
   if (mapEl) {
     await ensureLeaflet();
@@ -131,7 +129,6 @@ export async function init(root){
     setTimeout(()=> map?.invalidateSize(), 50);
   }
 
-  // Hearts / Splide
   if (root.querySelector('#heartsSplide')) {
     await ensureSplide();
     allHearts = []; heartsOffset = 0;
@@ -173,7 +170,6 @@ export async function init(root){
     });
   }
 
-  // Practical help
   root.querySelector('#wantHelp')?.addEventListener('click', () => {
     openModal(
       t('modal.help.title', t('support.physical','Practical help')),
