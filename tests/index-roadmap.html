@@ -7,7 +7,7 @@
   <style>
     :root{
       --bg:#0b0f16; --panel:#121826; --muted:#93a0b4; --text:#e9eef7;
-      --accent:#6aa6ff; --indigo:#4F46E5; /* Indigo 600 */
+      --indigo:#4F46E5; /* Indigo 600 */
       --done:#8fb3ff22; --current:#3b82f616; --plan:#ffc8571a;
       --border:#1e2a3f; --ok:#7bc66a; --warn:#ffc857; --low:#ff7a7a;
     }
@@ -19,44 +19,66 @@
     .legend{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 20px}
     .chip{border:1px solid var(--border);padding:4px 8px;border-radius:999px;font-size:12px;color:var(--muted)}
     .chip b{color:var(--text);font-weight:600}
+
     .grid{display:grid;grid-template-columns:1fr;gap:16px}
     @media(min-width:900px){.grid{grid-template-columns:1fr 1fr 1fr}}
-    .col{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden}
-    .col header{margin:0;padding:0;border-bottom:1px solid var(--border)}
-    .toggle{display:flex;align-items:center;gap:8px;width:100%;
-      background:transparent;color:#cfe0ff;border:1px solid transparent;padding:14px 16px;
-      font-size:16px;letter-spacing:.3px;cursor:pointer;border-radius:10px;margin:6px}
+
+    /* Колонки-аккордеон */
+    .col{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:visible}
+    .col header{margin:0;padding:6px;border-bottom:1px solid var(--border)}
+    .toggle{
+      display:block;width:100%;box-sizing:border-box;
+      background:transparent;color:#cfe0ff;
+      border:2px solid transparent;border-radius:12px;
+      padding:14px 16px;font-size:16px;letter-spacing:.3px;cursor:pointer;margin:0;
+    }
     .toggle:focus{outline:none;box-shadow:0 0 0 2px var(--indigo)}
-    .col:not(.collapsed) .toggle{box-shadow:0 0 0 2px var(--indigo); border-color:var(--indigo)}
+    /* Подсветка активной секции рамкой Indigo 600 */
+    .col:not(.collapsed) .toggle{border-color:var(--indigo)}
     .caret{transition:transform .2s ease}
     .col.collapsed .caret{transform:rotate(-90deg)}
     .list{padding:10px;display:block}
     .col.collapsed .list{display:none}
+
+    /* Карточки событий */
     .item{border:1px solid var(--border);border-radius:12px;padding:12px;margin:10px 0;background:#0e1422}
     .item.done{background:var(--done)}
-    .item.current{background:var(--current);border-color:#3b82f6aa}
+    .item.current{background:var(--current);border-color:var(--indigo)}
     .item.planned,.item.tentative{background:var(--plan)}
+
     .topline{display:flex;align-items:center;gap:8px;justify-content:space-between}
     .title{font-weight:600}
     .when{color:var(--muted);font-size:13px}
     .badges{display:flex;gap:6px;flex-wrap:wrap}
     .badge{font-size:11px;border:1px solid var(--border);padding:2px 6px;border-radius:999px;color:#93a0b4}
-    .badge.status-current{border-color:#3b82f6;color:#cfe0ff}
+    .badge.status-current{border-color:var(--indigo);color:#e4e6ff}
     .badge.status-done{color:#9cc59c;border-color:#355a35}
     .badge.status-planned{color:#e7c37a;border-color:#6a5520}
     .badge.status-tentative{color:#e59a9a;border-color:#6a2a2a}
+
     .conf{display:inline-flex;gap:2px;vertical-align:middle;margin-left:4px}
     .dot{width:7px;height:7px;border-radius:999px;display:inline-block;background:var(--border)}
     .dot.high{background:var(--ok)}
     .dot.medium{background:var(--warn)}
     .dot.low{background:var(--low)}
+
     .summary{margin:8px 0 0}
     .details{margin-top:8px;display:none;color:#d6def0}
     .actions{margin-top:8px;display:flex;gap:10px;flex-wrap:wrap}
     .btn{background:#1b2538;border:1px solid var(--border);color:#dfe9ff;font-size:12px;padding:6px 10px;border-radius:8px;cursor:pointer}
     .btn:hover{background:#22304a}
-    .nowpulse{width:8px;height:8px;border-radius:999px;background:#3b82f6;box-shadow:0 0 0 0 rgba(59,130,246,.7);animation:pulse 2s infinite}
-    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(59,130,246,.6)}70%{box-shadow:0 0 0 12px rgba(59,130,246,0)}100%{box-shadow:0 0 0 0 rgba(59,130,246,0)}}
+
+    /* Пульс-индикатор Indigo 600 */
+    .nowpulse{
+      width:8px;height:8px;border-radius:999px;background:var(--indigo);
+      box-shadow:0 0 0 0 rgba(79,70,229,.7);animation:pulse 2s infinite
+    }
+    @keyframes pulse{
+      0%{box-shadow:0 0 0 0 rgba(79,70,229,.6)}
+      70%{box-shadow:0 0 0 12px rgba(79,70,229,0)}
+      100%{box-shadow:0 0 0 0 rgba(79,70,229,0)}
+    }
+
     .notice{margin-top:18px;color:var(--muted);font-size:13px}
   </style>
 </head>
@@ -115,6 +137,7 @@
     const esc = (s)=>String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString(undefined,{year:'numeric',month:'short'}) : '';
 
+    // Подтягиваем данные
     fetch('roadmap.json', {cache:'no-cache'})
       .then(r => r.json())
       .then(data => render(data))
@@ -123,6 +146,7 @@
         console.error(err);
       });
 
+    // Переключение аккордеона + постоянная подсветка открытого заголовка
     document.addEventListener('click', (e)=>{
       const btn = e.target.closest('.toggle');
       if(!btn) return;
@@ -146,10 +170,12 @@
     }
 
     function render(data){
+      // Meta
       const m = data.meta || {};
       const when = m.updated_at ? new Date(m.updated_at).toLocaleString() : '—';
       document.getElementById('meta').textContent = `Updated ${when} • ${m.updated_by || ''}`.trim();
 
+      // Split/sort
       const items = (data.items || []).slice().sort(sortByTime);
       const done = items.filter(i => i.status === 'done');
       const current = items.filter(i => i.status === 'current').slice(0,1);
@@ -161,6 +187,7 @@
 
       enforceDefaultAccordionState();
 
+      // Deep link: дополнительно раскроем нужную колонку и прокрутим
       const hash = location.hash.replace('#','');
       if(hash){
         const el = document.querySelector(`[data-id="${CSS.escape(hash)}"]`);
@@ -208,11 +235,10 @@
 
       const badges = document.createElement('div');
       badges.className = 'badges';
-      // status badge first
+      // статус
       badges.appendChild(makeBadge(statusLabel(it.status)));
-      // then type/labels
-      const lbls = normalizeLabels(it);
-      lbls.forEach(l => badges.appendChild(makeBadge(l)));
+      // типы/метки (отдельными бейджами)
+      normalizeLabels(it).forEach(l => badges.appendChild(makeBadge(l)));
 
       top.append(left, badges);
 
@@ -247,7 +273,7 @@
              (s==='tentative')?'tentative':s||'';
     }
 
-    // NEW: prefer item.labels array; else split item.type on '+'
+    // Предпочитаем it.labels[], иначе — сплитим строку type по "+"
     function normalizeLabels(it){
       if (Array.isArray(it.labels) && it.labels.length){
         return it.labels.map(cleanLabel);
@@ -257,31 +283,22 @@
       }
       return [];
     }
-    function cleanLabel(s){
-      return (s||'').toString().trim().toLowerCase();
-    }
+    function cleanLabel(s){ return (s||'').toString().trim().toLowerCase(); }
 
     function makeBadge(text){
       const t = (text||'').toLowerCase();
       const span = document.createElement('span');
       let cls = 'badge';
-      // style known types a bit via status-like classes if you want
       if(['done','current','planned','tentative'].includes(t)){
         cls += ' status-'+t;
       }
       span.className = cls;
-      // prettify: capitalize first letter, keep common acronyms
       span.textContent = pretty(t);
       return span;
     }
 
     function pretty(t){
-      const map = {
-        'rt':'RT',
-        'car‑t':'CAR‑T', 'car-t':'CAR‑T',
-        'tki':'TKI',
-        'mi':'MI'
-      };
+      const map = {'rt':'RT','car‑t':'CAR‑T','car-t':'CAR‑T','tki':'TKI','mi':'MI'};
       if(map[t]) return map[t];
       return t.split(' ').map(w => w ? (w[0].toUpperCase()+w.slice(1)) : w).join(' ');
     }
