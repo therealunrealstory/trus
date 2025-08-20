@@ -67,10 +67,10 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
 }
 
 .subnav-btn{
-  --subnav-bg: rgba(255,255,255,0.22);
-  --subnav-bg-hover: rgba(255,255,255,0.30);
-  --subnav-bg-active: rgba(255,255,255,0.38);
-  --subnav-border: rgba(255,255,255,0.34);
+  --subnav-bg: rgba(79, 70, 229, 0.15);       /* лёгкий индиго */
+  --subnav-bg-hover: rgba(79, 70, 229, 0.25); /* при наведении немного темнее */
+  --subnav-bg-active: rgba(79, 70, 229, 0.35);/* активная кнопка ещё темнее */
+  --subnav-border: rgba(79, 70, 229, 0.35);   /* обводка тоже индиго */
   --subnav-text: #fff;
 
   background: var(--subnav-bg);
