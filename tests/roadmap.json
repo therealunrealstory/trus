@@ -1,8 +1,8 @@
 {
   "meta": {
-    "updated_at": "2025-08-20T23:20:00Z",
+    "updated_at": "2025-08-20T23:55:00Z",
     "updated_by": "Nico",
-    "version": "v1.6",
+    "version": "v1.7",
     "lang_default": "en"
   },
   "items": [
@@ -19,40 +19,52 @@
       "details": "Hematology consult, imaging and biopsies established the diagnosis and stage. Baseline cardiac and lab assessment recorded before therapy."
     },
     {
-      "id": "2019-03-rchop-6",
+      "id": "2019-03-first-chemo-rt",
       "year": 2019,
-      "type": "chemotherapy",
+      "type": "chemotherapy + radiotherapy",
       "status": "done",
       "date_start": "2019-03-10",
       "date_end": "2019-08-20",
       "when_label": "Mar–Aug 2019",
       "title": "Chemotherapy against lymphoma (T‑lymphoblastic)",
-      "summary": "First‑line systemic chemotherapy with supportive care.",
-      "details": "Cycles administered on schedule with interim response checks and end‑of‑treatment assessment documenting best response."
+      "summary": "Systemic chemotherapy with supportive care; adjuvant radiation therapy.",
+      "details": "Planned cycles with interim response checks and end‑of‑treatment assessment. Radiotherapy delivered for consolidation: ~30 sessions."
     },
     {
-      "id": "2020-04-relapse-mi",
+      "id": "2020-04-relapse-mi-rt-dx",
       "year": 2020,
-      "type": "chemotherapy",
+      "type": "chemotherapy + radiotherapy + diagnosis",
       "status": "done",
       "date_start": "2020-04-01",
-      "date_end": "2020-09-30",
-      "when_label": "Apr–Sep 2020",
-      "title": "Relapse; severe GI bleed with MI; resumed chemotherapy",
-      "summary": "Relapse treated with chemo; massive GI bleed led to myocardial infarction; stabilized and continued therapy.",
-      "details": "Severe anemia, tachyarrhythmia and GI ulcer bleeding with MI; transfusions and critical care. Chemotherapy resumed afterwards."
+      "date_end": "2020-11-30",
+      "when_label": "Apr–Nov 2020",
+      "title": "Relapse; severe GI bleed with MI; resumed therapy (with radiotherapy)",
+      "summary": "Relapse management included chemo and radiation; massive GI bleed led to myocardial infarction; stabilized and continued therapy.",
+      "details": "Severe anemia, tachyarrhythmia and GI ulcer bleeding with MI; transfusions and critical care. Chemotherapy resumed with adjunct radiotherapy (~30 sessions). Diagnostic reassessment performed in this period."
     },
     {
-      "id": "2021-06-acute-leukocytosis",
+      "id": "2021-05-aggressive-leukocytosis-dx",
       "year": 2021,
       "type": "diagnosis",
       "status": "done",
-      "date_start": "2021-06-01",
-      "date_end": "2021-12-01",
-      "when_label": "Mid–Late 2021",
-      "title": "Aggressive leukemia with extreme leukocytosis",
-      "summary": "Leukocytes >300k; initiated cytoreductive therapy and transfusion support.",
-      "details": "Rapid leukemic process (Ph+ features later); intensive cytoreduction to qualify for advanced therapy."
+      "date_start": "2021-05-01",
+      "date_end": "2021-05-31",
+      "when_label": "May 2021",
+      "title": "Aggressive leukemia with extreme leukocytosis — diagnosis",
+      "summary": "Leukocytes >300k; diagnosis established; cytoreductive plan initiated.",
+      "details": "Rapid leukemic process (Ph+ features later); urgent cytoreduction and transfusion support were indicated."
+    },
+    {
+      "id": "2021-05-2023-09-chemo-aggr-leukemia",
+      "year": 2021,
+      "type": "chemotherapy",
+      "status": "done",
+      "date_start": "2021-05-15",
+      "date_end": "2023-09-30",
+      "when_label": "May 2021–Sep 2023",
+      "title": "Chemotherapy against aggressive leukemia",
+      "summary": "Prolonged systemic chemotherapy to reach CAR‑T eligibility and disease control.",
+      "details": "Escalating/adjusted regimens aimed at bringing leukocytes below CAR‑T threshold; infections managed along the way."
     },
     {
       "id": "2022-03-26-neuro-shock",
@@ -76,7 +88,7 @@
       "when_label": "Oct 2022",
       "title": "Invasive fungal infection with sepsis",
       "summary": "Severe oropharyngeal focus with systemic involvement; treated successfully.",
-      "details": "Managed in hospital with antimicrobials; concurrent arrhythmias and prior micro‑stroke noted in the course of 2022."
+      "details": "Managed in hospital with antimicrobials; concurrent arrhythmias and prior micro‑stroke noted during 2022."
     },
     {
       "id": "2022-12-covid-icu-gi-bleed",
@@ -139,16 +151,16 @@
       "details": "Considered possibly related to prior immunotherapy background; oncology proposed a new chemotherapy strategy."
     },
     {
-      "id": "2024-08-2025-06-chemo-switch-sepsis",
+      "id": "2024-08-2025-06-chemo-rt",
       "year": 2024,
-      "type": "chemotherapy",
+      "type": "chemotherapy + radiotherapy",
       "status": "done",
       "date_start": "2024-08-01",
       "date_end": "2025-06-30",
       "when_label": "Aug 2024–Jun 2025",
       "title": "Escalated chemo → septic complication → switch to effective regimen; radiotherapy ×30",
       "summary": "Initial heavy dose caused sepsis; switched to better‑tolerated regimen; adjuvant radiotherapy (30 sessions).",
-      "details": "After septic episode, regimen adjusted; subsequent cycles showed effect. Radiotherapy added for consolidation."
+      "details": "After septic episode, regimen adjusted; subsequent cycles showed effect. Radiotherapy added for consolidation (30 daily sessions)."
     },
     {
       "id": "2025-06-relapse-Ph-pos",
@@ -254,6 +266,6 @@
     }
   ],
   "changelog": [
-    { "date": "2025-08-20", "note": "Set HL discovery to July 2024; extended chemo/radiation block to Aug 2024–Jun 2025; marked repeat radiotherapy as planned (high). Enforced 'Now open only' behavior in UI." }
+    { "date": "2025-08-20", "note": "2019 chemo marked with radiotherapy (×30). 2020 period extended to Apr–Nov and marked with diagnosis + radiotherapy (×30). May 2021 diagnosis set to exact month; added May 2021–Sep 2023 leukemia chemotherapy block. 2024–2025 block marked 'chemotherapy + radiotherapy'. Other prior date fixes preserved." }
   ]
 }
