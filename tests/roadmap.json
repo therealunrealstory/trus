@@ -1,13 +1,13 @@
 {
   "meta": {
-    "updated_at": "2025-08-20T18:30:00Z",
+    "updated_at": "2025-08-20T20:45:00Z",
     "updated_by": "Nico",
-    "version": "v1.2",
+    "version": "v1.3",
     "lang_default": "en"
   },
   "items": [
     {
-      "id": "dx-2019-primary",
+      "id": "2019-01-dx-staging",
       "year": 2019,
       "type": "diagnosis",
       "status": "done",
@@ -16,10 +16,10 @@
       "when_label": "Jan–Mar 2019",
       "title": "Primary diagnosis and staging",
       "summary": "Initial workup confirmed lymphoma; baseline tests and staging completed.",
-      "details": "Symptoms led to hematology consult. Imaging and biopsies established the diagnosis and stage. Baseline echocardiogram and labs recorded prior to therapy."
+      "details": "Hematology consult, imaging and biopsies established the diagnosis and stage. Baseline cardiac and lab assessment recorded before therapy."
     },
     {
-      "id": "chemo-2019-rchop",
+      "id": "2019-03-rchop-6",
       "year": 2019,
       "type": "chemotherapy",
       "status": "done",
@@ -28,70 +28,142 @@
       "when_label": "Mar–Aug 2019",
       "title": "R‑CHOP chemotherapy (6 cycles)",
       "summary": "First‑line regimen completed with supportive care.",
-      "details": "Six cycles approximately every 21 days. Interim imaging showed response; end‑of‑treatment assessment documented best response achieved."
+      "details": "Six cycles ~q21d. Interim imaging showed response; end‑of‑treatment assessment documented best response."
     },
     {
-      "id": "2021-cell-therapy",
-      "year": 2021,
-      "type": "transplant",
+      "id": "2020-04-relapse-mi",
+      "year": 2020,
+      "type": "chemotherapy",
       "status": "done",
-      "date_start": "2021-11-01",
-      "date_end": "2021-12-15",
-      "when_label": "Nov–Dec 2021",
-      "title": "Cell therapy with inpatient recovery",
-      "summary": "Cell infusion under protocol; complications managed during hospital stay.",
-      "details": "Cell therapy administered with neuro/cardiac monitoring. Complications included high fever and weakness; stabilized and discharged to step‑down care/rehab."
+      "date_start": "2020-04-01",
+      "date_end": "2020-09-30",
+      "when_label": "Apr–Sep 2020",
+      "title": "Relapse; severe GI bleed with MI; resumed chemotherapy",
+      "summary": "Relapse treated with chemo; massive GI bleed led to myocardial infarction; stabilized and continued therapy.",
+      "details": "Severe anemia, tachyarrhythmia and GI ulcer bleeding with MI; transfusions and critical care. Chemotherapy resumed afterwards."
     },
     {
-      "id": "2022-03-26-shock",
+      "id": "2021-06-acute-leukocytosis",
+      "year": 2021,
+      "type": "diagnosis",
+      "status": "done",
+      "date_start": "2021-06-01",
+      "date_end": "2021-12-01",
+      "when_label": "Mid–Late 2021",
+      "title": "Aggressive leukemia with extreme leukocytosis",
+      "summary": "Leukocytes >300k; initiated cytoreductive therapy and transfusion support.",
+      "details": "Rapid leukemic process (Ph+ features later); intensive cytoreduction to qualify for advanced therapy."
+    },
+    {
+      "id": "2022-03-26-neuro-shock",
       "year": 2022,
       "type": "event",
       "status": "done",
       "date_start": "2022-03-26",
       "date_end": "2022-04-30",
       "when_label": "Mar–Apr 2022",
-      "title": "Critical systemic shock and paralysis episode",
-      "summary": "Acute collapse during a video call; emergency hospitalization and paralysis.",
-      "details": "On March 26, 2022, Adam experienced a systemic shock with loss of function. Hospital course included loss of memory, slowed cognition, and paralysis. Gradual return of consciousness; began to eat and sleep; remained optimistic despite severe condition."
+      "title": "Systemic shock with paralysis and amnesia",
+      "summary": "Resuscitated; prolonged neurological deficits with gradual recovery.",
+      "details": "Acute collapse required resuscitation. Afterwards: paralysis, memory loss and slowed cognition; stepwise recovery under neurologic guidance."
     },
     {
-      "id": "2022-discharge-hardship",
+      "id": "2022-10-invasive-fungal-sepsis",
       "year": 2022,
       "type": "event",
       "status": "done",
-      "date_start": "2022-04-01",
-      "date_end": "2022-06-30",
-      "when_label": "Spring 2022",
-      "title": "Unsafe discharge; protective suit; temporary housing",
-      "summary": "Discharged in profound immunosuppression; urgent need for protective gear and shelter.",
-      "details": "Oncologist urged urgent purchase of a protective suit; Adam was temporarily placed in a motel. Later he moved to his apartment where additional caregiving issues arose; an unprofessional nurse was replaced by Melissa."
+      "date_start": "2022-10-01",
+      "date_end": "2022-10-31",
+      "when_label": "Oct 2022",
+      "title": "Invasive fungal infection with sepsis",
+      "summary": "Severe oropharyngeal focus with systemic involvement; treated successfully.",
+      "details": "Managed in hospital with antimicrobials; concurrent arrhythmias and prior micro‑stroke noted in the course of 2022."
     },
     {
-      "id": "2023-sedation-incident",
+      "id": "2022-12-covid-icu-gi-bleed",
+      "year": 2022,
+      "type": "event",
+      "status": "done",
+      "date_start": "2022-12-10",
+      "date_end": "2023-01-15",
+      "when_label": "Dec 2022–Jan 2023",
+      "title": "COVID‑19 pneumonia (ICU, intubation) and GI bleed; recovery",
+      "summary": "Critical COVID‑19 with intubation; GI bleeding; coma; unexpected recovery.",
+      "details": "Rapid pneumonia progression on immunosuppression; post‑ICU recovery followed by stabilization."
+    },
+    {
+      "id": "2023-06-respiratory-arrest-sepsis",
       "year": 2023,
       "type": "event",
       "status": "done",
-      "date_start": "2023-04-01",
-      "date_end": "2023-05-31",
-      "when_label": "Spring 2023",
-      "title": "Sedation/poisoning incident and police involvement",
-      "summary": "Unknown woman entered, Adam was sedated and found without memory; legal turbulence escalated.",
-      "details": "Water intended for Adam’s brother was used to sedate Adam; he was taken by police with amnesia. Guardian conflicts and attempts to access the apartment followed. Planned free rehab collapsed after a crisis with the oncologist, leading to cardiac distress."
+      "date_start": "2023-06-01",
+      "date_end": "2023-09-30",
+      "when_label": "Jun–Sep 2023",
+      "title": "Respiratory arrest (revived) and bacteremia; high‑dose chemo",
+      "summary": "Cardiorespiratory event reversed; rare cardiac‑source bacteremia treated; intensified chemo to reach CAR‑T criteria.",
+      "details": "Therapy escalated to reduce leukocytes below CAR‑T threshold; infections managed."
     },
     {
-      "id": "2024-tumor-detected",
+      "id": "2023-10-car-t",
+      "year": 2023,
+      "type": "transplant",
+      "status": "done",
+      "date_start": "2023-10-15",
+      "date_end": "2023-11-30",
+      "when_label": "Oct–Nov 2023",
+      "title": "CAR‑T cell therapy",
+      "summary": "CAR‑T administered; severe toxicity managed (fever, neurologic and cardiac events).",
+      "details": "High fever, vomiting, transient leg paralysis, cardiac event and profound memory loss consistent with neurotoxicity; gradual recovery thereafter."
+    },
+    {
+      "id": "2024-02-abdominal-mass-hl",
       "year": 2024,
       "type": "diagnosis",
       "status": "done",
       "date_start": "2024-02-01",
       "date_end": "2024-03-31",
       "when_label": "Early 2024",
-      "title": "Large abdominal tumor found; new Hodgkin lymphoma",
-      "summary": "Imaging discovered a large mass; aggressive Hodgkin lymphoma diagnosed.",
-      "details": "During hospitalization for an injury, imaging incidentally revealed a large abdominal tumor. Further workup suggested aggressive Hodgkin lymphoma, considered distinct from earlier disease and possibly a CAR‑T side effect. New chemotherapy was proposed."
+      "title": "Large abdominal mass; aggressive Hodgkin lymphoma",
+      "summary": "New HL diagnosed, distinct from earlier disease; therapy plan adjusted.",
+      "details": "Considered possibly related to prior immunotherapy background; oncology proposed a new chemotherapy strategy."
     },
     {
-      "id": "current-2025-oral-14doses",
+      "id": "2024-08-chemo-switch-sepsis",
+      "year": 2024,
+      "type": "chemotherapy",
+      "status": "done",
+      "date_start": "2024-08-01",
+      "date_end": "2024-12-31",
+      "when_label": "Aug–Dec 2024",
+      "title": "Escalated chemo → septic complication → switch to effective regimen; radiotherapy x30",
+      "summary": "Initial heavy dose caused sepsis; switched to better‑tolerated regimen; adjuvant radiotherapy (30 sessions).",
+      "details": "After septic episode, regimen adjusted; subsequent cycles showed effect. Radiotherapy added for consolidation."
+    },
+    {
+      "id": "2025-01-allo-sct-brother",
+      "year": 2025,
+      "type": "transplant",
+      "status": "done",
+      "date_start": "2025-01-01",
+      "date_end": "2025-02-01",
+      "when_label": "Jan 2025",
+      "title": "Allogeneic stem‑cell infusion (brother donor)",
+      "summary": "Allo stem cells infused as part of consolidation strategy.",
+      "details": "Engraftment phase under strict infection control; outpatient recovery thereafter."
+    },
+    {
+      "id": "2025-06-relapse-Ph-pos",
+      "year": 2025,
+      "type": "diagnosis",
+      "status": "done",
+      "date_start": "2025-06-20",
+      "date_end": "2025-06-30",
+      "when_label": "Late Jun 2025",
+      "title": "Rising leukocytes; Ph+ lymphoid cells detected",
+      "summary": "Leukocytes increased from ~35k to ~67k within days; Ph+ lymphoid lineage identified.",
+      "details": "Oncology proposed oral chemotherapy followed by TKI (ponatinib) once stabilized."
+    },
+    {
+      "id": "2025-07-oral-chemo-14",
       "year": 2025,
       "type": "chemotherapy",
       "status": "current",
@@ -99,21 +171,8 @@
       "date_end": null,
       "when_label": "Now",
       "title": "Oral multi‑agent chemotherapy (14 doses)",
-      "summary": "Current course: complex per‑oral regimen at home, total of 14 doses.",
-      "details": "Adam is on a structured oral chemotherapy made of multiple components (per os). The plan includes 14 doses with careful monitoring of tolerance, labs, and functional status."
-    },
-    {
-      "id": "plan-2025-q4-board",
-      "year": 2025,
-      "type": "other",
-      "status": "planned",
-      "confidence": "medium",
-      "date_start": null,
-      "date_end": null,
-      "when_label": "Q4 2025 (TBD)",
-      "title": "Second‑opinion board & treatment decision",
-      "summary": "Multidisciplinary review to confirm options and timing.",
-      "details": "Case to be presented to a board (hematology/oncology/rehab). Decision may include watchful waiting, targeted therapy, or enrollment in a program. Timing depends on diagnostics and logistics."
+      "summary": "Structured per‑oral regimen at home, total of 14 doses.",
+      "details": "Complex oral combination with interim labs and tolerance monitoring; decision points defined after completion."
     },
     {
       "id": "plan-2025-support-recovery",
@@ -124,25 +183,51 @@
       "date_start": null,
       "date_end": null,
       "when_label": "Post‑chemo (TBD)",
-      "title": "Support and recovery program",
-      "summary": "Structured support and functional recovery after the current oral course.",
-      "details": "If indicated after evaluation, a block of supportive care and rehabilitation will follow. Scope, schedule, and venue to be refined."
+      "title": "Support and functional recovery",
+      "summary": "Structured supportive care and rehabilitation after the current course.",
+      "details": "Scope and schedule to be adjusted to post‑chemo status and lab dynamics."
     },
     {
-      "id": "tentative-2026-extended-rehab",
-      "year": 2026,
+      "id": "plan-2025-tki-lifelong",
+      "year": 2025,
+      "type": "other",
+      "status": "planned",
+      "confidence": "medium",
+      "date_start": null,
+      "date_end": null,
+      "when_label": "After stabilization (TBD)",
+      "title": "Tyrosine‑kinase inhibitor (ponatinib) — long‑term",
+      "summary": "Initiate TKI maintenance after cytoreduction; likely long‑term or lifelong.",
+      "details": "Start after acceptable hematologic control; monitor response and adverse events; dose optimization expected."
+    },
+    {
+      "id": "plan-2025-re-irradiation",
+      "year": 2025,
       "type": "other",
       "status": "tentative",
       "confidence": "low",
       "date_start": null,
       "date_end": null,
+      "when_label": "If indicated (TBD)",
+      "title": "Potential repeat radiotherapy",
+      "summary": "Consider re‑irradiation if disease control requires it.",
+      "details": "To be discussed by tumor board; depends on imaging and prior dose constraints."
+    },
+    {
+      "id": "plan-2026-repeat-allo-sct",
+      "year": 2026,
+      "type": "transplant",
+      "status": "tentative",
+      "confidence": "low",
+      "date_start": null,
+      "date_end": null,
       "when_label": "2026 (possible)",
-      "title": "Extended rehabilitation program",
-      "summary": "Longer rehabilitation block may be required depending on status and resources.",
-      "details": "May proceed only if clinical course and resources permit. Details remain uncertain."
+      "title": "Possible repeat allogeneic stem‑cell transplant",
+      "summary": "Option if disease course necessitates definitive consolidation.",
+      "details": "Contingent on response to TKI and chemo; requires donor/center evaluation and risk–benefit review."
     }
   ],
   "changelog": [
-    { "date": "2025-08-20", "note": "Initial filled roadmap (EN). Removed locations. Current step updated to oral multi‑agent chemotherapy (14 doses). Added 2022 shock, 2023 sedation incident, 2024 new tumor and Hodgkin lymphoma." }
+    { "date": "2025-08-20", "note": "Medical‑only roadmap built from history; added future options: lifelong TKI, potential re‑irradiation, possible repeat allo‑SCT. Current step: oral multi‑agent chemo (14 doses)." }
   ]
 }
