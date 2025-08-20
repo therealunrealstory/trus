@@ -1,8 +1,8 @@
 {
   "meta": {
-    "updated_at": "2025-08-20T12:00:00Z",
+    "updated_at": "2025-08-20T15:00:00Z",
     "updated_by": "Nico",
-    "version": "v1",
+    "version": "v1.1",
     "lang_default": "en"
   },
   "items": [
@@ -17,7 +17,6 @@
       "title": "Primary diagnosis and staging",
       "summary": "Initial workup confirmed lymphoma; staging and baseline tests completed.",
       "details": "Symptoms led to hematology consult. Imaging and biopsies established the diagnosis and stage. Baseline echo and labs recorded before treatment.",
-      "location": "New York, USA",
       "links": []
     },
     {
@@ -31,7 +30,6 @@
       "title": "R‑CHOP (6 cycles)",
       "summary": "Standard-line chemotherapy completed with supportive care.",
       "details": "Six cycles administered every 21 days with growth‑factor support. Interim imaging showed partial response; end‑of‑treatment scan documented best response.",
-      "location": "NY/NJ, USA",
       "links": ["#news"]
     },
     {
@@ -45,25 +43,23 @@
       "title": "Cell therapy and inpatient recovery",
       "summary": "Cell infusion with monitored hospital stay; complications managed.",
       "details": "Received cell therapy under protocol with neuro/cardiac monitoring. Complications included fever and weakness; stabilized and discharged to rehab.",
-      "location": "USA",
       "links": []
     },
     {
-      "id": "current-2025-aug",
+      "id": "current-2025-oral-chemo",
       "year": 2025,
-      "type": "rehab",
+      "type": "chemotherapy",
       "status": "current",
       "date_start": "2025-07-15",
       "date_end": null,
       "when_label": "Now",
-      "title": "Supportive care and functional recovery",
-      "summary": "Focused rehab, symptom control, and diagnostics to decide next steps.",
-      "details": "Ongoing day‑to‑day rehab with nursing support and outpatient checks. Collecting opinions and scheduling assessments that will guide future therapy.",
-      "location": "EU/USA (remote coordination)",
-      "links": ["#support"]
+      "title": "Oral multi‑agent chemotherapy (14 doses)",
+      "summary": "Current course: complex oral regimen taken at home, total of 14 doses.",
+      "details": "Adam is on a structured per‑oral chemotherapy consisting of multiple components. The plan includes 14 doses with careful monitoring of tolerance and interim labs.",
+      "links": []
     },
     {
-      "id": "plan-2025-q4",
+      "id": "plan-2025-q4-board",
       "year": 2025,
       "type": "other",
       "status": "planned",
@@ -74,7 +70,20 @@
       "title": "Second‑opinion board & treatment decision",
       "summary": "Multidisciplinary review to confirm options and timing.",
       "details": "Case to be presented to a board (hematology/oncology/rehab). Decision may include watchful waiting, targeted therapy, or enrollment in a program. Timing depends on diagnostics and logistics.",
-      "location": "TBD",
+      "links": []
+    },
+    {
+      "id": "plan-support-recovery",
+      "year": 2025,
+      "type": "rehab",
+      "status": "planned",
+      "confidence": "medium",
+      "date_start": null,
+      "date_end": null,
+      "when_label": "Post‑chemo (TBD)",
+      "title": "Support and recovery program",
+      "summary": "Structured support and functional recovery after the current course.",
+      "details": "If indicated after evaluation, a block of supportive care and rehabilitation will follow (scope and venue to be refined).",
       "links": []
     },
     {
@@ -88,12 +97,11 @@
       "when_label": "2026 (possible)",
       "title": "Extended rehabilitation program",
       "summary": "If indicated, longer rehab block with daily routine.",
-      "details": "May proceed only if resources and clinical status permit. Scope and venue remain uncertain.",
-      "location": "TBD",
+      "details": "May proceed only if resources and clinical status permit. Scope and schedule remain uncertain.",
       "links": []
     }
   ],
   "changelog": [
-    { "date": "2025-08-20", "note": "Initial public roadmap created (EN only)." }
+    { "date": "2025-08-20", "note": "Updated: removed locations; set current to oral multi‑agent chemo (14 doses); moved support & recovery to plans." }
   ]
 }

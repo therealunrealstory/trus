@@ -84,13 +84,12 @@
     </div>
 
     <div class="notice">
-      Last updated text reflects editorial updates and isn’t medical advice.
+      “TBD” means “to be determined” (details/dates are not yet defined). Information here is for transparency and is not medical advice.
     </div>
   </div>
 
   <script>
-    // Utility: simple escape for text nodes (we avoid HTML in JSON fields)
-    const esc = (s)=>String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const esc = (s)=>String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString(undefined,{year:'numeric',month:'short'}) : '';
 
     fetch('roadmap.json', {cache:'no-cache'})
@@ -102,23 +101,19 @@
       });
 
     function render(data){
-      // Meta
       const m = data.meta || {};
       const when = m.updated_at ? new Date(m.updated_at).toLocaleString() : '—';
       document.getElementById('meta').textContent = `Updated ${when} • ${m.updated_by || ''}`.trim();
 
-      // Split items
       const items = (data.items || []).slice().sort(sortByTime);
       const done = items.filter(i => i.status === 'done');
       const current = items.filter(i => i.status === 'current').slice(0,1);
       const plans = items.filter(i => i.status === 'planned' || i.status === 'tentative');
 
-      // Render columns
       mountList('col-done', done);
       mountList('col-current', current);
       mountList('col-plans', plans);
 
-      // Optional: support deep-link by id #item-id
       const hash = location.hash.replace('#','');
       if(hash){
         const el = document.querySelector(`[data-id="${CSS.escape(hash)}"]`);
@@ -127,7 +122,6 @@
     }
 
     function sortByTime(a,b){
-      // Sort by end/start date ascending for done; current/plans keep natural timeline (year then start)
       const getKey = (x)=>{
         const y = Number(x.year) || 0;
         const d = x.date_start || x.date_end || `${y}-01-01`;
@@ -196,12 +190,6 @@
           actions.appendChild(a);
         });
       }
-      if (it.location){
-        const loc = document.createElement('span');
-        loc.className = 'badge';
-        loc.textContent = it.location;
-        actions.appendChild(loc);
-      }
 
       wrap.append(top, summary, details, actions);
       return wrap;
@@ -226,7 +214,7 @@
       const a = fmtDate(it.date_start);
       const b = fmtDate(it.date_end);
       if(a && b) return `${a} – ${b}`;
-      return a || b || (it.year ? String(it.year) : 'TBD');
+      return a || b || (it.year ? String(it.year) : 'TBD';
     }
 
     function confidenceDots(it){
