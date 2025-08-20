@@ -1,0 +1,99 @@
+{
+  "meta": {
+    "updated_at": "2025-08-20T12:00:00Z",
+    "updated_by": "Nico",
+    "version": "v1",
+    "lang_default": "en"
+  },
+  "items": [
+    {
+      "id": "dx-2019-01",
+      "year": 2019,
+      "type": "diagnosis",
+      "status": "done",
+      "date_start": "2019-02-01",
+      "date_end": "2019-03-01",
+      "when_label": "Feb–Mar 2019",
+      "title": "Primary diagnosis and staging",
+      "summary": "Initial workup confirmed lymphoma; staging and baseline tests completed.",
+      "details": "Symptoms led to hematology consult. Imaging and biopsies established the diagnosis and stage. Baseline echo and labs recorded before treatment.",
+      "location": "New York, USA",
+      "links": []
+    },
+    {
+      "id": "chemo-2019-rc",
+      "year": 2019,
+      "type": "chemotherapy",
+      "status": "done",
+      "date_start": "2019-03-10",
+      "date_end": "2019-08-20",
+      "when_label": "Mar–Aug 2019",
+      "title": "R‑CHOP (6 cycles)",
+      "summary": "Standard-line chemotherapy completed with supportive care.",
+      "details": "Six cycles administered every 21 days with growth‑factor support. Interim imaging showed partial response; end‑of‑treatment scan documented best response.",
+      "location": "NY/NJ, USA",
+      "links": ["#news"]
+    },
+    {
+      "id": "cell-therapy-2021",
+      "year": 2021,
+      "type": "transplant",
+      "status": "done",
+      "date_start": "2021-11-01",
+      "date_end": "2021-12-15",
+      "when_label": "Nov–Dec 2021",
+      "title": "Cell therapy and inpatient recovery",
+      "summary": "Cell infusion with monitored hospital stay; complications managed.",
+      "details": "Received cell therapy under protocol with neuro/cardiac monitoring. Complications included fever and weakness; stabilized and discharged to rehab.",
+      "location": "USA",
+      "links": []
+    },
+    {
+      "id": "current-2025-aug",
+      "year": 2025,
+      "type": "rehab",
+      "status": "current",
+      "date_start": "2025-07-15",
+      "date_end": null,
+      "when_label": "Now",
+      "title": "Supportive care and functional recovery",
+      "summary": "Focused rehab, symptom control, and diagnostics to decide next steps.",
+      "details": "Ongoing day‑to‑day rehab with nursing support and outpatient checks. Collecting opinions and scheduling assessments that will guide future therapy.",
+      "location": "EU/USA (remote coordination)",
+      "links": ["#support"]
+    },
+    {
+      "id": "plan-2025-q4",
+      "year": 2025,
+      "type": "other",
+      "status": "planned",
+      "confidence": "medium",
+      "date_start": null,
+      "date_end": null,
+      "when_label": "Q4 2025 (TBD)",
+      "title": "Second‑opinion board & treatment decision",
+      "summary": "Multidisciplinary review to confirm options and timing.",
+      "details": "Case to be presented to a board (hematology/oncology/rehab). Decision may include watchful waiting, targeted therapy, or enrollment in a program. Timing depends on diagnostics and logistics.",
+      "location": "TBD",
+      "links": []
+    },
+    {
+      "id": "tentative-2026",
+      "year": 2026,
+      "type": "other",
+      "status": "tentative",
+      "confidence": "low",
+      "date_start": null,
+      "date_end": null,
+      "when_label": "2026 (possible)",
+      "title": "Extended rehabilitation program",
+      "summary": "If indicated, longer rehab block with daily routine.",
+      "details": "May proceed only if resources and clinical status permit. Scope and venue remain uncertain.",
+      "location": "TBD",
+      "links": []
+    }
+  ],
+  "changelog": [
+    { "date": "2025-08-20", "note": "Initial public roadmap created (EN only)." }
+  ]
+}

@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>The Real Unreal Story — Treatment Roadmap (demo)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#0b0f16; --panel:#121826; --muted:#93a0b4; --text:#e9eef7;
+      --accent:#6aa6ff; --done:#8fb3ff22; --current:#3b82f616; --plan:#ffc8571a;
+      --border:#1e2a3f; --ok:#7bc66a; --warn:#ffc857; --low:#ff7a7a;
+    }
+    html,body{background:var(--bg);color:var(--text);margin:0;font:16px/1.5 system-ui,Segoe UI,Roboto,Arial;}
+    .wrap{max-width:1000px;margin:40px auto;padding:0 16px;}
+    .header{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+    h1{font-size:28px;margin:0}
+    .meta{color:var(--muted);font-size:14px}
+    .legend{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 20px}
+    .chip{border:1px solid var(--border);padding:4px 8px;border-radius:999px;font-size:12px;color:var(--muted)}
+    .chip b{color:var(--text);font-weight:600}
+    .grid{display:grid;grid-template-columns:1fr;gap:16px}
+    @media(min-width:900px){.grid{grid-template-columns:1fr 1fr 1fr}}
+    .col{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+    .col h2{margin:0;padding:14px 16px;border-bottom:1px solid var(--border);font-size:16px;letter-spacing:.3px;color:#cfe0ff}
+    .list{padding:10px}
+    .item{border:1px solid var(--border);border-radius:12px;padding:12px;margin:10px 0;background:#0e1422}
+    .item.done{background:var(--done)}
+    .item.current{background:var(--current);border-color:#3b82f6aa}
+    .item.planned,.item.tentative{background:var(--plan)}
+    .topline{display:flex;align-items:center;gap:8px;justify-content:space-between}
+    .title{font-weight:600}
+    .when{color:var(--muted);font-size:13px}
+    .badges{display:flex;gap:6px;flex-wrap:wrap}
+    .badge{font-size:11px;border:1px solid var(--border);padding:2px 6px;border-radius:999px;color:var(--muted)}
+    .badge.status-current{border-color:#3b82f6;color:#cfe0ff}
+    .badge.status-done{color:#9cc59c;border-color:#355a35}
+    .badge.status-planned{color:#e7c37a;border-color:#6a5520}
+    .badge.status-tentative{color:#e59a9a;border-color:#6a2a2a}
+    .conf{display:inline-flex;gap:2px;vertical-align:middle;margin-left:4px}
+    .dot{width:7px;height:7px;border-radius:999px;display:inline-block;background:var(--border)}
+    .dot.high{background:var(--ok)}
+    .dot.medium{background:var(--warn)}
+    .dot.low{background:var(--low)}
+    .summary{margin:8px 0 0}
+    .details{margin-top:8px;display:none;color:#d6def0}
+    .actions{margin-top:8px;display:flex;gap:10px;flex-wrap:wrap}
+    .btn{background:#1b2538;border:1px solid var(--border);color:#dfe9ff;font-size:12px;padding:6px 10px;border-radius:8px;cursor:pointer}
+    .btn:hover{background:#22304a}
+    .link{color:#a3c7ff;text-decoration:none}
+    .nowpulse{width:8px;height:8px;border-radius:999px;background:#3b82f6;box-shadow:0 0 0 0 rgba(59,130,246,.7);animation:pulse 2s infinite}
+    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(59,130,246,.6)}70%{box-shadow:0 0 0 12px rgba(59,130,246,0)}100%{box-shadow:0 0 0 0 rgba(59,130,246,0)}}
+    .notice{margin-top:18px;color:var(--muted);font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <h1>Treatment Roadmap</h1>
+      <div class="meta" id="meta"></div>
+    </div>
+
+    <div class="legend">
+      <span class="chip"><b>Done</b> — completed therapy/events</span>
+      <span class="chip"><b>Now</b> — current step <span class="nowpulse" style="margin-left:6px"></span></span>
+      <span class="chip"><b>Planned</b> — scheduled/expected</span>
+      <span class="chip"><b>Tentative</b> — possible, not confirmed</span>
+    </div>
+
+    <div class="grid">
+      <section class="col" id="col-done">
+        <h2>Completed</h2>
+        <div class="list"></div>
+      </section>
+
+      <section class="col" id="col-current">
+        <h2>Now</h2>
+        <div class="list"></div>
+      </section>
+
+      <section class="col" id="col-plans">
+        <h2>Plans</h2>
+        <div class="list"></div>
+      </section>
+    </div>
+
+    <div class="notice">
+      Last updated text reflects editorial updates and isn’t medical advice.
+    </div>
+  </div>
+
+  <script>
+    // Utility: simple escape for text nodes (we avoid HTML in JSON fields)
+    const esc = (s)=>String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString(undefined,{year:'numeric',month:'short'}) : '';
+
+    fetch('roadmap.json', {cache:'no-cache'})
+      .then(r => r.json())
+      .then(data => render(data))
+      .catch(err => {
+        document.getElementById('meta').textContent = 'Failed to load roadmap.json';
+        console.error(err);
+      });
+
+    function render(data){
+      // Meta
+      const m = data.meta || {};
+      const when = m.updated_at ? new Date(m.updated_at).toLocaleString() : '—';
+      document.getElementById('meta').textContent = `Updated ${when} • ${m.updated_by || ''}`.trim();
+
+      // Split items
+      const items = (data.items || []).slice().sort(sortByTime);
+      const done = items.filter(i => i.status === 'done');
+      const current = items.filter(i => i.status === 'current').slice(0,1);
+      const plans = items.filter(i => i.status === 'planned' || i.status === 'tentative');
+
+      // Render columns
+      mountList('col-done', done);
+      mountList('col-current', current);
+      mountList('col-plans', plans);
+
+      // Optional: support deep-link by id #item-id
+      const hash = location.hash.replace('#','');
+      if(hash){
+        const el = document.querySelector(`[data-id="${CSS.escape(hash)}"]`);
+        if(el){ el.scrollIntoView({behavior:'smooth', block:'center'}); el.classList.add('highlight'); }
+      }
+    }
+
+    function sortByTime(a,b){
+      // Sort by end/start date ascending for done; current/plans keep natural timeline (year then start)
+      const getKey = (x)=>{
+        const y = Number(x.year) || 0;
+        const d = x.date_start || x.date_end || `${y}-01-01`;
+        return `${y}-${d}`;
+      };
+      return getKey(a) > getKey(b) ? 1 : -1;
+    }
+
+    function mountList(colId, arr){
+      const list = document.querySelector(`#${colId} .list`);
+      list.innerHTML = '';
+      arr.forEach(item => list.appendChild(card(item)));
+      if(!arr.length){
+        const p = document.createElement('div');
+        p.className='item';
+        p.textContent = 'No entries yet.';
+        list.appendChild(p);
+      }
+    }
+
+    function card(it){
+      const wrap = document.createElement('article');
+      wrap.className = `item ${it.status}`;
+      wrap.dataset.id = it.id;
+
+      const top = document.createElement('div');
+      top.className = 'topline';
+
+      const left = document.createElement('div');
+      left.innerHTML = `<div class="title">${esc(it.title)}</div>
+                        <div class="when">${esc(it.when_label || labelFromDates(it))}${confidenceDots(it)}</div>`;
+
+      const badges = document.createElement('div');
+      badges.className = 'badges';
+      badges.appendChild(makeBadge(statusLabel(it.status)));
+      if(it.type) badges.appendChild(makeBadge(it.type));
+
+      top.append(left, badges);
+
+      const summary = document.createElement('div');
+      summary.className = 'summary';
+      summary.textContent = it.summary || '';
+
+      const details = document.createElement('div');
+      details.className = 'details';
+      details.textContent = it.details || '';
+
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+      const toggle = document.createElement('button');
+      toggle.className = 'btn';
+      toggle.textContent = 'Details';
+      toggle.addEventListener('click', ()=>{
+        const vis = details.style.display === 'block';
+        details.style.display = vis ? 'none' : 'block';
+        toggle.textContent = vis ? 'Details' : 'Hide';
+      });
+      actions.appendChild(toggle);
+
+      if (Array.isArray(it.links) && it.links.length){
+        it.links.forEach(href=>{
+          const a = document.createElement('a');
+          a.className='btn link';
+          a.href = href;
+          a.textContent = 'Open link';
+          actions.appendChild(a);
+        });
+      }
+      if (it.location){
+        const loc = document.createElement('span');
+        loc.className = 'badge';
+        loc.textContent = it.location;
+        actions.appendChild(loc);
+      }
+
+      wrap.append(top, summary, details, actions);
+      return wrap;
+    }
+
+    function statusLabel(s){
+      return (s==='done')?'done':
+             (s==='current')?'current':
+             (s==='planned')?'planned':
+             (s==='tentative')?'tentative':s||'';
+    }
+
+    function makeBadge(text){
+      const span = document.createElement('span');
+      const cls = 'status-'+(text||'').toLowerCase();
+      span.className = 'badge '+cls;
+      span.textContent = text;
+      return span;
+    }
+
+    function labelFromDates(it){
+      const a = fmtDate(it.date_start);
+      const b = fmtDate(it.date_end);
+      if(a && b) return `${a} – ${b}`;
+      return a || b || (it.year ? String(it.year) : 'TBD');
+    }
+
+    function confidenceDots(it){
+      if(!(it.status==='planned' || it.status==='tentative')) return '';
+      const c = (it.confidence||'').toLowerCase();
+      const dots =
+        c==='high' ? '<span class="dot high"></span><span class="dot high"></span><span class="dot high"></span>' :
+        c==='medium' ? '<span class="dot medium"></span><span class="dot medium"></span><span class="dot"></span>' :
+        '<span class="dot low"></span><span class="dot"></span><span class="dot"></span>';
+      return ` · confidence <span class="conf">${dots}</span>`;
+    }
+  </script>
+</body>
+</html>
