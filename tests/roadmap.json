@@ -1,52 +1,97 @@
 {
   "meta": {
-    "updated_at": "2025-08-20T15:00:00Z",
+    "updated_at": "2025-08-20T18:30:00Z",
     "updated_by": "Nico",
-    "version": "v1.1",
+    "version": "v1.2",
     "lang_default": "en"
   },
   "items": [
     {
-      "id": "dx-2019-01",
+      "id": "dx-2019-primary",
       "year": 2019,
       "type": "diagnosis",
       "status": "done",
-      "date_start": "2019-02-01",
+      "date_start": "2019-01-15",
       "date_end": "2019-03-01",
-      "when_label": "Feb–Mar 2019",
+      "when_label": "Jan–Mar 2019",
       "title": "Primary diagnosis and staging",
-      "summary": "Initial workup confirmed lymphoma; staging and baseline tests completed.",
-      "details": "Symptoms led to hematology consult. Imaging and biopsies established the diagnosis and stage. Baseline echo and labs recorded before treatment.",
-      "links": []
+      "summary": "Initial workup confirmed lymphoma; baseline tests and staging completed.",
+      "details": "Symptoms led to hematology consult. Imaging and biopsies established the diagnosis and stage. Baseline echocardiogram and labs recorded prior to therapy."
     },
     {
-      "id": "chemo-2019-rc",
+      "id": "chemo-2019-rchop",
       "year": 2019,
       "type": "chemotherapy",
       "status": "done",
       "date_start": "2019-03-10",
       "date_end": "2019-08-20",
       "when_label": "Mar–Aug 2019",
-      "title": "R‑CHOP (6 cycles)",
-      "summary": "Standard-line chemotherapy completed with supportive care.",
-      "details": "Six cycles administered every 21 days with growth‑factor support. Interim imaging showed partial response; end‑of‑treatment scan documented best response.",
-      "links": ["#news"]
+      "title": "R‑CHOP chemotherapy (6 cycles)",
+      "summary": "First‑line regimen completed with supportive care.",
+      "details": "Six cycles approximately every 21 days. Interim imaging showed response; end‑of‑treatment assessment documented best response achieved."
     },
     {
-      "id": "cell-therapy-2021",
+      "id": "2021-cell-therapy",
       "year": 2021,
       "type": "transplant",
       "status": "done",
       "date_start": "2021-11-01",
       "date_end": "2021-12-15",
       "when_label": "Nov–Dec 2021",
-      "title": "Cell therapy and inpatient recovery",
-      "summary": "Cell infusion with monitored hospital stay; complications managed.",
-      "details": "Received cell therapy under protocol with neuro/cardiac monitoring. Complications included fever and weakness; stabilized and discharged to rehab.",
-      "links": []
+      "title": "Cell therapy with inpatient recovery",
+      "summary": "Cell infusion under protocol; complications managed during hospital stay.",
+      "details": "Cell therapy administered with neuro/cardiac monitoring. Complications included high fever and weakness; stabilized and discharged to step‑down care/rehab."
     },
     {
-      "id": "current-2025-oral-chemo",
+      "id": "2022-03-26-shock",
+      "year": 2022,
+      "type": "event",
+      "status": "done",
+      "date_start": "2022-03-26",
+      "date_end": "2022-04-30",
+      "when_label": "Mar–Apr 2022",
+      "title": "Critical systemic shock and paralysis episode",
+      "summary": "Acute collapse during a video call; emergency hospitalization and paralysis.",
+      "details": "On March 26, 2022, Adam experienced a systemic shock with loss of function. Hospital course included loss of memory, slowed cognition, and paralysis. Gradual return of consciousness; began to eat and sleep; remained optimistic despite severe condition."
+    },
+    {
+      "id": "2022-discharge-hardship",
+      "year": 2022,
+      "type": "event",
+      "status": "done",
+      "date_start": "2022-04-01",
+      "date_end": "2022-06-30",
+      "when_label": "Spring 2022",
+      "title": "Unsafe discharge; protective suit; temporary housing",
+      "summary": "Discharged in profound immunosuppression; urgent need for protective gear and shelter.",
+      "details": "Oncologist urged urgent purchase of a protective suit; Adam was temporarily placed in a motel. Later he moved to his apartment where additional caregiving issues arose; an unprofessional nurse was replaced by Melissa."
+    },
+    {
+      "id": "2023-sedation-incident",
+      "year": 2023,
+      "type": "event",
+      "status": "done",
+      "date_start": "2023-04-01",
+      "date_end": "2023-05-31",
+      "when_label": "Spring 2023",
+      "title": "Sedation/poisoning incident and police involvement",
+      "summary": "Unknown woman entered, Adam was sedated and found without memory; legal turbulence escalated.",
+      "details": "Water intended for Adam’s brother was used to sedate Adam; he was taken by police with amnesia. Guardian conflicts and attempts to access the apartment followed. Planned free rehab collapsed after a crisis with the oncologist, leading to cardiac distress."
+    },
+    {
+      "id": "2024-tumor-detected",
+      "year": 2024,
+      "type": "diagnosis",
+      "status": "done",
+      "date_start": "2024-02-01",
+      "date_end": "2024-03-31",
+      "when_label": "Early 2024",
+      "title": "Large abdominal tumor found; new Hodgkin lymphoma",
+      "summary": "Imaging discovered a large mass; aggressive Hodgkin lymphoma diagnosed.",
+      "details": "During hospitalization for an injury, imaging incidentally revealed a large abdominal tumor. Further workup suggested aggressive Hodgkin lymphoma, considered distinct from earlier disease and possibly a CAR‑T side effect. New chemotherapy was proposed."
+    },
+    {
+      "id": "current-2025-oral-14doses",
       "year": 2025,
       "type": "chemotherapy",
       "status": "current",
@@ -54,9 +99,8 @@
       "date_end": null,
       "when_label": "Now",
       "title": "Oral multi‑agent chemotherapy (14 doses)",
-      "summary": "Current course: complex oral regimen taken at home, total of 14 doses.",
-      "details": "Adam is on a structured per‑oral chemotherapy consisting of multiple components. The plan includes 14 doses with careful monitoring of tolerance and interim labs.",
-      "links": []
+      "summary": "Current course: complex per‑oral regimen at home, total of 14 doses.",
+      "details": "Adam is on a structured oral chemotherapy made of multiple components (per os). The plan includes 14 doses with careful monitoring of tolerance, labs, and functional status."
     },
     {
       "id": "plan-2025-q4-board",
@@ -69,11 +113,10 @@
       "when_label": "Q4 2025 (TBD)",
       "title": "Second‑opinion board & treatment decision",
       "summary": "Multidisciplinary review to confirm options and timing.",
-      "details": "Case to be presented to a board (hematology/oncology/rehab). Decision may include watchful waiting, targeted therapy, or enrollment in a program. Timing depends on diagnostics and logistics.",
-      "links": []
+      "details": "Case to be presented to a board (hematology/oncology/rehab). Decision may include watchful waiting, targeted therapy, or enrollment in a program. Timing depends on diagnostics and logistics."
     },
     {
-      "id": "plan-support-recovery",
+      "id": "plan-2025-support-recovery",
       "year": 2025,
       "type": "rehab",
       "status": "planned",
@@ -82,12 +125,11 @@
       "date_end": null,
       "when_label": "Post‑chemo (TBD)",
       "title": "Support and recovery program",
-      "summary": "Structured support and functional recovery after the current course.",
-      "details": "If indicated after evaluation, a block of supportive care and rehabilitation will follow (scope and venue to be refined).",
-      "links": []
+      "summary": "Structured support and functional recovery after the current oral course.",
+      "details": "If indicated after evaluation, a block of supportive care and rehabilitation will follow. Scope, schedule, and venue to be refined."
     },
     {
-      "id": "tentative-2026",
+      "id": "tentative-2026-extended-rehab",
       "year": 2026,
       "type": "other",
       "status": "tentative",
@@ -96,12 +138,11 @@
       "date_end": null,
       "when_label": "2026 (possible)",
       "title": "Extended rehabilitation program",
-      "summary": "If indicated, longer rehab block with daily routine.",
-      "details": "May proceed only if resources and clinical status permit. Scope and schedule remain uncertain.",
-      "links": []
+      "summary": "Longer rehabilitation block may be required depending on status and resources.",
+      "details": "May proceed only if clinical course and resources permit. Details remain uncertain."
     }
   ],
   "changelog": [
-    { "date": "2025-08-20", "note": "Updated: removed locations; set current to oral multi‑agent chemo (14 doses); moved support & recovery to plans." }
+    { "date": "2025-08-20", "note": "Initial filled roadmap (EN). Removed locations. Current step updated to oral multi‑agent chemotherapy (14 doses). Added 2022 shock, 2023 sedation incident, 2024 new tumor and Hodgkin lymphoma." }
   ]
 }

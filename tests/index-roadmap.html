@@ -46,7 +46,6 @@
     .actions{margin-top:8px;display:flex;gap:10px;flex-wrap:wrap}
     .btn{background:#1b2538;border:1px solid var(--border);color:#dfe9ff;font-size:12px;padding:6px 10px;border-radius:8px;cursor:pointer}
     .btn:hover{background:#22304a}
-    .link{color:#a3c7ff;text-decoration:none}
     .nowpulse{width:8px;height:8px;border-radius:999px;background:#3b82f6;box-shadow:0 0 0 0 rgba(59,130,246,.7);animation:pulse 2s infinite}
     @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(59,130,246,.6)}70%{box-shadow:0 0 0 12px rgba(59,130,246,0)}100%{box-shadow:0 0 0 0 rgba(59,130,246,0)}}
     .notice{margin-top:18px;color:var(--muted);font-size:13px}
@@ -84,12 +83,12 @@
     </div>
 
     <div class="notice">
-      “TBD” means “to be determined” (details/dates are not yet defined). Information here is for transparency and is not medical advice.
+      “TBD” means “to be determined” (details/dates not yet defined). This roadmap is informational and not medical advice.
     </div>
   </div>
 
   <script>
-    const esc = (s)=>String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const esc = (s)=>String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString(undefined,{year:'numeric',month:'short'}) : '';
 
     fetch('roadmap.json', {cache:'no-cache'})
@@ -181,16 +180,6 @@
       });
       actions.appendChild(toggle);
 
-      if (Array.isArray(it.links) && it.links.length){
-        it.links.forEach(href=>{
-          const a = document.createElement('a');
-          a.className='btn link';
-          a.href = href;
-          a.textContent = 'Open link';
-          actions.appendChild(a);
-        });
-      }
-
       wrap.append(top, summary, details, actions);
       return wrap;
     }
@@ -214,7 +203,7 @@
       const a = fmtDate(it.date_start);
       const b = fmtDate(it.date_end);
       if(a && b) return `${a} – ${b}`;
-      return a || b || (it.year ? String(it.year) : 'TBD';
+      return a || b || (it.year ? String(it.year) : 'TBD');
     }
 
     function confidenceDots(it){
