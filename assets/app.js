@@ -15,15 +15,6 @@ function loadScript(src) {
   });
 }
 
-// ---------- intersection observer ----------
-function ioObserve(el, fn, opts={ rootMargin:'150px' }) {
-  if (!('IntersectionObserver' in window) || !el) { fn(); return; }
-  const io = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{ if(e.isIntersecting){ fn(); io.disconnect(); } });
-  }, opts);
-  io.observe(el);
-}
-
 // ---------- language / i18n ----------
 const LOCALE_DIRS = { AR:"rtl", CN:"ltr", DE:"ltr", EN:"ltr", ES:"ltr", FR:"ltr", IT:"ltr", PT:"ltr", RU:"ltr" };
 let I18N = {};
@@ -55,26 +46,34 @@ async function loadLocale(lang) {
     I18N = data || {}; window.I18N = I18N;
   } catch { I18N = {}; window.I18N = {}; }
 
-  // dir
-  const dir = LOCALE_DIRS[lang] || 'ltr';
-  document.documentElement.setAttribute('dir', dir);
-  document.documentElement.setAttribute('lang', lang.toLowerCase());
+  document.documentElement.lang = (lang || 'en').toLowerCase();
+  document.documentElement.dir  = LOCALE_DIRS[lang] || 'ltr';
 
-  // apply
+  const titleRest = I18N["meta.titleRest"] || DEFAULT_I18N["hero.titleRest"] || "support for Adam";
+  document.title = `The Real Unreal Story — ${titleRest}`;
+
+  if (I18N["meta.description"]) {
+    let m = document.querySelector('meta[name="description"]');
+    if (!m) { m = document.createElement('meta'); m.setAttribute('name','description'); document.head.appendChild(m); }
+    m.setAttribute('content', I18N["meta.description"]);
+  }
+
   $$("[data-i18n]").forEach(el => {
-    const k = el.getAttribute("data-i18n");
-    const v = t(k, el.innerHTML);
-    if (v != null) el.innerHTML = v;
+    const key = el.getAttribute("data-i18n");
+    const val = (I18N[key] ?? DEFAULT_I18N[key]);
+    if (val != null) el.innerHTML = val;
   });
   $$("[data-i18n-placeholder]").forEach(el => {
-    const k = el.getAttribute("data-i18n-placeholder");
-    const v = t(k, el.getAttribute("placeholder") || "");
-    if (v != null) el.setAttribute("placeholder", v);
+    const key = el.getAttribute("data-i18n-placeholder");
+    const val = (I18N[key] ?? DEFAULT_I18N[key]);
+    if (val != null) el.setAttribute('placeholder', val);
   });
 
-  // update audio labels if something playing
+  // update labels for player buttons given current states
   updateAudioLabels();
   updateMiniLabels(lang);
+
+  // switch sources ONLY if currently playing (strict lazy)
   if (!bgAudio.paused)        setMainAudioForLang(lang, true);
   if (!announceAudio.paused)  setAnnouncementForLang(lang, true);
   if (!shortAudio.paused)     setShortForLang(lang, true);
@@ -105,22 +104,35 @@ $('#modalClose').onclick=closeModal; $('#modalOk').onclick=closeModal;
 modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
 
 // ---------- overlay tiles ----------
-(function initTiles(){
-  const map = {
-    tile1: { titleKey: 'tiles.me', bodyKey: 'tiles.meBody', fallbackTitle: 'I’m Nico', fallback: 'Hi! I’m Nico…' },
-    tile2: { titleKey: 'tiles.about', bodyKey: 'tiles.aboutBody', fallbackTitle: 'About Adam', fallback: 'A few words about Adam…' },
-    tile3: { titleKey: 'tiles.others', bodyKey: 'tiles.othersBody', fallbackTitle: 'Other people', fallback: '…and about other people in our story.' },
-  };
-  Object.keys(map).forEach(id=>{
-    const el = $('#'+id); if (!el) return;
-    el.addEventListener('click', ()=> openModal(
-      t(map[id].titleKey, map[id].fallbackTitle),
-      t(map[id].bodyKey, map[id].fallback)
-    ));
-  });
-})();
+const tileEls = [$('#tile1'), $('#tile2'), $('#tile3')];
+function lockOverlay(idx, lock){ const el = tileEls[idx]; if(!el) return; el.classList.toggle('overlay-off', !!lock); }
+$('#tile1').onclick=()=>{ lockOverlay(0,true); openModal(t('tiles.me','I’m Nico'), t('modal.tile1.body', `…`)); };
+$('#tile2').onclick=()=>{ lockOverlay(1,true); openModal(t('tiles.about','About Adam'), t('modal.tile2.body', `…`)); };
+$('#tile3').onclick=()=>{ lockOverlay(2,true); openModal(t('tiles.others','Other people in the story'), t('modal.tile3.body', `…`)); };
+$('#modalClose').addEventListener('click', ()=> tileEls.forEach(el=>el.classList.remove('overlay-off')));
+$('#modalOk').addEventListener('click', ()=> tileEls.forEach(el=>el.classList.remove('overlay-off')));
+$('#modalBackdrop').addEventListener('click', (e)=>{ if(e.target===$('#modalBackdrop')) tileEls.forEach(el=>el.classList.remove('overlay-off')); });
 
-// ---------- audio ----------
+// ---------- share ----------
+$('#shareBtn').addEventListener('click', async () => {
+  try {
+    const u = new URL(location.href);
+    u.searchParams.set('lang', $('#lang').value);
+    const url = u.toString();
+    if (navigator.share) { await navigator.share({ title: 'The Real Unreal Story', url }); }
+    else { await navigator.clipboard.writeText(url); alert((I18N && I18N["share.copied"]) || 'Link copied'); }
+  } catch {}
+});
+
+// ---------- engagement local state ----------
+const ENG_KEY='engagement_v1';
+const loadEng=()=>{ try{return JSON.parse(localStorage.getItem(ENG_KEY)||'[]');}catch{return []} };
+const saveEng=a=>{ try{localStorage.setItem(ENG_KEY,JSON.stringify(a));}catch{} };
+function applyEng(){ const on=loadEng(); $$('.eng-btn').forEach((b,i)=>{const s=on.includes(i); b.classList.toggle('bg-green-700',s); b.classList.toggle('border-green-400',s); b.setAttribute('aria-pressed', s?'true':'false');}); }
+$$('.eng-btn').forEach((b,i)=>b.addEventListener('click',()=>{const on=loadEng(); const p=on.indexOf(i); if(p>=0) on.splice(p,1); else on.push(i); saveEng(on); applyEng();}));
+applyEng();
+
+// ---------- players (mutual exclusivity + strict lazy) ----------
 const bgAudio = $('#bgAudio');
 const audioBtn = $('#audioBtn');
 const announceAudio = $('#announceAudio');
@@ -132,12 +144,12 @@ const shortStatus= $('#shortStatus');
 const langSelect = $('#lang');
 
 function updateAudioLabels(){
-  if (audioBtn)    audioBtn.textContent    = bgAudio.paused     ? (I18N["audio.play"]    || "Story in music") : (I18N["audio.pause"]   || "‖ Pause");
+  if (audioBtn)    audioBtn.textContent    = bgAudio.paused       ? (I18N["audio.play"]    || DEFAULT_I18N["audio.play"]    || "Story in music") : (I18N["audio.pause"] || "‖ Pause");
 }
 function updateMiniLabels(lang){
-  if (announceBtn) announceBtn.textContent = announceAudio.paused? (I18N["announce.play"] || "▶︎ Play") : (I18N["announce.pause"] || "‖ Pause");
-  if (announceStatus) announceStatus.textContent = (I18N["announce.langLabel"] || "Language: ") + (lang || langSelect.value);
-  if (shortBtn)   shortBtn.textContent     = shortAudio.paused  ? (I18N["short.play"]    || "▶︎ Play") : (I18N["short.pause"] || "‖ Pause");
+  if (announceBtn) announceBtn.textContent = announceAudio.paused ? (I18N["announce.play"] || DEFAULT_I18N["announce.play"] || "▶︎ Play") : (I18N["announce.pause"] || "‖ Pause");
+  if (announceStatus) announceStatus.textContent = (I18N["announce.langLabel"] || DEFAULT_I18N["announce.langLabel"] || "Language: ") + (lang || langSelect.value);
+  if (shortBtn)   shortBtn.textContent     = shortAudio.paused    ? (I18N["short.play"]    || DEFAULT_I18N["short.play"]    || "▶︎ Play") : (I18N["short.pause"] || "‖ Pause");
   if (shortStatus)shortStatus.textContent  = (I18N["short.langLabel"] || DEFAULT_I18N["short.langLabel"] || "Language: ") + (lang || langSelect.value);
 }
 
@@ -156,68 +168,72 @@ function setMainAudioForLang(l, autoplay=false){
   if (autoplay) bgAudio.play().catch(()=>{});
 }
 function setAnnouncementForLang(l, autoplay=false){
-  const src = `audio/ANN-${l}.mp3`;
-  if (announceAudio.src.endsWith(src)) { if (autoplay && announceAudio.paused) announceAudio.play().catch(()=>{}); return; }
-  announceAudio.pause();
-  announceAudio.src = src;
-  if (autoplay) announceAudio.play().catch(()=>{});
+  const src=`audio/ANNOUNCEMENT-${l}.mp3`;
+  if (announceAudio.src.endsWith(src)) { if(autoplay && announceAudio.paused) announceAudio.play().catch(()=>{}); return; }
+  announceAudio.pause(); announceAudio.src=src; updateMiniLabels(l); if(autoplay) announceAudio.play().catch(()=>{});
 }
 function setShortForLang(l, autoplay=false){
-  const src = `audio/SHORT-${l}.mp3`;
-  if (shortAudio.src.endsWith(src)) { if (autoplay && shortAudio.paused) shortAudio.play().catch(()=>{}); return; }
-  shortAudio.pause();
-  shortAudio.src = src;
-  if (autoplay) shortAudio.play().catch(()=>{});
+  const src = `audio/SHORTSTORY-${l}.mp3`;
+  if (shortAudio.src.endsWith(src)) { if(autoplay && shortAudio.paused) shortAudio.play().catch(()=>{}); return; }
+  shortAudio.pause(); shortAudio.src = src; updateMiniLabels(l); if(autoplay) shortAudio.play().catch(()=>{});
 }
 
-// main audio
-audioBtn?.addEventListener('click', async ()=>{
-  try{
-    if (bgAudio.paused) { pauseOthers(bgAudio); setMainAudioForLang(langSelect.value, true); }
-    else { bgAudio.pause(); }
-  }catch{}
+// buttons
+audioBtn.addEventListener('click', async ()=>{
+  if (bgAudio.paused){
+    setMainAudioForLang(langSelect.value, true);
+    pauseOthers(bgAudio);
+  } else {
+    bgAudio.pause();
+  }
   updateAudioLabels();
 });
-
-// mini audios
-announceBtn?.addEventListener('click', async ()=>{
-  try{
-    if (announceAudio.paused) { pauseOthers(announceAudio); setAnnouncementForLang(langSelect.value, true); }
-    else { announceAudio.pause(); }
-  }catch{}
+announceBtn.addEventListener('click', async ()=>{
+  if (announceAudio.paused){
+    setAnnouncementForLang(langSelect.value, true);
+    pauseOthers(announceAudio);
+  } else {
+    announceAudio.pause();
+  }
   updateMiniLabels();
 });
-shortBtn?.addEventListener('click', async ()=>{
-  try{
-    if (shortAudio.paused) { pauseOthers(shortAudio); setShortForLang(langSelect.value, true); }
-    else { shortAudio.pause(); }
-  }catch{}
+shortBtn.addEventListener('click', async ()=>{
+  if (shortAudio.paused){
+    setShortForLang(langSelect.value, true);
+    pauseOthers(shortAudio);
+  } else {
+    shortAudio.pause();
+  }
   updateMiniLabels();
 });
+announceAudio.addEventListener('ended', ()=>{ updateMiniLabels(); });
+shortAudio.addEventListener('ended',   ()=>{ updateMiniLabels(); });
 
-// lang select
-langSelect?.addEventListener('change', async ()=>{
-  const l = langSelect.value;
-  const url = new URL(location.href);
-  url.searchParams.set('lang', l);
-  history.replaceState(null, '', url.toString());
-  await loadLocale(l);
+// ---------- language init & change ----------
+$('#donateHero')?.setAttribute('href', donateURL);
+
+const fromQuery = getLangFromQuery();
+const initialLang = fromQuery || localStorage.getItem('site_lang') || 'EN';
+langSelect.value = initialLang;
+localStorage.setItem('site_lang', initialLang);
+loadLocale(initialLang);
+if (fromQuery) {
+  const u = new URL(location.href); u.searchParams.delete('lang'); history.replaceState({}, '', u);
+}
+langSelect.addEventListener('change', e => {
+  const l = e.target.value;
+  localStorage.setItem('site_lang', l);
+  const u = new URL(location.href); u.searchParams.set('lang', l); history.replaceState({}, '', u);
+  loadLocale(l);
+  if (!bgAudio.paused)        setMainAudioForLang(l, true);
+  if (!announceAudio.paused)  setAnnouncementForLang(l, true);
+  if (!shortAudio.paused)     setShortForLang(l, true);
 });
 
-// on load: set locale
-(async ()=>{
-  const l = getLangFromQuery() || 'EN';
-  await loadLocale(l);
-  langSelect.value = l;
-})();
-
-// ---------- PWA prompt ----------
+// ---------- PWA install ----------
 let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', (e)=>{
-  e.preventDefault(); deferredPrompt = e;
-  $('#installBtn')?.classList.remove('hidden');
-});
-window.addEventListener('appinstalled', ()=> $('#installBtn')?.classList.add('hidden'));
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; $('#installBtn')?.classList.remove('hidden'); });
+window.addEventListener('appinstalled', () => $('#installBtn')?.classList.add('hidden'));
 if (window.matchMedia('(display-mode: standalone)').matches) $('#installBtn')?.classList.add('hidden');
 $('#installBtn')?.addEventListener('click', async () => {
   if (!deferredPrompt) return;
@@ -240,11 +256,11 @@ async function renderTgFeed(){
     if(!Array.isArray(arr)||!arr.length){ box.innerHTML=`<div class="text-sm text-gray-300">${t("feed.empty","No posts yet.")}</div>`; return; }
     box.innerHTML=arr.map(p=>{
       const dt=p.date?new Date(p.date):null, time=dt?dt.toLocaleString():'';
-      const link=p.link?`<a href="${p.link}" target="_blank" class="text-sky-400">${t("feed.openTelegram","Open in Telegram")}</a>`:'';
+      const link=p.link?`<a href="${p.link}" target="_blank" class="underline text-sky-400">${t("feed.openTelegram","Open in Telegram")}</a>`:'';
       const text=(p.text||'').replace(/\n/g,'<br>');
       const _img = (p.media_type==='photo' && p.media_path) ? `/.netlify/functions/tg-file?path=${encodeURIComponent(p.media_path)}` : null;
       const mediaHtml = _img
-        ? `<img src="${_img}" alt="" class="mt-2 rounded-xl border border-gray-700 bg-black/30 max-h-52 sm:max-h-52 w-auto object-contain block cursor-zoom-in"
+        ? `<img src="${_img}" alt="" class="mt-2 rounded-xl border border-gray-700 max-w-full max-h-52 sm:max-h-52 w-auto object-contain block cursor-zoom-in"
              onclick="document.dispatchEvent(new CustomEvent('openImage',{detail:'${_img}'}))">`
         : '';
       return `<article class="mb-4 p-3 rounded-xl bg-gray-900/50 border border-gray-700">
@@ -269,45 +285,35 @@ async function ensureLeaflet() {
 async function initMapOnce(){
   if (map) return;
   await ensureLeaflet();
-  LMap = window.L;
-  map = LMap.map('map', { zoomControl: true }).setView([51.1, 10.45], 4);
-  LMap.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '&copy; OpenStreetMap' }).addTo(map);
-  layer = LMap.layerGroup().addTo(map);
+  map = L.map('map').setView([20,0],2);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
+  layer=L.layerGroup().addTo(map);
 
-  // click to preview
-  map.on('click', (e)=>{
-    selectedLatLng = e.latlng;
-    if (!previewMarker) previewMarker = LMap.marker(selectedLatLng).addTo(map);
-    else previewMarker.setLatLng(selectedLatLng);
+  map.on('click', e=>{
+    selectedLatLng=e.latlng; if(previewMarker) previewMarker.remove();
+    previewMarker=L.marker([selectedLatLng.lat,selectedLatLng.lng],{draggable:true}).addTo(map).bindPopup(t("map.selectedPoint","Selected point (you can drag)")).openPopup();
+    previewMarker.on('dragend',()=>{selectedLatLng=previewMarker.getLatLng();});
   });
 
-  await loadAllMarksPaged();
+  // initial load
+  loadAllMarksPaged();
+}
+function ioObserve(el, cb){
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ cb(); io.disconnect(); } });
+  }, { rootMargin: '160px' });
+  io.observe(el);
 }
 ioObserve($('#map'), initMapOnce);
 
-// locate button
-$('#locateBtn')?.addEventListener('click', async ()=>{
-  try{
-    $('#locateBtn').disabled = true; $('#locateBtn').textContent = t('map.locating','Locating…');
-    await ensureLeaflet();
-    map ??= LMap.map('map', { zoomControl: true }).setView([51.1, 10.45], 4);
-    navigator.geolocation.getCurrentPosition(pos=>{
-      const { latitude, longitude } = pos.coords;
-      map.setView([latitude, longitude], 10);
-      selectedLatLng = { lat: latitude, lng: longitude };
-      if (!previewMarker) previewMarker = LMap.marker(selectedLatLng).addTo(map);
-      else previewMarker.setLatLng(selectedLatLng);
-      $('#locateBtn').textContent = t('map.locateMe','Show my location');
-      $('#locateBtn').disabled = false;
-    }, ()=>{
-      alert(t('map.geoError',"Couldn't get your location. Please try again."));
-      $('#locateBtn').textContent = t('map.locateMe','Show my location');
-      $('#locateBtn').disabled = false;
-    });
-  }catch{
-    $('#locateBtn').textContent = t('map.locateMe','Show my location');
-    $('#locateBtn').disabled = false;
-  }
+// Locate button
+$('#locateBtn').addEventListener('click', async ()=>{
+  await initMapOnce();
+  if(!navigator.geolocation){ alert(t("map.noGeo","Geolocation not supported on this device.")); return; }
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const {latitude,longitude}=pos.coords; map.setView([latitude,longitude],6);
+    L.marker([latitude,longitude]).addTo(map).bindPopup(t("map.youAreHere","You are here")).openPopup();
+  },()=>{ alert(t("map.noGeo","Geolocation not supported on this device.")); });
 });
 
 // marks API (paged)
@@ -327,7 +333,7 @@ function drawMarksBatch(points, batch=300) {
       const m = points[i];
       const lat = Number(m.lat), lon = Number(m.lon);
       if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
-      LMap.circleMarker([lat, lon], { radius:4, color:'lime' })
+      L.circleMarker([lat, lon], { radius:4, color:'lime' })
         .bindPopup(`<b>${m.name||'Anon'}</b><br>${m.message||''}`)
         .addTo(layer);
     }
@@ -341,46 +347,67 @@ async function loadAllMarksPaged() {
     const chunk = await fetchMarksPage();
     if (!chunk.length) break;
     total += chunk.length;
-    drawMarksBatch(chunk);
-    marksOffset += marksPageSize;
+    drawMarksBatch(chunk, 300);
+    marksOffset += chunk.length;
+    if (chunk.length < marksPageSize) break;
   }
   setMarksCount(total);
 }
-
-// add mark
-$('#addMark')?.addEventListener('click', async ()=>{
-  const name = ($('#name')?.value || '').trim();
-  const message = ($('#msg')?.value || '').trim();
-  if (!selectedLatLng) { alert('Click on the map to select a place.'); return; }
-  await fetch('/.netlify/functions/marks', { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ name, message, lat:selectedLatLng.lat, lon:selectedLatLng.lng }) });
-  await loadAllMarksPaged();
+$('#addMark').addEventListener('click', async ()=>{
+  await initMapOnce();
+  const name=$('#name').value.trim();
+  const message=$('#msg').value.trim();
+  if(!message) return alert(t("alert.enterMessage","Enter a message"));
+  if(!selectedLatLng) return alert(t("alert.clickMapFirst","Click on the map first!"));
+  const {lat,lng}=selectedLatLng;
+  const resp=await fetch('/.netlify/functions/marks',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name,message,lat,lon:lng})});
+  if(!resp.ok){ const tt=await resp.text().catch(()=>'-'); alert((t("error.saveFailed","Save error: ")) + tt); return; }
+  $('#msg').value=''; selectedLatLng=null; if(previewMarker){previewMarker.remove(); previewMarker=null;}
+  marksOffset = 0;
+  loadAllMarksPaged();
 });
 
-// ---------- Hearts (Splide) ----------
-let allHearts = []; let heartsOffset = 0;
-async function ensureSplide(){ if (window.Splide) return; await loadScript('https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js'); }
-async function loadMoreHearts(){
-  const btn = $('#loadMoreHearts');
-  if (!btn) return;
-  btn.setAttribute('disabled','true'); btn.classList.add('opacity-50','cursor-not-allowed');
-  const res = await fetch(`/.netlify/functions/hearts?offset=${heartsOffset}&limit=30`, { cache:'no-store' });
-  const arr = await res.json();
-  if (!Array.isArray(arr) || !arr.length){ return; }
-  allHearts = allHearts.concat(arr);
-  heartsOffset += arr.length;
-  const ul = $('#heartsSlides');
-  for (const h of arr) {
-    const li = document.createElement('li'); li.className='splide__slide';
-    li.innerHTML = `<div class="px-4 py-3 rounded-xl bg-gray-900/60 border border-gray-700"><div class="text-xs text-gray-400">${h.date||''}</div><div class="text-sm">${h.name||'Anon'}</div></div>`;
-    ul.appendChild(li);
-  }
+// ---------- Lazy init: Hearts + Splide ----------
+let splide;
+function chunk(a,s){const out=[];for(let i=0;i<a.length;i+=s) out.push(a.slice(i,i+s));return out;}
+function heartCard(n){return `<div class="p-4 rounded-2xl bg-gray-900/50 shadow-sm border border-gray-700"><div class="flex items-center gap-2"><span class="text-xl">❤️</span><div class="text-sm text-gray-200">${n||'Anon'}</div></div></div>`;}
+function renderHeartsSlides(arr){
+  const pages=chunk(arr,12), ul=$('#heartsSlides');
+  ul.innerHTML=pages.map(p=>`<li class="splide__slide"><div class="grid md:grid-cols-3 gap-3">${p.map(x=>heartCard(x.name)).join('')}</div></li>`).join('')
+    || `<li class="splide__slide"><div class="text-sm text-gray-300">${t("hearts.empty","No hearts yet.")}</div></li>`;
+  if(splide) splide.destroy(true);
+  splide=new window.Splide('#heartsSplide',{type:'slide',perPage:1,perMove:1,pagination:true,arrows:true,classes:{pagination:'splide__pagination mt-4'}}); splide.mount();
+}
+
+let heartsOffset = 0;
+const heartsPageSize = 200;
+let allHearts = [];
+async function fetchHeartsPage() {
+  const r = await fetch(`/.netlify/functions/hearts?limit=${heartsPageSize}&offset=${heartsOffset}`, { cache: 'no-store' });
+  const chunk = await r.json();
+  if (!Array.isArray(chunk)) return [];
+  return chunk;
+}
+async function loadMoreHearts() {
   await ensureSplide();
-  if (!window.__hearts) {
-    window.__hearts = new Splide('#heartsSplide', { perPage: 2, gap: '10px', pagination: true, arrows: false, autoplay: true, interval: 4000, breakpoints: { 768: { perPage: 1 } } }).mount();
-  } else {
-    window.__hearts.refresh();
+  const chunk = await fetchHeartsPage();
+  const btn = $('#loadMoreHearts');
+  if (!chunk.length) {
+    btn?.setAttribute('disabled','disabled');
+    btn?.classList.add('opacity-50','cursor-not-allowed');
+    return;
   }
-  btn.removeAttribute('disabled'); btn.classList.remove('opacity-50','cursor-not-allowed');
+  allHearts = allHearts.concat(chunk);
+  heartsOffset += chunk.length;
+  renderHeartsSlides(allHearts);
+  if (chunk.length < heartsPageSize) {
+    btn?.setAttribute('disabled','disabled');
+    btn?.classList.add('opacity-50','cursor-not-allowed');
+  }
+}
+async function ensureSplide(){
+  if (window.Splide) return;
+  await loadScript('https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js');
 }
 ioObserve($('#heartsSplide'), async ()=>{ await ensureSplide(); loadMoreHearts(); });
 $('#loadMoreHearts')?.addEventListener('click', loadMoreHearts);
@@ -394,76 +421,3 @@ $('#addHeart').addEventListener('click', async ()=>{
   btn?.removeAttribute('disabled'); btn?.classList.remove('opacity-50','cursor-not-allowed');
   loadMoreHearts();
 });
-
-// ===== TRUS: Story/Live routing (minimal, non-invasive) =====
-(function(){
-  function show(mode){
-    const story = document.getElementById('story');
-    const live  = document.getElementById('live');
-    if (!story || !live) return;
-    if (mode === 'live') {
-      story.classList.add('hidden');
-      live.classList.remove('hidden');
-      localStorage.setItem('trus:lastMode','live');
-    } else {
-      live.classList.add('hidden');
-      story.classList.remove('hidden');
-      localStorage.setItem('trus:lastMode','story');
-    }
-  }
-  function onHashChange(){
-    const h = (location.hash || '#story').toLowerCase();
-    if (h.startsWith('#live')) {
-      show('live');
-      const id = h.slice(1);
-      if (id !== 'live') setTimeout(()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth'}), 30);
-    } else {
-      show('story');
-      const id = h.slice(1);
-      if (id && id !== 'story') setTimeout(()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth'}), 30);
-    }
-  }
-
-  // AMA (local-only placeholder)
-  function setupAMA(){
-    const form = document.getElementById('amaForm');
-    const feed = document.getElementById('amaFeed');
-    if (!form || !feed) return;
-    const KEY = 'trus:ama';
-    const list = JSON.parse(localStorage.getItem(KEY) || '[]');
-
-    function render(){
-      feed.innerHTML = '';
-      list.slice().reverse().forEach(item => {
-        const el = document.createElement('div');
-        el.className = 'p-3 rounded-xl bg-gray-900/50 border border-gray-700';
-        el.innerHTML = '<div class="text-xs text-gray-300 mb-2">'+item.date+'</div><p class="text-sm"><b>'+(item.name||'Anon')+':</b> '+item.question+'</p>';
-        feed.appendChild(el);
-      });
-    }
-    render();
-
-    form.addEventListener('submit', (e)=>{
-      e.preventDefault();
-      const fd = new FormData(form);
-      const name = (fd.get('name')||'').toString().trim();
-      const question = (fd.get('question')||'').toString().trim();
-      if (!question) return;
-      const now = new Date();
-      list.push({ name, question, date: now.toISOString().slice(0,10) });
-      localStorage.setItem(KEY, JSON.stringify(list));
-      form.reset();
-      render();
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', ()=>{
-    if (!location.hash) {
-      const last = localStorage.getItem('trus:lastMode');
-      if (last) location.hash = '#'+last;
-    }
-    onHashChange();
-    window.addEventListener('hashchange', onHashChange);
-    setupAMA();
-  });
-})();
