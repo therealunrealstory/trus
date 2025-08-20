@@ -1,6 +1,7 @@
 // /assets/js/core/router.js
 // SPA-роутер для v200825-final: грузит partials JSON в #subpage, lazy-импортирует модули страниц,
-// отменяет "устаревшие" переходы через navToken, обновляет активность кнопок [data-route].
+// отменяет "устаревшие" переходы через navToken, обновляет активность кнопок [data-route] и
+// делегирует клики по ним в смену hash.
 //
 // Страницы:
 //  - story   (#/story)   -> partials/story.json + pages/story.js
@@ -9,36 +10,18 @@
 //  - roadmap (#/roadmap) -> БЕЗ partial (модуль сам рисует), pages/roadmap.js
 
 import { qs, qsa } from './dom.js';
-import { getLocale } from './i18n.js';
 
 let current = { name: null, destroy: null };
 let navToken = 0;
 
 const ROUTES = {
-  story: {
-    partial: 'story',
-    module: () => import('./pages/story.js'),
-    titleKey: 'nav.story' // опционально, если используешь обновление title по i18n
-  },
-  support: {
-    partial: 'support',
-    module: () => import('./pages/support.js'),
-    titleKey: 'nav.support'
-  },
-  now: {
-    partial: 'now',
-    module: () => import('./pages/now.js'),
-    titleKey: 'nav.now'
-  },
-  roadmap: {
-    partial: null, // без partial — модуль сам всё отрисует
-    module: () => import('./pages/roadmap.js'),
-    titleKey: 'nav.roadmap'
-  }
+  story:   { partial: 'story',   module: () => import('./pages/story.js'),   titleKey: 'nav.story'   },
+  support: { partial: 'support', module: () => import('./pages/support.js'), titleKey: 'nav.support' },
+  now:     { partial: 'now',     module: () => import('./pages/now.js'),     titleKey: 'nav.now'     },
+  roadmap: { partial: null,      module: () => import('./pages/roadmap.js'), titleKey: 'nav.roadmap' }
 };
 
 function parseRoute() {
-  // ожидаем вид #/name[/sub]
   const m = location.hash.match(/^#\/?([^\/]+)?/);
   const name = (m && m[1]) ? m[1] : 'story';
   return name in ROUTES ? name : 'story';
@@ -47,13 +30,12 @@ function parseRoute() {
 async function fetchPartial(name, token) {
   const url = `/partials/${name}.json`;
   const res = await fetch(url, { cache: 'no-store' }).catch(() => null);
-  if (token !== navToken) return null; // устарело
-  if (!res || !res.ok) return { html: `<div data-i18n="page.error">Не удалось загрузить страницу.</div>` };
-
+  if (token !== navToken) return null;
+  if (!res || !res.ok) {
+    return { html: `<div data-i18n="page.error">Не удалось загрузить страницу.</div>` };
+  }
   const json = await res.json().catch(() => ({}));
   if (token !== navToken) return null;
-
-  // Универсальная подстановка: поддержим html/markup/content/innerHTML
   const html = json.html ?? json.markup ?? json.content ?? '';
   return { ...json, html: String(html) };
 }
@@ -77,7 +59,7 @@ async function runRoute(name, token) {
 
   // Снять предыдущую страницу
   if (current.destroy) {
-    try { current.destroy(); } catch(e) {}
+    try { current.destroy(); } catch {}
   }
   current = { name, destroy: null };
 
@@ -88,10 +70,9 @@ async function runRoute(name, token) {
   let mount = qs('#subpage');
   if (cfg.partial) {
     const partial = await fetchPartial(cfg.partial, token);
-    if (token !== navToken || partial === null) return; // отменено
+    if (token !== navToken || partial === null) return;
     mount = mountHTML(partial.html);
   } else {
-    // очищаем подложку, модуль сам создаст контент
     if (mount) mount.innerHTML = '';
   }
 
@@ -105,23 +86,19 @@ async function runRoute(name, token) {
     current.destroy = mod.destroy;
   }
 
-  // (опционально) обновление заголовка страницы
-  // Если у тебя уже есть глобальный механизм через i18n.loadLocale() — можно не трогать title тут.
-  if (cfg.titleKey) {
-    try {
-      const base = document.querySelector('meta[name="site-title-base"]')?.getAttribute('content') || document.title || 'The Real Unreal Story';
-      // Простой вариант: оставим текущий document.title как есть
-      document.title = base;
-    } catch {}
-  }
+  // Заголовок оставляем как есть (titleKey не используем здесь)
 }
 
 export async function navigate(hash) {
   if (hash && location.hash !== hash) location.hash = hash;
-  // onHashChange обработает
 }
 
 async function onHashChange() {
+  // Если пустой хеш — установим дефолтный
+  if (!location.hash || location.hash === '#/' || location.hash === '#') {
+    location.hash = '#/story';
+    return; // дождёмся следующего события
+  }
   const name = parseRoute();
   navToken++;
   const myToken = navToken;
@@ -129,12 +106,23 @@ async function onHashChange() {
 }
 
 export function init() {
+  // Делегирование кликов по [data-route]
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-route]');
+    if (!btn) return;
+    const to = btn.getAttribute('data-route');
+    if (!to) return;
+    e.preventDefault();
+    if (location.hash !== to) location.hash = to;
+  });
+
   window.addEventListener('hashchange', onHashChange);
+
   // Первый запуск
   onHashChange();
 }
 
-// Авто-инициализация, если роутер подключён напрямую
+// Авто-инициализация, если роутер подключён напрямую (на всякий случай)
 if (document.currentScript && !window.__TRUS_ROUTER_BOOTSTRAPPED__) {
   window.__TRUS_ROUTER_BOOTSTRAPPED__ = true;
   init();
