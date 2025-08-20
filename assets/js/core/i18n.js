@@ -1,11 +1,11 @@
-import { $, $$ } from './dom.js';
+import { $$ } from './dom.js';
 
 export const LOCALE_DIRS = { AR:"rtl", CN:"ltr", DE:"ltr", EN:"ltr", ES:"ltr", FR:"ltr", IT:"ltr", PT:"ltr", RU:"ltr" };
 
 export let I18N = {};
 export const DEFAULT_I18N = {};
 
-// Собираем дефолтные строки из разметки один раз
+// Собираем дефолты из текущей разметки
 (function captureDefaultI18n(){
   $$('[data-i18n]').forEach(el => {
     const k = el.getAttribute('data-i18n');
@@ -21,6 +21,15 @@ export function t(key, fallback){
   return (I18N && I18N[key]) ?? DEFAULT_I18N[key] ?? fallback;
 }
 
+export function getLangFromQuery() {
+  try {
+    const u = new URL(location.href);
+    const p = (u.searchParams.get('lang') || '').toUpperCase();
+    const ok = ['EN','ES','FR','IT','DE','PT','RU','CN','AR'];
+    return ok.includes(p) ? p : null;
+  } catch { return null; }
+}
+
 async function fetchLocaleJson(lang){
   try { const r1 = await fetch(`i18n/${lang}.json`, { cache: 'no-store' }); if (r1.ok) return await r1.json(); } catch {}
   try { const r2 = await fetch(`/i18n/${lang}.json`, { cache: 'no-store' }); if (r2.ok) return await r2.json(); } catch {}
@@ -30,7 +39,7 @@ async function fetchLocaleJson(lang){
 export async function loadLocale(lang) {
   try {
     const data = await fetchLocaleJson(lang);
-    I18N = data || {}; 
+    I18N = data || {};
   } catch { I18N = {}; }
 
   document.documentElement.lang = (lang || 'en').toLowerCase();
@@ -45,7 +54,6 @@ export async function loadLocale(lang) {
     m.setAttribute('content', I18N['meta.description']);
   }
 
-  // Применить к документу — глобальные надписи (шапка/футер/меню)
   applyI18nTo(document);
 }
 

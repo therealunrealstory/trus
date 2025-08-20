@@ -16,7 +16,7 @@ const loaders = {
 const subpageEl = $('#subpage');
 const navButtons = $$('.subnav-btn');
 
-// проставим data-route по i18n-ключам
+// Проставим data-route по i18n-ключам меню
 navButtons.forEach(btn => {
   const key = btn.getAttribute('data-i18n');
   if (key === 'menu.story') btn.dataset.route = 'story';
@@ -43,7 +43,9 @@ async function fetchContent(route){
 }
 
 async function mount(route){
-  // Отвязать предыдущую страницу
+  if (!ROUTES[route]) route = 'story';
+
+  // Отключаем предыдущую страницу
   if (currentModule?.destroy) {
     try { currentModule.destroy(); } catch {}
   }
@@ -56,10 +58,10 @@ async function mount(route){
     const html = await fetchContent(route);
     subpageEl.innerHTML = html;
 
-    // Применяем i18n к вставленному поддереву
+    // Применяем i18n к поддереву
     applyI18nTo(subpageEl);
 
-    // Ленивая загрузка «поведения» конкретной страницы
+    // Догружаем код поведения конкретной страницы
     const mod = await loaders[route]();
     currentModule = mod;
     if (mod?.init) mod.init(subpageEl);
@@ -71,7 +73,7 @@ async function mount(route){
 }
 
 export function startRouter(){
-  // клики по кнопкам
+  // Клики по меню
   navButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const r = btn.dataset.route || 'story';
@@ -80,18 +82,18 @@ export function startRouter(){
     });
   });
 
-  // hashchange
+  // Навигация по hash
   window.addEventListener('hashchange', () => {
     const r = (location.hash || '#story').slice(1);
     mount(r);
   });
 
-  // стартовый маршрут
+  // Стартовый маршрут
   const start = (location.hash || '#story').slice(1);
   mount(start);
 }
 
-// При смене языка просто заново применяем тексты на текущей странице
+// Применить переводы на текущей странице ещё раз (при смене языка)
 export function rerenderCurrentPage(){
   if (subpageEl) applyI18nTo(subpageEl);
 }

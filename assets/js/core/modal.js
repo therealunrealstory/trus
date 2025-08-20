@@ -1,8 +1,8 @@
 import { $ } from './dom.js';
 
-const modal = $('#modalBackdrop');
-const mTitle = $('#modalTitle');
-const mBody  = $('#modalBody');
+const modal   = $('#modalBackdrop');
+const mTitle  = $('#modalTitle');
+const mBody   = $('#modalBody');
 
 export const openModal = (title, html) => {
   mTitle.innerHTML = title;
@@ -11,7 +11,6 @@ export const openModal = (title, html) => {
 };
 export const closeModal = () => modal.classList.remove('show');
 
-// Базовые биндинги (глобальные кнопки модалки)
-$('#modalClose').onclick = closeModal;
-$('#modalOk').onclick = closeModal;
-modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+$('#modalClose')?.addEventListener('click', closeModal);
+$('#modalOk')?.addEventListener('click', closeModal);
+modal?.addEventListener('click', e => { if (e.target === modal) closeModal(); });

@@ -1,4 +1,4 @@
-// Базовые утилиты DOM и загрузчик скриптов
+// Утилиты DOM и загрузчик внешних скриптов
 export const $  = (sel, root = document) => root.querySelector(sel);
 export const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 export const sleep = (ms) => new Promise(r => setTimeout(r, ms));

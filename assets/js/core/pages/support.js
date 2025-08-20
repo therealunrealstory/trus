@@ -1,7 +1,8 @@
 import { $, loadScript } from '../core/dom.js';
 import { t } from '../core/i18n.js';
+import { openModal } from '../core/modal.js';
 
-let L;           // Leaflet namespace
+let L;                  // Leaflet
 let map = null;
 let layer = null;
 let selectedLatLng = null;
@@ -11,9 +12,9 @@ let marksOffset = 0;
 const marksPageSize = 500;
 
 let splide = null;
+let allHearts = [];
 let heartsOffset = 0;
 const heartsPageSize = 200;
-let allHearts = [];
 
 async function ensureLeaflet() {
   if (window.L) { L = window.L; return; }
@@ -73,7 +74,19 @@ function renderHeartsSlides(arr){
   splide.mount();
 }
 
+function initEngagement(root){
+  const ENG_KEY='engagement_v1';
+  const loadEng=()=>{ try{return JSON.parse(localStorage.getItem(ENG_KEY)||'[]');}catch{return []} };
+  const saveEng=a=>{ try{localStorage.setItem(ENG_KEY,JSON.stringify(a));}catch{} };
+  function applyEng(){ const on=loadEng(); root.querySelectorAll('.eng-btn').forEach((b,i)=>{const s=on.includes(i); b.classList.toggle('bg-green-700',s); b.classList.toggle('border-green-400',s); b.setAttribute('aria-pressed', s?'true':'false');}); }
+  root.querySelectorAll('.eng-btn').forEach((b,i)=>b.addEventListener('click',()=>{const on=loadEng(); const p=on.indexOf(i); if(p>=0) on.splice(p,1); else on.push(i); saveEng(on); applyEng();}));
+  applyEng();
+}
+
 export async function init(root){
+  // Engagement
+  initEngagement(root);
+
   // Карта
   const mapEl = root.querySelector('#map');
   if (mapEl) {
@@ -115,7 +128,6 @@ export async function init(root){
       await loadAllMarksPaged();
     });
 
-    // Вылечить размеры после монтирования
     setTimeout(()=> map?.invalidateSize(), 50);
   }
 
@@ -161,9 +173,12 @@ export async function init(root){
     });
   }
 
-  // Practical help modal
+  // Practical help
   root.querySelector('#wantHelp')?.addEventListener('click', () => {
-    alert(t('modal.help.body', 'If you are ready to help — whether legal, medical, or practical support (nurses, caregivers), or if you want to arrange a personal meeting — please write to: theRealUnrealStory@gmail.com.'));
+    openModal(
+      t('modal.help.title', t('support.physical','Practical help')),
+      t('modal.help.body', 'If you are ready to help — whether legal, medical, or practical support (nurses, caregivers), or if you want to arrange a personal meeting — please write to: <a href="mailto:theRealUnrealStory@gmail.com" class="underline">theRealUnrealStory@gmail.com</a>.<br><br>We are sincerely grateful to everyone who responds.')
+    );
   });
 }
 

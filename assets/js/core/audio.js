@@ -1,12 +1,13 @@
 import { $ } from './dom.js';
 import { I18N, DEFAULT_I18N } from './i18n.js';
 
-const bgAudio  = $('#bgAudio');
-const audioBtn = $('#audioBtn');
-const langSelect = $('#lang');
+const bgAudio   = $('#bgAudio');
+const audioBtn  = $('#audioBtn');
+const langSelect= $('#lang');
 
 export function updateAudioLabels(){
-  if (audioBtn) audioBtn.textContent = bgAudio.paused
+  if (!audioBtn) return;
+  audioBtn.textContent = bgAudio.paused
     ? (I18N['audio.play'] || DEFAULT_I18N['audio.play'] || 'Story in music')
     : (I18N['audio.pause'] || '‖ Pause');
 }
@@ -20,13 +21,12 @@ export function setMainAudioForLang(l, autoplay=false){
 }
 
 export function pauseOthers(except){
-  // Глобальный плеер узнаёт про локальные через кастомное событие
   document.dispatchEvent(new CustomEvent('pause-others', { detail: { except } }));
 }
 
-audioBtn?.addEventListener('click', async ()=>{
+audioBtn?.addEventListener('click', ()=>{
   if (bgAudio.paused){
-    setMainAudioForLang(langSelect.value, true);
+    setMainAudioForLang(langSelect?.value || 'EN', true);
     pauseOthers(bgAudio);
   } else {
     bgAudio.pause();
@@ -34,7 +34,6 @@ audioBtn?.addEventListener('click', async ()=>{
   updateAudioLabels();
 });
 
-// Обновление источника при смене языка (если играет)
 export function onLocaleChanged(newLang){
   if (!bgAudio.paused) setMainAudioForLang(newLang, true);
   updateAudioLabels();

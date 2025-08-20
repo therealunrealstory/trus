@@ -2,13 +2,12 @@ import { $, $$ } from '../core/dom.js';
 import { t, I18N, DEFAULT_I18N } from '../core/i18n.js';
 import { openModal } from '../core/modal.js';
 
-// Локальные ссылки и состояния страницы Story
 let announceAudio, shortAudio;
 let announceBtn, shortBtn, announceStatus, shortStatus;
 let onPauseOthers;
 
-function updateMiniLabels(langSel){
-  const lang = langSel?.value || $('#lang')?.value || 'EN';
+function updateMiniLabels(){
+  const lang = $('#lang')?.value || 'EN';
   if (announceBtn) announceBtn.textContent = announceAudio.paused ? (I18N['announce.play'] || DEFAULT_I18N['announce.play'] || '▶︎ Play') : (I18N['announce.pause'] || '‖ Pause');
   if (announceStatus) announceStatus.textContent = (I18N['announce.langLabel'] || DEFAULT_I18N['announce.langLabel'] || 'Language: ') + lang;
   if (shortBtn) shortBtn.textContent = shortAudio.paused ? (I18N['short.play'] || DEFAULT_I18N['short.play'] || '▶︎ Play') : (I18N['short.pause'] || '‖ Pause');
@@ -29,9 +28,9 @@ function setShortForLang(l, autoplay=false){
 }
 
 export function init(root){
-  // Мини‑плееры
-  announceAudio = root.querySelector('#announceAudio') || new Audio();
-  shortAudio    = root.querySelector('#shortAudio')    || new Audio();
+  // Мини‑плееры (если есть в разметке)
+  announceAudio  = root.querySelector('#announceAudio') || new Audio();
+  shortAudio     = root.querySelector('#shortAudio')    || new Audio();
   announceBtn    = root.querySelector('#announceBtn');
   announceStatus = root.querySelector('#announceStatus');
   shortBtn       = root.querySelector('#shortBtn');
@@ -40,41 +39,41 @@ export function init(root){
   const langSel  = $('#lang');
 
   if (announceBtn) {
-    announceBtn.addEventListener('click', async ()=>{
+    announceBtn.addEventListener('click', ()=>{
       if (announceAudio.paused){
-        setAnnouncementForLang(langSel.value, true);
+        setAnnouncementForLang(langSel?.value || 'EN', true);
         document.dispatchEvent(new CustomEvent('pause-others', { detail: { except: announceAudio }}));
       } else { announceAudio.pause(); }
-      updateMiniLabels(langSel);
+      updateMiniLabels();
     });
-    announceAudio.addEventListener('ended', ()=> updateMiniLabels(langSel));
+    announceAudio.addEventListener('ended', updateMiniLabels);
   }
   if (shortBtn) {
-    shortBtn.addEventListener('click', async ()=>{
+    shortBtn.addEventListener('click', ()=>{
       if (shortAudio.paused){
-        setShortForLang(langSel.value, true);
+        setShortForLang(langSel?.value || 'EN', true);
         document.dispatchEvent(new CustomEvent('pause-others', { detail: { except: shortAudio }}));
       } else { shortAudio.pause(); }
-      updateMiniLabels(langSel);
+      updateMiniLabels();
     });
-    shortAudio.addEventListener('ended', ()=> updateMiniLabels(langSel));
+    shortAudio.addEventListener('ended', updateMiniLabels);
   }
-  updateMiniLabels(langSel);
+  updateMiniLabels();
 
-  // Обработчик глобального «pause-others»
+  // Реакция на глобальное «pause-others»
   onPauseOthers = (e)=>{
     const ex = e.detail?.except;
     [announceAudio, shortAudio].forEach(a => { if (a && a !== ex && !a.paused) a.pause(); });
-    updateMiniLabels(langSel);
+    updateMiniLabels();
   };
   document.addEventListener('pause-others', onPauseOthers);
 
-  // Тайлы/модалки
+  // Тайлы/модалки (если присутствуют)
   root.querySelector('#tile1')?.addEventListener('click', ()=> openModal(t('tiles.me','I’m Nico'), t('modal.tile1.body','…')));
   root.querySelector('#tile2')?.addEventListener('click', ()=> openModal(t('tiles.about','About Adam'), t('modal.tile2.body','…')));
   root.querySelector('#tile3')?.addEventListener('click', ()=> openModal(t('tiles.others','Other people in the story'), t('modal.tile3.body','…')));
 
-  // Share
+  // Share (если есть)
   root.querySelector('#shareBtn')?.addEventListener('click', async () => {
     try {
       const u = new URL(location.href);

@@ -1,10 +1,10 @@
 import { $, $$ } from './dom.js';
-import { loadLocale, t } from './i18n.js';
+import { loadLocale, getLangFromQuery, t } from './i18n.js';
 import { openModal } from './modal.js';
 import { updateAudioLabels, setMainAudioForLang, onLocaleChanged } from './audio.js';
 import { startRouter, rerenderCurrentPage } from './router.js';
 
-// Hashtag typing
+// Анимация хештега + модалка
 (function initHashtag() {
   const el = $('#hashtagType'); const btn = $('#hashtagBtn');
   if (!el || !btn) return;
@@ -25,30 +25,20 @@ import { startRouter, rerenderCurrentPage } from './router.js';
 let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; $('#installBtn')?.classList.remove('hidden'); });
 window.addEventListener('appinstalled', () => $('#installBtn')?.classList.add('hidden'));
-if (window.matchMedia('(display-mode: standalone)').matches) $('#installBtn')?.classList.add('hidden');
+if (window.matchMedia?.('(display-mode: standalone)').matches) $('#installBtn')?.classList.add('hidden');
 $('#installBtn')?.addEventListener('click', async () => {
   if (!deferredPrompt) return;
   deferredPrompt.prompt();
-  await deferredPrompt.userChoice;
-  deferredPrompt = null;
+  await deferredPrompt.userChoice; deferredPrompt = null;
 });
 
-// Language init & change
+// Язык
 const langSelect = $('#lang');
-
-function getLangFromQuery() {
-  try {
-    const u = new URL(location.href);
-    const p = (u.searchParams.get('lang') || '').toUpperCase();
-    const ok = ['EN','ES','FR','IT','DE','PT','RU','CN','AR'];
-    return ok.includes(p) ? p : null;
-  } catch { return null; }
-}
 
 (async function boot(){
   const fromQuery = getLangFromQuery();
   const initialLang = fromQuery || localStorage.getItem('site_lang') || 'EN';
-  langSelect.value = initialLang;
+  if (langSelect) { langSelect.value = initialLang; }
   localStorage.setItem('site_lang', initialLang);
 
   await loadLocale(initialLang);
@@ -58,7 +48,7 @@ function getLangFromQuery() {
     const u = new URL(location.href); u.searchParams.delete('lang'); history.replaceState({}, '', u);
   }
 
-  langSelect.addEventListener('change', async e => {
+  langSelect?.addEventListener('change', async e => {
     const l = e.target.value;
     localStorage.setItem('site_lang', l);
     const u = new URL(location.href); u.searchParams.set('lang', l); history.replaceState({}, '', u);
@@ -67,6 +57,6 @@ function getLangFromQuery() {
     rerenderCurrentPage();
   });
 
-  // Стартуем роутер (Story/Support/Now)
+  // Стартуем роутер
   startRouter();
 })();

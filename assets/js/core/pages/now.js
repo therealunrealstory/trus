@@ -1,4 +1,4 @@
-import { $, } from '../core/dom.js';
+import { $ } from '../core/dom.js';
 import { t } from '../core/i18n.js';
 import { openModal } from '../core/modal.js';
 
@@ -24,7 +24,7 @@ export async function init(root){
           ? `<img src="${_img}" alt="" class="mt-2 rounded-xl border border-gray-700 max-w-full max-h-52 sm:max-h-52 w-auto object-contain block cursor-zoom-in"
                 onclick="document.dispatchEvent(new CustomEvent('openImage',{detail:'${_img}'}))">`
           : '';
-        return `<article class="mb-4 p-3 rounded-xl bg-gray-900/50 border border-gray-700">
+        return `<article class="mb-4 p-3 rounded-2xl bg-gray-900/50 border border-gray-700">
                   <div class="text-xs text-gray-300 mb-2">${time}${link?` · ${link}`:''}</div>
                   ${text ? `<div class="text-sm leading-relaxed">${text}</div>` : ''}
                   ${mediaHtml}
@@ -36,7 +36,6 @@ export async function init(root){
     box.innerHTML=`<div class="text-sm text-red-400">${t('feed.error','Failed to load news.')}</div>`;
   }
 
-  // Просмотр фото в модалке
   onOpenImage = (e)=> openModal('', `<img src="${e.detail}" class="w-full h-auto rounded-xl">`);
   document.addEventListener('openImage', onOpenImage);
 }
