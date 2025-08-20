@@ -29,14 +29,24 @@ function updateMiniLabels(){
 
 function setAnnouncementForLang(l, autoplay=false){
   const src=`audio/ANNOUNCEMENT-${l}.mp3`;
-  if (announceAudio.src.endsWith(src)) { if(autoplay && announceAudio.paused) announceAudio.play().catch(()=>{}); return; }
-  announceAudio.pause(); announceAudio.src=src; updateMiniLabels();
+  if (announceAudio.src.endsWith(src)) {
+    if(autoplay && announceAudio.paused) announceAudio.play().catch(()=>{});
+    return;
+  }
+  announceAudio.pause();
+  announceAudio.src=src;           // лениво задаём src только при необходимости
+  updateMiniLabels();
   if(autoplay) announceAudio.play().catch(()=>{});
 }
 function setShortForLang(l, autoplay=false){
   const src = `audio/SHORTSTORY-${l}.mp3`;
-  if (shortAudio.src.endsWith(src)) { if(autoplay && shortAudio.paused) shortAudio.play().catch(()=>{}); return; }
-  shortAudio.pause(); shortAudio.src = src; updateMiniLabels();
+  if (shortAudio.src.endsWith(src)) {
+    if(autoplay && shortAudio.paused) shortAudio.play().catch(()=>{});
+    return;
+  }
+  shortAudio.pause();
+  shortAudio.src = src;            // лениво задаём src только при необходимости
+  updateMiniLabels();
   if(autoplay) shortAudio.play().catch(()=>{});
 }
 
@@ -56,7 +66,9 @@ export function init(root){
       if (announceAudio.paused){
         setAnnouncementForLang(langSel?.value || 'EN', true);
         document.dispatchEvent(new CustomEvent('pause-others', { detail: { except: announceAudio }}));
-      } else { announceAudio.pause(); }
+      } else {
+        announceAudio.pause();
+      }
       updateMiniLabels();
     });
     announceAudio.addEventListener('ended', updateMiniLabels);
@@ -66,7 +78,9 @@ export function init(root){
       if (shortAudio.paused){
         setShortForLang(langSel?.value || 'EN', true);
         document.dispatchEvent(new CustomEvent('pause-others', { detail: { except: shortAudio }}));
-      } else { shortAudio.pause(); }
+      } else {
+        shortAudio.pause();
+      }
       updateMiniLabels();
     });
     shortAudio.addEventListener('ended', updateMiniLabels);
@@ -75,14 +89,22 @@ export function init(root){
   // Первичная отрисовка подписей
   updateMiniLabels();
 
-  // >>> Новое: реагировать на смену языка без клика Play
+  // >>> ВАЖНО: на смену языка переключаем треки, если они СЕЙЧАС играют
   onLocaleChangedHandler = (e) => {
-    // Не меняем поведение плееров (не автопереключаем треки), только обновляем подписи и языковую подсказку
+    const l = e.detail?.lang || $('#lang')?.value || 'EN';
+    // если мини‑плеер воспроизводит — переключаемся на новый язык и продолжаем
+    if (!announceAudio.paused) {
+      setAnnouncementForLang(l, true);
+    }
+    if (!shortAudio.paused) {
+      setShortForLang(l, true);
+    }
+    // в любом случае обновим подписи и подсказки языка
     updateMiniLabels();
   };
   document.addEventListener('locale-changed', onLocaleChangedHandler);
 
-  // Реакция на глобальное «pause-others»
+  // Реакция на глобальное «pause-others» — ставим на паузу, если это не «исключение»
   onPauseOthers = (e)=>{
     const ex = e.detail?.except;
     [announceAudio, shortAudio].forEach(a => { if (a && a !== ex && !a.paused) a.pause(); });
