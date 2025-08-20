@@ -52,9 +52,13 @@ const langSelect = $('#lang');
     const l = e.target.value;
     localStorage.setItem('site_lang', l);
     const u = new URL(location.href); u.searchParams.set('lang', l); history.replaceState({}, '', u);
-    await loadLocale(l);
-    onLocaleChanged(l);
-    rerenderCurrentPage();
+
+    await loadLocale(l);          // подтянуть переводы и атрибуты <html>
+    onLocaleChanged(l);           // обновить глобальный аудио‑плеер (если играет)
+    rerenderCurrentPage();        // применить i18n к текущей подстранице
+
+    // >>> Новое: уведомляем страницы, что язык сменился
+    document.dispatchEvent(new CustomEvent('locale-changed', { detail: { lang: l } }));
   });
 
   // Стартуем роутер
