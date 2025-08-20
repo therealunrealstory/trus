@@ -1,6 +1,29 @@
 // /assets/js/core/pages/roadmap.js
-import { qs, createEl, on } from '../dom.js';
-import { getLocale, onLocaleChanged } from '../i18n.js';
+// Тоже уходим от именованных экспортов из ../dom.js, даём фолбэки.
+
+import * as DOM from '../dom.js';
+import * as I18N from '../i18n.js';
+
+const qs        = DOM.qs        || ((sel, root = document) => root.querySelector(sel));
+const createEl  = DOM.createEl  || ((tag, attrs = {}) => {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') el.className = v;
+    else if (k in el) el[k] = v;
+    else el.setAttribute(k, v);
+  }
+  return el;
+});
+const on        = DOM.on        || ((target, type, handler, opts) => {
+  target.addEventListener(type, handler, opts);
+  return () => target.removeEventListener(type, handler, opts);
+});
+
+const getLocale       = I18N.getLocale       || (() => (document.documentElement.lang || 'en'));
+const onLocaleChanged = I18N.onLocaleChanged || ((cb) => {
+  // Фолбэк: если нет события, ничего не делаем; возвращаем no-op unsubscriber
+  return () => {};
+});
 
 let cleanup = [];
 let state = { locale: null, data: null, i18n: null };
@@ -161,22 +184,29 @@ function makeBadge(text){
 }
 
 async function loadAll(){
-  const locale=getLocale();
-  state.locale=locale;
-  if(!state.data){ state.data=await loadJSON('/partials/roadmap.json'); }
-  const lc=(locale||'').toLowerCase();
-  state.i18n=await loadJSON(`/i18n/Roadmap/${lc}.json`).catch(()=>({}));
-  return mergeLocalized(state.data,state.i18n);
+  const locale = getLocale();
+  state.locale = locale;
+  if(!state.data){ state.data = await loadJSON('/partials/roadmap.json'); }
+  const lc = (locale || '').toLowerCase();
+  state.i18n = await loadJSON(`/i18n/Roadmap/${lc}.json`).catch(() => ({}));
+  return mergeLocalized(state.data, state.i18n);
 }
 
 export async function init({ mount } = {}){
-  const root=typeof mount==='string'?qs(mount):(mount||qs('#subpage'));
+  const root = typeof mount==='string' ? qs(mount) : (mount || qs('#subpage'));
   if(!root) return;
-  const page=createEl('section'); root.innerHTML=''; root.appendChild(page);
-  const merged=await loadAll(); render(page,merged,state.i18n);
-  const unSub=onLocaleChanged(async()=>{ const merged2=await loadAll(); render(page,merged2,state.i18n); });
+  const page = createEl('section');
+  root.innerHTML = '';
+  root.appendChild(page);
+  const merged = await loadAll();
+  render(page, merged, state.i18n);
+  const unSub = onLocaleChanged(async () => {
+    const merged2 = await loadAll();
+    render(page, merged2, state.i18n);
+  });
   cleanup.push(unSub);
-  const offDoc=on(document,'click',()=>{}); cleanup.push(offDoc);
+  const offDoc = on(document, 'click', () => {});
+  cleanup.push(offDoc);
 }
 
-export function destroy(){ cleanup.forEach(fn=>{ try{ fn(); }catch(e){} }); cleanup=[]; }
+export function destroy(){ cleanup.forEach(fn => { try{ fn(); } catch(e){} }); cleanup = []; }

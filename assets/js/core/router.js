@@ -1,8 +1,11 @@
 // /assets/js/core/router.js
-// SPA-роутер: partials → #subpage, lazy-страницы, подсветка активной кнопки,
-// делегирование кликов по [data-route], дефолтный хэш на старте.
+// Не полагаемся на именованные экспорты из dom.js — берём namespace и даём фолбэки.
 
-import { qs, qsa } from './dom.js';
+import * as DOM from './dom.js';
+
+// Фолбэки, если в dom.js нет нужных именованных экспортов
+const qs  = DOM.qs  || ((sel, root = document) => root.querySelector(sel));
+const qsa = DOM.qsa || ((sel, root = document) => Array.from(root.querySelectorAll(sel)));
 
 let current = { name: null, destroy: null };
 let navToken = 0;
@@ -24,7 +27,9 @@ async function fetchPartial(name, token) {
   const url = `/partials/${name}.json`;
   const res = await fetch(url, { cache: 'no-store' }).catch(() => null);
   if (token !== navToken) return null;
-  if (!res || !res.ok) return { html: `<div data-i18n="page.error">Не удалось загрузить страницу.</div>` };
+  if (!res || !res.ok) {
+    return { html: `<div data-i18n="page.error">Не удалось загрузить страницу.</div>` };
+  }
   const json = await res.json().catch(() => ({}));
   if (token !== navToken) return null;
   const html = json.html ?? json.markup ?? json.content ?? '';
@@ -73,7 +78,6 @@ export async function navigate(hash) {
 }
 
 async function onHashChange() {
-  // если хэш пуст — ставим дефолт
   if (!location.hash || location.hash === '#/' || location.hash === '#') {
     location.hash = '#/story';
     return;
@@ -85,7 +89,7 @@ async function onHashChange() {
 }
 
 export function init() {
-  // Делегирование кликов по [data-route] (кнопки в сабнавигации)
+  // Делегирование кликов по [data-route] — чтобы <button data-route> работали
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-route]');
     if (!btn) return;
@@ -99,8 +103,8 @@ export function init() {
   onHashChange(); // первый запуск
 }
 
-// Автоинициализация при первом подключении
-if (!window.__TRUS_ROUTER_BOOTSTRAPPED__) {
+// Автобут, если подключили напрямую отдельным модульным скриптом
+if (document.currentScript && !window.__TRUS_ROUTER_BOOTSTRAPPED__) {
   window.__TRUS_ROUTER_BOOTSTRAPPED__ = true;
   init();
 }
