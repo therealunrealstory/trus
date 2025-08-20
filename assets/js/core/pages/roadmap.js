@@ -1,5 +1,6 @@
 // /assets/js/core/pages/roadmap.js
-// Тоже уходим от именованных экспортов из ../dom.js, даём фолбэки.
+// Вкладка «Хронология»: совместима с init(mount) И init({ mount }),
+// не зависит от именованных экспортов dom.js.
 
 import * as DOM from '../dom.js';
 import * as I18N from '../i18n.js';
@@ -20,10 +21,7 @@ const on        = DOM.on        || ((target, type, handler, opts) => {
 });
 
 const getLocale       = I18N.getLocale       || (() => (document.documentElement.lang || 'en'));
-const onLocaleChanged = I18N.onLocaleChanged || ((cb) => {
-  // Фолбэк: если нет события, ничего не делаем; возвращаем no-op unsubscriber
-  return () => {};
-});
+const onLocaleChanged = I18N.onLocaleChanged || (() => () => {});
 
 let cleanup = [];
 let state = { locale: null, data: null, i18n: null };
@@ -34,10 +32,10 @@ async function loadJSON(path) {
   return res.json();
 }
 
-function esc(s) { return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-function fmtDate(iso) { if (!iso) return ''; try { return new Date(iso).toLocaleDateString(undefined, { year:'numeric', month:'short' }); } catch { return String(iso); } }
+function esc(s){ return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function fmtDate(iso){ if(!iso) return ''; try{ return new Date(iso).toLocaleDateString(undefined,{year:'numeric',month:'short'});}catch{return String(iso);} }
 
-function mergeLocalized(data, dict) {
+function mergeLocalized(data, dict){
   const clone = structuredClone(data ?? {});
   const mapItem = (it) => {
     if (!it || !it.id) return it;
@@ -56,13 +54,14 @@ function mergeLocalized(data, dict) {
 function statusLabel(s){ return (s==='done')?'done':(s==='current')?'current':(s==='planned')?'planned':(s==='tentative')?'tentative':(s||''); }
 function normalizeLabels(it){ if (Array.isArray(it.labels)&&it.labels.length) return it.labels.map(cleanLabel); if (typeof it.type==='string'&&it.type.trim()) return it.type.split('+').map(cleanLabel); return []; }
 function cleanLabel(s){ return (s||'').toString().trim().toLowerCase(); }
-function pretty(t){ const map={'rt':'RT','car‑t':'CAR‑T','car-t':'CAR‑T','tki':'TKI','mi':'MI'}; if (map[t]) return map[t]; return t.split(' ').map(w=>w?(w[0].toUpperCase()+w.slice(1)):w).join(' '); }
+function pretty(t){ const map={'rt':'RT','car‑t':'CAR‑T','car-t':'CAR‑T','tki':'TKI','mi':'MI'}; if(map[t]) return map[t]; return t.split(' ').map(w=>w?(w[0].toUpperCase()+w.slice(1)):w).join(' '); }
 function labelFromDates(it){ const a=fmtDate(it.date_start); const b=fmtDate(it.date_end); if(a&&b) return `${a} – ${b}`; return a||b||(it.year?String(it.year):'TBD'); }
 function confidenceDots(it){ if(!(it.status==='planned'||it.status==='tentative')) return ''; const c=(it.confidence||'').toLowerCase(); const dots=c==='high'?'<span class="roadmap-dot high"></span><span class="roadmap-dot high"></span><span class="roadmap-dot high"></span>':c==='medium'?'<span class="roadmap-dot medium"></span><span class="roadmap-dot medium"></span><span class="roadmap-dot"></span>':'<span class="roadmap-dot low"></span><span class="roadmap-dot"></span><span class="roadmap-dot"></span>'; return ` · confidence <span class="roadmap-conf">${dots}</span>`; }
 function sortByTime(a,b){ const getKey=(x)=>{ const y=Number(x.year)||0; const d=x.date_start||x.date_end||`${y}-01-01`; return `${y}-${d}`; }; return getKey(a)>getKey(b)?1:-1; }
 
 function render(container, data, dict){
   container.innerHTML='';
+
   const ui = dict?.ui || {};
   const tTitle=ui.page_title||'Treatment Roadmap';
   const tMetaUpd=ui.meta_updated||'Updated';
@@ -192,21 +191,32 @@ async function loadAll(){
   return mergeLocalized(state.data, state.i18n);
 }
 
-export async function init({ mount } = {}){
-  const root = typeof mount==='string' ? qs(mount) : (mount || qs('#subpage'));
-  if(!root) return;
+export async function init(mountArg){
+  // Принимаем: элемент | селектор | объект { mount }
+  let mount = mountArg;
+  if (mount && typeof mount === 'object' && 'mount' in mount) mount = mount.mount;
+  if (typeof mount === 'string') mount = qs(mount);
+  const root = mount || qs('#subpage');
+  if (!root) return;
+
   const page = createEl('section');
   root.innerHTML = '';
   root.appendChild(page);
+
   const merged = await loadAll();
   render(page, merged, state.i18n);
+
   const unSub = onLocaleChanged(async () => {
     const merged2 = await loadAll();
     render(page, merged2, state.i18n);
   });
   cleanup.push(unSub);
+
   const offDoc = on(document, 'click', () => {});
   cleanup.push(offDoc);
 }
 
-export function destroy(){ cleanup.forEach(fn => { try{ fn(); } catch(e){} }); cleanup = []; }
+export function destroy(){
+  cleanup.forEach(fn => { try{ fn(); } catch(e){} });
+  cleanup = [];
+}

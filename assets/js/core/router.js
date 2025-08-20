@@ -1,9 +1,9 @@
 // /assets/js/core/router.js
-// Не полагаемся на именованные экспорты из dom.js — берём namespace и даём фолбэки.
+// Надёжный SPA-роутер с делегированием кликов, дефолтным #/story,
+// совместим с pages/story.js|support.js|now.js (init(mount)) и pages/roadmap.js.
 
 import * as DOM from './dom.js';
 
-// Фолбэки, если в dom.js нет нужных именованных экспортов
 const qs  = DOM.qs  || ((sel, root = document) => root.querySelector(sel));
 const qsa = DOM.qsa || ((sel, root = document) => Array.from(root.querySelectorAll(sel)));
 
@@ -62,19 +62,30 @@ async function runRoute(name, token) {
   if (cfg.partial) {
     const partial = await fetchPartial(cfg.partial, token);
     if (token !== navToken || partial === null) return;
-    mount = mountHTML(partial.html);
+    mount = mountHTML(partial.html);                // ← получаем ЭЛЕМЕНТ
   } else {
     if (mount) mount.innerHTML = '';
   }
 
   const mod = await cfg.module();
   if (token !== navToken) return;
-  if (typeof mod?.init === 'function') await mod.init({ mount });
+
+  // ВАЖНО: передаём в init ИМЕННО ЭЛЕМЕНТ, а не объект { mount }
+  if (typeof mod?.init === 'function') await mod.init(mount);
+
   if (typeof mod?.destroy === 'function') current.destroy = mod.destroy;
 }
 
 export async function navigate(hash) {
   if (hash && location.hash !== hash) location.hash = hash;
+}
+
+// Требуется boot.js: перерисовать текущую страницу без смены hash
+export async function rerenderCurrentPage() {
+  if (!current.name) return;
+  navToken++;
+  const myToken = navToken;
+  await runRoute(current.name, myToken);
 }
 
 async function onHashChange() {
@@ -89,7 +100,7 @@ async function onHashChange() {
 }
 
 export function init() {
-  // Делегирование кликов по [data-route] — чтобы <button data-route> работали
+  // Делегирование кликов по [data-route] (кнопки сабнава)
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-route]');
     if (!btn) return;
@@ -103,10 +114,10 @@ export function init() {
   onHashChange(); // первый запуск
 }
 
-// Автобут, если подключили напрямую отдельным модульным скриптом
+// Автобут, если подключили напрямую модульным скриптом из index.html
 if (document.currentScript && !window.__TRUS_ROUTER_BOOTSTRAPPED__) {
   window.__TRUS_ROUTER_BOOTSTRAPPED__ = true;
   init();
 }
 
-export default { init, navigate };
+export default { init, navigate, rerenderCurrentPage };
