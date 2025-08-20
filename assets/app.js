@@ -103,11 +103,11 @@ const closeModal=()=> modal.classList.remove('show');
 $('#modalClose').onclick=closeModal; $('#modalOk').onclick=closeModal;
 modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
 
-// ---------- Practical help modal ----------
+// ---------- Practical help (modal) ----------
 $('#wantHelp')?.addEventListener('click', () => {
   openModal(
-    t('help.title', 'Practical help'),
-    t('help.body', 'We need nurses/caregivers, logistics and legal support. Write us in Telegram.')
+    t('modal.help.title', t('support.physical', 'Practical help')),
+    t('modal.help.body', 'If you are ready to help — whether legal, medical, or practical support (nurses, caregivers), or if you want to arrange a personal meeting — please write to: <a href=\"mailto:theRealUnrealStory@gmail.com\" class=\"underline\">theRealUnrealStory@gmail.com</a>.<br><br>We are sincerely grateful to everyone who responds.')
   );
 });
 
