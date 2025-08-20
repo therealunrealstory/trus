@@ -1,8 +1,8 @@
 {
   "meta": {
-    "updated_at": "2025-08-20T20:45:00Z",
+    "updated_at": "2025-08-20T22:40:00Z",
     "updated_by": "Nico",
-    "version": "v1.3",
+    "version": "v1.5",
     "lang_default": "en"
   },
   "items": [
@@ -14,8 +14,8 @@
       "date_start": "2019-01-15",
       "date_end": "2019-03-01",
       "when_label": "Jan–Mar 2019",
-      "title": "Primary diagnosis and staging",
-      "summary": "Initial workup confirmed lymphoma; baseline tests and staging completed.",
+      "title": "Primary diagnosis — T‑lymphoblasts (lymphoma); staging",
+      "summary": "Initial workup confirmed lymphoma with T‑lymphoblastic features; baseline tests and staging completed.",
       "details": "Hematology consult, imaging and biopsies established the diagnosis and stage. Baseline cardiac and lab assessment recorded before therapy."
     },
     {
@@ -26,9 +26,9 @@
       "date_start": "2019-03-10",
       "date_end": "2019-08-20",
       "when_label": "Mar–Aug 2019",
-      "title": "R‑CHOP chemotherapy (6 cycles)",
-      "summary": "First‑line regimen completed with supportive care.",
-      "details": "Six cycles ~q21d. Interim imaging showed response; end‑of‑treatment assessment documented best response."
+      "title": "Chemotherapy against lymphoma (T‑lymphoblastic)",
+      "summary": "First‑line systemic chemotherapy with supportive care.",
+      "details": "Cycles administered on schedule with interim response checks and end‑of‑treatment assessment documenting best response."
     },
     {
       "id": "2020-04-relapse-mi",
@@ -115,6 +115,18 @@
       "details": "High fever, vomiting, transient leg paralysis, cardiac event and profound memory loss consistent with neurotoxicity; gradual recovery thereafter."
     },
     {
+      "id": "2024-01-allo-sct-brother-bradonor",
+      "year": 2024,
+      "type": "transplant",
+      "status": "done",
+      "date_start": "2024-01-01",
+      "date_end": "2024-02-01",
+      "when_label": "Jan 2024",
+      "title": "Allogeneic stem‑cell infusion — brother donor (BRADONOR)",
+      "summary": "Allogeneic stem cells infused as consolidation after CAR‑T.",
+      "details": "Engraftment phase under strict infection control; outpatient recovery thereafter."
+    },
+    {
       "id": "2024-02-abdominal-mass-hl",
       "year": 2024,
       "type": "diagnosis",
@@ -134,21 +146,9 @@
       "date_start": "2024-08-01",
       "date_end": "2024-12-31",
       "when_label": "Aug–Dec 2024",
-      "title": "Escalated chemo → septic complication → switch to effective regimen; radiotherapy x30",
+      "title": "Escalated chemo → septic complication → switch to effective regimen; radiotherapy ×30",
       "summary": "Initial heavy dose caused sepsis; switched to better‑tolerated regimen; adjuvant radiotherapy (30 sessions).",
       "details": "After septic episode, regimen adjusted; subsequent cycles showed effect. Radiotherapy added for consolidation."
-    },
-    {
-      "id": "2025-01-allo-sct-brother",
-      "year": 2025,
-      "type": "transplant",
-      "status": "done",
-      "date_start": "2025-01-01",
-      "date_end": "2025-02-01",
-      "when_label": "Jan 2025",
-      "title": "Allogeneic stem‑cell infusion (brother donor)",
-      "summary": "Allo stem cells infused as part of consolidation strategy.",
-      "details": "Engraftment phase under strict infection control; outpatient recovery thereafter."
     },
     {
       "id": "2025-06-relapse-Ph-pos",
@@ -179,7 +179,7 @@
       "year": 2025,
       "type": "rehab",
       "status": "planned",
-      "confidence": "medium",
+      "confidence": "high",
       "date_start": null,
       "date_end": null,
       "when_label": "Post‑chemo (TBD)",
@@ -205,7 +205,7 @@
       "year": 2025,
       "type": "other",
       "status": "tentative",
-      "confidence": "low",
+      "confidence": "high",
       "date_start": null,
       "date_end": null,
       "when_label": "If indicated (TBD)",
@@ -214,11 +214,37 @@
       "details": "To be discussed by tumor board; depends on imaging and prior dose constraints."
     },
     {
+      "id": "plan-2025-chemo-switch",
+      "year": 2025,
+      "type": "chemotherapy",
+      "status": "tentative",
+      "confidence": "low",
+      "date_start": null,
+      "date_end": null,
+      "when_label": "If current regimen underperforms (TBD)",
+      "title": "Possible switch of current chemotherapy protocol",
+      "summary": "Protocol change may be required based on response or toxicity.",
+      "details": "Decision after reassessment of labs, imaging and tolerance; alternative protocol to be selected if indicated."
+    },
+    {
+      "id": "plan-2025-next-line-chemo",
+      "year": 2025,
+      "type": "chemotherapy",
+      "status": "tentative",
+      "confidence": "low",
+      "date_start": null,
+      "date_end": null,
+      "when_label": "If needed (TBD)",
+      "title": "Possible additional chemotherapy line",
+      "summary": "Another line may be required depending on disease dynamics.",
+      "details": "To be defined by tumor board after current course evaluation."
+    },
+    {
       "id": "plan-2026-repeat-allo-sct",
       "year": 2026,
       "type": "transplant",
       "status": "tentative",
-      "confidence": "low",
+      "confidence": "medium",
       "date_start": null,
       "date_end": null,
       "when_label": "2026 (possible)",
@@ -228,6 +254,6 @@
     }
   ],
   "changelog": [
-    { "date": "2025-08-20", "note": "Medical‑only roadmap built from history; added future options: lifelong TKI, potential re‑irradiation, possible repeat allo‑SCT. Current step: oral multi‑agent chemo (14 doses)." }
+    { "date": "2025-08-20", "note": "Adjusted 2019 chemo title (no R-CHOP); made T‑lymphoblasts explicit in initial diagnosis; kept BRADONOR at Jan 2024 after CAR‑T; updated confidence levels; added potential chemo protocol switch and possible additional chemo line; Now section to be open by default in UI." }
   ]
 }
