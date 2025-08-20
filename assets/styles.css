@@ -10,9 +10,47 @@ body{
 header{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
 section, footer{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
 
-/* ---------- Icon buttons ---------- */
+/* ---------- Icon buttons (base) ---------- */
 .icon-btn{ display:inline-flex; align-items:center; gap:8px }
 .icon-btn svg{ width:18px; height:18px }
+
+/* ---------- Social buttons: icon-only ---------- */
+.icon-btn.social-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  width:36px;
+  height:36px;
+
+  border-radius:0.75rem; /* rounded-xl */
+  border:1px solid rgba(255,255,255,.15);
+  background:rgba(0,0,0,0.40);
+  box-shadow:0 1px 2px rgba(0,0,0,0.35);
+
+  color:rgba(255,255,255,0.9);  /* SVG inherits currentColor */
+  -webkit-tap-highlight-color:transparent;
+  transition:color .15s ease, border-color .15s ease, background-color .15s ease, transform .02s ease;
+}
+.icon-btn.social-btn svg{
+  width:22px;  /* up from 18px */
+  height:22px;
+  display:block;
+}
+.icon-btn.social-btn:hover,
+.icon-btn.social-btn:focus-visible{
+  color:#4f46e5; /* Indigo 600 */
+  border-color:rgba(79,70,229,0.45);
+  background:rgba(79,70,229,0.10);
+  outline:none;
+  box-shadow:0 0 0 2px rgba(79,70,229,0.25);
+}
+.icon-btn.social-btn:active{
+  color:#4f46e5;
+  border-color:rgba(79,70,229,0.55);
+  background:rgba(79,70,229,0.16);
+  transform:translateY(1px);
+}
 
 /* ---------- Tiles with overlay ---------- */
 .tile{
@@ -66,21 +104,24 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
   align-items:center;
 }
 
+/* Increased by ~25% and tinted Indigo */
 .subnav-btn{
-  --subnav-bg: rgba(79, 70, 229, 0.15);       /* лёгкий индиго */
-  --subnav-bg-hover: rgba(79, 70, 229, 0.25); /* при наведении немного темнее */
-  --subnav-bg-active: rgba(79, 70, 229, 0.35);/* активная кнопка ещё темнее */
-  --subnav-border: rgba(79, 70, 229, 0.35);   /* обводка тоже индиго */
+  /* Indigo 600 (#4f46e5) with transparency */
+  --subnav-bg: rgba(79, 70, 229, 0.15);
+  --subnav-bg-hover: rgba(79, 70, 229, 0.25);
+  --subnav-bg-active: rgba(79, 70, 229, 0.35);
+  --subnav-border: rgba(79, 70, 229, 0.35);
   --subnav-text: #fff;
 
   background: var(--subnav-bg);
   border: 1px solid var(--subnav-border);
   color: var(--subnav-text);
 
-  padding: 0.5rem 1rem;
+  /* +25% vs previous (0.5/1 → 0.625/1.25; 0.875rem → 1.09375rem) */
+  padding: 0.625rem 1.25rem;
   border-radius: 0.75rem;
-  font-weight: 500;
-  font-size: 0.875rem;
+  font-weight: 600;
+  font-size: 1.09375rem;
   line-height: 1.2;
   white-space: nowrap;
 
@@ -97,11 +138,11 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
 }
 .subnav-btn:hover{ background: var(--subnav-bg-hover); }
 .subnav-btn:active{ background: var(--subnav-bg-active); transform: translateY(1px); }
-.subnav-btn:focus-visible{ outline: 2px solid rgba(99,102,241,0.75); outline-offset: 2px; }
+.subnav-btn:focus-visible{ outline: 2px solid rgba(79,70,229,0.75); outline-offset: 2px; }
 
 .subnav-btn[aria-current="page"]{
   background: var(--subnav-bg-active);
-  border-color: #818cf8;
+  border-color: #818cf8; /* индиго рамка у активной */
   box-shadow: 0 0 0 2px rgba(99,102,241,0.35);
 }
 
