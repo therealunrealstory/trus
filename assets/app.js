@@ -103,6 +103,14 @@ const closeModal=()=> modal.classList.remove('show');
 $('#modalClose').onclick=closeModal; $('#modalOk').onclick=closeModal;
 modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
 
+// ---------- Practical help modal ----------
+$('#wantHelp')?.addEventListener('click', () => {
+  openModal(
+    t('help.title', 'Practical help'),
+    t('help.body', 'We need nurses/caregivers, logistics and legal support. Write us in Telegram.')
+  );
+});
+
 // ---------- overlay tiles ----------
 const tileEls = [$('#tile1'), $('#tile2'), $('#tile3')];
 function lockOverlay(idx, lock){ const el = tileEls[idx]; if(!el) return; el.classList.toggle('overlay-off', !!lock); }
