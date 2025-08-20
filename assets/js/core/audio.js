@@ -1,3 +1,4 @@
+// assets/js/core/audio.js
 import { $ } from './dom.js';
 import { I18N, DEFAULT_I18N } from './i18n.js';
 
@@ -14,9 +15,13 @@ export function updateAudioLabels(){
 
 export function setMainAudioForLang(l, autoplay=false){
   const src = `audio/ORUS-${l}.mp3`;
-  if (bgAudio.src.endsWith(src)) { if (autoplay && bgAudio.paused) bgAudio.play().catch(()=>{}); return; }
+  // Не трогаем src без нужды; меняем только когда реально запускаем или уже играем
+  if (bgAudio.src.endsWith(src)) { 
+    if (autoplay && bgAudio.paused) bgAudio.play().catch(()=>{});
+    return; 
+  }
   bgAudio.pause();
-  bgAudio.src = src;
+  bgAudio.src = src;            // src задаётся только по нажатию или когда уже играет
   if (autoplay) bgAudio.play().catch(()=>{});
 }
 
@@ -27,7 +32,7 @@ export function pauseOthers(except){
 audioBtn?.addEventListener('click', ()=>{
   if (bgAudio.paused){
     setMainAudioForLang(langSelect?.value || 'EN', true);
-    pauseOthers(bgAudio);
+    pauseOthers(bgAudio);       // сообщаем мини‑плеерам остановиться
   } else {
     bgAudio.pause();
   }
@@ -35,6 +40,16 @@ audioBtn?.addEventListener('click', ()=>{
 });
 
 export function onLocaleChanged(newLang){
+  // Меняем источник только если глобальный плеер сейчас играет
   if (!bgAudio.paused) setMainAudioForLang(newLang, true);
   updateAudioLabels();
 }
+
+/* === НОВОЕ: реагируем на чужой запрос "поставить на паузу" === */
+document.addEventListener('pause-others', (e)=>{
+  const ex = e.detail?.except;
+  if (bgAudio && !bgAudio.paused && bgAudio !== ex) {
+    bgAudio.pause();
+    updateAudioLabels();
+  }
+});
