@@ -34,7 +34,7 @@ function setAnnouncementForLang(l, autoplay=false){
     return;
   }
   announceAudio.pause();
-  announceAudio.src=src;           // лениво задаём src только при необходимости
+  announceAudio.src=src;           // лениво: src ставим только по делу
   updateMiniLabels();
   if(autoplay) announceAudio.play().catch(()=>{});
 }
@@ -45,7 +45,7 @@ function setShortForLang(l, autoplay=false){
     return;
   }
   shortAudio.pause();
-  shortAudio.src = src;            // лениво задаём src только при необходимости
+  shortAudio.src = src;            // лениво: src ставим только по делу
   updateMiniLabels();
   if(autoplay) shortAudio.play().catch(()=>{});
 }
@@ -89,22 +89,16 @@ export function init(root){
   // Первичная отрисовка подписей
   updateMiniLabels();
 
-  // >>> ВАЖНО: на смену языка переключаем треки, если они СЕЙЧАС играют
+  // >>> При смене языка: если плеер играет — переключаемся и продолжаем
   onLocaleChangedHandler = (e) => {
     const l = e.detail?.lang || $('#lang')?.value || 'EN';
-    // если мини‑плеер воспроизводит — переключаемся на новый язык и продолжаем
-    if (!announceAudio.paused) {
-      setAnnouncementForLang(l, true);
-    }
-    if (!shortAudio.paused) {
-      setShortForLang(l, true);
-    }
-    // в любом случае обновим подписи и подсказки языка
+    if (!announceAudio.paused) setAnnouncementForLang(l, true);
+    if (!shortAudio.paused)    setShortForLang(l, true);
     updateMiniLabels();
   };
   document.addEventListener('locale-changed', onLocaleChangedHandler);
 
-  // Реакция на глобальное «pause-others» — ставим на паузу, если это не «исключение»
+  // Когда другие плееры просят «паузу» — останавливаемся
   onPauseOthers = (e)=>{
     const ex = e.detail?.except;
     [announceAudio, shortAudio].forEach(a => { if (a && a !== ex && !a.paused) a.pause(); });
