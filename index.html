@@ -1,306 +1,231 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>The Real Unreal Story — support for Adam</title>
-  <meta name="description" content="The Real Unreal Story — the true story of a surgeon who saved others all his life and is now fighting for his own." />
-
-  <!-- Hreflang -->
-  <link rel="alternate" hreflang="x-default" href="?lang=EN">
-  <link rel="alternate" hreflang="en" href="?lang=EN">
-  <link rel="alternate" hreflang="es" href="?lang=ES">
-  <link rel="alternate" hreflang="fr" href="?lang=FR">
-  <link rel="alternate" hreflang="it" href="?lang=IT">
-  <link rel="alternate" hreflang="de" href="?lang=DE">
-  <link rel="alternate" hreflang="pt" href="?lang=PT">
-  <link rel="alternate" hreflang="ru" href="?lang=RU">
-  <link rel="alternate" hreflang="zh" href="?lang=CN">
-  <link rel="alternate" hreflang="ar" href="?lang=AR">
-
-  <!-- PWA / Icons -->
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <!-- ✅ фикс имени файла: -->
-  <link rel="icon" sizes="32x32" href="favicon-32x32.png">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="manifest" href="site.webmanifest">
-  <meta name="theme-color" content="#0b0b0b">
-
-  <!-- iOS A2HS -->
-  <meta name="apple-mobile-web-app-title" content="The Real Unreal Story">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>The Real Unreal Story — помощь Адаму</title>
+  <meta name="description" content="The Real Unreal Story — правдивая история хирурга, который всю жизнь спасал других, а теперь сам борется за жизнь." />
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- CSS библиотек (лёгкие) -->
+  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- Наши стили -->
+  <!-- Splide -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+  <!-- Icons & styles -->
+  <link rel="icon" href="favicon-32x32.png" sizes="32x32">
+  <link rel="icon" href="android-chrome-192x192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
   <link rel="stylesheet" href="assets/styles.css">
 </head>
-<body class="text-white">
-
-  <!-- HEADER -->
-  <header class="max-w-5xl mx-auto px-4 py-6">
-    <div class="flex items-center justify-between gap-3">
-      <div id="hashtagBtn" class="font-mono text-xs sm:text-sm text-white/90 cursor-pointer select-none flex items-center" title="#TheRealUnrealStory" aria-label="#TheRealUnrealStory">
-        <span id="hashtagType">#TheRealUnrealStory</span><span class="hashtag-caret ml-0.5">|</span>
+<body class="bg-slate-950 text-slate-100 antialiased">
+  <!-- ======= ШАПКА / INTRO ======= -->
+  <header class="max-w-6xl mx-auto px-4 md:px-6 pt-6">
+    <!-- 1) Хэштег + музыка + выбор языка -->
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div class="flex items-center gap-2">
+        <img src="android-chrome-192x192.png" alt="" class="inline-block align-middle h-[1.5em] w-auto mr-2">
+        <h1 class="text-xl md:text-2xl font-semibold">
+          <span class="opacity-80">#</span><span class="text-indigo-400" data-i18n="hero.hashtag">TheRealUnrealStory</span>
+        </h1>
       </div>
-      <div class="flex gap-2 items-end sm:items-center sm:flex-row flex-col">
-        <button id="installBtn" class="px-4 py-2 rounded-xl border border-indigo-500 text-indigo-300 hover:bg-indigo-600/10 text-sm hidden" data-i18n="btn.install">Install app</button>
-        <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse" data-i18n="audio.play">Story in music</button>
-        <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
-          <optgroup label="Languages">
-            <option value="EN" selected>EN</option><option value="ES">ES</option><option value="FR">FR</option>
-            <option value="PT">PT</option><option value="DE">DE</option><option value="IT">IT</option>
-            <option value="RU">RU</option><option value="CN">CN</option><option value="AR">AR</option>
-          </optgroup>
-        </select>
+      <div class="flex items-center gap-3">
+        <button id="musicBtn" class="btn-ghost" data-i18n="hero.music">История в музыке</button>
+        <nav class="flex items-center gap-2 text-sm">
+          <a href="?lang=RU" class="lang-link" data-lang="RU">RU</a>
+          <span class="opacity-50">|</span>
+          <a href="?lang=EN" class="lang-link" data-lang="EN">EN</a>
+        </nav>
       </div>
     </div>
+
+    <!-- 2) Соцсети -->
+    <div class="mt-5 flex flex-wrap items-center gap-3 text-sm opacity-90">
+      <a href="https://instagram.com/theRealUnrealStory" target="_blank" rel="noopener" class="social">Instagram</a>
+      <a href="https://t.me/theRealUnrealStory" target="_blank" rel="noopener" class="social">Telegram</a>
+      <a href="https://www.youtube.com/@theRealUnrealStory" target="_blank" rel="noopener" class="social">YouTube</a>
+      <a href="https://t.me/theRealUnrealStory" target="_blank" rel="noopener" class="social">Updates TG</a>
+    </div>
+
+    <!-- 3) Навигация: Story | Live | Donate -->
+    <nav class="mt-6 border-t border-white/10 pt-4 flex items-center gap-4 text-sm">
+      <a href="#story" class="tab-link" data-route="story" data-i18n="nav.story">Story</a>
+      <a href="#live" class="tab-link" data-route="live" data-i18n="nav.live">Live</a>
+      <a href="#story-donate" class="btn-primary ml-auto" data-i18n="nav.donate">Donate</a>
+    </nav>
   </header>
 
-  <!-- Соцсети -->
-  <section class="max-w-5xl mx-auto px-4">
-    <div class="flex items-center gap-3">
-      <div class="flex items-center gap-3 flex-wrap grow">
-        <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 shadow-sm" href="https://instagram.com/theRealUnrealStory" target="_blank" rel="noreferrer">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2.2A2.8 2.8 0 1 0 12 15.8 2.8 2.8 0 0 0 12 9.2zm4.8-2.5a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2z"/></svg>
-          Instagram
-        </a>
-        <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 shadow-sm" href="https://t.me/theRealUnrealStory" target="_blank" rel="noreferrer">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9.96 15.47l-.4 5.63c.57 0 .81-.24 1.1-.53l2.64-2.53 5.47 4c1.01.56 1.73.27 2-.93l3.62-16.97c.32-1.5-.54-2.08-1.52-1.72L1.2 9.65c-1.46.57-1.44 1.39-.25 1.76l5.54 1.73 12.85-8.11c.6-.39 1.15-.17.7.22"/></svg>
-          Telegram
-        </a>
-        <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 shadow-sm" href="https://www.youtube.com/@theRealUnrealStory" target="_blank" rel="noreferrer">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .6 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.3.6 9.3.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.6-5.8zM9.6 15.5v-7l6.2 3.5-6.2 3.5z"/></svg>
-          YouTube
-        </a>
-        <a class="icon-btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 shadow-sm" href="https://open.spotify.com" target="_blank" rel="noreferrer">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1.5a10.5 10.5 0 1 0 0 21 10.5 10.5 0 0 0 0-21zm4.84 15.2c-.19.3-.6.39-.9.2-2.44-1.5-5.52-1.84-9.13-1-.35.08-.7-.14-.78-.5-.08-.35.14-.7.5-.78 3.93-.9 7.34-.51 10.02 1.15.3.18.4.6.2.92zm1.28-2.88c-.24.38-.75.5-1.13.26-2.8-1.72-7.08-2.23-10.4-1.2-.43.13-.88-.11-1-.54-.13-.43.1-.88.54-1 3.76-1.12 8.45-.54 11.67 1.4.4.24.52.76.3 1.08zm.1-3.1c-3.23-1.92-8.6-2.1-11.69-1.14-.5.15-1.04-.14-1.2-.66-.15-.5.14-1.04.66-1.2 3.57-1.1 9.46-.86 13.2 1.37.47.28.63.9.35 1.36-.28.48-.9.63-1.32.27z"/></svg>
-          Spotify
-        </a>
-      </div>
-    </div>
-  </section>
+  <!-- ======= ОСНОВНОЙ КОНТЕНТ ======= -->
+  <main class="max-w-6xl mx-auto px-4 md:px-6 pb-24">
 
-  <main class="max-w-5xl mx-auto px-4">
-    <!-- HERO -->
-    <section id="hero">
-      <h1 class="text-2xl md:text-4xl font-semibold leading-tight">
-        <!-- маленькая иконка слева от заголовка -->
-			<img
-			  src="android-chrome-192x192.png"
-			  alt=""
-			  class="inline-block align-bottom h-[1em] w-auto mr-1"
-			>
-			The Real Unreal Story — 
-			<span class="text-indigo-600" data-i18n="hero.titleRest">support for Adam</span>
-			<span class="align-super text-white/80 text-sm">*</span>
-      </h1>
-      <p class="mt-4" data-i18n="hero.lead1">
-        The true story of a surgeon who spent his life saving others and is now fighting for his own life.
-      </p>
-      <p class="mt-2 text-xs text-gray-300" data-i18n="hero.note">
-        * “Adam” is a pseudonym of a real person. The name has been changed to protect privacy.
-      </p>
-      <div class="mt-5 flex flex-wrap items-center gap-3">
-        <a id="donateHero" target="_blank" class="px-4 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-sm font-medium" data-i18n="btn.donate">Donate</a>
-        <button id="shareBtn" class="px-4 py-2 rounded-xl bg-gray-200 text-black text-sm hover:opacity-90" data-i18n="btn.share">Share</button>
+    <!-- === РЕЖИМ: STORY === -->
+    <section id="story" data-mode="story" class="mode-block mt-10">
+      <!-- Анонс/введение -->
+      <div class="prose-invert max-w-none space-y-4">
+        <h2 class="text-3xl font-semibold" data-i18n="story.title">The Real Unreal Story — помощь Адаму</h2>
+        <p class="opacity-90" data-i18n="story.lead">
+          Правдивая история хирурга, который всю жизнь спасал других, а теперь сам борется за жизнь.
+        </p>
       </div>
-    </section>
 
-    <!-- ТАЙЛЫ -->
-    <section>
-      <div class="grid md:grid-cols-3 gap-4">
-        <div id="tile1" class="tile" style="background-image:url('images/1.png')"><span data-i18n="tiles.me">I’m Nico</span></div>
-        <div id="tile2" class="tile" style="background-image:url('images/2.png')"><span data-i18n="tiles.about">About Adam</span></div>
-        <div id="tile3" class="tile" style="background-image:url('images/3.png')"><span data-i18n="tiles.others">Other people in the story</span></div>
-      </div>
-    </section>
+      <!-- Основной рассказ/тайлы (до середины 2025) -->
+      <section class="mt-8" id="story-tiles">
+        <h3 class="section-title" data-i18n="story.tilesTitle">История до середины 2025</h3>
+        <div id="tilesContainer" class="grid gap-4 md:grid-cols-2">
+          <!-- (Оставьте ваш существующий контент тайлов из v190825) -->
+        </div>
+      </section>
 
-    <!-- АУДИО-АНОНС -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4" data-i18n="announce.title">Our story announcement</h2>
-      <div class="rounded-2xl border border-gray-700 p-4 flex items-center gap-3" style="background:rgba(0,0,0,0.35)">
-        <button id="announceBtn" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm pulse" data-i18n="announce.play">▶︎ Play</button>
-        <div class="text-sm text-gray-200" data-i18n="announce.short">Short audio announcement</div>
-        <div id="announceStatus" class="ml-auto text-xs text-gray-300"></div>
-      </div>
-      <audio id="announceAudio" preload="none"></audio>
-    </section>
+      <!-- «История продолжается сейчас» — реальные карточки из вашего TG-эндпоинта -->
+      <section class="mt-12" id="story-now">
+        <h3 class="section-title" data-i18n="story.nowTitle">История продолжается сейчас</h3>
+        <p class="section-desc" data-i18n="story.nowDesc">Короткие обновления — продолжение истории в реальном времени.</p>
 
-    <!-- ВИДЕО -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4" data-i18n="video.title">Video teaser</h2>
-      <div class="video-wrap">
-        <iframe src="https://www.youtube.com/embed/9bWXMziCmXk" title="YouTube video" frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen></iframe>
-      </div>
-    </section>
+        <div id="storyNowFeed" class="stacked-list">
+          <!-- Сюда подгрузятся карточки с /.netlify/functions/news (мы перенесли сюда «Новости») -->
+        </div>
 
-    <!-- КРАТКАЯ АУДИО-ВЕРСИЯ -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4" data-i18n="short.title">Short version of our story</h2>
-      <div class="rounded-2xl border border-gray-700 p-4 flex items-center gap-3" style="background:rgba(0,0,0,0.35)">
-        <button id="shortBtn" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm pulse" data-i18n="short.play">▶︎ Play</button>
-        <div class="text-sm text-gray-200" data-i18n="short.note">About the events from early 2019 to mid-2025.</div>
-        <div id="shortStatus" class="ml-auto text-xs text-gray-300"></div>
-      </div>
-      <audio id="shortAudio" preload="none"></audio>
-    </section>
+        <!-- Ссылка на TG-канал (как было) -->
+        <div class="mt-4">
+          <a href="https://t.me/theRealUnrealStory" target="_blank" rel="noreferrer"
+             class="px-4 py-2 rounded-xl bg-sky-600 text-white text-sm hover:bg-sky-700" data-i18n="news.follow">
+            Следить в Telegram
+          </a>
+        </div>
+      </section>
 
-    <!-- ПОДДЕРЖАТЬ СЕЙЧАС -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4" data-i18n="support.title">Support now</h2>
-      <div class="grid md:grid-cols-2 gap-4">
-        <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
-          <div class="text-2xl mb-2">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M12 21s-6-4.35-8.28-8A5 5 0 0 1 12 5a5 5 0 0 1 8.28 8C18 16.65 12 21 12 21Z"/>
-            </svg>
-          </div>
-          <div class="font-medium mb-2" data-i18n="support.money">Donate funds</div>
-          <div class="flex flex-wrap gap-2">
-            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=5">$5</a>
-            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=10">$10</a>
-            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=25">$25</a>
-            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=50">$50</a>
-            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=100">$100</a>
-            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=250">$250</a>
-            <a class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm" target="_blank" href="https://www.gofundme.com/f/your-campaign-slug/donate?amount=500">$500</a>
+      <!-- Донат -->
+      <section class="mt-12" id="story-donate">
+        <h3 class="section-title" data-i18n="donate.title">Поддержите Адама</h3>
+        <p class="section-desc" data-i18n="donate.lead">Каждый вклад важен: деньгами, временем, делом или словом.</p>
+
+        <div class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3" id="donate-presets">
+          <button class="pill" data-amount="10">10€</button>
+          <button class="pill" data-amount="25">25€</button>
+          <button class="pill" data-amount="50">50€</button>
+          <button class="pill" data-amount="100">100€</button>
+        </div>
+
+        <div class="mt-4 flex items-center gap-3 text-sm">
+          <label class="inline-flex items-center gap-2">
+            <input type="checkbox" id="donate-recurring" class="accent-indigo-500">
+            <span data-i18n="donate.recurring">Ежемесячно</span>
+          </label>
+          <span class="opacity-60">|</span>
+          <button id="donateNowBtn" class="btn-primary" data-i18n="donate.cta">Пожертвовать</button>
+        </div>
+
+        <!-- FAQ -->
+        <div class="mt-10">
+          <h4 class="text-lg font-semibold mb-3" data-i18n="faq.title">Перед пожертвованием</h4>
+          <details class="faq"><summary data-i18n="faq.q1">Куда идут средства?</summary><div data-i18n="faq.a1">На лечение, реабилитацию и жизненно важные расходы.</div></details>
+          <details class="faq"><summary data-i18n="faq.q2">Есть ли отчётность?</summary><div data-i18n="faq.a2">Да — в разделе Live публикуем краткие отчёты и покупки.</div></details>
+          <details class="faq"><summary data-i18n="faq.q3">Можно ли ежемесячно?</summary><div data-i18n="faq.a3">Да — отметьте «Ежемесячно», и мы учтём это в апдейтах.</div></details>
+          <details class="faq"><summary data-i18n="faq.q4">Можно помочь не деньгами?</summary><div data-i18n="faq.a4">Да. Нужны медсёстры/сиделки, логистика, юр.помощь.</div></details>
+          <details class="faq"><summary data-i18n="faq.q5">Как получать апдейты?</summary><div data-i18n="faq.a5">Подпишитесь на Live или Telegram‑канал.</div></details>
+        </div>
+      </section>
+
+      <!-- Карусель «сердец» -->
+      <section class="mt-12" id="hearts">
+        <h3 class="section-title" data-i18n="hearts.title">Слова поддержки</h3>
+        <div class="splide" id="heartsSplide" aria-label="Support carousel">
+          <div class="splide__track">
+            <ul class="splide__list">
+              <li class="splide__slide">❤️ Спасибо всем, кто рядом</li>
+              <li class="splide__slide">❤️ Мы видим вашу поддержку</li>
+              <li class="splide__slide">❤️ Каждое доброе слово важно</li>
+            </ul>
           </div>
         </div>
+      </section>
 
-        <div class="p-5 rounded-2xl border border-gray-700" style="background:rgba(0,0,0,0.35)">
-          <div class="text-2xl mb-2">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-          </div>
-          <div class="font-medium mb-2" data-i18n="support.physical">Practical help</div>
-          <button id="wantHelp" class="text-sm underline" data-i18n="btn.wantHelp">I want to help</button>
-        </div>
-      </div>
+      <!-- Карта поддержки -->
+      <section class="mt-12" id="support-map">
+        <h3 class="section-title" data-i18n="map.title">Карта поддержки</h3>
+        <div id="map" class="map"></div>
+      </section>
     </section>
 
-    <!-- НОВОСТИ -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4" data-i18n="news.title">News</h2>
-      <div id="tgFeed" class="rounded-2xl border border-gray-700 p-4" style="background:rgba(0,0,0,0.35); max-height:560px; overflow-y:auto;">
-        <div class="text-sm text-gray-300" data-i18n="feed.loading">Loading news…</div>
-      </div>
-      <div class="mt-4">
-        <a href="https://t.me/theRealUnrealStory" target="_blank" rel="noreferrer" class="px-4 py-2 rounded-xl bg-sky-600 text-white text-sm hover:bg-sky-700" data-i18n="news.follow">
-          Follow our story on Telegram
-        </a>
-      </div>
-    </section>
-
-    <!-- ВОВЛЕЧЁННОСТЬ -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4" data-i18n="engage.title">Your engagement</h2>
-      <p class="text-sm text-gray-200 mb-3" data-i18n="engage.desc">Mark what you've already done — that’s support too ❤️</p>
-      <div id="engageWrap" class="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b1">Read/listened to the short version</button>
-        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b2">Read/listened to the full story</button>
-        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b3">Listened to tracks about our story</button>
-        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b4">Subscribed to the Telegram channel</button>
-        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b5">Subscribed to Instagram</button>
-        <button class="eng-btn px-4 py-3 rounded-xl border border-gray-700 bg-gray-800/60 text-left" data-i18n="engage.b6">Shared the story</button>
-      </div>
-      <p class="mt-2 text-xs text-gray-300" data-i18n="engage.note">Your selections are saved in your browser.</p>
-    </section>
-
-    <!-- КАРТА -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M2 12h20" />
-          <path d="M12 2a15.3 15.3 0 0 1 0 20" />
-          <path d="M12 2a15.3 15.3 0 0 0 0 20" />
-        </svg>
-        <span data-i18n="map.title">Support map</span>
-      </h2>
-
-      <!-- кнопка геолокации -->
-      <div class="mb-2">
-        <button id="locateBtn" class="px-3 py-2 rounded-xl bg-gray-800/70 border border-gray-700 text-sm" data-i18n="map.locate">Show my location</button>
-      </div>
-
-      <div id="map" class="rounded-2xl shadow-sm border" style="background:#0b0b0b; height:360px"></div>
-      <p class="text-xs text-gray-300 mt-2" data-i18n="map.tip">Be sure to click on the map to specify the exact place of your support.</p>
-      <div class="mt-4 grid md:grid-cols-3 gap-3">
-        <input id="name" class="px-3 py-2 rounded-xl border bg-gray-800/70 text-white" data-i18n-placeholder="placeholder.name" placeholder="Name" />
-        <input id="msg" class="px-3 py-2 rounded-2xl border bg-gray-800/70 text-white md:col-span-2" data-i18n-placeholder="placeholder.msg" placeholder="Message (up to 140 characters)" maxlength="140" />
-      </div>
-      <div class="grid md:grid-cols-3 gap-3 mt-2">
-        <button id="addMark" class="px-3 py-2 rounded-xl bg-green-600 text-white text-sm col-span-1" data-i18n="btn.addMark">Add</button>
-        <div class="col-span-2 text-xs text-gray-300 flex items-center" data-i18n="map.dataNote">Data is stored in the database</div>
-      </div>
-      <div class="mt-2 text-sm text-gray-300">
-        <span data-i18n="map.totalLabel">Total marks:</span> <span id="marksCount">0</span>
-      </div>
-    </section>
-
-    <!-- СЕРДЦА -->
-    <section id="contact">
-      <div class="rounded-3xl p-6 shadow-sm border border-gray-700" style="background:rgba(0,0,0,0.35)">
-        <div class="text-lg font-semibold mb-3 flex items-center gap-2">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 21s-6-4.35-8.28-8A5 5 0 0 1 12 5a5 5 0 0 1 8.28 8C18 16.65 12 21 12 21Z"/>
-          </svg>
-          <span data-i18n="hearts.title">Hearts of support</span>
+    <!-- === РЕЖИМ: LIVE === -->
+    <section id="live" data-mode="live" class="mode-block mt-10 hidden">
+      <!-- Дорожная карта лечения -->
+      <section id="live-roadmap">
+        <h3 class="section-title" data-i18n="live.roadmap.title">Дорожная карта лечения</h3>
+        <p class="section-desc" data-i18n="live.roadmap.desc">Сделано / В процессе / Впереди / Неопределено.</p>
+        <div id="roadmapGrid" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <!-- Элегантные заглушки -->
+          <article class="card"><div class="card-head"><time>2025‑08‑10</time><span class="badge">done</span></div><h4>Химиотерапия — цикл #3</h4><p class="small text-emerald-400">Сделано</p></article>
+          <article class="card"><div class="card-head"><time>2025‑08‑18</time><span class="badge">now</span></div><h4>Контроль сердца</h4><p class="small text-amber-400">В процессе</p></article>
+          <article class="card"><div class="card-head"><time>2025‑09‑02</time><span class="badge">next</span></div><h4>Реабилитация (этап 1)</h4><p class="small text-sky-400">Впереди</p></article>
+          <article class="card"><div class="card-head"><time>—</time><span class="badge">tbd</span></div><h4>CAR‑T побочные эффекты</h4><p class="small text-slate-400">Неопределено</p></article>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2">
-          <input id="heartName" class="px-3 py-2 rounded-xl border bg-gray-800/70 text-white text-sm" placeholder="Name" data-i18n-placeholder="placeholder.name" />
-          <button id="addHeart" class="px-4 py-2 rounded-xl bg-pink-600 text-white text-sm" data-i18n="btn.addHeart">Leave a heart</button>
+      </section>
+
+      <!-- Новости мед/орг из закрытого TG (заглушки) -->
+      <section class="mt-12" id="live-updates">
+        <h3 class="section-title" data-i18n="live.updates.title">Медицинские и организационные апдейты</h3>
+        <p class="section-desc" data-i18n="live.updates.desc">Лента обновлений (будет подтягиваться из закрытого TG).</p>
+        <div id="liveUpdatesFeed" class="stacked-list">
+          <article class="card">
+            <div class="card-head"><time>2025‑08‑18</time><span class="badge">med</span></div>
+            <h4>Плановый анализ крови</h4>
+            <p>Показатели стабильные, готовимся к следующему этапу.</p>
+            <a href="#story-donate" class="text-indigo-400 hover:underline" data-i18n="cta.donateInline">Пожертвовать</a>
+          </article>
+          <article class="card">
+            <div class="card-head"><time>2025‑08‑19</time><span class="badge">org</span></div>
+            <h4>Логистика госпитализации</h4>
+            <p>Подтверждены даты и транспорт, уточняем детали по страховой.</p>
+            <a href="#story-donate" class="text-indigo-400 hover:underline" data-i18n="cta.donateInline">Пожертвовать</a>
+          </article>
         </div>
-        <div id="heartsSplide" class="splide mt-6" aria-label="Hearts of support">
-          <div class="splide__track"><ul id="heartsSlides" class="splide__list"></ul></div>
+      </section>
+
+      <!-- Мысли Nico -->
+      <section class="mt-12" id="live-nico">
+        <h3 class="section-title" data-i18n="live.nico.title">Мысли Nico</h3>
+        <p class="section-desc" data-i18n="live.nico.desc">Личная лента коротких заметок.</p>
+        <div id="nicoFeed" class="stacked-list">
+          <article class="card"><div class="card-head"><time>2025‑08‑17</time></div><p>Иногда одно письмо меняет весь день.</p></article>
+          <article class="card"><div class="card-head"><time>2025‑08‑20</time></div><p>История продолжается — и мы продолжаем.</p></article>
         </div>
-        <button id="loadMoreHearts" class="mt-4 px-4 py-2 rounded-xl bg-gray-800/60 border border-gray-700 text-sm" data-i18n="btn.loadMoreHearts">Load more hearts</button>
-      </div>
+      </section>
+
+      <!-- Вопросы к Nico (AMA) -->
+      <section class="mt-12" id="live-ama">
+        <h3 class="section-title" data-i18n="live.ama.title">Вопросы к Nico</h3>
+        <p class="section-desc" data-i18n="live.ama.desc">Задайте вопрос — ответим кратко в этой ленте.</p>
+        <form id="amaForm" class="card space-y-3">
+          <input type="text" name="name" class="input" placeholder="Ваше имя (необязательно)">
+          <textarea name="question" class="textarea" placeholder="Ваш вопрос" required></textarea>
+          <button type="submit" class="btn-primary" data-i18n="ama.submit">Отправить</button>
+        </form>
+        <div id="amaFeed" class="stacked-list mt-6"></div>
+      </section>
+
+      <!-- Отчёты о покупках/оплате (заглушки) -->
+      <section class="mt-12" id="live-reports">
+        <h3 class="section-title" data-i18n="live.reports.title">Что куплено и оплачено</h3>
+        <p class="section-desc" data-i18n="live.reports.desc">Краткие отчёты: позиция → сумма → дата → статус.</p>
+        <div id="reportsFeed" class="stacked-list">
+          <article class="card"><div class="card-head"><time>2025‑08‑16</time><span class="badge">paid</span></div><p>Медтранспорт — 120€ — оплачено.</p></article>
+          <article class="card"><div class="card-head"><time>2025‑08‑19</time><span class="badge">ordered</span></div><p>Расходники — 48€ — заказано.</p></article>
+        </div>
+      </section>
     </section>
   </main>
 
-  <footer class="max-w-5xl mx-auto px-4 text-center text-sm text-gray-300" data-i18n="footer.note">
-    Thank you for any support—even a repost can change a life.
-  </footer>
+  <!-- Sticky Donate -->
+  <a href="#story-donate" id="stickyDonate" class="sticky-donate" data-i18n="nav.donate">Donate</a>
 
-  <!-- Аудио -->
-  <audio id="bgAudio" preload="none"></audio>
-
-  <!-- Модалка -->
-  <div id="modalBackdrop" class="modal-backdrop fixed inset-0 bg-black/60">
-    <div class="min-h-full flex items-center justify-center p-4">
-      <div class="bg-gray-900 text-white rounded-2xl shadow-xl border border-gray-700 max-w-xl w-full p-6 relative">
-        <button id="modalClose" class="absolute right-3 top-3 text-gray-400 hover:text-white" aria-label="Close">✕</button>
-        <h3 id="modalTitle" class="text-lg font-semibold mb-3"></h3>
-        <div id="modalBody" class="text-sm text-gray-200 leading-relaxed"></div>
-        <div class="mt-5 text-right"><button id="modalOk" class="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600">OK</button></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Наш JS (ленивая инициализация библиотек, аудио, карта, сплайд) -->
-  <script type="module" src="assets/app.js"></script>
-
-  <script>
-    // Service Worker (версия синхронизирована с sw.js)
-    if ('serviceWorker' in navigator) {
-      (async () => {
-        try { await navigator.serviceWorker.register('/sw.js?ver=v1.3.1'); } catch {}
-      })();
-    }
-  </script>
+  <!-- Scripts -->
+  <script src="assets/app.js"></script>
 </body>
 </html>
