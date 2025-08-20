@@ -1,6 +1,6 @@
 // /assets/js/core/router.js
-// SPA-роутер: partials → #subpage, lazy-страницы, активная кнопка,
-// делегирование кликов по [data-route], дефолтный #/story на старте.
+// SPA-роутер: partials → #subpage, lazy-страницы, подсветка активной кнопки,
+// делегирование кликов по [data-route], дефолтный хэш на старте.
 
 import { qs, qsa } from './dom.js';
 
@@ -24,7 +24,7 @@ async function fetchPartial(name, token) {
   const url = `/partials/${name}.json`;
   const res = await fetch(url, { cache: 'no-store' }).catch(() => null);
   if (token !== navToken) return null;
-  if (!res || !res.ok) return { html: `<div data-i18n="page.error">Failed to load page</div>` };
+  if (!res || !res.ok) return { html: `<div data-i18n="page.error">Не удалось загрузить страницу.</div>` };
   const json = await res.json().catch(() => ({}));
   if (token !== navToken) return null;
   const html = json.html ?? json.markup ?? json.content ?? '';
@@ -73,7 +73,7 @@ export async function navigate(hash) {
 }
 
 async function onHashChange() {
-  // ставим дефолт при пустом хэше
+  // если хэш пуст — ставим дефолт
   if (!location.hash || location.hash === '#/' || location.hash === '#') {
     location.hash = '#/story';
     return;
@@ -85,7 +85,7 @@ async function onHashChange() {
 }
 
 export function init() {
-  // Делегирование кликов по [data-route]
+  // Делегирование кликов по [data-route] (кнопки в сабнавигации)
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-route]');
     if (!btn) return;
@@ -99,8 +99,8 @@ export function init() {
   onHashChange(); // первый запуск
 }
 
-// Авто-инициализация, если подключили напрямую отдельным <script type="module">
-if (document.currentScript && !window.__TRUS_ROUTER_BOOTSTRAPPED__) {
+// Автоинициализация при первом подключении
+if (!window.__TRUS_ROUTER_BOOTSTRAPPED__) {
   window.__TRUS_ROUTER_BOOTSTRAPPED__ = true;
   init();
 }
