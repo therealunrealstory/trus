@@ -355,23 +355,46 @@ async function ensureLeaflet() {
   if (window.L) return;
   await loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js');
 }
+// ВМЕСТО старой initMapOnce(root)
 async function initMapOnce(root){
-  if (mapCtx.map) return; // одна карта на страницу
-  await ensureLeaflet();
   const mapEl = root.querySelector('#map');
   if (!mapEl) return;
-  mapCtx.map = L.map(mapEl).setView([20,0],2);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(mapCtx.map);
-  mapCtx.layer=L.layerGroup().addTo(mapCtx.map);
 
-  mapCtx.map.on('click', e=>{
-    mapCtx.selectedLatLng=e.latlng; if(mapCtx.previewMarker) mapCtx.previewMarker.remove();
-    mapCtx.previewMarker=L.marker([mapCtx.selectedLatLng.lat,mapCtx.selectedLatLng.lng],{draggable:true}).addTo(mapCtx.map).bindPopup(t("map.selectedPoint","Selected point (you can drag)")).openPopup();
-    mapCtx.previewMarker.on('dragend',()=>{mapCtx.selectedLatLng=mapCtx.previewMarker.getLatLng();});
-  });
+  await ensureLeaflet();
 
-  loadAllMarksPaged();
+  // если карта уже есть, но её контейнер не тот, что в текущем DOM — пересоздать
+  if (mapCtx.map && mapCtx.map._container !== mapEl) {
+    try { mapCtx.map.remove(); } catch {}
+    mapCtx = { map:null, layer:null, selectedLatLng:null, previewMarker:null, marksOffset:0, pageSize:500 };
+  }
 
+  // создать карту при отсутствии
+  if (!mapCtx.map) {
+    mapCtx.map = L.map(mapEl).setView([20,0],2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(mapCtx.map);
+    mapCtx.layer = L.layerGroup().addTo(mapCtx.map);
+
+    mapCtx.map.on('click', e=>{
+      mapCtx.selectedLatLng = e.latlng;
+      if (mapCtx.previewMarker) mapCtx.previewMarker.remove();
+      mapCtx.previewMarker = L.marker([e.latlng.lat, e.latlng.lng], {draggable:true})
+        .addTo(mapCtx.map)
+        .bindPopup(t("map.selectedPoint","Selected point (you can drag)")).openPopup();
+      mapCtx.previewMarker.on('dragend',()=>{ mapCtx.selectedLatLng = mapCtx.previewMarker.getLatLng(); });
+    });
+
+    // начальная подгрузка точек
+    mapCtx.marksOffset = 0;
+    loadAllMarksPaged();
+
+    // после монтирования слегка «пнуть» расчёт размеров
+    setTimeout(()=> mapCtx.map?.invalidateSize(), 50);
+  } else {
+    // карта уже была — просто «пнуть» размеры на новом DOM
+    setTimeout(()=> mapCtx.map?.invalidateSize(), 50);
+  }
+
+  // === ВНИМАНИЕ: обработчики всегда перевешиваем на актуальные элементы ===
   root.querySelector('#locateBtn')?.addEventListener('click', async ()=>{
     if(!navigator.geolocation){ alert(t("map.noGeo","Geolocation not supported on this device.")); return; }
     navigator.geolocation.getCurrentPosition(pos=>{
@@ -381,18 +404,20 @@ async function initMapOnce(root){
   });
 
   root.querySelector('#addMark')?.addEventListener('click', async ()=>{
-    const name=root.querySelector('#name').value.trim();
-    const message=root.querySelector('#msg').value.trim();
+    const name = root.querySelector('#name')?.value.trim() || '';
+    const message = root.querySelector('#msg')?.value.trim()  || '';
     if(!message) return alert(t("alert.enterMessage","Enter a message"));
     if(!mapCtx.selectedLatLng) return alert(t("alert.clickMapFirst","Click on the map first!"));
-    const {lat,lng}=mapCtx.selectedLatLng;
-    const resp=await fetch('/.netlify/functions/marks',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name,message,lat,lon:lng})});
+    const {lat,lng} = mapCtx.selectedLatLng;
+    const resp = await fetch('/.netlify/functions/marks',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name,message,lat,lon:lng})});
     if(!resp.ok){ const tt=await resp.text().catch(()=>'-'); alert((t("error.saveFailed","Save error: ")) + tt); return; }
-    root.querySelector('#msg').value=''; mapCtx.selectedLatLng=null; if(mapCtx.previewMarker){mapCtx.previewMarker.remove(); mapCtx.previewMarker=null;}
+    const msgInp = root.querySelector('#msg'); if (msgInp) msgInp.value='';
+    mapCtx.selectedLatLng=null; if(mapCtx.previewMarker){ mapCtx.previewMarker.remove(); mapCtx.previewMarker=null; }
     mapCtx.marksOffset = 0;
     loadAllMarksPaged();
   });
 }
+
 function setMarksCount(n){ const el=$('#marksCount'); if(el) el.textContent=Number.isFinite(n)?String(n):'0'; }
 async function fetchMarksPage() {
   const r = await fetch(`/.netlify/functions/marks?limit=${mapCtx.pageSize}&offset=${mapCtx.marksOffset}`, { cache: 'no-store' });
