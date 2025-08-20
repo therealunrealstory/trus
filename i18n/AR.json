@@ -12,6 +12,9 @@
   "menu.story": "القصة",
   "menu.support": "الدعم",
   "menu.storyNow": "القصة الآن",
+  
+  "page.loading": "جارٍ تحميل الصفحة",
+  "page.error": "فشل تحميل الصفحة",
 
   "btn.install": "تثبيت التطبيق",
   "pwa.installedTitle": "تم التثبيت",

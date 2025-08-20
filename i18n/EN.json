@@ -12,6 +12,9 @@
   "menu.story": "The Story",
   "menu.support": "Support",
   "menu.storyNow": "The Story Now",
+  
+  "page.loading": "Loading page",
+  "page.error": "Failed to load page",
 
   "btn.install": "Install app",
   "pwa.installedTitle": "Installed",

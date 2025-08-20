@@ -101,7 +101,7 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
 
 .subnav-btn[aria-current="page"]{
   background: var(--subnav-bg-active);
-  border-color: #818cf8; /* индиго рамка у активной */
+  border-color: #818cf8;
   box-shadow: 0 0 0 2px rgba(99,102,241,0.35);
 }
 

@@ -1,11 +1,9 @@
 // ---------- helpers ----------
-const $ = (sel, root = document) => root.querySelector(sel);
+const $  = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-const donateURL = "https://www.gofundme.com/f/your-campaign-slug";
-
-// dynamic script loader
+// ---------- dynamic script loader ----------
 function loadScript(src) {
   return new Promise((res, rej) => {
     if ($(`script[src="${src}"]`)) return res();
@@ -15,7 +13,7 @@ function loadScript(src) {
   });
 }
 
-// ---------- language / i18n ----------
+// ---------- i18n ----------
 const LOCALE_DIRS = { AR:"rtl", CN:"ltr", DE:"ltr", EN:"ltr", ES:"ltr", FR:"ltr", IT:"ltr", PT:"ltr", RU:"ltr" };
 let I18N = {};
 const DEFAULT_I18N = {};
@@ -24,7 +22,18 @@ const DEFAULT_I18N = {};
   $$("[data-i18n-placeholder]").forEach(el => { const k = el.getAttribute("data-i18n-placeholder"); if (!(k in DEFAULT_I18N)) DEFAULT_I18N[k] = el.getAttribute("placeholder") || ""; });
 })();
 function t(key, fallback){ return (I18N && I18N[key]) ?? DEFAULT_I18N[key] ?? fallback; }
-
+function applyI18nTo(root){
+  root.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = (I18N[key] ?? DEFAULT_I18N[key]);
+    if (val != null) el.innerHTML = val;
+  });
+  root.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    const val = (I18N[key] ?? DEFAULT_I18N[key]);
+    if (val != null) el.setAttribute('placeholder', val);
+  });
+}
 function getLangFromQuery() {
   try {
     const u = new URL(location.href);
@@ -33,18 +42,14 @@ function getLangFromQuery() {
     return ok.includes(p) ? p : null;
   } catch { return null; }
 }
-
 async function fetchLocaleJson(lang){
   try { const r1 = await fetch(`i18n/${lang}.json`, { cache: 'no-store' }); if (r1.ok) return await r1.json(); } catch {}
   try { const r2 = await fetch(`/i18n/${lang}.json`, { cache: 'no-store' }); if (r2.ok) return await r2.json(); } catch {}
   return null;
 }
-
 async function loadLocale(lang) {
-  try {
-    const data = await fetchLocaleJson(lang);
-    I18N = data || {}; window.I18N = I18N;
-  } catch { I18N = {}; window.I18N = {}; }
+  try { I18N = (await fetchLocaleJson(lang)) || {}; } catch { I18N = {}; }
+  window.I18N = I18N;
 
   document.documentElement.lang = (lang || 'en').toLowerCase();
   document.documentElement.dir  = LOCALE_DIRS[lang] || 'ltr';
@@ -58,24 +63,18 @@ async function loadLocale(lang) {
     m.setAttribute('content', I18N["meta.description"]);
   }
 
-  $$("[data-i18n]").forEach(el => {
-    const key = el.getAttribute("data-i18n");
-    const val = (I18N[key] ?? DEFAULT_I18N[key]);
-    if (val != null) el.innerHTML = val;
-  });
-  $$("[data-i18n-placeholder]").forEach(el => {
-    const key = el.getAttribute("data-i18n-placeholder");
-    const val = (I18N[key] ?? DEFAULT_I18N[key]);
-    if (val != null) el.setAttribute('placeholder', val);
-  });
+  // apply to whole page (header/footer etc.)
+  applyI18nTo(document);
 
-  // update labels for player buttons given current states
+  // update audio labels to current language
   updateAudioLabels();
-  updateMiniLabels(lang);
 
-  if (!bgAudio.paused)        setMainAudioForLang(lang, true);
+  // if a subpage is mounted, re-apply i18n only to it
+  if (subpageEl && subpageEl.firstChild) applyI18nTo(subpageEl);
+
+  // maintain currently playing language-specific audios
+  if (!bgAudio.paused) setMainAudioForLang(lang, true);
   if (currentRoute === 'story') {
-    // если в сториз активны мини‑плееры — обновим их источники
     if (!announceAudio.paused)  setAnnouncementForLang(lang, true);
     if (!shortAudio.paused)     setShortForLang(lang, true);
   }
@@ -105,7 +104,7 @@ const closeModal=()=> modal.classList.remove('show');
 $('#modalClose').onclick=closeModal; $('#modalOk').onclick=closeModal;
 modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
 
-// ---------- GLOBAL audio controls (header main track) ----------
+// ---------- GLOBAL audio controls ----------
 const bgAudio = $('#bgAudio');
 const audioBtn = $('#audioBtn');
 const langSelect = $('#lang');
@@ -114,24 +113,17 @@ function updateAudioLabels(){
     ? (I18N["audio.play"] || DEFAULT_I18N["audio.play"] || "Story in music")
     : (I18N["audio.pause"] || "‖ Pause");
 }
-function pauseOthers(except){
-  [bgAudio, announceAudio, shortAudio].forEach(a => {
-    if (a && a !== except && !a.paused) a.pause();
-  });
-  updateAudioLabels(); updateMiniLabels();
-}
 function setMainAudioForLang(l, autoplay=false){
   const src = `audio/ORUS-${l}.mp3`;
   if (bgAudio.src.endsWith(src)) { if (autoplay && bgAudio.paused) bgAudio.play().catch(()=>{}); return; }
   bgAudio.pause(); bgAudio.src = src; if (autoplay) bgAudio.play().catch(()=>{});
 }
-$('#donateHero')?.setAttribute('href', donateURL);
 audioBtn.addEventListener('click', async ()=>{
   if (bgAudio.paused){ setMainAudioForLang(langSelect.value, true); pauseOthers(bgAudio); } else { bgAudio.pause(); }
   updateAudioLabels();
 });
 
-// ---------- locale init ----------
+// ---------- language init ----------
 const fromQuery = getLangFromQuery();
 const initialLang = fromQuery || localStorage.getItem('site_lang') || 'EN';
 langSelect.value = initialLang;
@@ -151,14 +143,11 @@ langSelect.addEventListener('change', e => {
 let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; $('#installBtn')?.classList.remove('hidden'); });
 window.addEventListener('appinstalled', () => $('#installBtn')?.classList.add('hidden'));
-if (window.matchMedia('(display-mode: standalone)').matches) $('#installBtn')?.classList.add('hidden');
+if (window.matchMedia('(display-mode: standalone)').matches) $('#installBtn')?.addClass?.('hidden');
 $('#installBtn')?.addEventListener('click', async () => {
   if (!deferredPrompt) return;
   deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  if (outcome === 'accepted') {
-    openModal(t('pwa.installedTitle','Installed'), t('pwa.installedBody','The app has been added to your Home screen / app list.'));
-  }
+  await deferredPrompt.userChoice;
   deferredPrompt = null;
 });
 
@@ -170,7 +159,6 @@ const ROUTES = {
 };
 const subpageEl = $('#subpage');
 const navButtons = $$('.subnav-btn');
-// пометим кнопки data-route по их i18n-ключам
 navButtons.forEach(btn => {
   const key = btn.getAttribute('data-i18n');
   if (key === 'menu.story') btn.dataset.route = 'story';
@@ -179,10 +167,18 @@ navButtons.forEach(btn => {
 });
 let currentRoute = null;
 
-// мини-плееры (активны только внутри Story)
+function setActiveButton(route){
+  navButtons.forEach(b=>{
+    const on = b.dataset.route === route;
+    b.setAttribute('aria-current', on ? 'page' : 'false');
+  });
+}
+
+// ---------- page-level audio helpers used in subpages ----------
 let announceAudio = new Audio();
 let shortAudio = new Audio();
 let announceBtn = null, shortBtn = null, announceStatus = null, shortStatus = null;
+
 function updateMiniLabels(lang){
   if (announceBtn) announceBtn.textContent = announceAudio.paused ? (I18N["announce.play"] || DEFAULT_I18N["announce.play"] || "▶︎ Play") : (I18N["announce.pause"] || "‖ Pause");
   if (announceStatus) announceStatus.textContent = (I18N["announce.langLabel"] || DEFAULT_I18N["announce.langLabel"] || "Language: ") + (lang || langSelect.value);
@@ -199,16 +195,14 @@ function setShortForLang(l, autoplay=false){
   if (shortAudio.src.endsWith(src)) { if(autoplay && shortAudio.paused) shortAudio.play().catch(()=>{}); return; }
   shortAudio.pause(); shortAudio.src = src; updateMiniLabels(l); if(autoplay) shortAudio.play().catch(()=>{});
 }
-
-// подсветка активной кнопки
-function setActiveButton(route){
-  navButtons.forEach(b=>{
-    const on = b.dataset.route === route;
-    b.setAttribute('aria-current', on ? 'page' : 'false');
+function pauseOthers(except){
+  [bgAudio, announceAudio, shortAudio].forEach(a => {
+    if (a && a !== except && !a.paused) a.pause();
   });
+  updateAudioLabels(); updateMiniLabels();
 }
 
-// инициализация интерактивов внутри подстраницы
+// ---------- init bindings inside a subpage ----------
 function initSubpageBindings(root){
   // Practical help modal
   root.querySelector('#wantHelp')?.addEventListener('click', () => {
@@ -288,27 +282,30 @@ function initSubpageBindings(root){
   updateMiniLabels();
 }
 
-// загрузка подстраницы
+// ---------- subpage loader ----------
 async function loadSubpage(route){
   if (!ROUTES[route]) route = 'story';
-  if (currentRoute === route && subpageEl.innerHTML.trim()) { setActiveButton(route); return; }
   setActiveButton(route);
-  subpageEl.innerHTML = `<section><div class="text-sm text-gray-300">${t('feed.loading','Loading…')}</div></section>`;
+
+  const loadingText = t('page.loading','Loading page');
+  const errorText   = t('page.error','Failed to load page');
+
+  subpageEl.innerHTML = `<section><div class="text-sm text-gray-300">${loadingText}</div></section>`;
   try{
     const res = await fetch(ROUTES[route], { cache:'no-store' });
     const json = await res.json();
     subpageEl.innerHTML = json.content || '';
+    // apply i18n into the newly inserted subtree
+    applyI18nTo(subpageEl);
     currentRoute = route;
     initSubpageBindings(subpageEl);
-    // для Story сразу выставим подписи мини‑плееров под язык
-    if (route === 'story') updateMiniLabels(langSelect.value);
   }catch(e){
     console.error(e);
-    subpageEl.innerHTML = `<section><div class="text-sm text-red-400">${t('feed.error','Failed to load.')}</div></section>`;
+    subpageEl.innerHTML = `<section><div class="text-sm text-red-400">${errorText}</div></section>`;
   }
 }
 
-// обработка навигации (кнопки + hash)
+// ---------- navigation (buttons + hash) ----------
 navButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     const r = btn.dataset.route || 'story';
@@ -358,12 +355,6 @@ async function ensureLeaflet() {
   if (window.L) return;
   await loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js');
 }
-function ioObserve(el, cb){
-  const io = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{ if(e.isIntersecting){ cb(); io.disconnect(); } });
-  }, { rootMargin: '160px' });
-  io.observe(el);
-}
 async function initMapOnce(root){
   if (mapCtx.map) return; // одна карта на страницу
   await ensureLeaflet();
@@ -379,10 +370,8 @@ async function initMapOnce(root){
     mapCtx.previewMarker.on('dragend',()=>{mapCtx.selectedLatLng=mapCtx.previewMarker.getLatLng();});
   });
 
-  // initial load
   loadAllMarksPaged();
 
-  // Locate button
   root.querySelector('#locateBtn')?.addEventListener('click', async ()=>{
     if(!navigator.geolocation){ alert(t("map.noGeo","Geolocation not supported on this device.")); return; }
     navigator.geolocation.getCurrentPosition(pos=>{
@@ -391,7 +380,6 @@ async function initMapOnce(root){
     },()=>{ alert(t("map.noGeo","Geolocation not supported on this device.")); });
   });
 
-  // Add mark
   root.querySelector('#addMark')?.addEventListener('click', async ()=>{
     const name=root.querySelector('#name').value.trim();
     const message=root.querySelector('#msg').value.trim();
@@ -404,8 +392,6 @@ async function initMapOnce(root){
     mapCtx.marksOffset = 0;
     loadAllMarksPaged();
   });
-
-  // lazy trigger already visible — ок
 }
 function setMarksCount(n){ const el=$('#marksCount'); if(el) el.textContent=Number.isFinite(n)?String(n):'0'; }
 async function fetchMarksPage() {
@@ -481,10 +467,8 @@ async function loadMoreHearts() {
   }
 }
 async function initHeartsOnce(root){
-  // lazy mount
   const el = root.querySelector('#heartsSplide');
   if (!el) return;
-  // первая загрузка
   allHearts = []; heartsOffset = 0;
   await ensureSplide();
   renderHeartsSlides([]);
@@ -505,7 +489,6 @@ async function initHeartsOnce(root){
 // ---------- boot ----------
 (async function boot(){
   await loadLocale(initialLang);
-  // стартовый маршрут из hash
   const start = (location.hash || '#story').replace('#','');
   loadSubpage(start);
 })();

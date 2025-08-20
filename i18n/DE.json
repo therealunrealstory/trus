@@ -12,6 +12,9 @@
   "menu.story": "Die Geschichte",
   "menu.support": "Unterstützung",
   "menu.storyNow": "Die Geschichte jetzt",
+  
+  "page.loading": "Seite wird geladen",
+  "page.error": "Seite konnte nicht geladen werden",
 
   "btn.install": "App installieren",
   "pwa.installedTitle": "Installiert",

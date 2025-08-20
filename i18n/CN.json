@@ -12,6 +12,9 @@
   "menu.story": "故事",
   "menu.support": "支持",
   "menu.storyNow": "现在的故事",
+  
+  "page.loading": "正在加载页面",
+  "page.error": "无法加载页面",
 
   "btn.install": "安装应用",
   "pwa.installedTitle": "已安装",
