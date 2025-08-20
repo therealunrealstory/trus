@@ -67,10 +67,10 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
 }
 
 .subnav-btn{
-  --subnav-bg: rgba(255,255,255,0.16);
-  --subnav-bg-hover: rgba(255,255,255,0.24);
-  --subnav-bg-active: rgba(255,255,255,0.32);
-  --subnav-border: rgba(255,255,255,0.28);
+  --subnav-bg: rgba(255,255,255,0.22);
+  --subnav-bg-hover: rgba(255,255,255,0.30);
+  --subnav-bg-active: rgba(255,255,255,0.38);
+  --subnav-border: rgba(255,255,255,0.34);
   --subnav-text: #fff;
 
   background: var(--subnav-bg);
