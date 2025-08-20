@@ -1,13 +1,6 @@
 // /assets/js/core/router.js
-// SPA-роутер для v200825-final: грузит partials JSON в #subpage, lazy-импортирует модули страниц,
-// отменяет "устаревшие" переходы через navToken, обновляет активность кнопок [data-route] и
-// делегирует клики по ним в смену hash.
-//
-// Страницы:
-//  - story   (#/story)   -> partials/story.json + pages/story.js
-//  - support (#/support) -> partials/support.json + pages/support.js
-//  - now     (#/now)     -> partials/now.json + pages/now.js
-//  - roadmap (#/roadmap) -> БЕЗ partial (модуль сам рисует), pages/roadmap.js
+// SPA-роутер: partials → #subpage, lazy-страницы, подсветка активной кнопки,
+// делегирование кликов по [data-route], дефолтный хэш на старте.
 
 import { qs, qsa } from './dom.js';
 
@@ -15,10 +8,10 @@ let current = { name: null, destroy: null };
 let navToken = 0;
 
 const ROUTES = {
-  story:   { partial: 'story',   module: () => import('./pages/story.js'),   titleKey: 'nav.story'   },
-  support: { partial: 'support', module: () => import('./pages/support.js'), titleKey: 'nav.support' },
-  now:     { partial: 'now',     module: () => import('./pages/now.js'),     titleKey: 'nav.now'     },
-  roadmap: { partial: null,      module: () => import('./pages/roadmap.js'), titleKey: 'nav.roadmap' }
+  story:   { partial: 'story',   module: () => import('./pages/story.js')   },
+  support: { partial: 'support', module: () => import('./pages/support.js') },
+  now:     { partial: 'now',     module: () => import('./pages/now.js')     },
+  roadmap: { partial: null,      module: () => import('./pages/roadmap.js') }
 };
 
 function parseRoute() {
@@ -31,9 +24,7 @@ async function fetchPartial(name, token) {
   const url = `/partials/${name}.json`;
   const res = await fetch(url, { cache: 'no-store' }).catch(() => null);
   if (token !== navToken) return null;
-  if (!res || !res.ok) {
-    return { html: `<div data-i18n="page.error">Не удалось загрузить страницу.</div>` };
-  }
+  if (!res || !res.ok) return { html: `<div data-i18n="page.error">Не удалось загрузить страницу.</div>` };
   const json = await res.json().catch(() => ({}));
   if (token !== navToken) return null;
   const html = json.html ?? json.markup ?? json.content ?? '';
@@ -57,16 +48,11 @@ function setActiveNav(routeHash) {
 async function runRoute(name, token) {
   const cfg = ROUTES[name];
 
-  // Снять предыдущую страницу
-  if (current.destroy) {
-    try { current.destroy(); } catch {}
-  }
+  if (current.destroy) { try { current.destroy(); } catch {} }
   current = { name, destroy: null };
 
-  // Подсветить активную кнопку
   setActiveNav(`#/` + name);
 
-  // Подложка
   let mount = qs('#subpage');
   if (cfg.partial) {
     const partial = await fetchPartial(cfg.partial, token);
@@ -76,15 +62,10 @@ async function runRoute(name, token) {
     if (mount) mount.innerHTML = '';
   }
 
-  // Lazy-импорт страницы
   const mod = await cfg.module();
   if (token !== navToken) return;
-  if (typeof mod?.init === 'function') {
-    await mod.init({ mount });
-  }
-  if (typeof mod?.destroy === 'function') {
-    current.destroy = mod.destroy;
-  }
+  if (typeof mod?.init === 'function') await mod.init({ mount });
+  if (typeof mod?.destroy === 'function') current.destroy = mod.destroy;
 }
 
 export async function navigate(hash) {
@@ -92,7 +73,7 @@ export async function navigate(hash) {
 }
 
 async function onHashChange() {
-  // если пусто — проставим дефолт
+  // если хэш пуст — ставим дефолт
   if (!location.hash || location.hash === '#/' || location.hash === '#') {
     location.hash = '#/story';
     return;
@@ -104,7 +85,7 @@ async function onHashChange() {
 }
 
 export function init() {
-  // Делегирование кликов по data-route (чтобы кнопки работали)
+  // Делегирование кликов по [data-route]
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-route]');
     if (!btn) return;
@@ -118,7 +99,8 @@ export function init() {
   onHashChange(); // первый запуск
 }
 
-// Авто-инициализация при прямом подключении
+// Если этот файл подключат напрямую отдельным тегом <script type="module">,
+// он сам инициализируется; когда он импортируется из app.js — app.js может вызвать init().
 if (document.currentScript && !window.__TRUS_ROUTER_BOOTSTRAPPED__) {
   window.__TRUS_ROUTER_BOOTSTRAPPED__ = true;
   init();
