@@ -1,8 +1,8 @@
 {
   "meta": {
-    "updated_at": "2025-08-20T23:55:00Z",
+    "updated_at": "2025-08-21T00:25:00Z",
     "updated_by": "Nico",
-    "version": "v1.7",
+    "version": "v1.8",
     "lang_default": "en"
   },
   "items": [
@@ -30,18 +30,32 @@
       "summary": "Systemic chemotherapy with supportive care; adjuvant radiation therapy.",
       "details": "Planned cycles with interim response checks and end‑of‑treatment assessment. Radiotherapy delivered for consolidation: ~30 sessions."
     },
+
     {
-      "id": "2020-04-relapse-mi-rt-dx",
+      "id": "2020-04-relapse-dx",
       "year": 2020,
-      "type": "chemotherapy + radiotherapy + diagnosis",
+      "type": "diagnosis",
       "status": "done",
       "date_start": "2020-04-01",
+      "date_end": "2020-04-30",
+      "when_label": "Apr 2020",
+      "title": "Relapse — T‑lymphoblastic lymphoma (diagnosis)",
+      "summary": "Relapse confirmed; treatment plan renewed.",
+      "details": "Diagnostic reassessment reconfirmed T‑lymphoblastic lymphoma; systemic therapy restart indicated."
+    },
+    {
+      "id": "2020-04-11-chemo-rt-mi",
+      "year": 2020,
+      "type": "chemotherapy + radiotherapy",
+      "status": "done",
+      "date_start": "2020-04-15",
       "date_end": "2020-11-30",
       "when_label": "Apr–Nov 2020",
-      "title": "Relapse; severe GI bleed with MI; resumed therapy (with radiotherapy)",
-      "summary": "Relapse management included chemo and radiation; massive GI bleed led to myocardial infarction; stabilized and continued therapy.",
-      "details": "Severe anemia, tachyarrhythmia and GI ulcer bleeding with MI; transfusions and critical care. Chemotherapy resumed with adjunct radiotherapy (~30 sessions). Diagnostic reassessment performed in this period."
+      "title": "Chemotherapy with adjunct radiotherapy ×30; massive GI bleed with MI",
+      "summary": "Chemo resumed with radiotherapy; GI ulcer bleed led to myocardial infarction; therapy continued after stabilization.",
+      "details": "Severe anemia and tachyarrhythmia managed with transfusions and critical care. Radiotherapy delivered alongside chemotherapy: ~30 sessions."
     },
+
     {
       "id": "2021-05-aggressive-leukocytosis-dx",
       "year": 2021,
@@ -266,6 +280,6 @@
     }
   ],
   "changelog": [
-    { "date": "2025-08-20", "note": "2019 chemo marked with radiotherapy (×30). 2020 period extended to Apr–Nov and marked with diagnosis + radiotherapy (×30). May 2021 diagnosis set to exact month; added May 2021–Sep 2023 leukemia chemotherapy block. 2024–2025 block marked 'chemotherapy + radiotherapy'. Other prior date fixes preserved." }
+    { "date": "2025-08-21", "note": "Split 2020 into two blocks: Apr 2020 relapse diagnosis; Apr–Nov 2020 chemo + radiotherapy ×30 with GI bleed/MI. Added persistent header highlight for opened sections (UI change in HTML)." }
   ]
 }

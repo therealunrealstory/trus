@@ -7,7 +7,8 @@
   <style>
     :root{
       --bg:#0b0f16; --panel:#121826; --muted:#93a0b4; --text:#e9eef7;
-      --accent:#6aa6ff; --done:#8fb3ff22; --current:#3b82f616; --plan:#ffc8571a;
+      --accent:#6aa6ff; --indigo:#4F46E5; /* Indigo 600 */
+      --done:#8fb3ff22; --current:#3b82f616; --plan:#ffc8571a;
       --border:#1e2a3f; --ok:#7bc66a; --warn:#ffc857; --low:#ff7a7a;
     }
     html,body{background:var(--bg);color:var(--text);margin:0;font:16px/1.5 system-ui,Segoe UI,Roboto,Arial;}
@@ -22,8 +23,11 @@
     @media(min-width:900px){.grid{grid-template-columns:1fr 1fr 1fr}}
     .col{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden}
     .col header{margin:0;padding:0;border-bottom:1px solid var(--border)}
-    .toggle{display:flex;align-items:center;gap:8px;width:100%;background:transparent;color:#cfe0ff;border:0;padding:14px 16px;font-size:16px;letter-spacing:.3px;cursor:pointer}
-    .toggle:focus{outline:2px solid var(--accent);outline-offset:-2px}
+    .toggle{display:flex;align-items:center;gap:8px;width:100%;
+      background:transparent;color:#cfe0ff;border:1px solid transparent;padding:14px 16px;
+      font-size:16px;letter-spacing:.3px;cursor:pointer;border-radius:10px;margin:6px}
+    .toggle:focus{outline:none;box-shadow:0 0 0 2px var(--indigo)}
+    .col:not(.collapsed) .toggle{box-shadow:0 0 0 2px var(--indigo); border-color:var(--indigo)}
     .caret{transition:transform .2s ease}
     .col.collapsed .caret{transform:rotate(-90deg)}
     .list{padding:10px;display:block}
@@ -36,7 +40,7 @@
     .title{font-weight:600}
     .when{color:var(--muted);font-size:13px}
     .badges{display:flex;gap:6px;flex-wrap:wrap}
-    .badge{font-size:11px;border:1px solid var(--border);padding:2px 6px;border-radius:999px;color:#muted}
+    .badge{font-size:11px;border:1px solid var(--border);padding:2px 6px;border-radius:999px;color:#93a0b4}
     .badge.status-current{border-color:#3b82f6;color:#cfe0ff}
     .badge.status-done{color:#9cc59c;border-color:#355a35}
     .badge.status-planned{color:#e7c37a;border-color:#6a5520}
@@ -111,7 +115,6 @@
     const esc = (s)=>String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString(undefined,{year:'numeric',month:'short'}) : '';
 
-    // Fetch data
     fetch('roadmap.json', {cache:'no-cache'})
       .then(r => r.json())
       .then(data => render(data))
@@ -120,36 +123,33 @@
         console.error(err);
       });
 
-    // Accordion toggles
     document.addEventListener('click', (e)=>{
       const btn = e.target.closest('.toggle');
       if(!btn) return;
       const section = btn.closest('.col');
       const expanded = btn.getAttribute('aria-expanded') === 'true';
       btn.setAttribute('aria-expanded', String(!expanded));
-      section.classList.toggle('collapsed', expanded); // if was open -> collapse
+      section.classList.toggle('collapsed', expanded);
     });
 
     function enforceDefaultAccordionState(){
-      // Collapse Completed + Plans; expand Now. This runs after render to override any accidental state.
-      const done = document.getElementById('col-done');
-      const now = document.getElementById('col-current');
-      const plans = document.getElementById('col-plans');
-      done.classList.add('collapsed');
-      plans.classList.add('collapsed');
-      now.classList.remove('collapsed');
-      done.querySelector('.toggle')?.setAttribute('aria-expanded','false');
-      plans.querySelector('.toggle')?.setAttribute('aria-expanded','false');
-      now.querySelector('.toggle')?.setAttribute('aria-expanded','true');
+      setOpen('col-done', false);
+      setOpen('col-plans', false);
+      setOpen('col-current', true);
+    }
+    function setOpen(colId, open){
+      const col = document.getElementById(colId);
+      if(!col) return;
+      col.classList.toggle('collapsed', !open);
+      const btn = col.querySelector('.toggle');
+      if(btn) btn.setAttribute('aria-expanded', String(open));
     }
 
     function render(data){
-      // Meta
       const m = data.meta || {};
       const when = m.updated_at ? new Date(m.updated_at).toLocaleString() : '—';
       document.getElementById('meta').textContent = `Updated ${when} • ${m.updated_by || ''}`.trim();
 
-      // Split/sort items
       const items = (data.items || []).slice().sort(sortByTime);
       const done = items.filter(i => i.status === 'done');
       const current = items.filter(i => i.status === 'current').slice(0,1);
@@ -159,19 +159,14 @@
       mountList('list-current', current);
       mountList('list-plans', plans);
 
-      enforceDefaultAccordionState(); // <- ключевая строка
+      enforceDefaultAccordionState();
 
-      // Deep link to item: раскрываем только нужное (оставляя Now открытым)
       const hash = location.hash.replace('#','');
       if(hash){
-        // Определим, в какой колонке элемент, и раскроем её точечно
         const el = document.querySelector(`[data-id="${CSS.escape(hash)}"]`);
         if(el){
           const col = el.closest('.col');
-          if(col){
-            col.classList.remove('collapsed');
-            col.querySelector('.toggle')?.setAttribute('aria-expanded','true');
-          }
+          if(col){ col.classList.remove('collapsed'); col.querySelector('.toggle')?.setAttribute('aria-expanded','true'); }
           el.scrollIntoView({behavior:'smooth', block:'center'});
           el.classList.add('highlight');
         }
@@ -213,8 +208,11 @@
 
       const badges = document.createElement('div');
       badges.className = 'badges';
+      // status badge first
       badges.appendChild(makeBadge(statusLabel(it.status)));
-      if(it.type) badges.appendChild(makeBadge(it.type));
+      // then type/labels
+      const lbls = normalizeLabels(it);
+      lbls.forEach(l => badges.appendChild(makeBadge(l)));
 
       top.append(left, badges);
 
@@ -249,12 +247,43 @@
              (s==='tentative')?'tentative':s||'';
     }
 
+    // NEW: prefer item.labels array; else split item.type on '+'
+    function normalizeLabels(it){
+      if (Array.isArray(it.labels) && it.labels.length){
+        return it.labels.map(cleanLabel);
+      }
+      if (typeof it.type === 'string' && it.type.trim()){
+        return it.type.split('+').map(cleanLabel);
+      }
+      return [];
+    }
+    function cleanLabel(s){
+      return (s||'').toString().trim().toLowerCase();
+    }
+
     function makeBadge(text){
+      const t = (text||'').toLowerCase();
       const span = document.createElement('span');
-      const cls = 'status-'+(text||'').toLowerCase();
-      span.className = 'badge '+cls;
-      span.textContent = text;
+      let cls = 'badge';
+      // style known types a bit via status-like classes if you want
+      if(['done','current','planned','tentative'].includes(t)){
+        cls += ' status-'+t;
+      }
+      span.className = cls;
+      // prettify: capitalize first letter, keep common acronyms
+      span.textContent = pretty(t);
       return span;
+    }
+
+    function pretty(t){
+      const map = {
+        'rt':'RT',
+        'car‑t':'CAR‑T', 'car-t':'CAR‑T',
+        'tki':'TKI',
+        'mi':'MI'
+      };
+      if(map[t]) return map[t];
+      return t.split(' ').map(w => w ? (w[0].toUpperCase()+w.slice(1)) : w).join(' ');
     }
 
     function labelFromDates(it){
