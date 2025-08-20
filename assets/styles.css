@@ -1,48 +1,139 @@
-/* Базовые утилиты под Tailwind CDN */
+/* ---------- Global background ---------- */
+body{
+  /* ВЫНЕСЕНО: путь теперь относительно assets/styles.css */
+  background:#000 url('../images/bg.png') center/cover fixed no-repeat;
+}
 
-.section-title { @apply text-2xl md:text-3xl font-semibold; }
-.section-desc { @apply opacity-80 mt-1; }
-.small { font-size: 0.9rem; }
+/* ---------- Map ---------- */
+#map{ height:360px }
 
-/* Карточки и списки */
-.card { @apply bg-white/5 border border-white/10 rounded-2xl p-4; }
-.card-head { @apply flex items-center justify-between text-xs uppercase tracking-wide opacity-70 mb-2; }
-.badge { @apply bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full; }
-.stacked-list > .card + .card { @apply mt-3; }
+/* ---------- Containers with translucent bg ---------- */
+header{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
+section, footer{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
 
-/* Навигация табов */
-.tab-link { @apply text-slate-300 hover:text-white transition-colors; }
-.tab-link.active { @apply text-white border-b-2 border-indigo-400 pb-1; }
+/* ---------- Icon buttons ---------- */
+.icon-btn{ display:inline-flex; align-items:center; gap:8px }
+.icon-btn svg{ width:18px; height:18px }
 
-/* Кнопки */
-.btn-primary { @apply inline-flex items-center justify-center rounded-2xl px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-500 transition-colors; }
-.btn-ghost { @apply inline-flex items-center justify-center rounded-2xl px-3 py-1.5 bg-white/5 hover:bg-white/10; }
+/* ---------- Tiles with overlay ---------- */
+.tile{
+  position:relative; overflow:hidden; border-radius:1rem;
+  height:180px; background-size:cover; background-position:center;
+  cursor:pointer; border:1px solid rgba(255,255,255,.08)
+}
+.tile::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.6));
+  transition:opacity .2s ease
+}
+.tile:hover::after{ opacity:0 }
+.tile.overlay-off::after{ opacity:0 }
+.tile>span{
+  position:absolute; left:1rem; bottom:1rem; z-index:1;
+  background:rgba(0,0,0,.55); padding:.4rem .7rem; border-radius:.8rem
+}
 
-/* Соцссылки */
-.social { @apply text-slate-300 hover:text-white transition-colors underline-offset-4 hover:underline; }
+/* ---------- Video wrapper ---------- */
+.video-wrap{ position:relative; width:100%; padding-top:56.25%; border-radius:1rem; overflow:hidden; border:1px solid rgba(255,255,255,.08) }
+.video-wrap iframe{ position:absolute; inset:0; width:100%; height:100% }
 
-/* Пилюли сумм */
-.pill { @apply rounded-2xl px-4 py-2 bg-white/5 border border-white/10 text-white hover:bg-white/10; }
-.pill--active { @apply bg-indigo-600 border-indigo-500; }
+/* ---------- Modal ---------- */
+.modal-backdrop{ display:none; z-index:9999; }
+.modal-backdrop.show{ display:block }
 
-/* Инпуты */
-.input, .textarea { @apply w-full bg-white/5 border border-white/10 rounded-2xl px-3 py-2 text-white placeholder:text-white/40; }
-.textarea { min-height: 120px; }
+/* ---------- Pulse button ---------- */
+@keyframes pulse {
+  0% { transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,.6); }
+  70%{ transform:scale(1.03); box-shadow:0 0 0 12px rgba(99,102,241,0); }
+  100%{ transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,0); }
+}
+.pulse{ animation:pulse 2s infinite; }
+
+/* ---------- RTL cosmetics ---------- */
+html[dir="rtl"] .icon-btn { flex-direction: row-reverse; }
+html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
+
+/* ---------- Hashtag caret ---------- */
+.hashtag-caret { animation: hashblink 1s step-start infinite; }
+@keyframes hashblink { 50% { opacity: 0; } }
+
+/* ====== ваш существующий CSS v190825 выше оставить без изменений ====== */
+
+/* ====== добавки для навигации и Live-блоков ====== */
+.section-title { font-size: 1.5rem; line-height: 1.25; font-weight: 600; }
+.section-desc { opacity: .8; margin-top: .25rem; }
+.stacked-list > .trus-card + .trus-card { margin-top: .75rem; }
+
+/* Навигация Story/Live/Donate */
+.trus-tab { color: rgba(241,245,249,.85); transition: .2s; }
+.trus-tab:hover { color: #fff; text-decoration: underline; }
+.trus-tab.active { color:#fff; border-bottom: 2px solid rgba(99,102,241,.9); padding-bottom: 2px; } /* indigo-500 */
+
+.trus-donate {
+  padding: 8px 14px; border-radius: 9999px;
+  background: #4f46e5; color:#fff; font-weight:600;
+}
+.trus-donate:hover { background:#6366f1; }
+
+/* Карточки Live/Story-now */
+.trus-card {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 1rem;
+  padding: 1rem;
+}
+.trus-card-head {
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:.75rem; text-transform:uppercase; letter-spacing:.04em;
+  opacity:.75; margin-bottom:.5rem;
+}
+.trus-badge {
+  background: rgba(99,102,241,.2); color: rgba(165,180,252,1);
+  padding:.125rem .5rem; border-radius: 9999px;
+}
+.trus-stack > .trus-card + .trus-card { margin-top:.75rem; }
+.trus-small { font-size:.9rem; }
+
+/* Пилюли сумм / кнопки (если у вас уже есть — можно удалить этот блок) */
+.pill {
+  border-radius: 1rem; padding: .5rem 1rem;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  color:#fff;
+}
+.pill:hover { background: rgba(255,255,255,.1); }
+.pill--active { background:#4f46e5; border-color:#4f46e5; }
+
+.btn-primary {
+  display:inline-flex; align-items:center; justify-content:center;
+  border-radius: .75rem; padding:.5rem 1rem; background:#4f46e5; color:#fff; font-weight:600;
+}
+.btn-primary:hover { background:#6366f1; }
+
+.btn-ghost {
+  display:inline-flex; align-items:center; justify-content:center;
+  border-radius: .75rem; padding:.4rem .8rem; background: rgba(255,255,255,.05);
+}
+.btn-ghost:hover { background: rgba(255,255,255,.1); }
+
+/* Инпуты AMA (если у вас свои — этот блок не критичен) */
+.trus-form .trus-input, .trus-form .trus-textarea {
+  width:100%; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
+  border-radius: .75rem; padding:.5rem .75rem; color:#fff;
+}
+.trus-form .trus-textarea { min-height: 120px; }
+.trus-form .trus-btn {
+  display:inline-flex; align-items:center; justify-content:center;
+  background:#4f46e5; color:#fff; padding:.5rem .9rem; border-radius:.75rem; font-weight:600;
+}
+.trus-form .trus-btn:hover { background:#6366f1; }
 
 /* Карта */
-.map { width: 100%; height: 360px; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.1); }
+.map { width:100%; height:360px; border-radius: 1rem; border: 1px solid rgba(255,255,255,.1); }
 
-/* Скрываемые режимы */
-.mode-block.hidden { display: none; }
+/* Скрытие для режима */
+.hidden { display:none !important; }
 
-/* Sticky Donate */
-.sticky-donate {
-  position: fixed; right: 16px; bottom: 16px; z-index: 50;
-  padding: 12px 16px; border-radius: 9999px;
-  background: #4f46e5; color: white; font-weight: 600;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.35);
-}
-.sticky-donate:hover { background: #6366f1; }
-
-/* Prose invert */
-.prose-invert p { color: rgba(255,255,255,0.9); }
+/* Соцссылки безопасно подсветим (если не было) */
+.social { color: rgba(241,245,249,.8); transition:.2s; }
+.social:hover { color:#fff; text-decoration: underline; }

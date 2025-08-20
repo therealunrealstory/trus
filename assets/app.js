@@ -1,11 +1,14 @@
-/* v190825 → режим D: Story/Live, перенос «Новостей» в #story-now с реальными карточками из /.netlify/functions/news,
-   заглушки для Live, минимальная i18n (RU/EN). */
+/* TRUS v190825 → формат D (Story/Live)
+   - Минимально-инвазивно: дизайн/блоки сохраняем.
+   - Перенос «Новостей» → #story-now (реальные карточки из /.netlify/functions/news)
+   - Live: дорожная карта — статично; остальные ленты — заглушки (до подключения TG/БД).
+*/
 
 (function () {
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  // --- i18n ---
+  // ---------- i18n (только RU/EN) ----------
   const i18n = {
     dict: {},
     lang: "RU",
@@ -31,57 +34,47 @@
         const val = i18n.t(key);
         if (val && typeof val === "string") el.textContent = val;
       });
+      // подсветка текущего языка
+      $$(".lang-link").forEach(a => a.classList.toggle("active", a.dataset.lang?.toUpperCase() === i18n.lang));
     }
   };
 
-  // --- Router ---
-  const MODES = { STORY: "story", LIVE: "live" };
-
+  // ---------- Router: Story/Live ----------
   function setActiveTab(route) {
-    $$(".tab-link").forEach((a) => a.classList.toggle("active", a.dataset.route === route));
+    $$(".trus-tab").forEach((a) => a.classList.toggle("active", a.dataset.route === route));
   }
 
   function showMode(mode) {
     const story = $('#story');
-    const live = $('#live');
+    const live  = $('#live');
     if (!story || !live) return;
-    if (mode === MODES.LIVE) {
-      story.classList.add("hidden"); live.classList.remove("hidden");
-      setActiveTab(MODES.LIVE);
-      localStorage.setItem("trus:lastMode", MODES.LIVE);
+    if (mode === 'live') {
+      story.classList.add('hidden');
+      live.classList.remove('hidden');
+      setActiveTab('live');
+      localStorage.setItem('trus:lastMode', 'live');
     } else {
-      live.classList.add("hidden"); story.classList.remove("hidden");
-      setActiveTab(MODES.STORY);
-      localStorage.setItem("trus:lastMode", MODES.STORY);
+      live.classList.add('hidden');
+      story.classList.remove('hidden');
+      setActiveTab('story');
+      localStorage.setItem('trus:lastMode', 'story');
     }
   }
 
   function navigateFromHash() {
-    const hash = (location.hash || "#story").toLowerCase();
-    if (hash.startsWith("#live")) {
-      showMode(MODES.LIVE);
-      const id = hash.replace("#", "");
-      if (id !== "live") setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }), 40);
+    const hash = (location.hash || '#story').toLowerCase();
+    if (hash.startsWith('#live')) {
+      showMode('live');
+      const id = hash.slice(1);
+      if (id !== 'live') setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 30);
     } else {
-      showMode(MODES.STORY);
-      const id = hash.replace("#", "");
-      if (id && id !== "story") setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }), 40);
+      showMode('story');
+      const id = hash.slice(1);
+      if (id && id !== 'story') setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 30);
     }
   }
 
-  function applyStickyDonateText() {
-    const el = $("#stickyDonate");
-    if (el) el.textContent = i18n.t("nav.donate") || "Donate";
-  }
-
-  // Music placeholder
-  function setupMusicBtn() {
-    $("#musicBtn")?.addEventListener("click", () => {
-      alert(i18n.t("hero.musicToast") || "Music preview: coming soon");
-    });
-  }
-
-  // Hearts carousel
+  // ---------- Hearts (Splide) ----------
   function setupHearts() {
     const el = $("#heartsSplide");
     if (!el || !window.Splide) return;
@@ -90,51 +83,61 @@
     } catch (e) { console.warn("Splide init failed:", e); }
   }
 
-  // Leaflet map
+  // ---------- Leaflet map ----------
   function setupMap() {
     const mapEl = $("#map");
     if (!mapEl || !window.L) return;
     const map = L.map(mapEl).setView([51.1657, 10.4515], 4);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap" }).addTo(map);
+    // Небольшие «огни» для живости
     [{name:"Berlin",coords:[52.52,13.405]},{name:"Warsaw",coords:[52.2297,21.0122]},{name:"Paris",coords:[48.8566,2.3522]}]
       .forEach(p => L.circleMarker(p.coords, { radius: 6 }).addTo(map).bindPopup(`❤️ ${p.name}`));
   }
 
-  // Donate UI (placeholder)
+  // ---------- Donate (без привязки к провайдеру; если есть ваш — он останется) ----------
   function setupDonate() {
     const presets = $$("#donate-presets .pill");
     const recurring = $("#donate-recurring");
     const btn = $("#donateNowBtn");
     let selected = null;
+
     presets.forEach(p => p.addEventListener("click", () => {
       presets.forEach(x => x.classList.remove("pill--active"));
       p.classList.add("pill--active");
       selected = Number(p.dataset.amount || 0);
     }));
+
     btn?.addEventListener("click", () => {
       const isRec = !!recurring?.checked;
       const amount = selected || 25;
-      alert(`${i18n.t("donate.alertPrefix") || "Donation"}: ${amount}€ ${isRec ? "(monthly)" : ""}`);
+      alert(`${i18n.t("donate.alertPrefix") || "Пожертвование"}: ${amount}€ ${isRec ? "(ежемесячно)" : ""}`);
     });
   }
 
-  // AMA (localStorage placeholder)
+  // ---------- AMA (локально, без бэкенда) ----------
   function setupAMA() {
-    const form = $("#amaForm"), feed = $("#amaFeed");
+    const form = $("#amaForm");
+    const feed = $("#amaFeed");
     if (!form || !feed) return;
+
     const KEY = "trus:ama";
     const list = JSON.parse(localStorage.getItem(KEY) || "[]");
+
     const render = () => {
       feed.innerHTML = "";
       list.slice().reverse().forEach(item => {
         const el = document.createElement("article");
-        el.className = "card";
-        el.innerHTML = `<div class="card-head"><time>${item.date}</time><span class="badge">Q</span></div>
-                        <p class="opacity-90"><strong>${item.name || "Anon"}:</strong> ${item.question}</p>`;
+        el.className = "trus-card";
+        el.innerHTML = `
+          <div class="trus-card-head"><time>${item.date}</time><span class="trus-badge">Q</span></div>
+          <p><strong>${item.name || "Anon"}:</strong> ${item.question}</p>
+        `;
         feed.appendChild(el);
       });
     };
+
     render();
+
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       const fd = new FormData(form);
@@ -144,68 +147,74 @@
       const now = new Date();
       list.push({ name, question, date: now.toISOString().slice(0,10) });
       localStorage.setItem(KEY, JSON.stringify(list));
-      form.reset(); render();
+      form.reset();
+      render();
     });
   }
 
-  // === Перенос «Новостей» в STORY: подгружаем реальные карточки ===
+  // ---------- Story Now: реальные карточки (перенос «Новостей») ----------
   async function renderStoryNow() {
     const box = $("#storyNowFeed");
     if (!box) return;
     try {
-      box.innerHTML = `<div class="text-sm text-gray-300">${i18n.t("feed.loading") || "Loading…"}</div>`;
-      // используем ваш уже существующий news-эндпоинт
+      box.innerHTML = `<div class="text-sm text-gray-300">${i18n.t("feed.loading") || "Загрузка…"}</div>`;
+      // используем текущий рабочий эндпоинт новостей (как в v190825)
       const res = await fetch('/.netlify/functions/news?limit=30', { cache: 'no-store' });
       if (!res.ok) throw new Error('news API ' + res.status);
       const arr = await res.json();
       if (!Array.isArray(arr) || !arr.length) {
-        box.innerHTML = `<div class="text-sm text-gray-300">${i18n.t("feed.empty") || "No posts yet."}</div>`;
+        box.innerHTML = `<div class="text-sm text-gray-300">${i18n.t("feed.empty") || "Пока нет записей."}</div>`;
         return;
       }
-      box.innerHTML = arr.map(p => {
+      const html = arr.map(p => {
         const dt = p.date ? new Date(p.date) : null;
         const time = dt ? dt.toLocaleString() : '';
         const link = p.link ? `<a href="${p.link}" target="_blank" rel="noreferrer" class="text-sky-400 hover:underline">source</a>` : '';
-        const title = p.title ? `<h4>${p.title}</h4>` : '';
-        const text = p.text ? `<p>${p.text}</p>` : '';
-        return `<article class="card">
-                  <div class="card-head"><time>${time}</time><span class="badge">update</span></div>
+        const title = p.title ? `<h4 class="font-semibold mb-1">${p.title}</h4>` : '';
+        const text  = p.text  ? `<p class="opacity-90">${p.text}</p>` : '';
+        return `<article class="trus-card">
+                  <div class="trus-card-head"><time>${time}</time><span class="trus-badge">update</span></div>
                   ${title}
                   ${text}
                   <div class="mt-2 flex items-center gap-3">
-                    <a href="#story-donate" class="text-indigo-400 hover:underline">${i18n.t("cta.donateInline") || "Donate"}</a>
+                    <a href="#story-donate" class="text-indigo-400 hover:underline">${i18n.t("cta.donateInline") || "Пожертвовать"}</a>
                     ${link}
                   </div>
                 </article>`;
       }).join("");
+      box.innerHTML = html;
     } catch (e) {
       console.warn("story-now feed error:", e);
       box.innerHTML = `<div class="text-sm text-rose-300">Feed error</div>`;
     }
   }
 
-  // --- Заглушки-загрузчики на будущее (пока ничего не делают) ---
-  async function loadLiveUpdates() { return true; }
-  async function loadReports() { return true; }
-  async function loadNicoThoughts() { return true; }
+  // ---------- Music (placeholder) ----------
+  function setupMusicBtn() {
+    $("#musicBtn")?.addEventListener("click", () => {
+      alert(i18n.t("hero.musicToast") || "Скоро добавим предпрослушивание");
+    });
+  }
 
-  // --- Init ---
+  // ---------- Init ----------
   async function init() {
-    // Язык
+    // Язык из ?lang= или памяти
     const urlLang = new URLSearchParams(location.search).get("lang");
     const savedLang = localStorage.getItem("trus:lang");
     const lang = (urlLang || savedLang || "RU").toUpperCase();
     await i18n.load(lang);
     localStorage.setItem("trus:lang", i18n.lang);
-    applyStickyDonateText();
 
-    // Маршрутизация
-    const lastMode = localStorage.getItem("trus:lastMode");
-    if (!location.hash && lastMode) location.hash = `#${lastMode}`;
+    // Восстановить последний режим
+    if (!location.hash) {
+      const last = localStorage.getItem('trus:lastMode');
+      if (last) location.hash = '#' + last;
+    }
     navigateFromHash();
     window.addEventListener("hashchange", navigateFromHash);
+    setActiveTab((location.hash || '#story').replace('#','') || 'story');
 
-    // UI
+    // Инициализация UI
     setupMusicBtn();
     setupHearts();
     setupMap();
@@ -214,13 +223,6 @@
 
     // Реальные карточки «История продолжается сейчас»
     await renderStoryNow();
-
-    // Заглушки Live
-    await Promise.all([loadLiveUpdates(), loadReports(), loadNicoThoughts()]);
-
-    // Подсветка активных табов и языка
-    setActiveTab((location.hash || "#story").replace("#","") || "story");
-    $$(".lang-link").forEach(a => a.classList.toggle("active", a.dataset.lang?.toUpperCase() === i18n.lang));
   }
 
   document.addEventListener("DOMContentLoaded", init);

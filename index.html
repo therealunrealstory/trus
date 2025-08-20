@@ -2,32 +2,34 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device=device-width, initial-scale=1" />
   <title>The Real Unreal Story — помощь Адаму</title>
   <meta name="description" content="The Real Unreal Story — правдивая история хирурга, который всю жизнь спасал других, а теперь сам борется за жизнь." />
 
-  <!-- Tailwind -->
+  <!-- Tailwind (как в v190825) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- Splide -->
+  <!-- Splide (карусель сердец) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
 
-  <!-- Icons & styles -->
+  <!-- Icons & manifest -->
   <link rel="icon" href="favicon-32x32.png" sizes="32x32">
   <link rel="icon" href="android-chrome-192x192.png" sizes="192x192">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
+
+  <!-- Ваши стили -->
   <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body class="bg-slate-950 text-slate-100 antialiased">
-  <!-- ======= ШАПКА / INTRO ======= -->
+  <!-- ======= ШАПКА / INTRO (как в v190825) ======= -->
   <header class="max-w-6xl mx-auto px-4 md:px-6 pt-6">
-    <!-- 1) Хэштег + музыка + выбор языка -->
+    <!-- 1) Хэштег + музыка + переключатель языка -->
     <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div class="flex items-center gap-2">
         <img src="android-chrome-192x192.png" alt="" class="inline-block align-middle h-[1.5em] w-auto mr-2">
@@ -37,6 +39,7 @@
       </div>
       <div class="flex items-center gap-3">
         <button id="musicBtn" class="btn-ghost" data-i18n="hero.music">История в музыке</button>
+        <!-- Только RU/EN для теста -->
         <nav class="flex items-center gap-2 text-sm">
           <a href="?lang=RU" class="lang-link" data-lang="RU">RU</a>
           <span class="opacity-50">|</span>
@@ -45,7 +48,7 @@
       </div>
     </div>
 
-    <!-- 2) Соцсети -->
+    <!-- 2) Соцсети (как в v190825) -->
     <div class="mt-5 flex flex-wrap items-center gap-3 text-sm opacity-90">
       <a href="https://instagram.com/theRealUnrealStory" target="_blank" rel="noopener" class="social">Instagram</a>
       <a href="https://t.me/theRealUnrealStory" target="_blank" rel="noopener" class="social">Telegram</a>
@@ -53,20 +56,20 @@
       <a href="https://t.me/theRealUnrealStory" target="_blank" rel="noopener" class="social">Updates TG</a>
     </div>
 
-    <!-- 3) Навигация: Story | Live | Donate -->
-    <nav class="mt-6 border-t border-white/10 pt-4 flex items-center gap-4 text-sm">
-      <a href="#story" class="tab-link" data-route="story" data-i18n="nav.story">Story</a>
-      <a href="#live" class="tab-link" data-route="live" data-i18n="nav.live">Live</a>
-      <a href="#story-donate" class="btn-primary ml-auto" data-i18n="nav.donate">Donate</a>
+    <!-- 3) Новая навигация: Story | Live | Donate (после соцсетей) -->
+    <nav class="mt-6 border-t border-white/10 pt-4 flex items-center gap-4 text-sm" id="topNav">
+      <a href="#story" class="trus-tab" data-route="story" data-i18n="nav.story">Story</a>
+      <a href="#live" class="trus-tab" data-route="live" data-i18n="nav.live">Live</a>
+      <a href="#story-donate" class="trus-donate ml-auto" data-i18n="nav.donate">Donate</a>
     </nav>
   </header>
 
   <!-- ======= ОСНОВНОЙ КОНТЕНТ ======= -->
   <main class="max-w-6xl mx-auto px-4 md:px-6 pb-24">
 
-    <!-- === РЕЖИМ: STORY === -->
-    <section id="story" data-mode="story" class="mode-block mt-10">
-      <!-- Анонс/введение -->
+    <!-- ========= РЕЖИМ: STORY ========= -->
+    <section id="story" data-mode="story" class="mt-10">
+      <!-- Анонс/введение (оставьте ваш существующий контент) -->
       <div class="prose-invert max-w-none space-y-4">
         <h2 class="text-3xl font-semibold" data-i18n="story.title">The Real Unreal Story — помощь Адаму</h2>
         <p class="opacity-90" data-i18n="story.lead">
@@ -74,24 +77,24 @@
         </p>
       </div>
 
-      <!-- Основной рассказ/тайлы (до середины 2025) -->
+      <!-- ВАШИ СУЩЕСТВУЮЩИЕ БЛОКИ STORY (тайлы, видео, тексты и т.д.) -->
+      <!-- ↓↓↓ Сохраните, не удаляйте. Можно обернуть в контейнер для порядка. -->
       <section class="mt-8" id="story-tiles">
         <h3 class="section-title" data-i18n="story.tilesTitle">История до середины 2025</h3>
         <div id="tilesContainer" class="grid gap-4 md:grid-cols-2">
-          <!-- (Оставьте ваш существующий контент тайлов из v190825) -->
+          <!-- ОСТАВЬТЕ ЗДЕСЬ ВАШ СУЩЕСТВУЮЩИЙ КОНТЕНТ ИЗ v190825 -->
         </div>
       </section>
 
-      <!-- «История продолжается сейчас» — реальные карточки из вашего TG-эндпоинта -->
+      <!-- Переименованный блок «Новости» → «История продолжается сейчас» -->
       <section class="mt-12" id="story-now">
         <h3 class="section-title" data-i18n="story.nowTitle">История продолжается сейчас</h3>
         <p class="section-desc" data-i18n="story.nowDesc">Короткие обновления — продолжение истории в реальном времени.</p>
-
         <div id="storyNowFeed" class="stacked-list">
-          <!-- Сюда подгрузятся карточки с /.netlify/functions/news (мы перенесли сюда «Новости») -->
+          <!-- Реальные карточки подгрузятся из /.netlify/functions/news -->
         </div>
 
-        <!-- Ссылка на TG-канал (как было) -->
+        <!-- (Если было: кнопка «следить в TG» — оставьте) -->
         <div class="mt-4">
           <a href="https://t.me/theRealUnrealStory" target="_blank" rel="noreferrer"
              class="px-4 py-2 rounded-xl bg-sky-600 text-white text-sm hover:bg-sky-700" data-i18n="news.follow">
@@ -100,8 +103,10 @@
         </div>
       </section>
 
-      <!-- Донат -->
+      <!-- ДОНАТ-БЛОК (важно: якорь #story-donate) -->
       <section class="mt-12" id="story-donate">
+        <!-- ОСТАВЬТЕ ВАШ СУЩЕСТВУЮЩИЙ ДОНАТ-БЛОК v190825 -->
+        <!-- Ниже — минимальный пресет как запасной вариант -->
         <h3 class="section-title" data-i18n="donate.title">Поддержите Адама</h3>
         <p class="section-desc" data-i18n="donate.lead">Каждый вклад важен: деньгами, временем, делом или словом.</p>
 
@@ -111,7 +116,6 @@
           <button class="pill" data-amount="50">50€</button>
           <button class="pill" data-amount="100">100€</button>
         </div>
-
         <div class="mt-4 flex items-center gap-3 text-sm">
           <label class="inline-flex items-center gap-2">
             <input type="checkbox" id="donate-recurring" class="accent-indigo-500">
@@ -121,7 +125,7 @@
           <button id="donateNowBtn" class="btn-primary" data-i18n="donate.cta">Пожертвовать</button>
         </div>
 
-        <!-- FAQ -->
+        <!-- FAQ «Перед пожертвованием» (если у вас уже был — оставьте ваш) -->
         <div class="mt-10">
           <h4 class="text-lg font-semibold mb-3" data-i18n="faq.title">Перед пожертвованием</h4>
           <details class="faq"><summary data-i18n="faq.q1">Куда идут средства?</summary><div data-i18n="faq.a1">На лечение, реабилитацию и жизненно важные расходы.</div></details>
@@ -132,7 +136,7 @@
         </div>
       </section>
 
-      <!-- Карусель «сердец» -->
+      <!-- КАРУСЕЛЬ «СЕРДЕЦ» (оставьте как в v190825; ниже — пример) -->
       <section class="mt-12" id="hearts">
         <h3 class="section-title" data-i18n="hearts.title">Слова поддержки</h3>
         <div class="splide" id="heartsSplide" aria-label="Support carousel">
@@ -146,86 +150,74 @@
         </div>
       </section>
 
-      <!-- Карта поддержки -->
+      <!-- КАРТА ПОДДЕРЖКИ (оставьте как в v190825) -->
       <section class="mt-12" id="support-map">
         <h3 class="section-title" data-i18n="map.title">Карта поддержки</h3>
         <div id="map" class="map"></div>
       </section>
+
+      <!-- (остальные ваши STORY-блоки) -->
     </section>
 
-    <!-- === РЕЖИМ: LIVE === -->
-    <section id="live" data-mode="live" class="mode-block mt-10 hidden">
-      <!-- Дорожная карта лечения -->
-      <section id="live-roadmap">
+    <!-- ========= РЕЖИМ: LIVE ========= -->
+    <section id="live" data-mode="live" class="hidden mt-16">
+      <!-- 1) Дорожная карта лечения (без бэкенда, редактируемые карточки) -->
+      <section id="live-roadmap" class="mb-12">
         <h3 class="section-title" data-i18n="live.roadmap.title">Дорожная карта лечения</h3>
         <p class="section-desc" data-i18n="live.roadmap.desc">Сделано / В процессе / Впереди / Неопределено.</p>
-        <div id="roadmapGrid" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <!-- Элегантные заглушки -->
-          <article class="card"><div class="card-head"><time>2025‑08‑10</time><span class="badge">done</span></div><h4>Химиотерапия — цикл #3</h4><p class="small text-emerald-400">Сделано</p></article>
-          <article class="card"><div class="card-head"><time>2025‑08‑18</time><span class="badge">now</span></div><h4>Контроль сердца</h4><p class="small text-amber-400">В процессе</p></article>
-          <article class="card"><div class="card-head"><time>2025‑09‑02</time><span class="badge">next</span></div><h4>Реабилитация (этап 1)</h4><p class="small text-sky-400">Впереди</p></article>
-          <article class="card"><div class="card-head"><time>—</time><span class="badge">tbd</span></div><h4>CAR‑T побочные эффекты</h4><p class="small text-slate-400">Неопределено</p></article>
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <article class="trus-card"><div class="trus-card-head"><time>2025‑08‑10</time><span class="trus-badge">done</span></div><h4>Химиотерапия — цикл #3</h4><p class="trus-small text-emerald-400">Сделано</p></article>
+          <article class="trus-card"><div class="trus-card-head"><time>2025‑08‑18</time><span class="trus-badge">now</span></div><h4>Контроль сердца</h4><p class="trus-small text-amber-400">В процессе</p></article>
+          <article class="trus-card"><div class="trus-card-head"><time>2025‑09‑02</time><span class="trus-badge">next</span></div><h4>Реабилитация (этап 1)</h4><p class="trus-small text-sky-400">Впереди</p></article>
+          <article class="trus-card"><div class="trus-card-head"><time>—</time><span class="trus-badge">tbd</span></div><h4>CAR‑T побочные эффекты</h4><p class="trus-small opacity-70">Неопределено</p></article>
         </div>
       </section>
 
-      <!-- Новости мед/орг из закрытого TG (заглушки) -->
-      <section class="mt-12" id="live-updates">
+      <!-- 2) Новости мед/орг из закрытого TG — ПОКА ЗАГЛУШКИ -->
+      <section id="live-updates" class="mb-12">
         <h3 class="section-title" data-i18n="live.updates.title">Медицинские и организационные апдейты</h3>
-        <p class="section-desc" data-i18n="live.updates.desc">Лента обновлений (будет подтягиваться из закрытого TG).</p>
-        <div id="liveUpdatesFeed" class="stacked-list">
-          <article class="card">
-            <div class="card-head"><time>2025‑08‑18</time><span class="badge">med</span></div>
-            <h4>Плановый анализ крови</h4>
-            <p>Показатели стабильные, готовимся к следующему этапу.</p>
-            <a href="#story-donate" class="text-indigo-400 hover:underline" data-i18n="cta.donateInline">Пожертвовать</a>
-          </article>
-          <article class="card">
-            <div class="card-head"><time>2025‑08‑19</time><span class="badge">org</span></div>
-            <h4>Логистика госпитализации</h4>
-            <p>Подтверждены даты и транспорт, уточняем детали по страховой.</p>
-            <a href="#story-donate" class="text-indigo-400 hover:underline" data-i18n="cta.donateInline">Пожертвовать</a>
-          </article>
+        <p class="section-desc" data-i18n="live.updates.desc">Лента будет подтягиваться из закрытого TG.</p>
+        <div class="trus-stack" data-placeholder="true">
+          <article class="trus-card"><div class="trus-card-head"><time>2025‑08‑18</time><span class="trus-badge">med</span></div><h4>Плановый анализ крови</h4><p>Показатели стабильные, готовимся к следующему этапу.</p></article>
+          <article class="trus-card"><div class="trus-card-head"><time>2025‑08‑19</time><span class="trus-badge">org</span></div><h4>Логистика госпитализации</h4><p>Подтверждены даты и транспорт, уточняем детали по страховой.</p></article>
         </div>
       </section>
 
-      <!-- Мысли Nico -->
-      <section class="mt-12" id="live-nico">
+      <!-- 3) Мысли Nico — ПОКА ЗАГЛУШКИ -->
+      <section id="live-nico" class="mb-12">
         <h3 class="section-title" data-i18n="live.nico.title">Мысли Nico</h3>
         <p class="section-desc" data-i18n="live.nico.desc">Личная лента коротких заметок.</p>
-        <div id="nicoFeed" class="stacked-list">
-          <article class="card"><div class="card-head"><time>2025‑08‑17</time></div><p>Иногда одно письмо меняет весь день.</p></article>
-          <article class="card"><div class="card-head"><time>2025‑08‑20</time></div><p>История продолжается — и мы продолжаем.</p></article>
+        <div class="trus-stack" data-placeholder="true">
+          <article class="trus-card"><div class="trus-card-head"><time>2025‑08‑17</time></div><p>Иногда одно письмо меняет весь день.</p></article>
+          <article class="trus-card"><div class="trus-card-head"><time>2025‑08‑20</time></div><p>История продолжается — и мы продолжаем.</p></article>
         </div>
       </section>
 
-      <!-- Вопросы к Nico (AMA) -->
-      <section class="mt-12" id="live-ama">
+      <!-- 4) Вопросы к Nico (AMA) — локально, без бэкенда -->
+      <section id="live-ama" class="mb-12">
         <h3 class="section-title" data-i18n="live.ama.title">Вопросы к Nico</h3>
         <p class="section-desc" data-i18n="live.ama.desc">Задайте вопрос — ответим кратко в этой ленте.</p>
-        <form id="amaForm" class="card space-y-3">
-          <input type="text" name="name" class="input" placeholder="Ваше имя (необязательно)">
-          <textarea name="question" class="textarea" placeholder="Ваш вопрос" required></textarea>
-          <button type="submit" class="btn-primary" data-i18n="ama.submit">Отправить</button>
+        <form id="amaForm" class="trus-card trus-form">
+          <input type="text" name="name" class="trus-input" placeholder="Ваше имя (необязательно)">
+          <textarea name="question" class="trus-textarea" placeholder="Ваш вопрос" required></textarea>
+          <button type="submit" class="trus-btn" data-i18n="ama.submit">Отправить</button>
         </form>
-        <div id="amaFeed" class="stacked-list mt-6"></div>
+        <div id="amaFeed" class="trus-stack mt-4"></div>
       </section>
 
-      <!-- Отчёты о покупках/оплате (заглушки) -->
-      <section class="mt-12" id="live-reports">
+      <!-- 5) Отчёты о покупках/оплате — ПОКА ЗАГЛУШКИ -->
+      <section id="live-reports" class="mb-12">
         <h3 class="section-title" data-i18n="live.reports.title">Что куплено и оплачено</h3>
         <p class="section-desc" data-i18n="live.reports.desc">Краткие отчёты: позиция → сумма → дата → статус.</p>
-        <div id="reportsFeed" class="stacked-list">
-          <article class="card"><div class="card-head"><time>2025‑08‑16</time><span class="badge">paid</span></div><p>Медтранспорт — 120€ — оплачено.</p></article>
-          <article class="card"><div class="card-head"><time>2025‑08‑19</time><span class="badge">ordered</span></div><p>Расходники — 48€ — заказано.</p></article>
+        <div class="trus-stack" data-placeholder="true">
+          <article class="trus-card"><div class="trus-card-head"><time>2025‑08‑16</time><span class="trus-badge">paid</span></div><p>Медтранспорт — 120€ — оплачено.</p></article>
+          <article class="trus-card"><div class="trus-card-head"><time>2025‑08‑19</time><span class="trus-badge">ordered</span></div><p>Расходники — 48€ — заказано.</p></article>
         </div>
       </section>
     </section>
   </main>
 
-  <!-- Sticky Donate -->
-  <a href="#story-donate" id="stickyDonate" class="sticky-donate" data-i18n="nav.donate">Donate</a>
-
-  <!-- Scripts -->
+  <!-- Скрипты (ваш основной app.js + логика вкладок/feeds) -->
   <script src="assets/app.js"></script>
 </body>
 </html>
