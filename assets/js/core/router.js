@@ -26,6 +26,7 @@ navButtons.forEach(btn => {
 
 let currentRoute = null;
 let currentModule = null;
+let navToken = 0; // токен для отмены устаревших загрузок
 
 function setActiveButton(route){
   navButtons.forEach(b => {
@@ -43,32 +44,37 @@ async function fetchContent(route){
 }
 
 async function mount(route){
+  if (!subpageEl) { console.error('No #subpage mount point'); return; }
   if (!ROUTES[route]) route = 'story';
 
-  // Отключаем предыдущую страницу
+  // Снимаем предыдущую страницу
   if (currentModule?.destroy) {
     try { currentModule.destroy(); } catch {}
   }
   currentModule = null;
 
+  const myToken = ++navToken; // фиксируем токен текущей навигации
+
   setActiveButton(route);
-  subpageEl.innerHTML = `<section><div class="text-sm text-gray-300">${t('feed.loading','Loading…')}</div></section>`;
+  subpageEl.innerHTML = `<section><div class="text-sm text-gray-300">${t('page.loading','Loading…')}</div></section>`;
 
   try {
     const html = await fetchContent(route);
-    subpageEl.innerHTML = html;
+    if (myToken !== navToken) return; // пришёл устаревший ответ
 
-    // Применяем i18n к поддереву
+    subpageEl.innerHTML = html;
     applyI18nTo(subpageEl);
 
-    // Догружаем код поведения конкретной страницы
     const mod = await loaders[route]();
+    if (myToken !== navToken) return;
+
     currentModule = mod;
-    if (mod?.init) mod.init(subpageEl);
+    mod?.init?.(subpageEl);
     currentRoute = route;
   } catch (e) {
     console.error(e);
-    subpageEl.innerHTML = `<section><div class="text-sm text-red-400">${t('feed.error','Failed to load page.')}</div></section>`;
+    if (myToken !== navToken) return;
+    subpageEl.innerHTML = `<section><div class="text-sm text-red-400">${t('page.error','Не удалось загрузить страницу.')}</div></section>`;
   }
 }
 
