@@ -1,0 +1,129 @@
+{
+  "ui": {
+    "page_title": "治疗路线图",
+    "meta_updated": "已更新",
+    "legend_done": "Done — 已完成的治疗/事件",
+    "legend_now": "Now — 当前阶段",
+    "legend_planned": "Planned — 计划/预期",
+    "legend_tentative": "Tentative — 可能，未确认",
+    "section_completed": "已完成",
+    "section_now": "现在",
+    "section_plans": "计划",
+    "no_entries": "暂无条目。",
+    "btn_details": "详情",
+    "btn_hide": "收起",
+    "notice_tbd": "“TBD” = “待确定”（细节/日期尚未确定）。本路线图仅供参考，不构成医疗建议。"
+  },
+  "items": {
+    "2019-01-dx-staging": {
+      "when_label": "Jan–Mar 2019",
+      "title": "Primary diagnosis — T‑lymphoblasts (lymphoma); staging",
+      "summary": "Initial workup confirmed lymphoma with T‑lymphoblastic features; baseline tests and staging completed."
+    },
+    "2019-03-first-chemo-rt": {
+      "when_label": "Mar–Aug 2019",
+      "title": "Chemotherapy against lymphoma (T‑lymphoblastic)",
+      "summary": "Systemic chemotherapy with supportive care; adjuvant radiation therapy."
+    },
+    "2020-04-relapse-dx": {
+      "when_label": "Apr 2020",
+      "title": "Relapse — T‑lymphoblastic lymphoma (diagnosis)",
+      "summary": "Relapse confirmed; treatment plan renewed."
+    },
+    "2020-04-11-chemo-rt-mi": {
+      "when_label": "Apr–Nov 2020",
+      "title": "Chemotherapy with adjunct radiotherapy ×30; massive GI bleed with MI",
+      "summary": "Chemo resumed with radiotherapy; GI ulcer bleed led to myocardial infarction; therapy continued after stabilization."
+    },
+    "2021-05-aggressive-leukocytosis-dx": {
+      "when_label": "May 2021",
+      "title": "Aggressive leukemia with extreme leukocytosis — diagnosis",
+      "summary": "Leukocytes >300k; diagnosis established; cytoreductive plan initiated."
+    },
+    "2021-05-2023-09-chemo-aggr-leukemia": {
+      "when_label": "May 2021–Sep 2023",
+      "title": "Chemotherapy against aggressive leukemia",
+      "summary": "Prolonged systemic chemotherapy to reach CAR‑T eligibility and disease control."
+    },
+    "2022-03-26-neuro-shock": {
+      "when_label": "Mar–Apr 2022",
+      "title": "Systemic shock with paralysis and amnesia",
+      "summary": "Resuscitated; prolonged neurological deficits with gradual recovery."
+    },
+    "2022-10-invasive-fungal-sepsis": {
+      "when_label": "Oct 2022",
+      "title": "Invasive fungal infection with sepsis",
+      "summary": "Severe oropharyngeal focus with systemic involvement; treated successfully."
+    },
+    "2022-12-covid-icu-gi-bleed": {
+      "when_label": "Dec 2022–Jan 2023",
+      "title": "COVID‑19 pneumonia (ICU, intubation) and GI bleed; recovery",
+      "summary": "Critical COVID‑19 with intubation; GI bleeding; coma; unexpected recovery."
+    },
+    "2023-06-respiratory-arrest-sepsis": {
+      "when_label": "Jun–Sep 2023",
+      "title": "Respiratory arrest (revived) and bacteremia; high‑dose chemo",
+      "summary": "Cardiorespiratory event reversed; rare cardiac‑source bacteremia treated; intensified chemo to reach CAR‑T criteria."
+    },
+    "2023-10-car-t": {
+      "when_label": "Oct–Nov 2023",
+      "title": "CAR‑T cell therapy",
+      "summary": "CAR‑T administered; severe toxicity managed (fever, neurologic and cardiac events)."
+    },
+    "2024-01-allo-sct-brother-bradonor": {
+      "when_label": "Jan 2024",
+      "title": "Allogeneic stem‑cell infusion — brother donor",
+      "summary": "Allogeneic stem cells infused as consolidation after CAR‑T."
+    },
+    "2024-07-abdominal-mass-hl": {
+      "when_label": "July 2024",
+      "title": "Large abdominal mass; aggressive Hodgkin lymphoma",
+      "summary": "New HL diagnosed, distinct from earlier disease; therapy plan adjusted."
+    },
+    "2024-08-2025-06-chemo-rt": {
+      "when_label": "Aug 2024–Jun 2025",
+      "title": "Escalated chemo → septic complication → switch to effective regimen; radiotherapy ×30",
+      "summary": "Initial heavy dose caused sepsis; switched to better‑tolerated regimen; adjuvant radiotherapy (30 sessions)."
+    },
+    "2025-06-relapse-Ph-pos": {
+      "when_label": "Late Jun 2025",
+      "title": "Rising leukocytes; Ph+ lymphoid cells detected",
+      "summary": "Leukocytes increased from ~35k to ~67k within days; Ph+ lymphoid lineage identified."
+    },
+    "2025-07-oral-chemo-14": {
+      "when_label": "Now",
+      "title": "Oral multi‑agent chemotherapy (14 doses)",
+      "summary": "Structured per‑oral regimen at home, total of 14 doses."
+    },
+    "plan-2025-support-recovery": {
+      "when_label": "Post‑chemo (TBD)",
+      "title": "Support and functional recovery",
+      "summary": "Structured supportive care and rehabilitation after the current course."
+    },
+    "plan-2025-tki-lifelong": {
+      "when_label": "After stabilization (TBD)",
+      "title": "Tyrosine‑kinase inhibitor (ponatinib) — long‑term",
+      "summary": "Initiate TKI maintenance after cytoreduction; likely long‑term or lifelong."
+    },
+    "plan-2025-re-irradiation": {
+      "when_label": "If indicated (TBD)",
+      "title": "Potential repeat radiotherapy",
+      "summary": "Consider re‑irradiation if disease control requires it."
+    },
+    "plan-2025-chemo-switch": {
+      "when_label": "If current regimen underperforms (TBD)",
+      "title": "Possible switch of current chemotherapy protocol",
+      "summary": "Protocol change may be required based on response or toxicity."
+    },
+    "plan-2025-next-line-chemo": {
+      "when_label": "If needed (TBD)",
+      "title": "Possible additional chemotherapy line",
+      "summary": "Another line may be required depending on disease dynamics."
+    },
+    "plan-2026-repeat-allo-sct": {
+      "when_label": "2026 (possible)",
+      "title": "Possible repeat allogeneic stem‑cell transplant",
+      "summary": "Option if disease course necessitates definitive consolidation."
+    }
+  }
+}
