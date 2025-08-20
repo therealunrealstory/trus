@@ -67,6 +67,7 @@ function heartCard(n){return `<div class="p-4 rounded-2xl bg-gray-900/50 shadow-
 function renderHeartsSlides(arr){
   const pages=chunk(arr,12);
   const ul = $('#heartsSlides');
+  if (!ul) return;
   ul.innerHTML = pages.map(p=>`<li class="splide__slide"><div class="grid md:grid-cols-3 gap-3">${p.map(x=>heartCard(x.name)).join('')}</div></li>`).join('')
     || `<li class="splide__slide"><div class="text-sm text-gray-300">${t('hearts.empty','No hearts yet.')}</div></li>`;
   if (splide) splide.destroy(true);
@@ -87,30 +88,33 @@ function initEngagement(root){
    Donate buttons rendering
    ========================= */
 
-function getDonateConfig(root){
-  // Основной путь: partial, который подставляет router
-  const fromPartial = root && root.__partial && root.__partial.donate;
-  if (fromPartial && fromPartial.baseUrl) return fromPartial;
+function parseDonateConfigFromDOM(root){
+  const wrap = root.querySelector('[data-donate-buttons]');
+  if (!wrap) return null;
 
-  // Фолбэк: значения по умолчанию (на случай, если router не положил donate внутрь root)
-  return {
-    baseUrl: 'https://www.gofundme.com/f/your-campaign-slug/donate',
-    amounts: [5, 10, 25, 50, 100, 250, 500]
-  };
+  const rawBase = (wrap.getAttribute('data-donate-base') || '').trim();
+  const rawAmts = (wrap.getAttribute('data-donate-amounts') || '').trim();
+
+  const base = rawBase
+    ? String(rawBase).replace(/\/donate.*$/,'/donate')
+    : 'https://www.gofundme.com/f/your-campaign-slug/donate';
+
+  const amounts = rawAmts
+    ? rawAmts.split(',').map(s=>Number(s.trim())).filter(n=>Number.isFinite(n) && n>0)
+    : [5, 10, 25, 50, 100, 250, 500];
+
+  return { base, amounts, wrap };
 }
 
 function renderDonateButtons(root){
-  const wrap = root.querySelector('[data-donate-buttons]');
-  if (!wrap) return;
+  const cfg = parseDonateConfigFromDOM(root);
+  if (!cfg || !cfg.wrap) return;
 
-  const donateCfg = getDonateConfig(root);
-  const base = String(donateCfg.baseUrl || '').replace(/\\/donate.*$/,'/donate');
-  const amts = Array.isArray(donateCfg.amounts) ? donateCfg.amounts : [];
-
+  const { base, amounts, wrap } = cfg;
   wrap.innerHTML = '';
 
-  // Кнопки фиксированных сумм
-  amts.forEach((amt) => {
+  // Кнопки фиксированных сумм (как раньше)
+  amounts.forEach((amt) => {
     const a = document.createElement('a');
     a.className = 'px-3 py-2 rounded-xl bg-green-600 text-white text-sm';
     a.target = '_blank';
@@ -120,7 +124,7 @@ function renderDonateButtons(root){
     wrap.appendChild(a);
   });
 
-  // Кнопка "без суммы" ПОСЛЕ $500
+  // Кнопка «без суммы» ПОСЛЕ $500 — ключ btn.donate
   const custom = document.createElement('a');
   custom.className = 'px-3 py-2 rounded-xl bg-green-600 text-white text-sm';
   custom.target = '_blank';
@@ -246,3 +250,6 @@ export function destroy(){
   splide = null;
   allHearts = [];
 }
+
+// На случай, если роутер ждёт default-экспорт
+export default { init, destroy };
