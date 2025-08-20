@@ -287,7 +287,7 @@ async function loadSubpage(route){
   if (!ROUTES[route]) route = 'story';
   setActiveButton(route);
 
-  const loadingText = t('page.loading','Loading page');
+  const loadingText = t('page.loading','Loading page...');
   const errorText   = t('page.error','Failed to load page');
 
   subpageEl.innerHTML = `<section><div class="text-sm text-gray-300">${loadingText}</div></section>`;
