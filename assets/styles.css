@@ -120,7 +120,7 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
   /* +25% vs previous (0.5/1 → 0.625/1.25; 0.875rem → 1.09375rem) */
   padding: 0.625rem 1.25rem;
   border-radius: 0.75rem;
-  font-weight: 600;
+  font-weight: 400;
   font-size: 1.09375rem;
   line-height: 1.2;
   white-space: nowrap;
