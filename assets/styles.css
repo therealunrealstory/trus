@@ -1,58 +1,70 @@
-/* ---------- Global background ---------- */
-body{
-  /* ВЫНЕСЕНО: путь теперь относительно assets/styles.css */
-  background:#000 url('../images/bg.png') center/cover fixed no-repeat;
+/* БАЗА (как в v190825 по духу; ничего лишнего) */
+:root { --border: rgba(148,163,184,.35); }
+body { background:#0b0b0b; }
+
+/* Кнопки соцсетей/навигации */
+.icon-btn{
+  display:inline-flex; align-items:center; gap:.5rem;
+  padding:.5rem .9rem; border-radius: .75rem;
+  border:1px solid var(--border); background: rgba(17,24,39,.4); /* bg-gray-900/40 */
+  color:#fff; font-size:.9rem; line-height:1; transition:.2s;
+}
+.icon-btn:hover{ background: rgba(17,24,39,.6); }
+.icon-btn--green{ background:#16a34a; border-color:#16a34a; }
+.icon-btn--green:hover{ background:#22c55e; }
+
+/* маленькие и большие иконки с ровными пропорциями */
+.ib-icon, .ib-icon--lg { display:inline-flex; align-items:center; justify-content:center; }
+.ib-icon svg { width:1.1em; height:1.1em; display:block; }
+.ib-icon--lg svg { width:1.6em; height:1.6em; display:block; }
+.ib-icon svg, .ib-icon--lg svg { fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+
+/* Кнопки общие */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:.5rem .9rem; border-radius:.75rem; border:1px solid var(--border);
+  background: rgba(17,24,39,.6); color:#fff; font-weight:600; transition:.2s;
+}
+.btn:hover{ background: rgba(17,24,39,.8); }
+.btn--ghost{ background:transparent; }
+.btn--pink{ background:#be185d; border-color:#be185d; }
+.btn--pink:hover{ background:#db2777; }
+
+.btn-green{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:.45rem .8rem; border-radius:.75rem;
+  background:#16a34a; color:#fff; font-weight:600; border:1px solid #16a34a;
+}
+.btn-green:hover{ background:#22c55e; border-color:#22c55e; }
+
+/* Инпуты */
+.input{
+  padding:.5rem .75rem; border-radius:.75rem; border:1px solid var(--border);
+  background: rgba(17,24,39,.6); color:#fff;
 }
 
-/* ---------- Map ---------- */
-#map{ height:360px }
-
-/* ---------- Containers with translucent bg ---------- */
-header{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
-section, footer{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem; padding:1rem; color:#fff; }
-
-/* ---------- Icon buttons ---------- */
-.icon-btn{ display:inline-flex; align-items:center; gap:8px }
-.icon-btn svg{ width:18px; height:18px }
-
-/* ---------- Tiles with overlay ---------- */
+/* Плитки с «плёнкой» */
 .tile{
-  position:relative; overflow:hidden; border-radius:1rem;
-  height:180px; background-size:cover; background-position:center;
-  cursor:pointer; border:1px solid rgba(255,255,255,.08)
+  position:relative; height:160px; border-radius:1rem; overflow:hidden;
+  background-size:cover; background-position:center; border:1px solid var(--border);
 }
-.tile::after{
-  content:""; position:absolute; inset:0;
-  background:linear-gradient(180deg,transparent,rgba(0,0,0,.6));
-  transition:opacity .2s ease
-}
-.tile:hover::after{ opacity:0 }
-.tile.overlay-off::after{ opacity:0 }
-.tile>span{
-  position:absolute; left:1rem; bottom:1rem; z-index:1;
-  background:rgba(0,0,0,.55); padding:.4rem .7rem; border-radius:.8rem
+.tile > span{
+  position:absolute; left:0; right:0; bottom:0; padding:.6rem .8rem;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.65) 55%, rgba(0,0,0,.85) 100%);
 }
 
-/* ---------- Video wrapper ---------- */
-.video-wrap{ position:relative; width:100%; padding-top:56.25%; border-radius:1rem; overflow:hidden; border:1px solid rgba(255,255,255,.08) }
-.video-wrap iframe{ position:absolute; inset:0; width:100%; height:100% }
+/* Видео респонсив */
+.video-wrap{ position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:1rem; border:1px solid var(--border); background:#000; }
+.video-wrap iframe{ position:absolute; top:0; left:0; width:100%; height:100%; }
 
-/* ---------- Modal ---------- */
-.modal-backdrop{ display:none; z-index:9999; }
-.modal-backdrop.show{ display:block }
+/* Модалка */
+.modal-backdrop{ display:none; }
+.modal-backdrop.show{ display:block; }
 
-/* ---------- Pulse button ---------- */
-@keyframes pulse {
-  0% { transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,.6); }
-  70%{ transform:scale(1.03); box-shadow:0 0 0 12px rgba(99,102,241,0); }
-  100%{ transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,0); }
-}
-.pulse{ animation:pulse 2s infinite; }
+/* Карточки Live */
+.card{ padding:1rem; border-radius:1rem; border:1px solid var(--border); background:rgba(17,24,39,.5); }
+.card-head{ font-size:.75rem; color:#cbd5e1; margin-bottom:.25rem; }
+.badge{ padding:.1rem .45rem; border-radius:9999px; background:rgba(99,102,241,.2); color:#a5b4fc; }
 
-/* ---------- RTL cosmetics ---------- */
-html[dir="rtl"] .icon-btn { flex-direction: row-reverse; }
-html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
-
-/* ---------- Hashtag caret ---------- */
-.hashtag-caret { animation: hashblink 1s step-start infinite; }
-@keyframes hashblink { 50% { opacity: 0; } }
+/* Утилиты */
+.hashtag-caret{ opacity:.6; }
