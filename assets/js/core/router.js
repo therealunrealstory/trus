@@ -1,99 +1,143 @@
-import { $, $$ } from './dom.js';
-import { applyI18nTo, t } from './i18n.js';
+// /assets/js/core/router.js
+// SPA-роутер для v200825-final: грузит partials JSON в #subpage, lazy-импортирует модули страниц,
+// отменяет "устаревшие" переходы через navToken, обновляет активность кнопок [data-route].
+//
+// Страницы:
+//  - story   (#/story)   -> partials/story.json + pages/story.js
+//  - support (#/support) -> partials/support.json + pages/support.js
+//  - now     (#/now)     -> partials/now.json + pages/now.js
+//  - roadmap (#/roadmap) -> БЕЗ partial (модуль сам рисует), pages/roadmap.js
 
-const ROUTES = {
-  story:   'partials/story.json',
-  support: 'partials/support.json',
-  now:     'partials/now.json'
-};
+import { qs, qsa } from './dom.js';
+import { getLocale } from './i18n.js';
 
-const loaders = {
-  story:   () => import('./pages/story.js'),
-  support: () => import('./pages/support.js'),
-  now:     () => import('./pages/now.js')
-};
-
-const subpageEl = $('#subpage');
-const navButtons = $$('.subnav-btn');
-
-navButtons.forEach(btn => {
-  const key = btn.getAttribute('data-i18n');
-  if (key === 'menu.story') btn.dataset.route = 'story';
-  if (key === 'menu.support') btn.dataset.route = 'support';
-  if (key === 'menu.storyNow') btn.dataset.route = 'now';
-});
-
-let currentRoute = null;
-let currentModule = null;
+let current = { name: null, destroy: null };
 let navToken = 0;
 
-function setActiveButton(route){
-  navButtons.forEach(b => {
-    const on = b.dataset.route === route;
-    b.setAttribute('aria-current', on ? 'page' : 'false');
-  });
-}
-
-async function fetchContent(route){
-  const url = ROUTES[route] || ROUTES.story;
-  const res = await fetch(url, { cache: 'no-store' });
-  if (!res.ok) throw new Error('Failed to load page');
-  const json = await res.json();
-  return json.content || '';
-}
-
-async function mount(route){
-  if (!subpageEl) { console.error('No #subpage mount point'); return; }
-  if (!ROUTES[route]) route = 'story';
-
-  if (currentModule?.destroy) {
-    try { currentModule.destroy(); } catch {}
+const ROUTES = {
+  story: {
+    partial: 'story',
+    module: () => import('./pages/story.js'),
+    titleKey: 'nav.story' // опционально, если используешь обновление title по i18n
+  },
+  support: {
+    partial: 'support',
+    module: () => import('./pages/support.js'),
+    titleKey: 'nav.support'
+  },
+  now: {
+    partial: 'now',
+    module: () => import('./pages/now.js'),
+    titleKey: 'nav.now'
+  },
+  roadmap: {
+    partial: null, // без partial — модуль сам всё отрисует
+    module: () => import('./pages/roadmap.js'),
+    titleKey: 'nav.roadmap'
   }
-  currentModule = null;
+};
 
-  const myToken = ++navToken;
+function parseRoute() {
+  // ожидаем вид #/name[/sub]
+  const m = location.hash.match(/^#\/?([^\/]+)?/);
+  const name = (m && m[1]) ? m[1] : 'story';
+  return name in ROUTES ? name : 'story';
+}
 
-  setActiveButton(route);
-  subpageEl.innerHTML = `<section><div class="text-sm text-gray-300">${t('page.loading','Loading…')}</div></section>`;
+async function fetchPartial(name, token) {
+  const url = `/partials/${name}.json`;
+  const res = await fetch(url, { cache: 'no-store' }).catch(() => null);
+  if (token !== navToken) return null; // устарело
+  if (!res || !res.ok) return { html: `<div data-i18n="page.error">Не удалось загрузить страницу.</div>` };
 
-  try {
-    const html = await fetchContent(route);
-    if (myToken !== navToken) return;
+  const json = await res.json().catch(() => ({}));
+  if (token !== navToken) return null;
 
-    subpageEl.innerHTML = html;
-    applyI18nTo(subpageEl);
+  // Универсальная подстановка: поддержим html/markup/content/innerHTML
+  const html = json.html ?? json.markup ?? json.content ?? '';
+  return { ...json, html: String(html) };
+}
 
-    const mod = await loaders[route]();
-    if (myToken !== navToken) return;
+function mountHTML(html) {
+  const mount = qs('#subpage') || document.body;
+  mount.innerHTML = html || '';
+  return mount;
+}
 
-    currentModule = mod;
-    mod?.init?.(subpageEl);
-    currentRoute = route;
-  } catch (e) {
-    console.error(e);
-    if (myToken !== navToken) return;
-    subpageEl.innerHTML = `<section><div class="text-sm text-red-400">${t('page.error','Не удалось загрузить страницу.')}</div></section>`;
+function setActiveNav(routeHash) {
+  qsa('[data-route]').forEach(el => {
+    const isActive = el.getAttribute('data-route') === routeHash;
+    if (isActive) el.setAttribute('aria-current', 'page');
+    else el.removeAttribute('aria-current');
+  });
+}
+
+async function runRoute(name, token) {
+  const cfg = ROUTES[name];
+
+  // Снять предыдущую страницу
+  if (current.destroy) {
+    try { current.destroy(); } catch(e) {}
+  }
+  current = { name, destroy: null };
+
+  // Обновить состояние навигации
+  setActiveNav(`#/` + name);
+
+  // Если есть partial — грузим и вставляем его HTML перед инициализацией модуля
+  let mount = qs('#subpage');
+  if (cfg.partial) {
+    const partial = await fetchPartial(cfg.partial, token);
+    if (token !== navToken || partial === null) return; // отменено
+    mount = mountHTML(partial.html);
+  } else {
+    // очищаем подложку, модуль сам создаст контент
+    if (mount) mount.innerHTML = '';
+  }
+
+  // Lazy-импорт и init()
+  const mod = await cfg.module();
+  if (token !== navToken) return;
+  if (typeof mod?.init === 'function') {
+    await mod.init({ mount });
+  }
+  if (typeof mod?.destroy === 'function') {
+    current.destroy = mod.destroy;
+  }
+
+  // (опционально) обновление заголовка страницы
+  // Если у тебя уже есть глобальный механизм через i18n.loadLocale() — можно не трогать title тут.
+  if (cfg.titleKey) {
+    try {
+      const base = document.querySelector('meta[name="site-title-base"]')?.getAttribute('content') || document.title || 'The Real Unreal Story';
+      // Простой вариант: оставим текущий document.title как есть
+      document.title = base;
+    } catch {}
   }
 }
 
-export function startRouter(){
-  navButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const r = btn.dataset.route || 'story';
-      if (location.hash !== `#${r}`) location.hash = `#${r}`;
-      else mount(r);
-    });
-  });
-
-  window.addEventListener('hashchange', () => {
-    const r = (location.hash || '#story').slice(1);
-    mount(r);
-  });
-
-  const start = (location.hash || '#story').slice(1);
-  mount(start);
+export async function navigate(hash) {
+  if (hash && location.hash !== hash) location.hash = hash;
+  // onHashChange обработает
 }
 
-export function rerenderCurrentPage(){
-  if (subpageEl) applyI18nTo(subpageEl);
+async function onHashChange() {
+  const name = parseRoute();
+  navToken++;
+  const myToken = navToken;
+  await runRoute(name, myToken);
 }
+
+export function init() {
+  window.addEventListener('hashchange', onHashChange);
+  // Первый запуск
+  onHashChange();
+}
+
+// Авто-инициализация, если роутер подключён напрямую
+if (document.currentScript && !window.__TRUS_ROUTER_BOOTSTRAPPED__) {
+  window.__TRUS_ROUTER_BOOTSTRAPPED__ = true;
+  init();
+}
+
+export default { init, navigate };
