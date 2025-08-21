@@ -1,4 +1,19 @@
 {
+	
+	"labels": {
+    "done": "Завершено",
+    "current": "Сейчас",
+    "planned": "Запланировано",
+    "tentative": "Под вопросом",
+
+    "diagnosis": "Диагноз",
+    "chemotherapy": "Химиотерапия",
+    "radiotherapy": "Лучевая терапия",
+    "transplant": "Трансплантация",
+    "rehab": "Реабилитация",
+    "event": "Событие",
+    "other": "Другое"
+  },
   "ui": {
     "page_title": "Медицинская хронология",
     "meta_updated": "Обновлено",
