@@ -138,7 +138,12 @@
 
   <!-- Наш JS -->
   <script type="module" src="assets/app.js"></script>
-  <script type="module" src="assets/js/features/header-bridge.js"></script>
+  
+		<script type="module">
+		  import router from './assets/js/core/router.js';
+		  if (!window.__TRUS_ROUTER_BOOTSTRAPPED__) router.init();
+		</script>
+
 
 
   <script>
