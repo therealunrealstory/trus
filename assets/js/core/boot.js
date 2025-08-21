@@ -3,9 +3,10 @@ import { $, $$ } from './dom.js';
 import { loadLocale, getLangFromQuery, t, onLocaleChanged, applyI18nTo } from './i18n.js';
 import { openModal } from './modal.js';
 import { startRouter, rerenderCurrentPage } from './router.js';
+import { updateAudioLabels, setMainAudioForLang } from './audio.js';
 
 // —————————————————————————————————————————————
-// УТИЛИТЫ
+// Helpers
 function onceFlag(el, flag) {
   if (!el) return false;
   const k = `__${flag}__`;
@@ -15,7 +16,7 @@ function onceFlag(el, flag) {
 }
 
 // —————————————————————————————————————————————
-// 1) ХЭШТЕГ + МОДАЛКА
+// Hashtag + modal
 (function initHashtag() {
   const el = $('#hashtagType');
   const btn = $('#hashtagBtn');
@@ -48,41 +49,42 @@ function onceFlag(el, flag) {
 })();
 
 // —————————————————————————————————————————————
-// 2) КНОПКА МУЗЫКИ В ШАПКЕ (#audioBtn ↔ #bgAudio)
+// Header music (#audioBtn ↔ #bgAudio)
 (function initHeaderMusic() {
   const btn = $('#audioBtn');
   const audio = $('#bgAudio');
+  const langSelect = $('#lang');
   if (!btn || !audio) return;
   if (onceFlag(btn, 'headerAudioBound')) return;
-
-  // Чтобы i18n не перетирал содержимое кнопки
-  btn.setAttribute('data-i18n-skip', '');
 
   const setPressed = (on) => btn.setAttribute('aria-pressed', on ? 'true' : 'false');
 
   btn.addEventListener('click', (e) => {
     e.preventDefault();
-    if (audio.paused) audio.play().catch(()=>{});
-    else audio.pause();
+    const L = (langSelect?.value || document.documentElement.getAttribute('lang') || 'EN').toUpperCase();
+    if (audio.paused) {
+      setMainAudioForLang(L, true);
+      document.dispatchEvent(new CustomEvent('pause-others', { detail: { except: audio }}));
+    } else {
+      audio.pause();
+    }
   });
 
-  audio.addEventListener('play',    () => setPressed(true));
-  audio.addEventListener('playing', () => setPressed(true));
-  audio.addEventListener('pause',   () => setPressed(false));
-  audio.addEventListener('ended',   () => setPressed(false));
+  ['play','playing'].forEach(ev => audio.addEventListener(ev, () => { setPressed(true); updateAudioLabels(); }));
+  ['pause','ended'].forEach(ev => audio.addEventListener(ev, () => { setPressed(false); updateAudioLabels(); }));
 
-  // начальное состояние
   setPressed(!audio.paused);
+  updateAudioLabels();
+
+  onLocaleChanged(() => updateAudioLabels());
 })();
 
 // —————————————————————————————————————————————
-// 3) КНОПКА «ПОДЕЛИТЬСЯ» В HERO (#shareBtn или [data-share])
-(function initShare() {
-  const btn = $('#shareBtn') || document.querySelector('[data-share]');
-  if (!btn) return;
-  if (onceFlag(btn, 'shareBound')) return;
-
-  btn.addEventListener('click', async (e) => {
+// Share button (delegated)
+(function initShareDelegated() {
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('#shareBtn, [data-share]');
+    if (!btn) return;
     e.preventDefault();
     const shareData = {
       title: t('share.title', 'The Real Unreal Story'),
@@ -98,14 +100,12 @@ function onceFlag(el, flag) {
         btn.textContent = t('share.copied', 'Copied!');
         setTimeout(() => { btn.textContent = orig; }, 1500);
       }
-    } catch {
-      // пользователь отменил — просто молчим
-    }
+    } catch {}
   });
 })();
 
 // —————————————————————————————————————————————
-// 4) УСТАНОВКА PWA (как было)
+// PWA Install
 (function initInstall() {
   const btn = $('#installBtn');
   if (!btn) return;
@@ -130,7 +130,7 @@ function onceFlag(el, flag) {
 })();
 
 // —————————————————————————————————————————————
-// 5) ЯЗЫК — ЗАГРУЗИТЬ ДО СТАРТА РОУТЕРА
+// Language + router (load locale FIRST)
 (async function initLangAndRouter(){
   const select = $('#lang');
   const startLang = getLangFromQuery();
@@ -139,9 +139,8 @@ function onceFlag(el, flag) {
     for (const opt of select.options) opt.selected = (opt.value.toUpperCase() === startLang);
   }
 
-  await loadLocale(startLang);     // подтянуть переводы, обновить <html lang/dir>
+  await loadLocale(startLang);
 
-  // смена языка пользователем
   if (select) {
     select.addEventListener('change', async (e) => {
       const L = (e.target.value || 'EN').toUpperCase();
@@ -149,17 +148,17 @@ function onceFlag(el, flag) {
       u.searchParams.set('lang', L);
       history.replaceState({}, '', u);
       await loadLocale(L);
-      rerenderCurrentPage();        // перерисовать контент подстраницы
-      applyI18nTo(document.body);   // и шапку/модалки
+      rerenderCurrentPage();
+      applyI18nTo(document.body);
+      updateAudioLabels();
     });
   }
 
-  // если язык меняется из кода — подстраиваем всё
   onLocaleChanged(() => {
     rerenderCurrentPage();
     applyI18nTo(document.body);
+    updateAudioLabels();
   });
 
-  // последний шаг — старт роутера
   startRouter();
 })();

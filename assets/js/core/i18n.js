@@ -7,7 +7,7 @@ export let I18N = {};
 export const DEFAULT_I18N = {};
 const listeners = new Set();
 
-// Снимаем дефолтные тексты, чтобы всегда был fallback
+// Capture defaults from markup for fallback
 (function captureDefaultI18n(){
   $$('[data-i18n]').forEach(el => {
     const k = el.getAttribute('data-i18n');
@@ -19,7 +19,6 @@ const listeners = new Set();
   });
 })();
 
-// Текущий язык: ?lang=XX -> localStorage -> html[lang]
 export function getLangFromQuery() {
   const url = new URL(location.href);
   const q = (url.searchParams.get('lang') || '').trim().toUpperCase();
@@ -41,25 +40,24 @@ export function onLocaleChanged(cb) {
   return () => listeners.delete(cb);
 }
 function emitLocaleChanged(lang) {
-  listeners.forEach(fn => { try { fn(lang); } catch {} });
+  listeners.forEach(fn => { try { fn({ lang }); } catch {} });
   document.dispatchEvent(new CustomEvent('locale-changed', { detail: { lang } }));
 }
 
-// Применяем переводы
 export function applyI18nTo(root = document) {
   $$('[data-i18n]', root).forEach(el => {
-    if (el.hasAttribute('data-i18n-skip')) return; // уважаем «живые» элементы
+    if (el.hasAttribute('data-i18n-skip')) return;
     const key = el.getAttribute('data-i18n');
     const val = (I18N[key] ?? DEFAULT_I18N[key]);
     if (val != null) el.innerHTML = val;
   });
   $$('[data-i18n-placeholder]', root).forEach(el => {
+    if (el.hasAttribute('data-i18n-skip')) return;
     const key = el.getAttribute('data-i18n-placeholder');
     const val = (I18N[key] ?? DEFAULT_I18N[key]);
     if (val != null) el.setAttribute('placeholder', val);
   });
 
-  // Заголовок/описание (если есть ключи)
   const titleRest = I18N['meta.titleRest'] || DEFAULT_I18N['hero.titleRest'] || 'support for Adam';
   document.title = `The Real Unreal Story — ${titleRest}`;
   if (I18N['meta.description']) {
@@ -69,7 +67,6 @@ export function applyI18nTo(root = document) {
   }
 }
 
-// Загружаем локаль из /i18n/XX.json
 export async function loadLocale(lang) {
   const L = (lang || 'EN').toUpperCase();
   localStorage.setItem('site_lang', L);
