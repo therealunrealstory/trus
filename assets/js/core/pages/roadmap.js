@@ -44,7 +44,7 @@ function mergeLocalized(data, dict) {
       it.when_label = loc.when_label ?? it.when_label;
       it.title      = loc.title      ?? it.title;
       it.summary    = loc.summary    ?? it.summary;
-      it.details    = loc.details    ?? it.details;   // ← ВАЖНО: локализуем "Подробнее"
+      it.details    = loc.details    ?? it.details;   // локализуем "Подробнее"
     }
     return it;
   };
@@ -56,6 +56,13 @@ function statusLabel(s){ return (s==='done')?'done':(s==='current')?'current':(s
 function normalizeLabels(it){ if (Array.isArray(it.labels)&&it.labels.length) return it.labels.map(cleanLabel); if (typeof it.type==='string'&&it.type.trim()) return it.type.split('+').map(cleanLabel); return []; }
 function cleanLabel(s){ return (s||'').toString().trim().toLowerCase(); }
 function pretty(t){ const map={'rt':'RT','car‑t':'CAR‑T','car-t':'CAR‑T','tki':'TKI','mi':'MI'}; if(map[t]) return map[t]; return t.split(' ').map(w=>w?(w[0].toUpperCase()+w.slice(1)):w).join(' '); }
+
+// локализация текста бэйджа (из dict.labels), иначе fallback на pretty()
+function tLabel(key, dict){
+  const k = (key || '').toLowerCase();
+  return dict?.labels?.[k] || pretty(k);
+}
+
 function labelFromDates(it){ const a=fmtDate(it.date_start); const b=fmtDate(it.date_end); if(a&&b) return `${a} – ${b}`; return a||b||(it.year?String(it.year):'TBD'); }
 function confidenceDots(it){ if(!(it.status==='planned'||it.status==='tentative')) return ''; const c=(it.confidence||'').toLowerCase(); const dots=c==='high'?'<span class="roadmap-dot high"></span><span class="roadmap-dot high"></span><span class="roadmap-dot high"></span>':c==='medium'?'<span class="roadmap-dot medium"></span><span class="roadmap-dot medium"></span><span class="roadmap-dot"></span>':'<span class="roadmap-dot low"></span><span class="roadmap-dot"></span><span class="roadmap-dot"></span>'; return ` · confidence <span class="roadmap-conf">${dots}</span>`; }
 function sortByTime(a,b){ const getKey=(x)=>{ const y=Number(x.year)||0; const d=x.date_start||x.date_end||`${y}-01-01`; return `${y}-${d}`; }; return getKey(a)>getKey(b)?1:-1; }
@@ -157,9 +164,10 @@ function makeCard(it,{tBtnDetails,tBtnHide,emphasizeNow}){
   const title=createEl('div',{class:'roadmap-title-sm'}); title.textContent=it.title||'';
   const when=createEl('div',{class:'roadmap-when'}); when.innerHTML=`${esc(it.when_label||labelFromDates(it))}${confidenceDots(it)}`;
   left.append(title,when);
+
   const badges=createEl('div',{class:'roadmap-badges'});
-  badges.appendChild(makeBadge(statusLabel(it.status)));
-  normalizeLabels(it).forEach(l=>badges.appendChild(makeBadge(l)));
+  badges.appendChild(makeBadge(statusLabel(it.status), state.i18n));
+  normalizeLabels(it).forEach(l=>badges.appendChild(makeBadge(l, state.i18n)));
   top.append(left,badges);
 
   const summary=createEl('div',{class:'roadmap-summary'}); summary.textContent=it.summary||'';
@@ -176,10 +184,10 @@ function makeCard(it,{tBtnDetails,tBtnHide,emphasizeNow}){
   return wrap;
 }
 
-function makeBadge(text){
+function makeBadge(text, dict){
   const t=(text||'').toLowerCase();
   const span=createEl('span',{class:'roadmap-badge'+(['done','current','planned','tentative'].includes(t)?(' status-'+t):'')});
-  span.textContent=pretty(t);
+  span.textContent=tLabel(t, dict);
   return span;
 }
 
@@ -188,7 +196,8 @@ async function loadAll(){
   state.locale = locale;
   if(!state.data){ state.data = await loadJSON('/partials/roadmap.json'); }
   const lc = (locale || '').toLowerCase();
-  state.i18n = await loadJSON(`/i18n/Roadmap/${lc}.json`).catch(() => ({}));
+  // Важно: папка локалей в нижнем регистре
+  state.i18n = await loadJSON(`/i18n/roadmap/${lc}.json`).catch(() => ({}));
   return mergeLocalized(state.data, state.i18n);
 }
 
