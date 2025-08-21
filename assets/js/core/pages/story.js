@@ -17,6 +17,12 @@ let fullTimeCur, fullTimeDur;
 let onPauseOthers;
 let unLocale;
 
+/* ====== Новое: настройки автопродолжения ====== */
+const RESUME_ENABLED = true;
+const RESUME_MIN_SECONDS = 15;    // не возобновляем, если слушали меньше 15с
+const RESUME_MARGIN_TAIL = 8;     // если оставалось <8с до конца — считаем завершённым
+const RESUME_SAVE_INTERVAL = 10000; // сохранять позицию каждые 10с
+
 function label(key, fallback){
   return (I18N[key] || DEFAULT_I18N[key] || fallback);
 }
@@ -31,6 +37,24 @@ function fmtTime(sec){
   const hh = String(h);
   const ss = String(s).padStart(2,'0');
   return h>0 ? `${hh}:${mm}:${ss}` : `${mm}:${ss}`;
+}
+
+/* ====== Новое: ключи и хранилище прогресса ====== */
+function resumeKey(trackKey, lang){ return `seek:${trackKey}:${(lang||'EN').toUpperCase()}`; }
+function readResume(trackKey, lang){
+  try {
+    const v = localStorage.getItem(resumeKey(trackKey, lang));
+    const n = v == null ? NaN : Number(v);
+    return Number.isFinite(n) ? Math.max(0, n) : NaN;
+  } catch { return NaN; }
+}
+function writeResume(trackKey, lang, seconds){
+  try {
+    localStorage.setItem(resumeKey(trackKey, lang), String(Math.max(0, Math.floor(seconds||0))));
+  } catch {}
+}
+function clearResumeIfCompleted(trackKey, lang){
+  try { localStorage.removeItem(resumeKey(trackKey, lang)); } catch {}
 }
 
 function updateMiniLabels(){
@@ -85,7 +109,7 @@ function setFullForLang(l, autoplay=false){
   setAudioFromRouter(fullAudio, 'full', l, autoplay);
 }
 
-// === Общая настройка мини‑плеера с поддержкой seek ===
+/* === Общая настройка мини‑плеера с поддержкой seek + resume === */
 function setupMiniPlayer(opts){
   const {
     key,                // 'announcement' | 'short' | 'full'
@@ -98,19 +122,23 @@ function setupMiniPlayer(opts){
   // не даём i18n перезаписывать подписи на кнопках
   btnEl.setAttribute('data-i18n-skip','');
 
-  // Внутреннее состояние перетаскивания
+  // Внутреннее состояние
   let dragging = false;
   let rafId = 0;
+  let saveTimer = 0;
+  let appliedResumeForLang = null; // чтобы не применять повторно одну и ту же позицию
 
   // Клик Play/Pause
   btnEl.addEventListener('click', ()=>{
     const L = getLang();
+
     if (audioEl.paused){
       // лениво подставим src и запустим
       if (key === 'announcement') setAnnouncementForLang(L, true);
       else if (key === 'short')  setShortForLang(L, true);
       else if (key === 'full')   setFullForLang(L, true);
 
+      // Попросим другие плееры замолчать
       document.dispatchEvent(new CustomEvent('pause-others', { detail: { except: audioEl }}));
     } else {
       audioEl.pause();
@@ -126,6 +154,27 @@ function setupMiniPlayer(opts){
         seekEl.max = Math.floor(d);
         seekEl.disabled = false;
       }
+
+      // ===== Новое: автопродолжение на основе localStorage =====
+      if (RESUME_ENABLED){
+        const L = getLang();
+        // применяем resume один раз на язык и трек
+        if (appliedResumeForLang !== L){
+          const saved = readResume(key, L);
+          if (Number.isFinite(saved) &&
+              saved >= RESUME_MIN_SECONDS &&
+              saved < (d - RESUME_MARGIN_TAIL)) {
+            try { audioEl.currentTime = saved; } catch {}
+            if (seekEl) seekEl.value = Math.floor(audioEl.currentTime || 0);
+          } else if (Number.isFinite(saved) && saved >= (d - RESUME_MARGIN_TAIL)) {
+            // На финише – считаем завершённым
+            clearResumeIfCompleted(key, L);
+          }
+          appliedResumeForLang = L;
+        }
+      }
+      // ===== /Новое =====
+
     } else {
       timeDurEl && (timeDurEl.textContent = '--:--');
       if (seekEl){
@@ -146,15 +195,50 @@ function setupMiniPlayer(opts){
   };
 
   audioEl.addEventListener('loadedmetadata', onMeta);
+
   ['play','playing'].forEach(ev => audioEl.addEventListener(ev, ()=>{
     statusEl && (statusEl.textContent = label('status.playing','Playing…'));
     updateMiniLabels();
     if (!rafId) rafId = requestAnimationFrame(tick);
+
+    // ===== Новое: периодическое сохранение позиции =====
+    if (RESUME_ENABLED && !saveTimer){
+      const L = getLang();
+      saveTimer = setInterval(()=>{
+        try {
+          const cur = audioEl.currentTime || 0;
+          const d = audioEl.duration;
+          if (Number.isFinite(d) && d - cur <= RESUME_MARGIN_TAIL){
+            clearResumeIfCompleted(key, L);
+          } else {
+            writeResume(key, L, cur);
+          }
+        } catch {}
+      }, RESUME_SAVE_INTERVAL);
+    }
+    // ===== /Новое =====
   }));
+
   ['pause','ended'].forEach(ev => audioEl.addEventListener(ev, ()=>{
     statusEl && (statusEl.textContent = label('status.paused','Paused'));
     updateMiniLabels();
     if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+
+    // ===== Новое: финальный сейв на паузе, очистка по завершению =====
+    if (RESUME_ENABLED){
+      const L = getLang();
+      try {
+        const cur = audioEl.currentTime || 0;
+        const d = audioEl.duration;
+        if (ev === 'ended' || (Number.isFinite(d) && d - cur <= RESUME_MARGIN_TAIL)){
+          clearResumeIfCompleted(key, L);
+        } else {
+          writeResume(key, L, cur);
+        }
+      } catch {}
+      if (saveTimer){ clearInterval(saveTimer); saveTimer = 0; }
+    }
+    // ===== /Новое =====
   }));
 
   // Seek взаимодействие
@@ -171,6 +255,13 @@ function setupMiniPlayer(opts){
       const v = Number(seekEl.value) || 0;
       if (Number.isFinite(v)) {
         try { audioEl.currentTime = v; } catch {}
+        // Новое: мгновенно записываем прогресс при ручной перемотке
+        if (RESUME_ENABLED){
+          const L = getLang();
+          const d = audioEl.duration;
+          if (Number.isFinite(d) && d - v <= RESUME_MARGIN_TAIL) clearResumeIfCompleted(key, L);
+          else writeResume(key, L, v);
+        }
       }
       dragging = false;
       // если играли — UI снова начнёт тикать по rAF
@@ -202,16 +293,23 @@ function setupMiniPlayer(opts){
       const resume = ()=>{
         // дождёмся метаданных нового источника
         if (Number.isFinite(audioEl.duration) && audioEl.duration > 0){
+          // при смене языка — возвращаемся на ту же позицию
           try { audioEl.currentTime = Math.min(pos, audioEl.duration - 0.25); } catch {}
           if (seekEl) seekEl.value = Math.floor(audioEl.currentTime || 0);
           if (wasPlaying) audioEl.play().catch(()=>{});
-          onMeta();
+          // обновим длительность/состояние слайдера
+          const d = audioEl.duration;
+          timeDurEl && (timeDurEl.textContent = fmtTime(d));
+          if (seekEl){ seekEl.max = Math.floor(d); seekEl.disabled = false; }
         } else {
           // ещё не готов — повторим чуть позже
           setTimeout(resume, 80);
         }
       };
       resume();
+
+      // Смена языка — сбрасываем флаг автоприменения resume (иначе не сработает при новом L)
+      appliedResumeForLang = null;
     }
   };
 }
