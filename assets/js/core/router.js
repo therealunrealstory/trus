@@ -1,6 +1,6 @@
 // /assets/js/core/router.js
-// SPA Router: грузит partials JSON в #subpage, лениво подключает модули страниц,
-// повторно применяет i18n после каждого рендера и отслеживает асинхронные изменения DOM.
+// SPA Router: partials + lazy modules, повторное применение i18n,
+// и БЕЗ зависаний (MutationObserver с защитами).
 
 import * as DOM from './dom.js';
 import * as I18N from './i18n.js';
@@ -9,9 +9,12 @@ import * as I18N from './i18n.js';
 const qs  = DOM.qs  || ((sel, root = document) => root.querySelector(sel));
 const qsa = DOM.qsa || ((sel, root = document) => Array.from(root.querySelectorAll(sel)));
 
-let current = { name: null, destroy: null };
-let navToken = 0;
-let mo = null; // MutationObserver
+let current   = { name: null, destroy: null };
+let navToken  = 0;
+let mo        = null;     // MutationObserver
+let moTarget  = null;     // где наблюдаем
+let isApplyingI18N = false;
+let moTimer   = null;     // debounce таймер
 
 const ROUTES = {
   story:   { partial: 'story',   module: () => import('./pages/story.js')   },
@@ -53,6 +56,7 @@ function setActiveNav(routeHash) {
   });
 }
 
+// Универсальный вызов i18n
 async function applyI18N(root) {
   const r = root || document.body;
   try {
@@ -66,25 +70,49 @@ async function applyI18N(root) {
   }
 }
 
-function startObserver(mount) {
-  stopObserver();
-  if (!mount || typeof MutationObserver === 'undefined') return;
-  let scheduled = false;
-  mo = new MutationObserver(() => {
-    if (scheduled) return;
-    scheduled = true;
-    queueMicrotask(async () => {
-      scheduled = false;
-      await applyI18N(mount);
-    });
-  });
-  mo.observe(mount, { childList: true, subtree: true });
-}
+// ————— Безопасный наблюдатель —————
 function stopObserver() {
   try { mo && mo.disconnect(); } catch {}
   mo = null;
+  moTarget = null;
+  if (moTimer) { clearTimeout(moTimer); moTimer = null; }
 }
 
+function startObserver(mount) {
+  stopObserver();
+  if (!mount || typeof MutationObserver === 'undefined') return;
+  moTarget = mount;
+  mo = new MutationObserver((mutations) => {
+    if (isApplyingI18N) return; // игнорируем собственные правки перевода
+    // Реагируем только если реально добавили/удалили узлы
+    const relevant = mutations.some(m => (m.addedNodes && m.addedNodes.length) || (m.removedNodes && m.removedNodes.length));
+    if (!relevant) return;
+    // Debounce: не чаще, чем раз в 150 мс
+    if (moTimer) return;
+    moTimer = setTimeout(async () => {
+      moTimer = null;
+      await safeApplyI18N(mount);
+    }, 150);
+  });
+  // наблюдаем только childList/subtree — НИ атрибуты, НИ characterData
+  mo.observe(mount, { childList: true, subtree: true });
+}
+
+async function safeApplyI18N(root) {
+  if (!root) return;
+  // На время применения переводов отключаем наблюдатель
+  const hadObserver = !!mo;
+  if (hadObserver) stopObserver();
+  isApplyingI18N = true;
+  try {
+    await applyI18N(root);
+  } finally {
+    isApplyingI18N = false;
+    if (hadObserver) startObserver(root);
+  }
+}
+
+// ————— Основной цикл маршрутизации —————
 async function runRoute(name, token) {
   const cfg = ROUTES[name];
 
@@ -105,23 +133,23 @@ async function runRoute(name, token) {
     const partial = await fetchPartial(cfg.partial, token);
     if (token !== navToken || partial === null) return;
     mount = mountHTML(partial.html);
-    await applyI18N(mount);
+    await safeApplyI18N(mount);
   } else {
     if (mount) mount.innerHTML = '';
   }
 
-  // 2) Грузим модуль и запускаем init С DOM-ЭЛЕМЕНТОМ (а не { mount })
+  // 2) Грузим модуль и запускаем init с DOM-ЭЛЕМЕНТОМ
   const mod = await cfg.module();
   if (token !== navToken) return;
   if (typeof mod?.init === 'function') {
-    await mod.init(mount); // ← фикс: передаём сам элемент
+    await mod.init(mount);
   }
   if (typeof mod?.destroy === 'function') {
     current.destroy = mod.destroy;
   }
 
-  // 3) После возможной дорисовки модулем — ещё раз i18n
-  await applyI18N(mount);
+  // 3) После возможной дорисовки модулем — ещё раз i18n (безопасно)
+  await safeApplyI18N(mount);
 
   // 4) Наблюдатель на асинхронные вставки
   startObserver(mount);
@@ -175,6 +203,7 @@ export function startRouter() {
   }
 }
 
+// Автозапуск
 if (document.currentScript && !window.__TRUS_ROUTER_BOOTSTRAPPED__) {
   startRouter();
 }
