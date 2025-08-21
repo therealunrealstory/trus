@@ -1,20 +1,17 @@
 // /assets/js/core/router.js
-// Лёгкий роутер: partials + lazy-модули страниц.
-// ВАЖНО: после каждого шага применяем i18n не только к #subpage, но и ко всему документу,
-// чтобы перевелись шапка/Hero/кнопки музыки/модалки, которые лежат вне #subpage.
-// Также выставляем <html data-route="..."> и шлём событие смены маршрута.
+// Лёгкий роутер: partials + lazy-модули.
+// Важно: после каждого шага прогоняем i18n по всему документу (чтобы «шапка», модалки и пр. перевелись),
+// выставляем <html data-route="..."> и шлём события жизненного цикла.
 
 import * as DOM from './dom.js';
 import * as I18N from './i18n.js';
 
-// Фолбэки на случай, если в dom.js нет именованных экспортов
 const qs  = DOM.qs  || ((sel, root = document) => root.querySelector(sel));
 const qsa = DOM.qsa || ((sel, root = document) => Array.from(root.querySelectorAll(sel)));
 
 let current = { name: null, destroy: null };
 let navToken = 0;
 
-// === Маршруты (контент страниц не трогаем)
 const ROUTES = {
   story:   { partial: 'story',   module: () => import('./pages/story.js')   },
   support: { partial: 'support', module: () => import('./pages/support.js') },
@@ -32,9 +29,7 @@ async function fetchPartial(name, token) {
   const url = `/partials/${name}.json`;
   const res = await fetch(url, { cache: 'no-store' }).catch(() => null);
   if (token !== navToken) return null;
-  if (!res || !res.ok) {
-    return { html: `<div data-i18n="page.error">Failed to load page</div>` };
-  }
+  if (!res || !res.ok) return { html: `<div data-i18n="page.error">Failed to load page</div>` };
   const json = await res.json().catch(() => ({}));
   if (token !== navToken) return null;
   const html = json.html ?? json.markup ?? json.content ?? json.innerHTML ?? '';
@@ -49,13 +44,12 @@ function mountHTML(html) {
 
 function setActiveNav(routeHash) {
   qsa('[data-route]').forEach(el => {
-    const isActive = el.getAttribute('data-route') === routeHash;
-    if (isActive) el.setAttribute('aria-current', 'page');
+    const active = el.getAttribute('data-route') === routeHash;
+    if (active) el.setAttribute('aria-current', 'page');
     else el.removeAttribute('aria-current');
   });
 }
 
-// Универсальный вызов i18n
 async function applyI18N(root) {
   const r = root || document.body;
   try {
@@ -68,66 +62,54 @@ async function applyI18N(root) {
     console.warn('[router] i18n apply failed:', e);
   }
 }
-
-// Вспомогательно: применить i18n к #subpage И ко всему документу,
-// чтобы перевелись шапка/модалки/хедер и не оставались "..."
 async function applyI18NAll(mount) {
-  await applyI18N(mount);
-  await applyI18N(document.body);
+  await applyI18N(mount);          // центральный контент
+  await applyI18N(document.body);  // шапка/модалки/футер
 }
 
 async function runRoute(name, token) {
   const cfg = ROUTES[name];
 
-  // Сообщим глобально, какой маршрут будет активен
   document.documentElement.setAttribute('data-route', name);
   document.dispatchEvent(new CustomEvent('trus:route:will-change', { detail: { to: name }}));
 
-  // Тёрндаун прошлой страницы
   if (current.destroy) { try { current.destroy(); } catch {} }
   current = { name, destroy: null };
 
-  // Подсветка активного меню
   setActiveNav(`#/${name}`);
 
-  // 1) Подключаем partial (если есть) и СРАЗУ переводим всё
   let mount = qs('#subpage');
+
   if (cfg.partial) {
     const partial = await fetchPartial(cfg.partial, token);
     if (token !== navToken || partial === null) return;
     mount = mountHTML(partial.html);
-    await applyI18NAll(mount);       // ← перевести и центр, и шапку/модалки
+    await applyI18NAll(mount);
   } else {
     if (mount) mount.innerHTML = '';
-    await applyI18N(document.body);  // ← хотя бы глобальные строки
+    await applyI18N(document.body);
   }
 
-  // 2) Инициализация модуля страницы (ему передаём DOM-элемент)
   const mod = await cfg.module();
   if (token !== navToken) return;
-  if (typeof mod?.init === 'function') {
-    await mod.init(mount);
-  }
-  if (typeof mod?.destroy === 'function') {
-    current.destroy = mod.destroy;
-  }
 
-  // 3) Финальный проход перевода по ВСЕМУ документу
+  if (typeof mod?.init === 'function') {
+    await mod.init(mount); // ВАЖНО: передаём DOM-элемент (совместимо с твоими модулями)
+  }
+  if (typeof mod?.destroy === 'function') current.destroy = mod.destroy;
+
   await applyI18NAll(mount);
 
-  // Сообщим, что маршрут отрисован (для твоих вспомогательных скриптов/плеера/модалок)
   document.dispatchEvent(new CustomEvent('trus:route:rendered', { detail: { name } }));
 }
 
 export async function navigate(hash) {
   if (hash && location.hash !== hash) location.hash = hash;
 }
-
 export function rerenderCurrentPage() {
   const name = parseRoute();
   navToken++;
-  const my = navToken;
-  runRoute(name, my);
+  runRoute(name, navToken);
 }
 
 async function onHashChange() {
@@ -137,8 +119,7 @@ async function onHashChange() {
   }
   const name = parseRoute();
   navToken++;
-  const my = navToken;
-  await runRoute(name, my);
+  await runRoute(name, navToken);
 }
 
 function onClick(e) {
@@ -155,11 +136,11 @@ export function init() {
   document.addEventListener('click', onClick);
   window.addEventListener('hashchange', onHashChange);
 
-  // Если i18n шлёт событие смены языка — перерисуем текущую страницу и переведём весь документ
   if (typeof I18N.onLocaleChanged === 'function') {
     I18N.onLocaleChanged(async () => {
       rerenderCurrentPage();
-      await applyI18N(document.body);
+      await applyI18N(document.body); // подхватить шапку/модалки
+      document.dispatchEvent(new CustomEvent('trus:locale:changed'));
     });
   }
 
@@ -172,8 +153,6 @@ export function startRouter() {
     init();
   }
 }
-
-// Автозапуск только при прямом подключении файла
 if (document.currentScript && !window.__TRUS_ROUTER_BOOTSTRAPPED__) {
   startRouter();
 }
