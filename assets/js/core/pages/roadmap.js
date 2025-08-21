@@ -1,6 +1,5 @@
 // /assets/js/core/pages/roadmap.js
-// Вкладка «Хронология»: tolerant init (mount | {mount} | selector), локализация details,
-// меток статусов/типов и слова "confidence".
+// Вкладка «Хронология»: без блока легенды, пульс перенесён в заголовок "Сейчас".
 
 import * as DOM from '../dom.js';
 import * as I18N from '../i18n.js';
@@ -44,7 +43,7 @@ function mergeLocalized(data, dict) {
       it.when_label = loc.when_label ?? it.when_label;
       it.title      = loc.title      ?? it.title;
       it.summary    = loc.summary    ?? it.summary;
-      it.details    = loc.details    ?? it.details;   // локализуем "Подробнее"
+      it.details    = loc.details    ?? it.details;
     }
     return it;
   };
@@ -55,9 +54,8 @@ function mergeLocalized(data, dict) {
 function statusLabel(s){ return (s==='done')?'done':(s==='current')?'current':(s==='planned')?'planned':(s==='tentative')?'tentative':(s||''); }
 function normalizeLabels(it){ if (Array.isArray(it.labels)&&it.labels.length) return it.labels.map(cleanLabel); if (typeof it.type==='string'&&it.type.trim()) return it.type.split('+').map(cleanLabel); return []; }
 function cleanLabel(s){ return (s||'').toString().trim().toLowerCase(); }
-function pretty(t){ const map={'rt':'RT','car‑t':'CAR‑T','car-t':'CAR‑T','tki':'TKI','mi':'MI'}; if(map[t]) return map[t]; return t.split(' ').map(w=>w?(w[0].toUpperCase()+w.slice(1)):w).join(' '); }
+function pretty(t){ const map={'rt':'RT','car-t':'CAR-T','car-t':'CAR-T','tki':'TKI','mi':'MI'}; if(map[t]) return map[t]; return t.split(' ').map(w=>w?(w[0].toUpperCase()+w.slice(1)):w).join(' '); }
 
-// локализация текста бэйджа (из dict.labels), иначе fallback на pretty()
 function tLabel(key, dict){
   const k = (key || '').toLowerCase();
   return dict?.labels?.[k] || pretty(k);
@@ -65,7 +63,6 @@ function tLabel(key, dict){
 
 function labelFromDates(it){ const a=fmtDate(it.date_start); const b=fmtDate(it.date_end); if(a&&b) return `${a} – ${b}`; return a||b||(it.year?String(it.year):'TBD'); }
 
-// Локализованный вывод confidence для planned/tentative
 function confidenceDots(it, dict){
   if(!(it.status==='planned'||it.status==='tentative')) return '';
   const c=(it.confidence||'').toLowerCase();
@@ -89,10 +86,6 @@ function render(container, data, dict){
   const ui = dict?.ui || {};
   const tTitle=ui.page_title||'Treatment Roadmap';
   const tMetaUpd=ui.meta_updated||'Updated';
-  const tLegendDone=ui.legend_done||'Done — completed therapy/events';
-  const tLegendNow=ui.legend_now||'Now — current step';
-  const tLegendPln=ui.legend_planned||'Planned — scheduled/expected';
-  const tLegendTent=ui.legend_tentative||'Tentative — possible, not confirmed';
   const tSecCompleted=ui.section_completed||'Completed';
   const tSecNow=ui.section_now||'Now';
   const tSecPlans=ui.section_plans||'Plans';
@@ -109,15 +102,6 @@ function render(container, data, dict){
   meta.textContent=`${tMetaUpd} ${when}${by}`;
   header.append(h1,meta);
   container.appendChild(header);
-
-  // Легенда: жирные слова также из локали labels
-  const legend=createEl('div',{class:'roadmap-legend'});
-  legend.innerHTML=`
-    <span class="roadmap-chip"><b>${esc(dict?.labels?.done || 'Done')}</b> — ${esc(tLegendDone.split('—').slice(1).join('—').trim()||'completed therapy/events')}</span>
-    <span class="roadmap-chip"><b>${esc(dict?.labels?.current || 'Now')}</b> — ${esc(tLegendNow.split('—').slice(1).join('—').trim()||'current step')} <span class="roadmap-nowpulse" style="margin-left:6px"></span></span>
-    <span class="roadmap-chip"><b>${esc(dict?.labels?.planned || 'Planned')}</b> — ${esc(tLegendPln.split('—').slice(1).join('—').trim()||'scheduled/expected')}</span>
-    <span class="roadmap-chip"><b>${esc(dict?.labels?.tentative || 'Tentative')}</b> — ${esc(tLegendTent.split('—').slice(1).join('—').trim()||'possible, not confirmed')}</span>`;
-  container.appendChild(legend);
 
   const items=(data?.items||[]).slice().sort(sortByTime);
   const done=items.filter(i=>i.status==='done');
@@ -157,7 +141,14 @@ function makeColumn(kind,titleText,list,opts){
   const section=createEl('section',{class:'roadmap-col'+(collapsed?' is-collapsed':'')});
   const header=createEl('header');
   const toggle=createEl('button',{class:'roadmap-toggle','aria-expanded':String(!collapsed),'aria-controls':`list-${kind}`});
-  toggle.innerHTML=`<span class="roadmap-caret">▾</span><span>${esc(titleText)}</span>`;
+
+  // Добавляем пульсирующую точку в заголовок "Сейчас"
+  if (emphasizeNow) {
+    toggle.innerHTML=`<span class="roadmap-caret">▾</span><span>${esc(titleText)} <span class="roadmap-nowpulse" style="margin-left:6px"></span></span>`;
+  } else {
+    toggle.innerHTML=`<span class="roadmap-caret">▾</span><span>${esc(titleText)}</span>`;
+  }
+
   header.appendChild(toggle);
 
   const listEl=createEl('div',{class:'roadmap-list',id:`list-${kind}`,role:'region','aria-label':titleText});
@@ -197,7 +188,6 @@ function makeCard(it,{tBtnDetails,tBtnHide,emphasizeNow}){
   actions.appendChild(btn);
 
   wrap.append(top,summary,details,actions);
-  if(emphasizeNow&&(it.status==='current')){ const pulse=createEl('span',{class:'roadmap-nowpulse',title:'Now'}); title.append(' ',pulse); }
   return wrap;
 }
 
@@ -218,7 +208,6 @@ async function loadAll(){
 }
 
 export async function init(mountArg){
-  // Принимаем: элемент | селектор | объект { mount }
   let mount = mountArg;
   if (mount && typeof mount === 'object' && 'mount' in mount) mount = mount.mount;
   if (typeof mount === 'string') mount = qs(mount);
