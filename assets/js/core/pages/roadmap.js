@@ -1,12 +1,18 @@
 // /assets/js/core/pages/roadmap.js
-// Вкладка «Хронология». Без изменений содержимого: только устойчивый init()
-// и корректная загрузка локалей из /i18n/roadmap/<lc>.json.
+// Вкладка «Хронология» без изменения содержимого.
+// Исправлен init (никаких TDZ), строгий путь локалей: /i18n/roadmap/<lc>.json.
 
 import * as DOM from '../dom.js';
 import * as I18N from '../i18n.js';
 
-const qs       = DOM.qs || ((sel, root = document) => root.querySelector(sel));
-const createEl = (tag, attrs = {}) => {
+const qs = DOM.qs || ((sel, root = document) => root.querySelector(sel));
+const getLocale       = I18N.getLocale       || (() => (document.documentElement.lang || 'en'));
+const onLocaleChanged = I18N.onLocaleChanged || (() => () => {});
+
+let cleanup = [];
+let state = { data: null, i18n: null, locale: null };
+
+function createEl(tag, attrs = {}) {
   const el = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
     if (k === 'class') el.className = v;
@@ -14,13 +20,7 @@ const createEl = (tag, attrs = {}) => {
     else el.setAttribute(k, v);
   }
   return el;
-};
-
-const getLocale       = I18N.getLocale       || (() => (document.documentElement.lang || 'en'));
-const onLocaleChanged = I18N.onLocaleChanged || (() => () => {});
-
-let cleanup = [];
-let state = { data: null, i18n: null, locale: null };
+}
 
 async function loadJSON(path) {
   const res = await fetch(path, { cache: 'no-store' });
@@ -69,16 +69,21 @@ function makeBadge(text, dict){
 
 function card(it, dict, emphasizeNow=false){
   const wrap=createEl('article',{class:'roadmap-card'});
+
   const top=createEl('header',{class:'roadmap-card-top'});
-  const title=createEl('h4',{class:'roadmap-card-title'}); title.textContent=it.title || '';
-  const date=createEl('span',{class:'roadmap-when'}); date.textContent=it.when_label || '';
+  const title=createEl('h4',{class:'roadmap-card-title'});
+  title.textContent=it.title || '';
   const badges=createEl('span',{class:'roadmap-badges'});
   (normalizeLabels(it)).forEach(l => badges.appendChild(makeBadge(l, dict)));
   if (it.status) badges.appendChild(makeBadge(it.status, dict));
   top.append(title, createEl('span',{class:'spacer'}), badges);
 
+  const date=createEl('span',{class:'roadmap-when'}); date.textContent=it.when_label || '';
   const summary=createEl('p',{class:'roadmap-summary'}); summary.textContent=it.summary || '';
-  const details=createEl('div',{class:'roadmap-details', style:'display:none'}); details.innerHTML = esc(it.details || '');
+
+  const details=createEl('div',{class:'roadmap-details', style:'display:none'});
+  details.innerHTML = esc(it.details || '');
+
   const actions=createEl('div',{class:'roadmap-actions'});
   const tBtnDetails = dict?.ui?.btn_details || 'Details';
   const tBtnHide    = dict?.ui?.btn_hide    || 'Hide';
@@ -147,17 +152,17 @@ async function loadAll(){
   const locale = (getLocale() || 'en').toLowerCase();
   state.locale = locale;
   if (!state.data) state.data = await loadJSON('/partials/roadmap.json');
-  state.i18n = await loadJSON(`/i18n/roadmap/${locale}.json`).catch(() => ({})); // строго строчно
+  state.i18n = await loadJSON(`/i18n/roadmap/${locale}.json`).catch(() => ({})); // строго строчный путь
   return mergeLocalized(state.data, state.i18n);
 }
 
 export async function init(mountArg){
-  // ВАЖНО: не переопределяем "mount" — избегаем TDZ
+  // НИКАКИХ переопределений "mount" — безопасно вычисляем корневой элемент
   let rootEl = null;
   if (mountArg && mountArg.nodeType === 1) {
-    rootEl = mountArg;
+    rootEl = mountArg;                              // передали DOM-элемент
   } else if (typeof mountArg === 'string') {
-    rootEl = qs(mountArg);
+    rootEl = qs(mountArg);                          // передали селектор
   } else if (mountArg && typeof mountArg === 'object' && 'mount' in mountArg) {
     const m = mountArg.mount;
     rootEl = (m && m.nodeType === 1) ? m : (typeof m === 'string' ? qs(m) : null);
