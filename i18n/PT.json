@@ -38,6 +38,9 @@
   "short.play": "▶︎ Reproduzir",
   "short.pause": "‖ Pausar",
   "short.langLabel": "Idioma: ",
+  
+  "status.playing": "Reproduzindo…",
+  "status.paused": "Pausado",
 
   "support.title": "Apoie agora",
   "support.money": "Doar fundos",

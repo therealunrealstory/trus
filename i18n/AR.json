@@ -38,6 +38,9 @@
   "short.play": "▶︎ تشغيل",
   "short.pause": "‖ إيقاف مؤقت",
   "short.langLabel": "اللغة: ",
+  
+  "status.playing": "جارٍ التشغيل…",
+  "status.paused": "متوقف مؤقتًا",
 
   "support.title": "ادعم الآن",
   "support.money": "التبرع بالمال",

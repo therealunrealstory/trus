@@ -38,6 +38,9 @@
   "short.play": "▶︎ Lire",
   "short.pause": "‖ Pause",
   "short.langLabel": "Langue : ",
+  
+  "status.playing": "Lecture…",
+  "status.paused": "En pause",
 
   "support.title": "Soutenir maintenant",
   "support.money": "Faire un don",

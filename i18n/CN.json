@@ -38,6 +38,9 @@
   "short.play": "▶︎ 播放",
   "short.pause": "‖ 暂停",
   "short.langLabel": "语言：",
+  
+  "status.playing": "播放中…",
+  "status.paused": "已暂停",
 
   "support.title": "立即支持",
   "support.money": "捐款",

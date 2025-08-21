@@ -38,6 +38,9 @@
   "short.play": "▶︎ Воспроизвести",
   "short.pause": "‖ Пауза",
   "short.langLabel": "Язык: ",
+  
+  "status.playing": "Воспроизведение…",
+  "status.paused": "Пауза",
 
   "support.title": "Поддержать сейчас",
   "support.money": "Финансовая поддержка",
