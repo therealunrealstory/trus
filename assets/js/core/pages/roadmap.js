@@ -35,7 +35,7 @@ async function loadJSON(path) {
 function esc(s){ return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function fmtDate(iso){ if(!iso) return ''; try{ return new Date(iso).toLocaleDateString(undefined,{year:'numeric',month:'short'});}catch{return String(iso);} }
 
-function mergeLocalized(data, dict){
+function mergeLocalized(data, dict) {
   const clone = structuredClone(data ?? {});
   const mapItem = (it) => {
     if (!it || !it.id) return it;
@@ -44,6 +44,7 @@ function mergeLocalized(data, dict){
       it.when_label = loc.when_label ?? it.when_label;
       it.title      = loc.title      ?? it.title;
       it.summary    = loc.summary    ?? it.summary;
+      it.details    = loc.details    ?? it.details;   // ← ВАЖНО: локализуем "Подробнее"
     }
     return it;
   };
