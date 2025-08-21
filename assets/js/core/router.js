@@ -1,6 +1,6 @@
 // /assets/js/core/router.js
 // SPA Router: partials + lazy modules, повторное применение i18n,
-// и БЕЗ зависаний (MutationObserver с защитами).
+// безопасный MutationObserver без зацикливаний и без вмешательства в «живые» элементы (аудио/модалки).
 
 import * as DOM from './dom.js';
 import * as I18N from './i18n.js';
@@ -12,9 +12,23 @@ const qsa = DOM.qsa || ((sel, root = document) => Array.from(root.querySelectorA
 let current   = { name: null, destroy: null };
 let navToken  = 0;
 let mo        = null;     // MutationObserver
-let moTarget  = null;     // где наблюдаем
+let moTarget  = null;
 let isApplyingI18N = false;
-let moTimer   = null;     // debounce таймер
+let moTimer   = null;     // debounce
+
+// Узлы/поддеревья, в которые i18n не лезет после запуска (живые островки)
+const I18N_SKIP_SELECTOR = [
+  '[data-i18n-skip]',
+  '[data-i18n-lock]',
+  '.audio-player',
+  '.js-audio',
+  '[data-audio]',
+  '[data-player]',
+  '.player',
+  '.hero-audio',
+  '.modal',
+  '[data-modal]'
+].join(',');
 
 const ROUTES = {
   story:   { partial: 'story',   module: () => import('./pages/story.js')   },
@@ -70,6 +84,29 @@ async function applyI18N(root) {
   }
 }
 
+// Помечаем «живые» элементы, чтобы i18n не перезатирал их состояние
+function markDynamicIslands(root) {
+  if (!root) return;
+  // Если у тебя уже стоят data-i18n-skip / data-i18n-lock — ничего делать не нужно.
+  // Здесь мягкая авто-подсветка типовых контейнеров плееров и модалок:
+  const candidates = qsa(I18N_SKIP_SELECTOR, root);
+  candidates.forEach(el => {
+    if (!el.hasAttribute('data-i18n-skip') && !el.hasAttribute('data-i18n-lock')) {
+      el.setAttribute('data-i18n-skip', '');
+    }
+  });
+
+  // Дополнительно — кнопки play/pause: если у них есть data-i18n, снимем его один раз,
+  // чтобы переводчик не менял innerHTML и не сбрасывал иконку состояния.
+  const playBtns = qsa('.play, .btn-play, [data-action="play"], [data-audio="toggle"]', root);
+  playBtns.forEach(btn => {
+    if (btn.hasAttribute('data-i18n')) {
+      btn.setAttribute('data-i18n-lock', ''); // помечаем как динамическую
+      btn.removeAttribute('data-i18n');       // и больше не трогаем текст/иконку переводом
+    }
+  });
+}
+
 // ————— Безопасный наблюдатель —————
 function stopObserver() {
   try { mo && mo.disconnect(); } catch {}
@@ -78,14 +115,29 @@ function stopObserver() {
   if (moTimer) { clearTimeout(moTimer); moTimer = null; }
 }
 
+function mutationTouchesSkipArea(mutation) {
+  const nodes = [
+    ...(mutation.addedNodes ? Array.from(mutation.addedNodes) : []),
+    ...(mutation.removedNodes ? Array.from(mutation.removedNodes) : [])
+  ];
+  return nodes.some(n => {
+    if (!(n instanceof Element)) return false;
+    return n.closest(I18N_SKIP_SELECTOR) != null;
+  });
+}
+
 function startObserver(mount) {
   stopObserver();
   if (!mount || typeof MutationObserver === 'undefined') return;
   moTarget = mount;
   mo = new MutationObserver((mutations) => {
     if (isApplyingI18N) return; // игнорируем собственные правки перевода
-    // Реагируем только если реально добавили/удалили узлы
-    const relevant = mutations.some(m => (m.addedNodes && m.addedNodes.length) || (m.removedNodes && m.removedNodes.length));
+    // реагируем только на добавление/удаление узлов НЕ внутри «skip»-зон
+    const relevant = mutations.some(m => {
+      const structural = (m.addedNodes && m.addedNodes.length) || (m.removedNodes && m.removedNodes.length);
+      if (!structural) return false;
+      return !mutationTouchesSkipArea(m);
+    });
     if (!relevant) return;
     // Debounce: не чаще, чем раз в 150 мс
     if (moTimer) return;
@@ -94,13 +146,14 @@ function startObserver(mount) {
       await safeApplyI18N(mount);
     }, 150);
   });
-  // наблюдаем только childList/subtree — НИ атрибуты, НИ characterData
-  mo.observe(mount, { childList: true, subtree: true });
+  mo.observe(mount, { childList: true, subtree: true }); // без attributes/characterData
 }
 
 async function safeApplyI18N(root) {
   if (!root) return;
-  // На время применения переводов отключаем наблюдатель
+  // 1) Отмечаем динамические островки (включая плеер/модалки)
+  markDynamicIslands(root);
+  // 2) На время применения переводов отключаем наблюдатель
   const hadObserver = !!mo;
   if (hadObserver) stopObserver();
   isApplyingI18N = true;
