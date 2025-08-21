@@ -1,9 +1,11 @@
 // /assets/js/core/router.js
-// Надёжный SPA-роутер с делегированием кликов, дефолтным #/story,
-// совместим с pages/story.js|support.js|now.js (init(mount)) и pages/roadmap.js.
+// SPA-роутер: partials → #subpage, lazy-страницы, активная кнопка,
+// делегирование кликов по [data-route], дефолтный #/story.
+// Экспорты под ожидания boot.js: startRouter, rerenderCurrentPage.
 
 import * as DOM from './dom.js';
 
+// Фолбэки на случай, если в dom.js нет именованных экспортов
 const qs  = DOM.qs  || ((sel, root = document) => root.querySelector(sel));
 const qsa = DOM.qsa || ((sel, root = document) => Array.from(root.querySelectorAll(sel)));
 
@@ -62,7 +64,7 @@ async function runRoute(name, token) {
   if (cfg.partial) {
     const partial = await fetchPartial(cfg.partial, token);
     if (token !== navToken || partial === null) return;
-    mount = mountHTML(partial.html);                // ← получаем ЭЛЕМЕНТ
+    mount = mountHTML(partial.html);
   } else {
     if (mount) mount.innerHTML = '';
   }
@@ -70,9 +72,8 @@ async function runRoute(name, token) {
   const mod = await cfg.module();
   if (token !== navToken) return;
 
-  // ВАЖНО: передаём в init ИМЕННО ЭЛЕМЕНТ, а не объект { mount }
+  // ВАЖНО: story/support/now ждут ЭЛЕМЕНТ, а не { mount }
   if (typeof mod?.init === 'function') await mod.init(mount);
-
   if (typeof mod?.destroy === 'function') current.destroy = mod.destroy;
 }
 
@@ -80,7 +81,7 @@ export async function navigate(hash) {
   if (hash && location.hash !== hash) location.hash = hash;
 }
 
-// Требуется boot.js: перерисовать текущую страницу без смены hash
+// Нужно boot.js
 export async function rerenderCurrentPage() {
   if (!current.name) return;
   navToken++;
@@ -114,10 +115,17 @@ export function init() {
   onHashChange(); // первый запуск
 }
 
-// Автобут, если подключили напрямую модульным скриптом из index.html
-if (document.currentScript && !window.__TRUS_ROUTER_BOOTSTRAPPED__) {
-  window.__TRUS_ROUTER_BOOTSTRAPPED__ = true;
-  init();
+// Специально для boot.js (ожидает named export startRouter)
+export function startRouter() {
+  if (!window.__TRUS_ROUTER_BOOTSTRAPPED__) {
+    window.__TRUS_ROUTER_BOOTSTRAPPED__ = true;
+    init();
+  }
 }
 
-export default { init, navigate, rerenderCurrentPage };
+// Автобут, если файл подключён напрямую отдельным модульным скриптом
+if (document.currentScript && !window.__TRUS_ROUTER_BOOTSTRAPPED__) {
+  startRouter();
+}
+
+export default { init, navigate, rerenderCurrentPage, startRouter };
