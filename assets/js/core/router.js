@@ -1,20 +1,20 @@
 // /assets/js/core/router.js
-// Лёгкий роутер: грузит partials, лениво подключает модули страниц,
-// применяет i18n ПОСЛЕ вставки partial и ПОСЛЕ init() страницы.
-// Без MutationObserver, без вмешательства в плееры/модалки.
-// Совместим с твоими now.js/story.js/support.js (init ждёт DOM-элемент).
+// Лёгкий роутер: partials + lazy-модули страниц.
+// ВАЖНО: после каждого шага применяем i18n не только к #subpage, но и ко всему документу,
+// чтобы перевелись шапка/Hero/кнопки музыки/модалки, которые лежат вне #subpage.
+// Также выставляем <html data-route="..."> и шлём событие смены маршрута.
 
 import * as DOM from './dom.js';
 import * as I18N from './i18n.js';
 
-// Фолбэки, если в dom.js нет именованных экспортов
+// Фолбэки на случай, если в dom.js нет именованных экспортов
 const qs  = DOM.qs  || ((sel, root = document) => root.querySelector(sel));
 const qsa = DOM.qsa || ((sel, root = document) => Array.from(root.querySelectorAll(sel)));
 
 let current = { name: null, destroy: null };
 let navToken = 0;
 
-// Маршруты (контент страниц не трогаем)
+// === Маршруты (контент страниц не трогаем)
 const ROUTES = {
   story:   { partial: 'story',   module: () => import('./pages/story.js')   },
   support: { partial: 'support', module: () => import('./pages/support.js') },
@@ -55,7 +55,7 @@ function setActiveNav(routeHash) {
   });
 }
 
-// Аккуратно применяем переводы (разные реализации i18n поддержаны)
+// Универсальный вызов i18n
 async function applyI18N(root) {
   const r = root || document.body;
   try {
@@ -69,28 +69,40 @@ async function applyI18N(root) {
   }
 }
 
+// Вспомогательно: применить i18n к #subpage И ко всему документу,
+// чтобы перевелись шапка/модалки/хедер и не оставались "..."
+async function applyI18NAll(mount) {
+  await applyI18N(mount);
+  await applyI18N(document.body);
+}
+
 async function runRoute(name, token) {
   const cfg = ROUTES[name];
+
+  // Сообщим глобально, какой маршрут будет активен
+  document.documentElement.setAttribute('data-route', name);
+  document.dispatchEvent(new CustomEvent('trus:route:will-change', { detail: { to: name }}));
 
   // Тёрндаун прошлой страницы
   if (current.destroy) { try { current.destroy(); } catch {} }
   current = { name, destroy: null };
 
-  // Подсветка активного пункта меню
+  // Подсветка активного меню
   setActiveNav(`#/${name}`);
 
-  // 1) Если есть partial — вставляем его и тут же переводим
+  // 1) Подключаем partial (если есть) и СРАЗУ переводим всё
   let mount = qs('#subpage');
   if (cfg.partial) {
     const partial = await fetchPartial(cfg.partial, token);
     if (token !== navToken || partial === null) return;
     mount = mountHTML(partial.html);
-    await applyI18N(mount);
+    await applyI18NAll(mount);       // ← перевести и центр, и шапку/модалки
   } else {
     if (mount) mount.innerHTML = '';
+    await applyI18N(document.body);  // ← хотя бы глобальные строки
   }
 
-  // 2) Загружаем модуль и передаём ЕМУ DOM-элемент (а не {mount})
+  // 2) Инициализация модуля страницы (ему передаём DOM-элемент)
   const mod = await cfg.module();
   if (token !== navToken) return;
   if (typeof mod?.init === 'function') {
@@ -100,8 +112,11 @@ async function runRoute(name, token) {
     current.destroy = mod.destroy;
   }
 
-  // 3) Финальный проход i18n на случай, если модуль дорисовал DOM
-  await applyI18N(mount);
+  // 3) Финальный проход перевода по ВСЕМУ документу
+  await applyI18NAll(mount);
+
+  // Сообщим, что маршрут отрисован (для твоих вспомогательных скриптов/плеера/модалок)
+  document.dispatchEvent(new CustomEvent('trus:route:rendered', { detail: { name } }));
 }
 
 export async function navigate(hash) {
@@ -140,9 +155,12 @@ export function init() {
   document.addEventListener('click', onClick);
   window.addEventListener('hashchange', onHashChange);
 
-  // Если i18n уведомляет о смене языка — просто перерисуем текущую страницу
+  // Если i18n шлёт событие смены языка — перерисуем текущую страницу и переведём весь документ
   if (typeof I18N.onLocaleChanged === 'function') {
-    I18N.onLocaleChanged(() => rerenderCurrentPage());
+    I18N.onLocaleChanged(async () => {
+      rerenderCurrentPage();
+      await applyI18N(document.body);
+    });
   }
 
   onHashChange();
@@ -155,7 +173,7 @@ export function startRouter() {
   }
 }
 
-// Автозапуск при прямом подключении файла <script type="module" src=".../router.js">
+// Автозапуск только при прямом подключении файла
 if (document.currentScript && !window.__TRUS_ROUTER_BOOTSTRAPPED__) {
   startRouter();
 }
