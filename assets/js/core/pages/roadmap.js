@@ -1,6 +1,6 @@
 // /assets/js/core/pages/roadmap.js
-// Вкладка «Хронология»: совместима с init(mount) И init({ mount }),
-// не зависит от именованных экспортов dom.js.
+// Вкладка «Хронология»: tolerant init (mount | {mount} | selector), локализация details,
+// меток статусов/типов и слова "confidence".
 
 import * as DOM from '../dom.js';
 import * as I18N from '../i18n.js';
@@ -64,8 +64,24 @@ function tLabel(key, dict){
 }
 
 function labelFromDates(it){ const a=fmtDate(it.date_start); const b=fmtDate(it.date_end); if(a&&b) return `${a} – ${b}`; return a||b||(it.year?String(it.year):'TBD'); }
-function confidenceDots(it){ if(!(it.status==='planned'||it.status==='tentative')) return ''; const c=(it.confidence||'').toLowerCase(); const dots=c==='high'?'<span class="roadmap-dot high"></span><span class="roadmap-dot high"></span><span class="roadmap-dot high"></span>':c==='medium'?'<span class="roadmap-dot medium"></span><span class="roadmap-dot medium"></span><span class="roadmap-dot"></span>':'<span class="roadmap-dot low"></span><span class="roadmap-dot"></span><span class="roadmap-dot"></span>'; return ` · confidence <span class="roadmap-conf">${dots}</span>`; }
-function sortByTime(a,b){ const getKey=(x)=>{ const y=Number(x.year)||0; const d=x.date_start||x.date_end||`${y}-01-01`; return `${y}-${d}`; }; return getKey(a)>getKey(b)?1:-1; }
+
+// Локализованный вывод confidence для planned/tentative
+function confidenceDots(it, dict){
+  if(!(it.status==='planned'||it.status==='tentative')) return '';
+  const c=(it.confidence||'').toLowerCase();
+  const dots = (c==='high')
+    ? '<span class="roadmap-dot high"></span><span class="roadmap-dot high"></span><span class="roadmap-dot high"></span>'
+    : (c==='medium')
+      ? '<span class="roadmap-dot medium"></span><span class="roadmap-dot medium"></span><span class="roadmap-dot"></span>'
+      : '<span class="roadmap-dot low"></span><span class="roadmap-dot"></span><span class="roadmap-dot"></span>';
+  const word = dict?.ui?.confidence || 'confidence';
+  return ` · ${esc(word)} <span class="roadmap-conf">${dots}</span>`;
+}
+
+function sortByTime(a,b){
+  const getKey=(x)=>{ const y=Number(x.year)||0; const d=x.date_start||x.date_end||`${y}-01-01`; return `${y}-${d}`; };
+  return getKey(a)>getKey(b)?1:-1;
+}
 
 function render(container, data, dict){
   container.innerHTML='';
@@ -94,12 +110,13 @@ function render(container, data, dict){
   header.append(h1,meta);
   container.appendChild(header);
 
-const legend=createEl('div',{class:'roadmap-legend'});
-legend.innerHTML=`
-  <span class="roadmap-chip"><b>${esc(dict?.labels?.done || 'Done')}</b> — ${esc(tLegendDone.split('—').slice(1).join('—').trim()||'completed therapy/events')}</span>
-  <span class="roadmap-chip"><b>${esc(dict?.labels?.current || 'Now')}</b> — ${esc(tLegendNow.split('—').slice(1).join('—').trim()||'current step')} <span class="roadmap-nowpulse" style="margin-left:6px"></span></span>
-  <span class="roadmap-chip"><b>${esc(dict?.labels?.planned || 'Planned')}</b> — ${esc(tLegendPln.split('—').slice(1).join('—').trim()||'scheduled/expected')}</span>
-  <span class="roadmap-chip"><b>${esc(dict?.labels?.tentative || 'Tentative')}</b> — ${esc(tLegendTent.split('—').slice(1).join('—').trim()||'possible, not confirmed')}</span>`;
+  // Легенда: жирные слова также из локали labels
+  const legend=createEl('div',{class:'roadmap-legend'});
+  legend.innerHTML=`
+    <span class="roadmap-chip"><b>${esc(dict?.labels?.done || 'Done')}</b> — ${esc(tLegendDone.split('—').slice(1).join('—').trim()||'completed therapy/events')}</span>
+    <span class="roadmap-chip"><b>${esc(dict?.labels?.current || 'Now')}</b> — ${esc(tLegendNow.split('—').slice(1).join('—').trim()||'current step')} <span class="roadmap-nowpulse" style="margin-left:6px"></span></span>
+    <span class="roadmap-chip"><b>${esc(dict?.labels?.planned || 'Planned')}</b> — ${esc(tLegendPln.split('—').slice(1).join('—').trim()||'scheduled/expected')}</span>
+    <span class="roadmap-chip"><b>${esc(dict?.labels?.tentative || 'Tentative')}</b> — ${esc(tLegendTent.split('—').slice(1).join('—').trim()||'possible, not confirmed')}</span>`;
   container.appendChild(legend);
 
   const items=(data?.items||[]).slice().sort(sortByTime);
@@ -162,7 +179,7 @@ function makeCard(it,{tBtnDetails,tBtnHide,emphasizeNow}){
   const top=createEl('div',{class:'roadmap-topline'});
   const left=createEl('div');
   const title=createEl('div',{class:'roadmap-title-sm'}); title.textContent=it.title||'';
-  const when=createEl('div',{class:'roadmap-when'}); when.innerHTML=`${esc(it.when_label||labelFromDates(it))}${confidenceDots(it)}`;
+  const when=createEl('div',{class:'roadmap-when'}); when.innerHTML=`${esc(it.when_label||labelFromDates(it))}${confidenceDots(it, state.i18n)}`;
   left.append(title,when);
 
   const badges=createEl('div',{class:'roadmap-badges'});
@@ -196,7 +213,6 @@ async function loadAll(){
   state.locale = locale;
   if(!state.data){ state.data = await loadJSON('/partials/roadmap.json'); }
   const lc = (locale || '').toLowerCase();
-  // Важно: папка локалей в нижнем регистре
   state.i18n = await loadJSON(`/i18n/roadmap/${lc}.json`).catch(() => ({}));
   return mergeLocalized(state.data, state.i18n);
 }
