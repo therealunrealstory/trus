@@ -1,129 +1,166 @@
 {
+  "labels": {
+    "done": "已完成",
+    "current": "当前",
+    "planned": "计划中",
+    "tentative": "待定",
+
+    "diagnosis": "诊断",
+    "chemotherapy": "化疗",
+    "radiotherapy": "放疗",
+    "transplant": "移植",
+    "rehab": "康复",
+    "event": "事件",
+    "other": "其他"
+  },
   "ui": {
     "page_title": "医疗时间线",
-    "meta_updated": "已更新",
-    "legend_done": "Done — 已完成的治疗/事件",
+    "meta_updated": "更新于",
+    "legend_done": "Done — 已完成的阶段/事件",
     "legend_now": "Now — 当前阶段",
     "legend_planned": "Planned — 计划/预期",
     "legend_tentative": "Tentative — 可能，未确认",
     "section_completed": "已完成",
-    "section_now": "现在",
+    "section_now": "当前",
     "section_plans": "计划",
     "no_entries": "暂无条目。",
     "btn_details": "详情",
     "btn_hide": "收起",
-    "notice_tbd": "“TBD” = “待确定”（细节/日期尚未确定）。本路线图仅供参考，不构成医疗建议。"
+    "confidence": "置信度",
+    "notice_tbd": "“TBD” = “待确定”。本路线图仅供参考，不构成医疗建议。"
   },
   "items": {
     "2019-01-dx-staging": {
-      "when_label": "Jan–Mar 2019",
-      "title": "Primary diagnosis — T‑lymphoblasts (lymphoma); staging",
-      "summary": "Initial workup confirmed lymphoma with T‑lymphoblastic features; baseline tests and staging completed."
+      "when_label": "2019年1–3月",
+      "title": "初始诊断——T淋巴母细胞淋巴瘤；分期",
+      "summary": "基线检查确认T淋巴母细胞淋巴瘤；完成分期与基线评估。",
+      "details": "血液科会诊、影像与活检明确诊断与分期。开始治疗前记录心功能与化验基线。"
     },
     "2019-03-first-chemo-rt": {
-      "when_label": "Mar–Aug 2019",
-      "title": "Chemotherapy against lymphoma (T‑lymphoblastic)",
-      "summary": "Systemic chemotherapy with supportive care; adjuvant radiation therapy."
+      "when_label": "2019年3–8月",
+      "title": "T淋巴母细胞淋巴瘤化疗",
+      "summary": "系统化疗与支持治疗；辅助放疗。",
+      "details": "按计划分期评估疗效并结疗评估。放疗用于巩固（约30次）。"
     },
     "2020-04-relapse-dx": {
-      "when_label": "Apr 2020",
-      "title": "Relapse — T‑lymphoblastic lymphoma (diagnosis)",
-      "summary": "Relapse confirmed; treatment plan renewed."
+      "when_label": "2020年4月",
+      "title": "复发——T淋巴母细胞淋巴瘤（确诊）",
+      "summary": "确证复发；更新治疗方案。",
+      "details": "诊断复核再次确认T‑LBL；建议重启系统治疗。"
     },
     "2020-04-11-chemo-rt-mi": {
-      "when_label": "Apr–Nov 2020",
-      "title": "Chemotherapy with adjunct radiotherapy ×30; massive GI bleed with MI",
-      "summary": "Chemo resumed with radiotherapy; GI ulcer bleed led to myocardial infarction; therapy continued after stabilization."
+      "when_label": "2020年4–11月",
+      "title": "化疗 + 放疗×30；严重消化道出血与心肌梗死",
+      "summary": "恢复化疗与放疗；消化性溃疡出血导致心梗；稳定后继续治疗。",
+      "details": "重度贫血与心律失常以输血与重症监护处理。放疗与化疗并行（约30次）。"
     },
     "2021-05-aggressive-leukocytosis-dx": {
-      "when_label": "May 2021",
-      "title": "Aggressive leukemia with extreme leukocytosis — diagnosis",
-      "summary": "Leukocytes >300k; diagnosis established; cytoreductive plan initiated."
+      "when_label": "2021年5月",
+      "title": "侵袭性白血病伴极度白细胞增多——诊断",
+      "summary": "白细胞 >30万；确诊；启动细胞减灭治疗。",
+      "details": "病程进展迅速（后示Ph+特征）；需紧急细胞减灭与输血支持。"
     },
     "2021-05-2023-09-chemo-aggr-leukemia": {
-      "when_label": "May 2021–Sep 2023",
-      "title": "Chemotherapy against aggressive leukemia",
-      "summary": "Prolonged systemic chemotherapy to reach CAR‑T eligibility and disease control."
+      "when_label": "2021年5月–2023年9月",
+      "title": "针对侵袭性白血病的化疗",
+      "summary": "长期系统治疗，以达到CAR‑T准入并控制病情。",
+      "details": "递增/个体化方案以降低白细胞至CAR‑T阈值以下；合并感染随治随管。"
     },
     "2022-03-26-neuro-shock": {
-      "when_label": "Mar–Apr 2022",
-      "title": "Systemic shock with paralysis and amnesia",
-      "summary": "Resuscitated; prolonged neurological deficits with gradual recovery."
+      "when_label": "2022年3–4月",
+      "title": "全身性休克并瘫痪与失忆",
+      "summary": "需复苏；继发神经功能缺损，后逐步恢复。",
+      "details": "急性崩溃行复苏。随后：瘫痪、运动性失语/失忆、认知减慢；在神经科随访下阶梯式恢复。"
     },
     "2022-10-invasive-fungal-sepsis": {
-      "when_label": "Oct 2022",
-      "title": "Invasive fungal infection with sepsis",
-      "summary": "Severe oropharyngeal focus with systemic involvement; treated successfully."
+      "when_label": "2022年10月",
+      "title": "侵袭性真菌感染并脓毒症",
+      "summary": "严重口咽部病灶并全身受累；治疗成功。",
+      "details": "住院抗感染治疗；并见心律失常与2022年微卒中样症状。"
     },
     "2022-12-covid-icu-gi-bleed": {
-      "when_label": "Dec 2022–Jan 2023",
-      "title": "COVID‑19 pneumonia (ICU, intubation) and GI bleed; recovery",
-      "summary": "Critical COVID‑19 with intubation; GI bleeding; coma; unexpected recovery."
+      "when_label": "2022年12月–2023年1月",
+      "title": "新冠肺炎（ICU、插管）与消化道出血；恢复",
+      "summary": "免疫抑制背景下病情危重并需插管与昏迷；随后稳定。",
+      "details": "免疫抑制中肺炎快速恶化 → ICU、插管与昏迷；ICU后康复，逐步稳定。"
     },
     "2023-06-respiratory-arrest-sepsis": {
-      "when_label": "Jun–Sep 2023",
-      "title": "Respiratory arrest (revived) and bacteremia; high‑dose chemo",
-      "summary": "Cardiorespiratory event reversed; rare cardiac‑source bacteremia treated; intensified chemo to reach CAR‑T criteria."
+      "when_label": "2023年6–9月",
+      "title": "呼吸骤停（复苏）与菌血症；强化化疗",
+      "summary": "事件控制；罕见菌血症治愈；为达CAR‑T阈值强化化疗。",
+      "details": "强化治疗以将白细胞降至CAR‑T阈值以下；并发感染随治。"
     },
     "2023-10-car-t": {
-      "when_label": "Oct–Nov 2023",
-      "title": "CAR‑T cell therapy",
-      "summary": "CAR‑T administered; severe toxicity managed (fever, neurologic and cardiac events)."
+      "when_label": "2023年10–11月",
+      "title": "CAR‑T治疗",
+      "summary": "实施CAR‑T；严重毒性（发热、神经及心脏事件）得到控制。",
+      "details": "高热、呕吐、下肢短暂瘫痪…… 符合神经毒性表现；随后逐步恢复。"
     },
     "2024-01-allo-sct-brother-bradonor": {
-      "when_label": "Jan 2024",
-      "title": "Allogeneic stem‑cell infusion — brother donor",
-      "summary": "Allogeneic stem cells infused as consolidation after CAR‑T."
+      "when_label": "2024年1月",
+      "title": "同种异体造血干细胞输注——兄弟供者",
+      "summary": "CAR‑T后以同种干细胞作巩固。",
+      "details": "植入期严格感染控制；随后门诊恢复。"
     },
     "2024-07-abdominal-mass-hl": {
-      "when_label": "July 2024",
-      "title": "Large abdominal mass; aggressive Hodgkin lymphoma",
-      "summary": "New HL diagnosed, distinct from earlier disease; therapy plan adjusted."
+      "when_label": "2024年7月",
+      "title": "巨大腹部肿块；侵袭性霍奇金淋巴瘤",
+      "summary": "新发HL，与既往不同；治疗策略调整。",
+      "details": "可能与既往治疗相关…… 肿瘤科提出新的化疗策略。"
     },
     "2024-08-2025-06-chemo-rt": {
-      "when_label": "Aug 2024–Jun 2025",
-      "title": "Escalated chemo → septic complication → switch to effective regimen; radiotherapy ×30",
-      "summary": "Initial heavy dose caused sepsis; switched to better‑tolerated regimen; adjuvant radiotherapy (30 sessions)."
+      "when_label": "2024年8月–2025年6月",
+      "title": "强化化疗 → 败血症 → 改为有效方案；放疗×30",
+      "summary": "初始大剂量致败血症；改用更耐受且有效的方案；加做放疗（30次）。",
+      "details": "败血症后调整方案以兼顾疗效与耐受性。放疗作为巩固（30个工作日）。"
     },
     "2025-06-relapse-Ph-pos": {
-      "when_label": "Late Jun 2025",
-      "title": "Rising leukocytes; Ph+ lymphoid cells detected",
-      "summary": "Leukocytes increased from ~35k to ~67k within days; Ph+ lymphoid lineage identified."
+      "when_label": "2025年6月下旬",
+      "title": "白细胞上升；发现Ph+淋巴系细胞",
+      "summary": "白细胞数数日内由约3.5万升至约6.7万；证实Ph+淋巴系。",
+      "details": "肿瘤科建议口服化疗，稳定后转入TKI（泊纳替尼）。"
     },
     "2025-07-oral-chemo-14": {
-      "when_label": "Now",
-      "title": "Oral multi‑agent chemotherapy (14 doses)",
-      "summary": "Structured per‑oral regimen at home, total of 14 doses."
+      "when_label": "2025年7月–现在",
+      "title": "口服多药化疗（14剂）",
+      "summary": "在家进行的结构化口服方案，共14剂。",
+      "details": "复杂口服组合，中期监测实验室与耐受；疗程结束后做决策评估。"
     },
     "plan-2025-support-recovery": {
-      "when_label": "Post‑chemo (TBD)",
-      "title": "Support and functional recovery",
-      "summary": "Structured supportive care and rehabilitation after the current course."
+      "when_label": "化疗后（待定）",
+      "title": "支持与功能恢复",
+      "summary": "结构化支持治疗与康复。",
+      "details": "具体强度与节奏将依据化疗后状态与化验趋势调整。"
     },
     "plan-2025-tki-lifelong": {
-      "when_label": "After stabilization (TBD)",
-      "title": "Tyrosine‑kinase inhibitor (ponatinib) — long‑term",
-      "summary": "Initiate TKI maintenance after cytoreduction; likely long‑term or lifelong."
+      "when_label": "稳定后（待定）",
+      "title": "酪氨酸激酶抑制剂（泊纳替尼）——长期",
+      "summary": "细胞减灭后维持性TKI；可能长期/终身。",
+      "details": "在血液学控制可接受后启动；监测疗效与不良反应；预计需剂量调整。"
     },
     "plan-2025-re-irradiation": {
-      "when_label": "If indicated (TBD)",
-      "title": "Potential repeat radiotherapy",
-      "summary": "Consider re‑irradiation if disease control requires it."
+      "when_label": "如指征（待定）",
+      "title": "可能的再次放疗",
+      "summary": "如需局部控制，可考虑。",
+      "details": "肿瘤多学科讨论决定；依赖影像与既往放疗剂量。"
     },
     "plan-2025-chemo-switch": {
-      "when_label": "If current regimen underperforms (TBD)",
-      "title": "Possible switch of current chemotherapy protocol",
-      "summary": "Protocol change may be required based on response or toxicity."
+      "when_label": "如当前方案不足（待定）",
+      "title": "可能更换当前化疗方案",
+      "summary": "若疗效不足或毒性不可接受，则更换。",
+      "details": "复评化验/影像与耐受后决定；必要时改选替代方案。"
     },
     "plan-2025-next-line-chemo": {
-      "when_label": "If needed (TBD)",
-      "title": "Possible additional chemotherapy line",
-      "summary": "Another line may be required depending on disease dynamics."
+      "when_label": "如需要（待定）",
+      "title": "可能的后续化疗线",
+      "summary": "根据病情进展决定的备选方案。",
+      "details": "由肿瘤会诊在评估当前疗程后决定。"
     },
     "plan-2026-repeat-allo-sct": {
-      "when_label": "2026 (possible)",
-      "title": "Possible repeat allogeneic stem‑cell transplant",
-      "summary": "Option if disease course necessitates definitive consolidation."
+      "when_label": "2026年（可能）",
+      "title": "可能再次行同种异体移植",
+      "summary": "如需最终巩固，可考虑此选项。",
+      "details": "取决于对TKI与化疗的反应；需评估供者/中心并权衡风险与获益。"
     }
   }
 }

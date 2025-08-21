@@ -1,10 +1,24 @@
 {
+  "labels": {
+    "done": "Completado",
+    "current": "Ahora",
+    "planned": "Planificado",
+    "tentative": "Tentativo",
+
+    "diagnosis": "Diagnóstico",
+    "chemotherapy": "Quimioterapia",
+    "radiotherapy": "Radioterapia",
+    "transplant": "Trasplante",
+    "rehab": "Rehabilitación",
+    "event": "Evento",
+    "other": "Otro"
+  },
   "ui": {
     "page_title": "Cronología médica",
     "meta_updated": "Actualizado",
     "legend_done": "Done — etapas/eventos completados",
     "legend_now": "Now — etapa actual",
-    "legend_planned": "Planned — programado/previsto",
+    "legend_planned": "Planned — programado/esperado",
     "legend_tentative": "Tentative — posible, no confirmado",
     "section_completed": "Completado",
     "section_now": "Ahora",
@@ -12,64 +26,141 @@
     "no_entries": "Aún no hay entradas.",
     "btn_details": "Detalles",
     "btn_hide": "Ocultar",
-    "notice_tbd": "“TBD” = “to be determined” (detalles/fechas aún sin definir). Esta hoja es informativa y no constituye consejo médico."
+    "confidence": "confianza",
+    "notice_tbd": "“TBD” = “por determinar”. Este mapa es informativo y no constituye consejo médico."
   },
   "items": {
-     "2019-01-dx-staging": {
-      "title": "Diagnóstico inicial",
-      "summary": "Diagnóstico de linfoma de Hodgkin, estadio IV, con compromiso óseo y esplénico."
+    "2019-01-dx-staging": {
+      "when_label": "Ene–Mar 2019",
+      "title": "Diagnóstico inicial — linfoma linfoblástico T; estadificación",
+      "summary": "Estudios iniciales confirmaron linfoma linfoblástico T; se completaron estadificación y pruebas de base.",
+      "details": "Consulta de hematología, imágenes y biopsias establecieron diagnóstico y estadio. Registro basal de función cardíaca y análisis antes del tratamiento."
     },
-    "2019-05-abvd": {
-      "title": "ABVD quimioterapia",
-      "summary": "6 ciclos de ABVD completados en 2019, logrando una respuesta completa inicial."
+    "2019-03-first-chemo-rt": {
+      "when_label": "Mar–Ago 2019",
+      "title": "Quimioterapia para linfoma linfoblástico T",
+      "summary": "Quimioterapia sistémica con soporte; radioterapia adyuvante.",
+      "details": "Ciclos planificados con evaluación intermedia y final. Radioterapia como consolidación (~30 sesiones)."
     },
     "2020-04-relapse-dx": {
-      "title": "Recaída",
-      "summary": "La enfermedad regresó en 2020, confirmada por biopsia. Se consideraron terapias de rescate."
+      "when_label": "Abr 2020",
+      "title": "Recaída — linfoma linfoblástico T (confirmada)",
+      "summary": "Se confirmó la recaída; se actualizó el plan terapéutico.",
+      "details": "La revisión diagnóstica reconfirmó LLB‑T; se indicó reiniciar tratamiento sistémico."
     },
-    "2020-05-salvage-ice": {
-      "title": "Terapia de rescate ICE",
-      "summary": "2 ciclos de ICE administrados como quimioterapia de rescate antes del trasplante."
+    "2020-04-11-chemo-rt-mi": {
+      "when_label": "Abr–Nov 2020",
+      "title": "QT + RT×30; hemorragia GI grave e infarto de miocardio",
+      "summary": "Se reanudó QT y RT; sangrado por úlcera llevó a IM; el tratamiento continuó tras estabilización.",
+      "details": "Anemia severa y taquiarritmia manejadas con transfusiones y UCI. RT administrada en paralelo con QT (~30 sesiones)."
     },
-    "2020-07-auto-sct": {
-      "title": "Trasplante autólogo de células madre",
-      "summary": "Trasplante autólogo realizado tras quimioterapia de acondicionamiento con BEAM."
+    "2021-05-aggressive-leukocytosis-dx": {
+      "when_label": "May 2021",
+      "title": "Leucemia agresiva con leucocitosis extrema — diagnóstico",
+      "summary": "Leucocitos >300k; diagnóstico confirmado; se inició citorreducción.",
+      "details": "Curso leucémico rápido (luego rasgos Ph+); requirió citorreducción urgente y soporte transfusional."
     },
-    "2021-06-relapse2": {
-      "title": "Segunda recaída",
-      "summary": "La enfermedad progresó nuevamente en 2021 a pesar del trasplante y la terapia previa."
+    "2021-05-2023-09-chemo-aggr-leukemia": {
+      "when_label": "May 2021–Sep 2023",
+      "title": "Quimioterapia contra leucemia agresiva",
+      "summary": "Terapia sistémica prolongada para alcanzar criterios de CAR‑T y controlar la enfermedad.",
+      "details": "Regímenes escalables/adaptativos dirigidos a reducir leucocitos por debajo del umbral CAR‑T; manejo de infecciones intercurrentes."
     },
-    "2021-08-brentuximab": {
-      "title": "Terapia con Brentuximab",
-      "summary": "Administración de Brentuximab Vedotin como intento de control de la enfermedad."
+    "2022-03-26-neuro-shock": {
+      "when_label": "Mar–Abr 2022",
+      "title": "Choque sistémico con parálisis y amnesia",
+      "summary": "Requirió reanimación; déficits neurológicos con recuperación gradual.",
+      "details": "Colapso agudo con RCP. Después: parálisis, afasia/amnesia motora, enlentecimiento cognitivo; recuperación por etapas con seguimiento neurológico."
     },
-    "2022-03-shock": {
-      "title": "Shock sistémico",
-      "summary": "Durante videollamada, colapso y hospitalización urgente. Paralizado temporalmente."
+    "2022-10-invasive-fungal-sepsis": {
+      "when_label": "Oct 2022",
+      "title": "Infección fúngica invasiva con sepsis",
+      "summary": "Foco orofaríngeo severo con afectación sistémica; tratado con éxito.",
+      "details": "Tratamiento antimicrobiano intrahospitalario; arritmias concomitantes y síntomas tipo micro‑ACV en 2022."
     },
-    "2022-04-complications": {
-      "title": "Complicaciones graves",
-      "summary": "Episodios de pérdida de memoria, infecciones recurrentes y crisis cardíacas."
+    "2022-12-covid-icu-gi-bleed": {
+      "when_label": "Dic 2022–Ene 2023",
+      "title": "Neumonía por COVID‑19 (UCI, intubación) y sangrado GI; recuperación",
+      "summary": "Curso crítico con intubación y coma; sangrado e inmunosupresión; estabilización posterior.",
+      "details": "Empeoramiento rápido de neumonía en inmunosupresión → UCI, intubación y coma; rehabilitación post‑UCI con estabilización progresiva."
     },
-    "2023-01-allogenic-sct": {
-      "title": "Trasplante alogénico de células madre",
-      "summary": "Trasplante con donante fraterno, acompañado de complicaciones severas de inmunidad."
+    "2023-06-respiratory-arrest-sepsis": {
+      "when_label": "Jun–Sep 2023",
+      "title": "Paro respiratorio (reanimado) y bacteriemia; QT intensificada",
+      "summary": "Evento controlado; bacteriemia rara tratada; QT intensificada para alcanzar umbral CAR‑T.",
+      "details": "Terapia escalada para bajar leucocitos por debajo del umbral CAR‑T; infecciones intercurrentes manejadas según aparición."
     },
     "2023-10-car-t": {
-      "title": "Terapia CAR-T",
-      "summary": "Infusión experimental de células CAR-T, con fuertes efectos secundarios neurológicos."
+      "when_label": "Oct–Nov 2023",
+      "title": "Terapia CAR‑T",
+      "summary": "Se realizó CAR‑T; toxicidad severa (fiebre, eventos neurológicos y cardíacos) controlada.",
+      "details": "Fiebre alta, vómitos, parálisis transitoria de la pierna… Hallazgos compatibles con neurotoxicidad; recuperación gradual posterior."
     },
-    "2024-02-new-dx": {
-      "title": "Nuevo diagnóstico",
-      "summary": "Se detectó linfoma de Hodgkin agresivo, posiblemente inducido por tratamientos previos."
+    "2024-01-allo-sct-brother-bradonor": {
+      "when_label": "Ene 2024",
+      "title": "Infusión alogénica de células madre — donante hermano",
+      "summary": "Células madre alogénicas como consolidación tras CAR‑T.",
+      "details": "Fase de injerto bajo estricto control infeccioso; luego recuperación ambulatoria."
+    },
+    "2024-07-abdominal-mass-hl": {
+      "when_label": "Jul 2024",
+      "title": "Masa abdominal grande; linfoma de Hodgkin agresivo",
+      "summary": "Nueva LH distinta de la previa; estrategia de tratamiento revisada.",
+      "details": "Considerada posiblemente relacionada con terapias previas… Oncología propuso nueva estrategia de QT."
+    },
+    "2024-08-2025-06-chemo-rt": {
+      "when_label": "Ago 2024–Jun 2025",
+      "title": "QT escalada → sepsis → cambio a esquema eficaz; RT×30",
+      "summary": "La dosis inicial alta causó sepsis; cambio a régimen eficaz y tolerable; radioterapia añadida (30 sesiones).",
+      "details": "Tras el episodio séptico, se ajustó el régimen por tolerabilidad y eficacia. RT añadida como consolidación (30 sesiones diarias)."
+    },
+    "2025-06-relapse-Ph-pos": {
+      "when_label": "Finales de jun 2025",
+      "title": "Leucocitos en ascenso; células linfoides Ph+",
+      "summary": "Leucocitos de ~35k a ~67k en días; se identificó linaje linfoide Ph+.",
+      "details": "Oncología propuso quimioterapia oral seguida de TKI (ponatinib) tras estabilización."
+    },
+    "2025-07-oral-chemo-14": {
+      "when_label": "Jul 2025 – Ahora",
+      "title": "Quimioterapia oral multicomponente (14 dosis)",
+      "summary": "Esquema oral estructurado en casa, 14 dosis en total.",
+      "details": "Combinación oral compleja con control intermedio de laboratorio y tolerancia; puntos de decisión al finalizar."
+    },
+    "plan-2025-support-recovery": {
+      "when_label": "Tras la QT (TBD)",
+      "title": "Apoyo y recuperación funcional",
+      "summary": "Atención de soporte estructurada y rehabilitación.",
+      "details": "Volumen y calendario adaptados al estado post‑QT y a la dinámica analítica."
     },
     "plan-2025-tki-lifelong": {
-      "title": "Plan TKI a largo plazo",
-      "summary": "Terapia con inhibidores de tirosina quinasa prevista como tratamiento crónico."
+      "when_label": "Tras la estabilización (TBD)",
+      "title": "Inhibidor de tirosina quinasa (ponatinib) — a largo plazo",
+      "summary": "TKI de mantenimiento tras citorreducción; probablemente prolongado o de por vida.",
+      "details": "Inicio tras control hematológico aceptable; monitorización de respuesta y EA; se prevé ajuste de dosis."
     },
-    "plan-2025-rehab": {
-      "title": "Rehabilitación compleja",
-      "summary": "Se planifican programas intensivos de recuperación física y neurológica."
+    "plan-2025-re-irradiation": {
+      "when_label": "Si está indicado (TBD)",
+      "title": "Posible re‑irradiación",
+      "summary": "Opción si se necesita control local.",
+      "details": "Para discusión en comité oncológico; depende de imagen y dosis de RT previas."
+    },
+    "plan-2025-chemo-switch": {
+      "when_label": "Si el esquema actual es insuficiente (TBD)",
+      "title": "Posible cambio de protocolo de QT",
+      "summary": "Cambio si la respuesta es inadecuada o la toxicidad inaceptable.",
+      "details": "Decisión tras reevaluar análisis, imagen y tolerancia; se elegirá protocolo alternativo si procede."
+    },
+    "plan-2025-next-line-chemo": {
+      "when_label": "Si es necesario (TBD)",
+      "title": "Posible línea adicional de QT",
+      "summary": "Opción dependiendo de la dinámica de la enfermedad.",
+      "details": "A determinar por comité oncológico tras evaluar el curso actual."
+    },
+    "plan-2026-repeat-allo-sct": {
+      "when_label": "2026 (posible)",
+      "title": "Posible trasplante alogénico repetido",
+      "summary": "Opción para consolidación definitiva si se requiere.",
+      "details": "Depende de la respuesta a TKI y QT; requerirá evaluación de donante/centro y análisis beneficio‑riesgo."
     }
   }
 }
