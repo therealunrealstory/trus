@@ -1,66 +1,93 @@
+// assets/js/core/boot.js
 import { $, $$ } from './dom.js';
-import { loadLocale, getLangFromQuery, t } from './i18n.js';
+import { loadLocale, getLangFromQuery, t, onLocaleChanged, applyI18nTo } from './i18n.js';
 import { openModal } from './modal.js';
-import { updateAudioLabels, setMainAudioForLang, onLocaleChanged } from './audio.js';
 import { startRouter, rerenderCurrentPage } from './router.js';
 
-// Анимация хештега + модалка
+// 1) Печатающийся хэштег + модалка
 (function initHashtag() {
-  const el = $('#hashtagType'); const btn = $('#hashtagBtn');
+  const el = $('#hashtagType');
+  const btn = $('#hashtagBtn');
   if (!el || !btn) return;
-  const TEXT = '#TheRealUnrealStory'; let i = 0, dir = 1;
+
+  const TEXT = '#TheRealUnrealStory';
+  let i = 0, dir = 1;
   const typeDelay = 90, eraseDelay = 45, pause = 900;
-  (function step(){
+
+  function step() {
     el.textContent = TEXT.slice(0, i);
-    if (dir > 0) { if (i < TEXT.length) { i++; setTimeout(step, typeDelay); } else { setTimeout(()=>{dir=-1; step();}, pause); } }
-    else { if (i > 0) { i--; setTimeout(step, eraseDelay); } else { setTimeout(()=>{dir=1; step();}, pause); } }
-  })();
-  btn.addEventListener('click', () => openModal(
-    t('hashtag.title', '#TheRealUnrealStory'),
-    t('hashtag.body', `Thank you for using <b>#TheRealUnrealStory</b>…`)
-  ));
+    if (dir > 0) {
+      if (i < TEXT.length) { i++; setTimeout(step, typeDelay); }
+      else { setTimeout(()=>{ dir = -1; step(); }, pause); }
+    } else {
+      if (i > 0) { i--; setTimeout(step, eraseDelay); }
+      else { setTimeout(()=>{ dir = 1; step(); }, pause); }
+    }
+  }
+  setTimeout(step, 200); // мягкий старт, чтобы шрифты применились
+
+  btn.addEventListener('click', () => {
+    openModal(
+      t('hashtag.title', '#TheRealUnrealStory'),
+      t('hashtag.body', '<p>#TheRealUnrealStory</p>')
+    );
+  });
 })();
 
-// PWA install
-let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; $('#installBtn')?.classList.remove('hidden'); });
-window.addEventListener('appinstalled', () => $('#installBtn')?.classList.add('hidden'));
-if (window.matchMedia?.('(display-mode: standalone)').matches) $('#installBtn')?.classList.add('hidden');
-$('#installBtn')?.addEventListener('click', async () => {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  await deferredPrompt.userChoice; deferredPrompt = null;
-});
+// 2) Установка приложения (PWA)
+(function initInstall() {
+  const btn = $('#installBtn');
+  if (!btn) return;
 
-// Язык
-const langSelect = $('#lang');
+  let deferredPrompt = null;
 
-(async function boot(){
-  const fromQuery = getLangFromQuery();
-  const initialLang = fromQuery || localStorage.getItem('site_lang') || 'EN';
-  if (langSelect) { langSelect.value = initialLang; }
-  localStorage.setItem('site_lang', initialLang);
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    btn.classList.remove('hidden');
+  });
+  window.addEventListener('appinstalled', () => btn.classList.add('hidden'));
+  if (window.matchMedia?.('(display-mode: standalone)').matches) btn.classList.add('hidden');
 
-  await loadLocale(initialLang);
-  updateAudioLabels();
+  btn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    try { await deferredPrompt.userChoice; } catch {}
+    deferredPrompt = null;
+    btn.classList.add('hidden');
+  });
+})();
 
-  if (fromQuery) {
-    const u = new URL(location.href); u.searchParams.delete('lang'); history.replaceState({}, '', u);
+// 3) Язык: загружаем ПЕРЕД запуском роутера
+(async function initLangAndRouter(){
+  const select = $('#lang');
+  const startLang = getLangFromQuery();
+
+  if (select) {
+    for (const opt of select.options) opt.selected = (opt.value.toUpperCase() === startLang);
   }
 
-  langSelect?.addEventListener('change', async e => {
-    const l = e.target.value;
-    localStorage.setItem('site_lang', l);
-    const u = new URL(location.href); u.searchParams.set('lang', l); history.replaceState({}, '', u);
+  await loadLocale(startLang);     // подтянуть переводы и проставить <html lang/dir>
 
-    await loadLocale(l);          // подтянуть переводы и атрибуты <html>
-    onLocaleChanged(l);           // обновить глобальный аудио‑плеер (если играет)
-    rerenderCurrentPage();        // применить i18n к текущей подстранице
+  // Смена языка пользователем
+  if (select) {
+    select.addEventListener('change', async (e) => {
+      const L = (e.target.value || 'EN').toUpperCase();
+      const u = new URL(location.href);
+      u.searchParams.set('lang', L);
+      history.replaceState({}, '', u);
+      await loadLocale(L);       // обновить переводы
+      rerenderCurrentPage();     // перерисовать текущую страницу
+      applyI18nTo(document.body);// на всякий — добить шапку/модалки
+    });
+  }
 
-    // >>> Новое: уведомляем страницы, что язык сменился
-    document.dispatchEvent(new CustomEvent('locale-changed', { detail: { lang: l } }));
+  // Если язык меняется из кода — просто перерисуем контент
+  onLocaleChanged(() => {
+    rerenderCurrentPage();
+    applyI18nTo(document.body);
   });
 
-  // Стартуем роутер
+  // И только теперь — старт роутера
   startRouter();
 })();

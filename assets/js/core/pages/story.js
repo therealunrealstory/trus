@@ -1,104 +1,105 @@
+// assets/js/core/pages/story.js
 import { $, $$ } from '../dom.js';
-import { t, I18N, DEFAULT_I18N } from '../i18n.js';
+import { t, I18N, DEFAULT_I18N, onLocaleChanged } from '../i18n.js';
 import { openModal } from '../modal.js';
 
 let announceAudio, shortAudio;
 let announceBtn, shortBtn, announceStatus, shortStatus;
 let onPauseOthers;
-let onLocaleChangedHandler;
+let unLocale;
 
+function label(key, fallback){
+  return (I18N[key] || DEFAULT_I18N[key] || fallback);
+}
 function updateMiniLabels(){
-  const lang = $('#lang')?.value || 'EN';
-  if (announceBtn) {
-    announceBtn.textContent = announceAudio.paused
-      ? (I18N['announce.play'] || DEFAULT_I18N['announce.play'] || '▶︎ Play')
-      : (I18N['announce.pause'] || '‖ Pause');
+  if (announceBtn && announceAudio) {
+    announceBtn.textContent = announceAudio.paused ? label('announce.play','▶︎ Play')
+                                                   : label('announce.pause','‖ Pause');
   }
-  if (announceStatus) {
-    announceStatus.textContent = (I18N['announce.langLabel'] || DEFAULT_I18N['announce.langLabel'] || 'Language: ') + lang;
-  }
-  if (shortBtn) {
-    shortBtn.textContent = shortAudio.paused
-      ? (I18N['short.play'] || DEFAULT_I18N['short.play'] || '▶︎ Play')
-      : (I18N['short.pause'] || '‖ Pause');
-  }
-  if (shortStatus) {
-    shortStatus.textContent = (I18N['short.langLabel'] || DEFAULT_I18N['short.langLabel'] || 'Language: ') + lang;
+  if (shortBtn && shortAudio) {
+    shortBtn.textContent = shortAudio.paused ? label('short.play','▶︎ Play')
+                                             : label('short.pause','‖ Pause');
   }
 }
-
 function setAnnouncementForLang(l, autoplay=false){
-  const src=`audio/ANNOUNCEMENT-${l}.mp3`;
+  if (!announceAudio) return;
+  const src = `audio/ANNOUNCEMENT-${l}.mp3`;
   if (announceAudio.src.endsWith(src)) {
-    if(autoplay && announceAudio.paused) announceAudio.play().catch(()=>{});
+    if (autoplay && announceAudio.paused) announceAudio.play().catch(()=>{});
     return;
   }
   announceAudio.pause();
-  announceAudio.src=src;           // лениво: src ставим только по делу
+  announceAudio.src = src;
   updateMiniLabels();
-  if(autoplay) announceAudio.play().catch(()=>{});
+  if (autoplay) announceAudio.play().catch(()=>{});
 }
 function setShortForLang(l, autoplay=false){
+  if (!shortAudio) return;
   const src = `audio/SHORTSTORY-${l}.mp3`;
   if (shortAudio.src.endsWith(src)) {
-    if(autoplay && shortAudio.paused) shortAudio.play().catch(()=>{});
+    if (autoplay && shortAudio.paused) shortAudio.play().catch(()=>{});
     return;
   }
   shortAudio.pause();
-  shortAudio.src = src;            // лениво: src ставим только по делу
+  shortAudio.src = src;
   updateMiniLabels();
-  if(autoplay) shortAudio.play().catch(()=>{});
+  if (autoplay) shortAudio.play().catch(()=>{});
 }
 
 export function init(root){
-  // Мини‑плееры (если есть в разметке)
-  announceAudio  = root.querySelector('#announceAudio') || new Audio();
-  shortAudio     = root.querySelector('#shortAudio')    || new Audio();
+  // DOM
+  announceAudio  = root.querySelector('#announceAudio') || root.querySelector('[data-audio="announce"]') || null;
+  shortAudio     = root.querySelector('#shortAudio')    || root.querySelector('[data-audio="short"]')    || null;
+
   announceBtn    = root.querySelector('#announceBtn');
   announceStatus = root.querySelector('#announceStatus');
   shortBtn       = root.querySelector('#shortBtn');
   shortStatus    = root.querySelector('#shortStatus');
 
   const langSel  = $('#lang');
+  const curLang  = (langSel?.value || 'EN').toUpperCase();
 
-  if (announceBtn) {
+  // ——— Защита от перезаписи переводом: только на аудиокнопки мини‑плееров ———
+  [announceBtn, shortBtn].forEach(btn => btn && btn.setAttribute('data-i18n-skip',''));
+
+  // Обработчики кликов
+  if (announceBtn && announceAudio) {
     announceBtn.addEventListener('click', ()=>{
       if (announceAudio.paused){
-        setAnnouncementForLang(langSel?.value || 'EN', true);
+        setAnnouncementForLang(curLang, true);
         document.dispatchEvent(new CustomEvent('pause-others', { detail: { except: announceAudio }}));
       } else {
         announceAudio.pause();
       }
-      updateMiniLabels();
     });
-    announceAudio.addEventListener('ended', updateMiniLabels);
+    // События аудио → UI
+    ['play','playing'].forEach(ev => announceAudio.addEventListener(ev, ()=>{ announceStatus && (announceStatus.textContent = label('status.playing','Playing…')); updateMiniLabels(); }));
+    ['pause','ended'].forEach(ev => announceAudio.addEventListener(ev, ()=>{ announceStatus && (announceStatus.textContent = label('status.paused','Paused'));   updateMiniLabels(); }));
   }
-  if (shortBtn) {
+
+  if (shortBtn && shortAudio) {
     shortBtn.addEventListener('click', ()=>{
       if (shortAudio.paused){
-        setShortForLang(langSel?.value || 'EN', true);
+        setShortForLang(curLang, true);
         document.dispatchEvent(new CustomEvent('pause-others', { detail: { except: shortAudio }}));
       } else {
         shortAudio.pause();
       }
-      updateMiniLabels();
     });
-    shortAudio.addEventListener('ended', updateMiniLabels);
+    // События аудио → UI
+    ['play','playing'].forEach(ev => shortAudio.addEventListener(ev, ()=>{ shortStatus && (shortStatus.textContent = label('status.playing','Playing…')); updateMiniLabels(); }));
+    ['pause','ended'].forEach(ev => shortAudio.addEventListener(ev, ()=>{ shortStatus && (shortStatus.textContent = label('status.paused','Paused'));   updateMiniLabels(); }));
   }
 
-  // Первичная отрисовка подписей
-  updateMiniLabels();
-
-  // >>> При смене языка: если плеер играет — переключаемся и продолжаем
-  onLocaleChangedHandler = (e) => {
-    const l = e.detail?.lang || $('#lang')?.value || 'EN';
-    if (!announceAudio.paused) setAnnouncementForLang(l, true);
-    if (!shortAudio.paused)    setShortForLang(l, true);
+  // Реакция на смену языка (обновить тексты и подменить src при активном воспроизведении)
+  unLocale = onLocaleChanged(({ detail })=>{
+    const l = (detail?.lang || langSel?.value || 'EN').toUpperCase();
+    if (!announceAudio?.paused) setAnnouncementForLang(l, true);
+    if (!shortAudio?.paused)    setShortForLang(l, true);
     updateMiniLabels();
-  };
-  document.addEventListener('locale-changed', onLocaleChangedHandler);
+  });
 
-  // Когда другие плееры просят «паузу» — останавливаемся
+  // Когда другие плееры стартуют — останавливаемся
   onPauseOthers = (e)=>{
     const ex = e.detail?.except;
     [announceAudio, shortAudio].forEach(a => { if (a && a !== ex && !a.paused) a.pause(); });
@@ -106,29 +107,23 @@ export function init(root){
   };
   document.addEventListener('pause-others', onPauseOthers);
 
-  // Тайлы/модалки (если присутствуют)
+  // Тайлы/модалки — оставил как есть (пример):
   root.querySelector('#tile1')?.addEventListener('click', ()=> openModal(t('tiles.me','I’m Nico'), t('modal.tile1.body','…')));
   root.querySelector('#tile2')?.addEventListener('click', ()=> openModal(t('tiles.about','About Adam'), t('modal.tile2.body','…')));
   root.querySelector('#tile3')?.addEventListener('click', ()=> openModal(t('tiles.others','Other people in the story'), t('modal.tile3.body','…')));
 
-  // Share (если есть)
-  root.querySelector('#shareBtn')?.addEventListener('click', async () => {
-    try {
-      const u = new URL(location.href);
-      u.searchParams.set('lang', $('#lang')?.value || 'EN');
-      const url = u.toString();
-      if (navigator.share) { await navigator.share({ title: 'The Real Unreal Story', url }); }
-      else { await navigator.clipboard.writeText(url); alert((I18N && I18N['share.copied']) || 'Link copied'); }
-    } catch {}
-  });
+  // Инициализация текущим языком
+  setAnnouncementForLang(curLang, false);
+  setShortForLang(curLang, false);
+  updateMiniLabels();
 }
 
 export function destroy(){
   try { announceAudio?.pause(); } catch {}
   try { shortAudio?.pause(); } catch {}
   document.removeEventListener('pause-others', onPauseOthers);
-  document.removeEventListener('locale-changed', onLocaleChangedHandler);
+  if (typeof unLocale === 'function') unLocale();
   announceAudio = shortAudio = null;
   announceBtn = shortBtn = announceStatus = shortStatus = null;
-  onPauseOthers = onLocaleChangedHandler = null;
+  onPauseOthers = unLocale = null;
 }
