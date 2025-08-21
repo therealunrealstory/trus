@@ -1,18 +1,17 @@
 // /assets/js/core/router.js
 // SPA Router: грузит partials JSON в #subpage, лениво подключает модули страниц,
-// поддерживает состояние навигации, и (важно) повторно применяет i18n
-// после каждого рендера + на любые асинхронные изменения DOM (через MutationObserver).
+// повторно применяет i18n после каждого рендера и отслеживает асинхронные изменения DOM.
 
 import * as DOM from './dom.js';
 import * as I18N from './i18n.js';
 
-// Фолбэки на случай, если в dom.js нет именованных экспортов qs/qsa
+// Фолбэки, если в dom.js нет именованных экспортов
 const qs  = DOM.qs  || ((sel, root = document) => root.querySelector(sel));
 const qsa = DOM.qsa || ((sel, root = document) => Array.from(root.querySelectorAll(sel)));
 
 let current = { name: null, destroy: null };
 let navToken = 0;
-let mo = null; // MutationObserver для динамических обновлений
+let mo = null; // MutationObserver
 
 const ROUTES = {
   story:   { partial: 'story',   module: () => import('./pages/story.js')   },
@@ -54,7 +53,6 @@ function setActiveNav(routeHash) {
   });
 }
 
-// Универсальный вызов применения переводов — не завязан на конкретные имена функций
 async function applyI18N(root) {
   const r = root || document.body;
   try {
@@ -68,7 +66,6 @@ async function applyI18N(root) {
   }
 }
 
-// Наблюдаем за изменениями внутри mount и дозакидываем переводы
 function startObserver(mount) {
   stopObserver();
   if (!mount || typeof MutationObserver === 'undefined') return;
@@ -91,42 +88,42 @@ function stopObserver() {
 async function runRoute(name, token) {
   const cfg = ROUTES[name];
 
-  // Сносим предыдущую страницу
+  // Тёрндаун прошлой страницы
   stopObserver();
   if (current.destroy) {
     try { current.destroy(); } catch {}
   }
   current = { name, destroy: null };
 
-  // Подсветка активной кнопки
+  // Активный пункт меню
   setActiveNav(`#/` + name);
 
   let mount = qs('#subpage');
 
-  // 1) Если есть partial — сначала монтируем его
+  // 1) Подставляем partial (если есть)
   if (cfg.partial) {
     const partial = await fetchPartial(cfg.partial, token);
     if (token !== navToken || partial === null) return;
     mount = mountHTML(partial.html);
-    await applyI18N(mount); // перевести только что вставленный HTML
+    await applyI18N(mount);
   } else {
     if (mount) mount.innerHTML = '';
   }
 
-  // 2) Загружаем модуль и инициализируем
+  // 2) Грузим модуль и запускаем init С DOM-ЭЛЕМЕНТОМ (а не { mount })
   const mod = await cfg.module();
   if (token !== navToken) return;
   if (typeof mod?.init === 'function') {
-    await mod.init({ mount });
+    await mod.init(mount); // ← фикс: передаём сам элемент
   }
   if (typeof mod?.destroy === 'function') {
     current.destroy = mod.destroy;
   }
 
-  // 3) После возможной дорисовки модулем — ещё раз применяем i18n
+  // 3) После возможной дорисовки модулем — ещё раз i18n
   await applyI18N(mount);
 
-  // 4) Стартуем наблюдатель, чтобы все будущие асинхронные вставки тоже переводились
+  // 4) Наблюдатель на асинхронные вставки
   startObserver(mount);
 }
 
@@ -178,7 +175,6 @@ export function startRouter() {
   }
 }
 
-// Автозапуск, если файл подключён напрямую
 if (document.currentScript && !window.__TRUS_ROUTER_BOOTSTRAPPED__) {
   startRouter();
 }
