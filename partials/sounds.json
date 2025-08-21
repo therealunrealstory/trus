@@ -1,0 +1,50 @@
+{
+  "provider": "archive",
+  "providers": { "archive": "https://archive.org/download" },
+  "tracks": {
+    "bg": { 
+	"en": "/orus-music/ORUS-M-EN.mp3", 
+	"ru": "/orus-music/ORUS-M-RU.mp3",
+	"es": "/orus-music/ORUS-M-ES.mp3", 
+	"it": "/orus-music/ORUS-M-IT.mp3", 
+	"pt": "/orus-music/ORUS-M-PT.mp3", 
+	"de": "/orus-music/ORUS-M-DE.mp3", 
+	"fr": "/orus-music/ORUS-M-FR.mp3", 
+	"cn": "/orus-music/ORUS-M-CN.mp3", 
+	"ar": "/orus-music/ORUS-M-AR.mp3"	
+	},
+    "announcement": { 
+	"en": "/orus-annouce/ORUS-A-EN.mp3", 
+	"ru": "/orus-annouce/ORUS-A-RU.mp3",
+	"es": "/orus-annouce/ORUS-A-ES.mp3", 
+	"it": "/orus-annouce/ORUS-A-IT.mp3", 
+	"pt": "/orus-annouce/ORUS-A-PT.mp3", 
+	"de": "/orus-annouce/ORUS-A-DE.mp3", 
+	"fr": "/orus-annouce/ORUS-A-FR.mp3", 
+	"cn": "/orus-annouce/ORUS-A-CN.mp3", 
+	"ar": "/orus-annouce/ORUS-A-AR.mp3"	
+	},
+    "short": { 
+	"en": "/orus-short/ORUS-S-EN.mp3", 
+	"ru": "/orus-short/ORUS-S-RU.mp3",
+	"es": "/orus-short/ORUS-S-ES.mp3", 
+	"it": "/orus-short/ORUS-S-IT.mp3", 
+	"pt": "/orus-short/ORUS-S-PT.mp3", 
+	"de": "/orus-short/ORUS-S-DE.mp3", 
+	"fr": "/orus-short/ORUS-S-FR.mp3", 
+	"cn": "/orus-short/ORUS-S-CN.mp3", 
+	"ar": "/orus-short/ORUS-S-AR.mp3"	
+	},
+    "full": { 
+	"en": "/orus-full/ORUS-F-EN.mp3", 
+	"ru": "/orus-full/ORUS-F-RU.mp3",
+	"es": "/orus-full/ORUS-F-ES.mp3", 
+	"it": "/orus-full/ORUS-F-IT.mp3", 
+	"pt": "/orus-full/ORUS-F-PT.mp3", 
+	"de": "/orus-full/ORUS-F-DE.mp3", 
+	"fr": "/orus-full/ORUS-F-FR.mp3", 
+	"cn": "/orus-full/ORUS-F-CN.mp3", 
+	"ar": "/orus-full/ORUS-F-AR.mp3"	
+	}
+  }
+}

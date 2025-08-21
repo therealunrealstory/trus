@@ -1,16 +1,19 @@
 // assets/js/core/audio.js
 // Стабильный контроллер фоновой музыки «Story in music».
-// Правки: убраны дублирующие обработчики (pointerdown и click в capture),
-// добавлен лёгкий анти‑дребезг, остальная логика сохранена.
+// Теперь берёт источник через soundRouter (sounds.json), а не из локальных путей.
 
 import { $ } from './dom.js';
 import { I18N, DEFAULT_I18N, onLocaleChanged } from './i18n.js';
+import { initSounds, getSoundUrl, onSoundsReady } from './soundRouter.js';
 
 const audioBtn   = $('#audioBtn');
 const langSelect = $('#lang');
 
 const BGA_SELECTOR = '#bgAudio, [data-bg-audio]';
 const bound = new WeakSet();
+
+// инициализируем загрузку реестра звуков как можно раньше
+initSounds();
 
 function playLabel()  { return I18N['audio.play']  || DEFAULT_I18N['audio.play']  || 'Story in music'; }
 function pauseLabel() { return I18N['audio.pause'] || DEFAULT_I18N['audio.pause'] || '‖ Pause'; }
@@ -45,17 +48,26 @@ export function setMainAudioForLang(lang, autoplay=false){
   if (!audios.length) { updateAudioLabels(); return; }
 
   const L = (lang || 'EN').toUpperCase();
-  const src = `audio/ORUS-${L}.mp3`;
+  const url = getSoundUrl('bg', L);
 
   const primary = pickPrimary(audios);
   if (!primary) { updateAudioLabels(); return; }
 
+  // Если реестр ещё не готов — дождёмся и повторим
+  if (!url) {
+    onSoundsReady(() => setMainAudioForLang(L, autoplay));
+    updateAudioLabels();
+    return;
+  }
+
   // погасим всех, кроме primary — один раз, до установки src
   audios.forEach(a => { if (a !== primary && !a.paused) { try{ a.pause(); } catch{} } });
 
-  if (!primary.src.endsWith(src)) {
+  if (!(primary.src && (primary.src === url || primary.src.endsWith(url)))) {
     try { primary.pause(); } catch {}
-    primary.src = src;
+    primary.preload = 'none';
+    primary.crossOrigin = 'anonymous';
+    primary.src = url;
   }
   if (autoplay) primary.play().catch(()=>{});
   // подпись обновится по событиям <audio>
