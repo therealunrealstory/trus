@@ -1,6 +1,11 @@
 {
 	
 	"labels": {
+    "done": "Завершено",
+    "current": "Сейчас",
+    "planned": "Запланировано",
+    "tentative": "Под вопросом",
+
     "diagnosis": "Диагноз",
     "chemotherapy": "Химиотерапия",
     "radiotherapy": "Лучевая терапия",
