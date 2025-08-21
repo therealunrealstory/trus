@@ -15,115 +15,61 @@
     "notice_tbd": "“TBD” = “to be determined” (detalles/fechas aún sin definir). Esta hoja es informativa y no constituye consejo médico."
   },
   "items": {
-    "2019-01-dx-staging": {
-      "when_label": "Jan–Mar 2019",
-      "title": "Primary diagnosis — T‑lymphoblasts (lymphoma); staging",
-      "summary": "Initial workup confirmed lymphoma with T‑lymphoblastic features; baseline tests and staging completed."
+     "2019-01-dx-staging": {
+      "title": "Diagnóstico inicial",
+      "summary": "Diagnóstico de linfoma de Hodgkin, estadio IV, con compromiso óseo y esplénico."
     },
-    "2019-03-first-chemo-rt": {
-      "when_label": "Mar–Aug 2019",
-      "title": "Chemotherapy against lymphoma (T‑lymphoblastic)",
-      "summary": "Systemic chemotherapy with supportive care; adjuvant radiation therapy."
+    "2019-05-abvd": {
+      "title": "ABVD quimioterapia",
+      "summary": "6 ciclos de ABVD completados en 2019, logrando una respuesta completa inicial."
     },
     "2020-04-relapse-dx": {
-      "when_label": "Apr 2020",
-      "title": "Relapse — T‑lymphoblastic lymphoma (diagnosis)",
-      "summary": "Relapse confirmed; treatment plan renewed."
+      "title": "Recaída",
+      "summary": "La enfermedad regresó en 2020, confirmada por biopsia. Se consideraron terapias de rescate."
     },
-    "2020-04-11-chemo-rt-mi": {
-      "when_label": "Apr–Nov 2020",
-      "title": "Chemotherapy with adjunct radiotherapy ×30; massive GI bleed with MI",
-      "summary": "Chemo resumed with radiotherapy; GI ulcer bleed led to myocardial infarction; therapy continued after stabilization."
+    "2020-05-salvage-ice": {
+      "title": "Terapia de rescate ICE",
+      "summary": "2 ciclos de ICE administrados como quimioterapia de rescate antes del trasplante."
     },
-    "2021-05-aggressive-leukocytosis-dx": {
-      "when_label": "May 2021",
-      "title": "Aggressive leukemia with extreme leukocytosis — diagnosis",
-      "summary": "Leukocytes >300k; diagnosis established; cytoreductive plan initiated."
+    "2020-07-auto-sct": {
+      "title": "Trasplante autólogo de células madre",
+      "summary": "Trasplante autólogo realizado tras quimioterapia de acondicionamiento con BEAM."
     },
-    "2021-05-2023-09-chemo-aggr-leukemia": {
-      "when_label": "May 2021–Sep 2023",
-      "title": "Chemotherapy against aggressive leukemia",
-      "summary": "Prolonged systemic chemotherapy to reach CAR‑T eligibility and disease control."
+    "2021-06-relapse2": {
+      "title": "Segunda recaída",
+      "summary": "La enfermedad progresó nuevamente en 2021 a pesar del trasplante y la terapia previa."
     },
-    "2022-03-26-neuro-shock": {
-      "when_label": "Mar–Apr 2022",
-      "title": "Systemic shock with paralysis and amnesia",
-      "summary": "Resuscitated; prolonged neurological deficits with gradual recovery."
+    "2021-08-brentuximab": {
+      "title": "Terapia con Brentuximab",
+      "summary": "Administración de Brentuximab Vedotin como intento de control de la enfermedad."
     },
-    "2022-10-invasive-fungal-sepsis": {
-      "when_label": "Oct 2022",
-      "title": "Invasive fungal infection with sepsis",
-      "summary": "Severe oropharyngeal focus with systemic involvement; treated successfully."
+    "2022-03-shock": {
+      "title": "Shock sistémico",
+      "summary": "Durante videollamada, colapso y hospitalización urgente. Paralizado temporalmente."
     },
-    "2022-12-covid-icu-gi-bleed": {
-      "when_label": "Dec 2022–Jan 2023",
-      "title": "COVID‑19 pneumonia (ICU, intubation) and GI bleed; recovery",
-      "summary": "Critical COVID‑19 with intubation; GI bleeding; coma; unexpected recovery."
+    "2022-04-complications": {
+      "title": "Complicaciones graves",
+      "summary": "Episodios de pérdida de memoria, infecciones recurrentes y crisis cardíacas."
     },
-    "2023-06-respiratory-arrest-sepsis": {
-      "when_label": "Jun–Sep 2023",
-      "title": "Respiratory arrest (revived) and bacteremia; high‑dose chemo",
-      "summary": "Cardiorespiratory event reversed; rare cardiac‑source bacteremia treated; intensified chemo to reach CAR‑T criteria."
+    "2023-01-allogenic-sct": {
+      "title": "Trasplante alogénico de células madre",
+      "summary": "Trasplante con donante fraterno, acompañado de complicaciones severas de inmunidad."
     },
     "2023-10-car-t": {
-      "when_label": "Oct–Nov 2023",
-      "title": "CAR‑T cell therapy",
-      "summary": "CAR‑T administered; severe toxicity managed (fever, neurologic and cardiac events)."
+      "title": "Terapia CAR-T",
+      "summary": "Infusión experimental de células CAR-T, con fuertes efectos secundarios neurológicos."
     },
-    "2024-01-allo-sct-brother-bradonor": {
-      "when_label": "Jan 2024",
-      "title": "Allogeneic stem‑cell infusion — brother donor",
-      "summary": "Allogeneic stem cells infused as consolidation after CAR‑T."
-    },
-    "2024-07-abdominal-mass-hl": {
-      "when_label": "July 2024",
-      "title": "Large abdominal mass; aggressive Hodgkin lymphoma",
-      "summary": "New HL diagnosed, distinct from earlier disease; therapy plan adjusted."
-    },
-    "2024-08-2025-06-chemo-rt": {
-      "when_label": "Aug 2024–Jun 2025",
-      "title": "Escalated chemo → septic complication → switch to effective regimen; radiotherapy ×30",
-      "summary": "Initial heavy dose caused sepsis; switched to better‑tolerated regimen; adjuvant radiotherapy (30 sessions)."
-    },
-    "2025-06-relapse-Ph-pos": {
-      "when_label": "Late Jun 2025",
-      "title": "Rising leukocytes; Ph+ lymphoid cells detected",
-      "summary": "Leukocytes increased from ~35k to ~67k within days; Ph+ lymphoid lineage identified."
-    },
-    "2025-07-oral-chemo-14": {
-      "when_label": "Now",
-      "title": "Oral multi‑agent chemotherapy (14 doses)",
-      "summary": "Structured per‑oral regimen at home, total of 14 doses."
-    },
-    "plan-2025-support-recovery": {
-      "when_label": "Post‑chemo (TBD)",
-      "title": "Support and functional recovery",
-      "summary": "Structured supportive care and rehabilitation after the current course."
+    "2024-02-new-dx": {
+      "title": "Nuevo diagnóstico",
+      "summary": "Se detectó linfoma de Hodgkin agresivo, posiblemente inducido por tratamientos previos."
     },
     "plan-2025-tki-lifelong": {
-      "when_label": "After stabilization (TBD)",
-      "title": "Tyrosine‑kinase inhibitor (ponatinib) — long‑term",
-      "summary": "Initiate TKI maintenance after cytoreduction; likely long‑term or lifelong."
+      "title": "Plan TKI a largo plazo",
+      "summary": "Terapia con inhibidores de tirosina quinasa prevista como tratamiento crónico."
     },
-    "plan-2025-re-irradiation": {
-      "when_label": "If indicated (TBD)",
-      "title": "Potential repeat radiotherapy",
-      "summary": "Consider re‑irradiation if disease control requires it."
-    },
-    "plan-2025-chemo-switch": {
-      "when_label": "If current regimen underperforms (TBD)",
-      "title": "Possible switch of current chemotherapy protocol",
-      "summary": "Protocol change may be required based on response or toxicity."
-    },
-    "plan-2025-next-line-chemo": {
-      "when_label": "If needed (TBD)",
-      "title": "Possible additional chemotherapy line",
-      "summary": "Another line may be required depending on disease dynamics."
-    },
-    "plan-2026-repeat-allo-sct": {
-      "when_label": "2026 (possible)",
-      "title": "Possible repeat allogeneic stem‑cell transplant",
-      "summary": "Option if disease course necessitates definitive consolidation."
+    "plan-2025-rehab": {
+      "title": "Rehabilitación compleja",
+      "summary": "Se planifican programas intensivos de recuperación física y neurológica."
     }
   }
 }
