@@ -16,7 +16,7 @@ function onceFlag(el, flag) {
 }
 
 // —————————————————————————————————————————————
-// Hashtag + modal
+// 1) Хэштег + модалка
 (function initHashtag() {
   const el = $('#hashtagType');
   const btn = $('#hashtagBtn');
@@ -49,38 +49,34 @@ function onceFlag(el, flag) {
 })();
 
 // —————————————————————————————————————————————
-// Header music (#audioBtn ↔ #bgAudio)
-(function initHeaderMusic() {
-  const btn = $('#audioBtn');
-  const audio = $('#bgAudio');
-  const langSelect = $('#lang');
-  if (!btn || !audio) return;
-  if (onceFlag(btn, 'headerAudioBound')) return;
+// 2) Музыка в шапке — делегированный клик (работает даже без #bgAudio в момент старта)
+(function initHeaderMusicDelegated() {
+  if (document.__headerMusicDelegated__) return;
+  document.__headerMusicDelegated__ = true;
 
-  const setPressed = (on) => btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-
-  btn.addEventListener('click', (e) => {
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('#audioBtn');
+    if (!btn) return;
     e.preventDefault();
-    const L = (langSelect?.value || document.documentElement.getAttribute('lang') || 'EN').toUpperCase();
-    if (audio.paused) {
-      setMainAudioForLang(L, true);
-      document.dispatchEvent(new CustomEvent('pause-others', { detail: { except: audio }}));
-    } else {
-      audio.pause();
-    }
-  });
 
-  ['play','playing'].forEach(ev => audio.addEventListener(ev, () => { setPressed(true); updateAudioLabels(); }));
-  ['pause','ended'].forEach(ev => audio.addEventListener(ev, () => { setPressed(false); updateAudioLabels(); }));
+    const L = ( $('#lang')?.value || document.documentElement.getAttribute('lang') || 'EN').toUpperCase();
 
-  setPressed(!audio.paused);
-  updateAudioLabels();
+    // setMainAudioForLang сама ничего не сломает, если аудио пока отсутствует
+    // а как только аудио будет в DOM — src подставится и воспроизведение начнётся
+    const hadAudio = !!document.getElementById('bgAudio');
+    setMainAudioForLang(L, true);
+    updateAudioLabels();
 
+    // Если аудио уже было — «пауза/плей» обработается внутри setMainAudioForLang
+    // (Если не было — просто ждём появления элемента; обработчики привяжет audio.js)
+  }, false);
+
+  // При смене языка обновим подписи кнопки
   onLocaleChanged(() => updateAudioLabels());
 })();
 
 // —————————————————————————————————————————————
-// Share button (delegated)
+// 3) Share — уже работал, оставляем делегированно
 (function initShareDelegated() {
   document.addEventListener('click', async (e) => {
     const btn = e.target.closest('#shareBtn, [data-share]');
@@ -105,7 +101,7 @@ function onceFlag(el, flag) {
 })();
 
 // —————————————————————————————————————————————
-// PWA Install
+// 4) PWA Install (как было)
 (function initInstall() {
   const btn = $('#installBtn');
   if (!btn) return;
@@ -130,7 +126,7 @@ function onceFlag(el, flag) {
 })();
 
 // —————————————————————————————————————————————
-// Language + router (load locale FIRST)
+// 5) Язык + роутер (загружаем локаль ПЕРЕД стартом)
 (async function initLangAndRouter(){
   const select = $('#lang');
   const startLang = getLangFromQuery();
