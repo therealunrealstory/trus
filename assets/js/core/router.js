@@ -1,16 +1,14 @@
 // /assets/js/core/router.js
-// SPA-роутер: partials → #subpage, lazy-страницы, активная кнопка,
-// делегирование кликов по [data-route], дефолтный #/story.
-// Экспорты под ожидания boot.js: startRouter, rerenderCurrentPage.
+// SPA Router: loads partials JSON into #subpage, lazy-loads page modules,
+// keeps nav state, and (importantly) reapplies i18n after every render,
+// fixing the "translation flashes then reverts to EN" issue for Hero/Support/News/etc.
 
-import * as DOM from './dom.js';
-
-// Фолбэки на случай, если в dom.js нет именованных экспортов
-const qs  = DOM.qs  || ((sel, root = document) => root.querySelector(sel));
-const qsa = DOM.qsa || ((sel, root = document) => Array.from(root.querySelectorAll(sel)));
+import { qs, qsa } from './dom.js';
+import * as I18N from './i18n.js';
 
 let current = { name: null, destroy: null };
 let navToken = 0;
+let mo = null; // MutationObserver for dynamic DOM updates
 
 const ROUTES = {
   story:   { partial: 'story',   module: () => import('./pages/story.js')   },
@@ -34,7 +32,7 @@ async function fetchPartial(name, token) {
   }
   const json = await res.json().catch(() => ({}));
   if (token !== navToken) return null;
-  const html = json.html ?? json.markup ?? json.content ?? '';
+  const html = json.html ?? json.markup ?? json.content ?? json.innerHTML ?? '';
   return { ...json, html: String(html) };
 }
 
@@ -52,41 +50,84 @@ function setActiveNav(routeHash) {
   });
 }
 
+// Robust i18n apply (actual export in your i18n.js is applyI18nTo)
+async function applyI18N(root) {
+  const r = root || document.body;
+  try {
+    if (typeof I18N.applyI18nTo      === 'function') return I18N.applyI18nTo(r);
+    if (typeof I18N.applyTranslations=== 'function') return I18N.applyTranslations(r);
+    if (typeof I18N.translateNode    === 'function') return I18N.translateNode(r);
+    if (typeof I18N.apply            === 'function') return I18N.apply(r);
+    if (typeof I18N.refresh          === 'function') return I18N.refresh(r);
+  } catch (e) {
+    console.warn('[router] i18n apply failed:', e);
+  }
+}
+
+// Observe dynamic changes inside mount and re-apply i18n
+function startObserver(mount) {
+  stopObserver();
+  if (!mount || typeof MutationObserver === 'undefined') return;
+  let scheduled = false;
+  mo = new MutationObserver(() => {
+    if (scheduled) return;
+    scheduled = true;
+    queueMicrotask(async () => {
+      scheduled = false;
+      await applyI18N(mount);
+    });
+  });
+  mo.observe(mount, { childList: true, subtree: true });
+}
+function stopObserver() {
+  try { mo && mo.disconnect(); } catch {}
+  mo = null;
+}
+
 async function runRoute(name, token) {
   const cfg = ROUTES[name];
 
-  if (current.destroy) { try { current.destroy(); } catch {} }
+  // Tear down previous page
+  stopObserver();
+  if (current.destroy) {
+    try { current.destroy(); } catch {}
+  }
   current = { name, destroy: null };
 
+  // Active nav
   setActiveNav(`#/` + name);
 
   let mount = qs('#subpage');
+
+  // 1) If there's a partial, mount it first
   if (cfg.partial) {
     const partial = await fetchPartial(cfg.partial, token);
     if (token !== navToken || partial === null) return;
     mount = mountHTML(partial.html);
+    await applyI18N(mount); // translate freshly inserted HTML
   } else {
     if (mount) mount.innerHTML = '';
   }
 
+  // 2) Load module and init
   const mod = await cfg.module();
   if (token !== navToken) return;
+  if (typeof mod?.init === 'function') {
+    await mod.init({ mount });
+  }
+  if (typeof mod?.destroy === 'function') {
+    current.destroy = mod.destroy;
+  }
 
-  // ВАЖНО: story/support/now ждут ЭЛЕМЕНТ, а не { mount }
-  if (typeof mod?.init === 'function') await mod.init(mount);
-  if (typeof mod?.destroy === 'function') current.destroy = mod.destroy;
+  // 3) Re-apply i18n after module possibly modified the DOM
+  await applyI18N(mount);
+
+  // 4) Start observer to auto-translate any subsequent async inserts
+  startObserver(mount);
 }
 
 export async function navigate(hash) {
   if (hash && location.hash !== hash) location.hash = hash;
-}
-
-// Нужно boot.js
-export async function rerenderCurrentPage() {
-  if (!current.name) return;
-  navToken++;
-  const myToken = navToken;
-  await runRoute(current.name, myToken);
 }
 
 async function onHashChange() {
@@ -100,22 +141,33 @@ async function onHashChange() {
   await runRoute(name, myToken);
 }
 
-export function init() {
-  // Делегирование кликов по [data-route] (кнопки сабнава)
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-route]');
-    if (!btn) return;
-    const to = btn.getAttribute('data-route');
-    if (!to) return;
-    e.preventDefault();
-    if (location.hash !== to) location.hash = to;
-  });
-
-  window.addEventListener('hashchange', onHashChange);
-  onHashChange(); // первый запуск
+export function rerenderCurrentPage() {
+  const name = parseRoute();
+  navToken++;
+  const myToken = navToken;
+  runRoute(name, myToken);
 }
 
-// Специально для boot.js (ожидает named export startRouter)
+function onClick(e) {
+  const btn = e.target.closest('[data-route]');
+  if (!btn) return;
+  const route = btn.getAttribute('data-route');
+  if (!route || !route.startsWith('#/')) return;
+  e.preventDefault();
+  if (location.hash === route) {
+    rerenderCurrentPage();
+  } else {
+    navigate(route);
+  }
+}
+
+export function init() {
+  document.addEventListener('click', onClick);
+  window.addEventListener('hashchange', onHashChange);
+  onHashChange();
+}
+
+// For boot.js
 export function startRouter() {
   if (!window.__TRUS_ROUTER_BOOTSTRAPPED__) {
     window.__TRUS_ROUTER_BOOTSTRAPPED__ = true;
@@ -123,7 +175,7 @@ export function startRouter() {
   }
 }
 
-// Автобут, если файл подключён напрямую отдельным модульным скриптом
+// Auto-boot if included directly
 if (document.currentScript && !window.__TRUS_ROUTER_BOOTSTRAPPED__) {
   startRouter();
 }
