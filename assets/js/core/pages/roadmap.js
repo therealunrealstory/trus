@@ -94,12 +94,12 @@ function render(container, data, dict){
   header.append(h1,meta);
   container.appendChild(header);
 
-  const legend=createEl('div',{class:'roadmap-legend'});
-  legend.innerHTML=`
-    <span class="roadmap-chip"><b>Done</b> — ${esc(tLegendDone.split('—').slice(1).join('—').trim()||'completed therapy/events')}</span>
-    <span class="roadmap-chip"><b>Now</b> — ${esc(tLegendNow.split('—').slice(1).join('—').trim()||'current step')} <span class="roadmap-nowpulse" style="margin-left:6px"></span></span>
-    <span class="roadmap-chip"><b>Planned</b> — ${esc(tLegendPln.split('—').slice(1).join('—').trim()||'scheduled/expected')}</span>
-    <span class="roadmap-chip"><b>Tentative</b> — ${esc(tLegendTent.split('—').slice(1).join('—').trim()||'possible, not confirmed')}</span>`;
+const legend=createEl('div',{class:'roadmap-legend'});
+legend.innerHTML=`
+  <span class="roadmap-chip"><b>${esc(dict?.labels?.done || 'Done')}</b> — ${esc(tLegendDone.split('—').slice(1).join('—').trim()||'completed therapy/events')}</span>
+  <span class="roadmap-chip"><b>${esc(dict?.labels?.current || 'Now')}</b> — ${esc(tLegendNow.split('—').slice(1).join('—').trim()||'current step')} <span class="roadmap-nowpulse" style="margin-left:6px"></span></span>
+  <span class="roadmap-chip"><b>${esc(dict?.labels?.planned || 'Planned')}</b> — ${esc(tLegendPln.split('—').slice(1).join('—').trim()||'scheduled/expected')}</span>
+  <span class="roadmap-chip"><b>${esc(dict?.labels?.tentative || 'Tentative')}</b> — ${esc(tLegendTent.split('—').slice(1).join('—').trim()||'possible, not confirmed')}</span>`;
   container.appendChild(legend);
 
   const items=(data?.items||[]).slice().sort(sortByTime);
