@@ -1,6 +1,6 @@
 // /assets/js/core/router.js
-// SPA Router: partials + lazy modules, повторное применение i18n,
-// безопасный MutationObserver без зацикливаний и без вмешательства в «живые» элементы (аудио/модалки).
+// SPA Router: partials + lazy modules, безопасное повторное применение i18n,
+// события жизненного цикла маршрута, защита от зацикливаний и вмешательства в «живые» узлы.
 
 import * as DOM from './dom.js';
 import * as I18N from './i18n.js';
@@ -12,11 +12,10 @@ const qsa = DOM.qsa || ((sel, root = document) => Array.from(root.querySelectorA
 let current   = { name: null, destroy: null };
 let navToken  = 0;
 let mo        = null;     // MutationObserver
-let moTarget  = null;
 let isApplyingI18N = false;
 let moTimer   = null;     // debounce
 
-// Узлы/поддеревья, в которые i18n не лезет после запуска (живые островки)
+// Узлы, в которые i18n не лезет после запуска (живые островки: плееры/модалки и т.п.)
 const I18N_SKIP_SELECTOR = [
   '[data-i18n-skip]',
   '[data-i18n-lock]',
@@ -30,6 +29,7 @@ const I18N_SKIP_SELECTOR = [
   '[data-modal]'
 ].join(',');
 
+// Маршруты (не трогаем содержимое страниц)
 const ROUTES = {
   story:   { partial: 'story',   module: () => import('./pages/story.js')   },
   support: { partial: 'support', module: () => import('./pages/support.js') },
@@ -47,9 +47,7 @@ async function fetchPartial(name, token) {
   const url = `/partials/${name}.json`;
   const res = await fetch(url, { cache: 'no-store' }).catch(() => null);
   if (token !== navToken) return null;
-  if (!res || !res.ok) {
-    return { html: `<div data-i18n="page.error">Не удалось загрузить страницу.</div>` };
-  }
+  if (!res || !res.ok) return { html: `<div data-i18n="page.error">Failed to load page</div>` };
   const json = await res.json().catch(() => ({}));
   if (token !== navToken) return null;
   const html = json.html ?? json.markup ?? json.content ?? json.innerHTML ?? '';
@@ -70,7 +68,7 @@ function setActiveNav(routeHash) {
   });
 }
 
-// Универсальный вызов i18n
+// Универсальный вызов i18n (под разные реализации)
 async function applyI18N(root) {
   const r = root || document.body;
   try {
@@ -84,34 +82,20 @@ async function applyI18N(root) {
   }
 }
 
-// Помечаем «живые» элементы, чтобы i18n не перезатирал их состояние
+// Мягкая маркировка «живых» островков, чтобы i18n не перезатирал их состояние
 function markDynamicIslands(root) {
   if (!root) return;
-  // Если у тебя уже стоят data-i18n-skip / data-i18n-lock — ничего делать не нужно.
-  // Здесь мягкая авто-подсветка типовых контейнеров плееров и модалок:
-  const candidates = qsa(I18N_SKIP_SELECTOR, root);
-  candidates.forEach(el => {
+  const nodes = qsa(I18N_SKIP_SELECTOR, root);
+  nodes.forEach(el => {
     if (!el.hasAttribute('data-i18n-skip') && !el.hasAttribute('data-i18n-lock')) {
       el.setAttribute('data-i18n-skip', '');
     }
   });
-
-  // Дополнительно — кнопки play/pause: если у них есть data-i18n, снимем его один раз,
-  // чтобы переводчик не менял innerHTML и не сбрасывал иконку состояния.
-  const playBtns = qsa('.play, .btn-play, [data-action="play"], [data-audio="toggle"]', root);
-  playBtns.forEach(btn => {
-    if (btn.hasAttribute('data-i18n')) {
-      btn.setAttribute('data-i18n-lock', ''); // помечаем как динамическую
-      btn.removeAttribute('data-i18n');       // и больше не трогаем текст/иконку переводом
-    }
-  });
 }
 
-// ————— Безопасный наблюдатель —————
 function stopObserver() {
   try { mo && mo.disconnect(); } catch {}
   mo = null;
-  moTarget = null;
   if (moTimer) { clearTimeout(moTimer); moTimer = null; }
 }
 
@@ -120,26 +104,20 @@ function mutationTouchesSkipArea(mutation) {
     ...(mutation.addedNodes ? Array.from(mutation.addedNodes) : []),
     ...(mutation.removedNodes ? Array.from(mutation.removedNodes) : [])
   ];
-  return nodes.some(n => {
-    if (!(n instanceof Element)) return false;
-    return n.closest(I18N_SKIP_SELECTOR) != null;
-  });
+  return nodes.some(n => (n instanceof Element) && n.closest(I18N_SKIP_SELECTOR));
 }
 
 function startObserver(mount) {
   stopObserver();
   if (!mount || typeof MutationObserver === 'undefined') return;
-  moTarget = mount;
   mo = new MutationObserver((mutations) => {
-    if (isApplyingI18N) return; // игнорируем собственные правки перевода
-    // реагируем только на добавление/удаление узлов НЕ внутри «skip»-зон
+    if (isApplyingI18N) return;
     const relevant = mutations.some(m => {
       const structural = (m.addedNodes && m.addedNodes.length) || (m.removedNodes && m.removedNodes.length);
       if (!structural) return false;
       return !mutationTouchesSkipArea(m);
     });
     if (!relevant) return;
-    // Debounce: не чаще, чем раз в 150 мс
     if (moTimer) return;
     moTimer = setTimeout(async () => {
       moTimer = null;
@@ -151,13 +129,11 @@ function startObserver(mount) {
 
 async function safeApplyI18N(root) {
   if (!root) return;
-  // 1) Отмечаем динамические островки (включая плеер/модалки)
-  markDynamicIslands(root);
-  // 2) На время применения переводов отключаем наблюдатель
   const hadObserver = !!mo;
   if (hadObserver) stopObserver();
   isApplyingI18N = true;
   try {
+    markDynamicIslands(root);
     await applyI18N(root);
   } finally {
     isApplyingI18N = false;
@@ -165,47 +141,48 @@ async function safeApplyI18N(root) {
   }
 }
 
-// ————— Основной цикл маршрутизации —————
 async function runRoute(name, token) {
   const cfg = ROUTES[name];
 
+  // Событие «до смены»
+  const from = current.name;
+  document.dispatchEvent(new CustomEvent('trus:route:will-change', { detail: { from, to: name }}));
+
   // Тёрндаун прошлой страницы
   stopObserver();
-  if (current.destroy) {
-    try { current.destroy(); } catch {}
-  }
+  if (current.destroy) { try { current.destroy(); } catch {} }
   current = { name, destroy: null };
 
-  // Активный пункт меню
-  setActiveNav(`#/` + name);
+  // Навигация
+  setActiveNav(`#/${name}`);
 
+  // Вставка partial (если есть)
   let mount = qs('#subpage');
-
-  // 1) Подставляем partial (если есть)
   if (cfg.partial) {
     const partial = await fetchPartial(cfg.partial, token);
     if (token !== navToken || partial === null) return;
     mount = mountHTML(partial.html);
     await safeApplyI18N(mount);
-  } else {
-    if (mount) mount.innerHTML = '';
+  } else if (mount) {
+    mount.innerHTML = '';
   }
 
-  // 2) Грузим модуль и запускаем init с DOM-ЭЛЕМЕНТОМ
+  // Модуль
   const mod = await cfg.module();
   if (token !== navToken) return;
   if (typeof mod?.init === 'function') {
-    await mod.init(mount);
+    await mod.init(mount); // ПЕРЕДАЁМ DOM-элемент (совместимо с твоими модулями)
   }
   if (typeof mod?.destroy === 'function') {
     current.destroy = mod.destroy;
   }
 
-  // 3) После возможной дорисовки модулем — ещё раз i18n (безопасно)
+  // Финальный i18n и наблюдатель
   await safeApplyI18N(mount);
-
-  // 4) Наблюдатель на асинхронные вставки
   startObserver(mount);
+
+  // Событие «после рендера»
+  document.dispatchEvent(new CustomEvent('trus:route:rendered', { detail: { name } }));
 }
 
 export async function navigate(hash) {
@@ -256,7 +233,7 @@ export function startRouter() {
   }
 }
 
-// Автозапуск
+// Автостарт только при прямом подключении файла
 if (document.currentScript && !window.__TRUS_ROUTER_BOOTSTRAPPED__) {
   startRouter();
 }

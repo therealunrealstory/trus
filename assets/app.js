@@ -1,2 +1,5 @@
-// Тонкий entry: инициализация делается в core/boot.js
-import './js/core/boot.js';
+// assets/app.js
+import router from './js/core/router.js';
+import './js/core/audio.js'; // устойчивый контроллер аудио
+
+router.startRouter();
