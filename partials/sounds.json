@@ -14,15 +14,15 @@
 	"ar": "/orus-music/ORUS-M-AR.mp3"	
 	},
     "announcement": { 
-	"en": "/orus-annouce/ORUS-A-EN.mp3", 
-	"ru": "/orus-annouce/ORUS-A-RU.mp3",
-	"es": "/orus-annouce/ORUS-A-ES.mp3", 
-	"it": "/orus-annouce/ORUS-A-IT.mp3", 
-	"pt": "/orus-annouce/ORUS-A-PT.mp3", 
-	"de": "/orus-annouce/ORUS-A-DE.mp3", 
-	"fr": "/orus-annouce/ORUS-A-FR.mp3", 
-	"cn": "/orus-annouce/ORUS-A-CN.mp3", 
-	"ar": "/orus-annouce/ORUS-A-AR.mp3"	
+	"en": "/orus-announce/ORUS-A-EN.mp3", 
+	"ru": "/orus-announce/ORUS-A-RU.mp3",
+	"es": "/orus-announce/ORUS-A-ES.mp3", 
+	"it": "/orus-announce/ORUS-A-IT.mp3", 
+	"pt": "/orus-announce/ORUS-A-PT.mp3", 
+	"de": "/orus-announce/ORUS-A-DE.mp3", 
+	"fr": "/orus-announce/ORUS-A-FR.mp3", 
+	"cn": "/orus-announce/ORUS-A-CN.mp3", 
+	"ar": "/orus-announce/ORUS-A-AR.mp3"	
 	},
     "short": { 
 	"en": "/orus-short/ORUS-S-EN.mp3", 
