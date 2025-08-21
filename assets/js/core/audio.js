@@ -1,4 +1,8 @@
 // assets/js/core/audio.js
+// Стабильный контроллер фоновой музыки «Story in music».
+// Правки: убраны дублирующие обработчики (pointerdown и click в capture),
+// добавлен лёгкий анти‑дребезг, остальная логика сохранена.
+
 import { $ } from './dom.js';
 import { I18N, DEFAULT_I18N, onLocaleChanged } from './i18n.js';
 
@@ -25,7 +29,6 @@ function ensureClickable() {
   audioBtn.classList.add('js-interactive');
   audioBtn.style.pointerEvents = 'auto';
   audioBtn.removeAttribute('disabled');
-  // на всякий — пусть это точно кнопка
   if (!audioBtn.getAttribute('type')) audioBtn.setAttribute('type','button');
 }
 
@@ -45,18 +48,17 @@ export function setMainAudioForLang(lang, autoplay=false){
   const src = `audio/ORUS-${L}.mp3`;
 
   const primary = pickPrimary(audios);
-  audios.forEach(a => { if (a !== primary && !a.paused) { try{ a.pause(); } catch{} } });
-
   if (!primary) { updateAudioLabels(); return; }
 
-  if (primary.src.endsWith(src)) {
-    if (autoplay && primary.paused) primary.play().catch(()=>{});
-    return; // события сами дернут updateAudioLabels
-  }
+  // погасим всех, кроме primary — один раз, до установки src
+  audios.forEach(a => { if (a !== primary && !a.paused) { try{ a.pause(); } catch{} } });
 
-  try { primary.pause(); } catch {}
-  primary.src = src;
+  if (!primary.src.endsWith(src)) {
+    try { primary.pause(); } catch {}
+    primary.src = src;
+  }
   if (autoplay) primary.play().catch(()=>{});
+  // подпись обновится по событиям <audio>
 }
 
 function pauseAllBg(except=null){
@@ -75,7 +77,7 @@ function bindAllIfNeeded(){
   updateAudioLabels();
 }
 
-/* === NEW: единая функция переключения === */
+/* === Единая функция переключения === */
 function toggleBgMusic() {
   ensureClickable();
 
@@ -87,38 +89,40 @@ function toggleBgMusic() {
 
   if (primary && !primary.paused && !primary.ended) {
     try { primary.pause(); } catch {}
+    // на всякий: погасим возможные дубликаты
     audios.forEach(a => { if (a !== primary && !a.paused) { try{ a.pause(); } catch{} } });
     return;
   }
 
   setMainAudioForLang(curLang, true);
 
+  // попросим другие плееры замолчать
   const bgAfterStart = pickPrimary(getBgAudios());
   document.dispatchEvent(new CustomEvent('pause-others', { detail: { except: bgAfterStart }}));
-  pauseAllBg(bgAfterStart);
 }
 
-/* === UPDATED: обвязка на все случаи (capture + bubble + pointer + keyboard) === */
+/* === Обработчики: ОДИН click + клавиатура, с анти‑дребезгом === */
 if (audioBtn && !audioBtn.__headerAudioBound__) {
   audioBtn.__headerAudioBound__ = true;
   ensureClickable();
 
+  let lastTs = 0;
   const handler = (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+
+    const now = Date.now();
+    if (now - lastTs < 160) return; // анти‑дребезг 160мс
+    lastTs = now;
+
     toggleBgMusic();
   };
 
-  // Click в capture-фазе — раньше любых внешних обработчиков
-  audioBtn.addEventListener('click', handler, true);
-  // И ещё раз в bubble — если capture вдруг кто-то отменил
+  // Только bubble‑фаза (никакого capture/pointerdown)
   audioBtn.addEventListener('click', handler, false);
 
-  // На случай, если кто-то убивает click — реагируем ещё на pointerdown
-  audioBtn.addEventListener('pointerdown', handler, true);
-
-  // Доступность: Space/Enter = toggle
+  // Доступность: Space/Enter = toggle (тоже с анти‑дребезгом внутри handler)
   audioBtn.addEventListener('keydown', (e) => {
     if (e.key === ' ' || e.key === 'Enter') handler(e);
   });
@@ -140,7 +144,7 @@ document.addEventListener('trus:route:rendered', bindAllIfNeeded);
 
 let tries = 0;
 (function tick(){
-  if (tries++ > 20) return;
+  if (tries++ > 20) return; // ~2s
   if (!getBgAudios().length) setTimeout(tick, 100);
   else bindAllIfNeeded();
 })();
