@@ -1,8 +1,7 @@
 // assets/js/core/audio.js
-// УСТОЙЧИВЫЙ контроллер фоновой музыки «Story in music».
-// Работает даже если в DOM внезапно появляется второй экземпляр <audio>
-// (из-за перерисовок/partials). Управляет ВСЕМИ экземплярами, выбирает
-// активный, синхронизирует метку кнопки и реагирует на глобальное pause-others.
+// Устойчивый контроллер фоновой музыки «Story in music».
+// Работает даже если в DOM появляется несколько экземпляров <audio>,
+// корректно обновляет подпись кнопки и ставит на паузу при запуске других плееров.
 
 import { $ } from './dom.js';
 import { I18N, DEFAULT_I18N, onLocaleChanged } from './i18n.js';
@@ -11,35 +10,44 @@ const audioBtn   = $('#audioBtn');
 const langSelect = $('#lang');
 
 const BGA_SELECTOR = '#bgAudio, [data-bg-audio]';
-const bound = new WeakSet(); // чтобы не вешать события дважды
+const bound = new WeakSet();
 
-// ——— i18n-лейблы
+// i18n-лейблы
 function playLabel()  { return I18N['audio.play']  || DEFAULT_I18N['audio.play']  || 'Story in music'; }
 function pauseLabel() { return I18N['audio.pause'] || DEFAULT_I18N['audio.pause'] || '‖ Pause'; }
 
-// ——— Получить ВСЕ возможные bg-audio
+// Все фоновые аудио
 function getBgAudios() {
   return Array.from(document.querySelectorAll(BGA_SELECTOR))
     .filter(el => el && el.tagName === 'AUDIO');
 }
 
-// ——— Выбрать «первичный» экземпляр (если играет — он главный; иначе первый)
+// Выбор «первичного» экземпляра
 function pickPrimary(audios) {
   if (!audios.length) return null;
   const playing = audios.find(a => !a.paused && !a.ended);
   return playing || audios[0];
 }
 
-// ——— Синхронизировать подпись кнопки по факту «играет ли кто-то»
+// Гарантируем кликабельность кнопки (на случай агрессивных CSS)
+function ensureClickable() {
+  if (!audioBtn) return;
+  audioBtn.classList.add('js-interactive');
+  audioBtn.style.pointerEvents = 'auto';
+  audioBtn.removeAttribute('disabled');
+}
+
+// Обновить подпись/aria состояния кнопки
 export function updateAudioLabels(){
   if (!audioBtn) return;
   const audios = getBgAudios();
   const anyPlaying = audios.some(a => !a.paused && !a.ended);
   audioBtn.textContent = anyPlaying ? pauseLabel() : playLabel();
   audioBtn.setAttribute('aria-pressed', anyPlaying ? 'true' : 'false');
+  ensureClickable();
 }
 
-// ——— Подставить язык и (опционально) запустить воспроизведение на ПЕРВИЧНОМ
+// Подставить трек языка и при необходимости запустить
 export function setMainAudioForLang(lang, autoplay=false){
   const audios = getBgAudios();
   if (!audios.length) { updateAudioLabels(); return; }
@@ -49,99 +57,98 @@ export function setMainAudioForLang(lang, autoplay=false){
 
   const primary = pickPrimary(audios);
 
-  // Всегда останавливаем ВСЕ, кроме primary (чтобы не было «двойной музыки»)
+  // Глушим все, кроме primary (во избежание «двойной музыки»)
   audios.forEach(a => { if (a !== primary && !a.paused) { try{ a.pause(); } catch{} } });
 
   if (!primary) { updateAudioLabels(); return; }
 
-  // Если уже нужный трек — просто play/pause по флагу
   if (primary.src.endsWith(src)) {
     if (autoplay && primary.paused) primary.play().catch(()=>{});
-    updateAudioLabels();
-    return;
+    return; // события play/pause сами вызовут updateAudioLabels
   }
 
   try { primary.pause(); } catch {}
   primary.src = src;
   if (autoplay) primary.play().catch(()=>{});
-  updateAudioLabels();
+  // updateAudioLabels не вызываем здесь — дождёмся событий <audio>, чтобы не мигать
 }
 
-// ——— Поставить на паузу все фоны (для протокола pause-others)
+// Поставить на паузу все фоновые аудио (без немедленного update — доверимся событиям)
 function pauseAllBg(except=null){
   getBgAudios().forEach(a => { if (a !== except && !a.paused) { try{ a.pause(); } catch{} } });
-  updateAudioLabels();
 }
 
-// ——— Навесить события на экземпляр (однократно)
+// Навесить события на экземпляр (однократно)
 function bindAudioEvents(a){
   if (!a || bound.has(a)) return;
   bound.add(a);
-  ['play','playing','pause','ended','emptied','abort','stalled','suspend'].forEach(ev =>
-    a.addEventListener(ev, updateAudioLabels)
-  );
+
+  // Сразу отражаем состояние в кнопке по ключевым событиям
+  a.addEventListener('play',     updateAudioLabels);
+  a.addEventListener('playing',  updateAudioLabels);
+  a.addEventListener('pause',    updateAudioLabels);
+  a.addEventListener('ended',    updateAudioLabels);
+  a.addEventListener('emptied',  updateAudioLabels);
 }
 
-// ——— Подцепиться ко всем экземплярам, если они есть (можно вызывать многократно)
+// Подцепиться ко всем экземплярам, если они есть
 function bindAllIfNeeded(){
   getBgAudios().forEach(bindAudioEvents);
   updateAudioLabels();
 }
 
-// ——— Логика клика по кнопке (делегирование уже в boot.js не требуется — здесь достаточно прямой привязки)
+// Кнопка: надёжный toggle
 if (audioBtn && !audioBtn.__headerAudioBound__) {
   audioBtn.__headerAudioBound__ = true;
+  ensureClickable();
 
   audioBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    const audios = getBgAudios();
+    ensureClickable();
 
-    // Если вообще нет <audio> — просто обновим подпись, а появится — следующие клики сработают
+    const audios = getBgAudios();
     if (!audios.length) { updateAudioLabels(); return; }
 
-    const primary = pickPrimary(audios);
+    const isAnyPlaying = audios.some(a => !a.paused && !a.ended);
     const curLang = (langSelect?.value || document.documentElement.getAttribute('lang') || 'EN').toUpperCase();
 
-    // Если «кто-то» уже играет — ставим ВСЁ на паузу (надёжный «toggle off»)
-    if (audios.some(a => !a.paused && !a.ended)) {
+    if (isAnyPlaying) {
+      // Надёжно гасим всё
       pauseAllBg();
+      // updateAudioLabels произойдёт по событиям pause/ended
       return;
     }
 
-    // Иначе — запускаем трек текущего языка на primary
+    // Стартуем трек текущего языка на primary и глушим остальные
     setMainAudioForLang(curLang, true);
-    // и аккуратно глушим все остальные (на случай внезапной инициализации второго)
     pauseAllBg(pickPrimary(getBgAudios()));
   });
 }
 
-// ——— Реакция на смену языка: если сейчас что-то играет — подменим источник и продолжим; если тишина — просто подпись
+// При смене языка: сначала отразим текущее состояние, затем сменим трек, если играет
 onLocaleChanged(({ lang }) => {
   const anyPlaying = getBgAudios().some(a => !a.paused && !a.ended);
+  updateAudioLabels(); // без мигания
   setMainAudioForLang(lang || (langSelect?.value || 'EN'), anyPlaying);
-  updateAudioLabels();
 });
 
-// ——— Глобальный протокол (когда мини-плееры запускаются, фоновую музыку ставим на паузу)
+// Если запускаются другие плееры — фон ставим на паузу
 document.addEventListener('pause-others', (e) => {
   const ex = e.detail?.except || null;
   pauseAllBg(ex);
 });
 
-// ——— Подключаемся в разумные моменты жизненного цикла: когда DOM готов, когда страница перерисована
+// Жизненный цикл: когда DOM готов / после перерисовки страницы
 document.addEventListener('DOMContentLoaded', bindAllIfNeeded);
 document.addEventListener('trus:route:rendered', bindAllIfNeeded);
 
-// ——— На всякий — короткий «мягкий» тикер старта: если аудио вставят с задержкой, мы его подхватим
+// Мягкий тикер старта: если аудио добавят чуть позже — подхватим
 let tries = 0;
 (function tick(){
-  if (tries++ > 20) return; // ~2 секунды максимум
-  if (!getBgAudios().length) {
-    setTimeout(tick, 100);
-  } else {
-    bindAllIfNeeded();
-  }
+  if (tries++ > 20) return; // ~2 секунды
+  if (!getBgAudios().length) setTimeout(tick, 100);
+  else bindAllIfNeeded();
 })();
 
-// ——— Первичная синхронизация метки
+// Первичная синхронизация
 updateAudioLabels();
