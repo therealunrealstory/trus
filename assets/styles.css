@@ -382,6 +382,20 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
   border-radius: 0 !important;
 }
 
+/* --- НОВОЕ: образец точки события в легенде --- */
+.swatch-dot{
+  width:16px; height:16px; border-radius:50%;
+  background:#ffffff; outline:1px solid rgba(255,255,255,0.12);
+  box-shadow:0 0 0 2px rgba(79,70,229,.45);
+}
+
+/* --- НОВОЕ: стили для раскрываемого текста в модалке --- */
+.js-morebox{
+  font-style: italic;
+  color:#dfe7fb;
+  margin-top:6px;
+}
+
 /* --- Unified modal panel look --- */
 :root{
   --modal-panel-bg: rgba(255,255,255,0.12); /* было слишком прозрачно */
