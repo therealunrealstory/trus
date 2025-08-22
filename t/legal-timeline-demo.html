@@ -58,7 +58,7 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
   border-top:4px dashed var(--indigo-600);
 }
 
-/* Точки/кластеры */
+/* Точки/кластеры (на шкале) */
 .cluster-dot{
   position:absolute; width:16px; height:16px; border-radius:50%;
   background:#ffffff; outline:1px solid rgba(255,255,255,0.12);
@@ -91,6 +91,13 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
 .swatch-base{ width:44px; background:var(--indigo-600); }
 .swatch-freeze{ width:44px; height:12px; background:var(--red-500); border-radius:8px; }
 .swatch-future{ width:44px; background:transparent; border-top:4px dashed var(--indigo-600); height:0; }
+
+/* НОВОЕ: образец «точки» в легенде — как на шкале */
+.swatch-dot{
+  width:16px; height:16px; border-radius:50%;
+  background:#ffffff; outline:1px solid rgba(255,255,255,0.12);
+  box-shadow:0 0 0 2px rgba(79,70,229,.45);
+}
 
 /* ── Мобильная версия ───────────────────────────────────────────── */
 @media (max-width:820px){
@@ -134,6 +141,11 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
       <div class="legend-item"><span class="legend-swatch swatch-base"></span><span>Период судебных разбирательств</span></div>
       <div class="legend-item"><span class="legend-swatch swatch-freeze"></span><span>Период блокировки</span></div>
       <div class="legend-item"><span class="legend-swatch swatch-future"></span><span>Судебные перспективы (впереди)</span></div>
+      <!-- НОВОЕ: точка события (кликабельно) -->
+      <div class="legend-item">
+        <span class="swatch-dot" aria-hidden="true"></span>
+        <span>Событие <span style="opacity:.8">(кликабельно)</span></span>
+      </div>
     </div>
   </div>
 
@@ -304,6 +316,11 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
     const dot = document.createElement('div'); dot.className='cluster-dot';
     const label = document.createElement('div'); label.className='label';
 
+    // НОВОЕ: подсказка и доступность
+    dot.setAttribute('title','Событие — нажмите для подробностей');
+    dot.setAttribute('aria-label','Событие — нажмите для подробностей');
+    dot.setAttribute('role','button');
+
     dot.dataset.center = +center;
     label.dataset.center = +center;
 
@@ -399,13 +416,25 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
     openModal(`События (${group.length})`, list);
   }
 
-  // делегирование на "Подробнее"
+  // НОВОЕ: делегирование на "Подробнее" — устойчиво к обоим вариантам разметки
   document.getElementById('modalBody').addEventListener('click', e=>{
     const btn = e.target.closest('.js-more');
     if(!btn) return;
-    const box = btn.previousElementSibling; // .js-morebox
-    const opened = box && box.style.display !== 'none';
-    if(box) box.style.display = opened ? 'none' : 'block';
+
+    // ищем соседний .js-morebox (в кластере он до кнопки, в одиночном событии — после <p>)
+    const findMoreBox = (button)=>{
+      const isBox = el => el && el.classList && el.classList.contains('js-morebox');
+      let el = button.previousElementSibling; if(isBox(el)) return el;
+      el = button.nextElementSibling;         if(isBox(el)) return el;
+      el = button.closest('p')?.nextElementSibling; if(isBox(el)) return el;
+      return null;
+    };
+
+    const box = findMoreBox(btn);
+    if(!box) return;
+
+    const opened = box.style.display !== 'none';
+    box.style.display = opened ? 'none' : 'block';
     btn.textContent = opened ? 'Подробнее' : 'Свернуть';
   });
 
