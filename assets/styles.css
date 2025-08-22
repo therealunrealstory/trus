@@ -384,7 +384,7 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
 
 /* --- Unified modal panel look --- */
 :root{
-  --modal-panel-bg: rgba(255,255,255,0.20); /* было слишком прозрачно */
+  --modal-panel-bg: rgba(255,255,255,0.15); /* было слишком прозрачно */
 }
 
 /* применяем ко всем вариантам контейнеров модалки, что встречаются в проекте */
