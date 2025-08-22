@@ -346,15 +346,6 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
   border-radius: 0 !important;
 }
 
-@media (max-width: 820px){
-  .legend .swatch-future,
-  .timeline-legend .swatch-future,
-  .legend-swatch.swatch-future{
-    width:0 !important; height:44px !important;
-    border-top:0 !important; border-left:4px dashed #4f46e5 !important;
-  }
-}
-
 /* ---------- Modal (UNIFIED LOOK & VARS) ---------- */
 :root{
   /* backdrop */
