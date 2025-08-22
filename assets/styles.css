@@ -368,3 +368,32 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
 
 /* ---- НОВОЕ для юр. хронологии (нейтрально, ничего не ломает) ---- */
 .now-marker{ pointer-events:none; } /* чтобы не перехватывала клики по точкам */
+
+/* --- Legal Timeline legend: dashed future sample --- */
+.timeline-legend .swatch-future,
+.legend .swatch-future,
+.legend-swatch.swatch-future{
+  width:44px;
+  height:0;
+  background:none;
+  border-top:4px dashed var(--indigo-600);
+}
+
+/* --- Unified modal panel look --- */
+:root{
+  --modal-panel-bg: rgba(255,255,255,0.20); /* было слишком прозрачно */
+}
+
+/* применяем ко всем вариантам контейнеров модалки, что встречаются в проекте */
+.modal-dialog,
+.modal-panel,
+.modal-content{
+  background: var(--modal-panel-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #111;
+  border-radius: 16px;
+}
+
+/* чтобы страница не прокручивалась под модалкой */
+body.modal-open{ overflow:hidden; }
