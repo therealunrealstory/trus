@@ -370,13 +370,16 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
 .now-marker{ pointer-events:none; } /* чтобы не перехватывала клики по точкам */
 
 /* --- Legal Timeline legend: dashed future sample --- */
-.timeline-legend .swatch-future,
+/* FIX: пунктир «судебные перспективы» в легенде */
 .legend .swatch-future,
+.timeline-legend .swatch-future,
+.legend [class*="swatch-future"],
 .legend-swatch.swatch-future{
+  background:transparent !important;
+  height:0 !important;
+  border:0 !important;
+  border-top:4px dashed var(--indigo-600) !important;
   width:44px;
-  height:0;
-  background:none;
-  border-top:4px dashed var(--indigo-600);
 }
 
 /* --- Unified modal panel look --- */
@@ -391,7 +394,7 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
   background: var(--modal-panel-bg);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  color: #111;
+  color: #e7ecf3;
   border-radius: 16px;
 }
 
