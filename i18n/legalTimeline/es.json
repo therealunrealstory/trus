@@ -1,0 +1,126 @@
+{
+  "meta": {
+    "updated_at": "2025-08-22T00:00:00Z",
+    "updated_by": "Nico",
+    "version": "legal.v1.3",
+    "lang_default": "es"
+  },
+  "legend": {
+    "roles": {
+      "plaintiff": "Acciones de los familiares (demandantes)",
+      "defendant": "Acciones de Adam (demandado)",
+      "court": "Tribunal",
+      "admin": "Medidas/restricciones"
+    },
+    "status": {
+      "done": "concluido",
+      "current": "actual",
+      "planned": "planificado",
+      "tentative": "posible"
+    },
+    "dot": "Punto de evento (clicable)"
+  },
+  "ui": {
+    "btn_details": "Más detalles",
+    "btn_hide": "Ocultar",
+    "tooltip_event": "Haz clic para leer detalles"
+  },
+  "items": {
+    "2020-09-will-mother": {
+      "when_label": "Sep 2020",
+      "title": "Testamento de la madre a favor de Adam",
+      "summary": "La madre falleció; testamento a favor de Adam.",
+      "details": "En septiembre de 2020 falleció la madre de Adam, dejando un testamento a su favor. En los meses siguientes no utilizó los bienes heredados. Los familiares no hicieron reclamos mientras vivía el padre."
+    },
+    "2021-04-father-dx-will": {
+      "when_label": "Abr 2021",
+      "title": "Diagnóstico del padre; testamento a favor de Adam",
+      "summary": "Al padre se le diagnosticó cáncer; el testamento ya estaba hecho.",
+      "details": "En abril de 2021 al padre de Adam se le diagnosticó cáncer en fase terminal. Para entonces ya había otorgado un testamento a favor de Adam."
+    },
+    "2021-07-father-death-claims": {
+      "when_label": "Jul 2021",
+      "title": "Muerte del padre; demandas internacionales",
+      "summary": "Familiares presentaron demandas; escritos extensos (~100 págs.).",
+      "details": "En julio de 2021 falleció el padre de Adam. Casi simultáneamente los familiares presentaron demandas internacionales impugnando los testamentos de los padres. Los escritos tenían decenas de páginas (unas 100) y buscaban bloquear los derechos y bienes de Adam el mayor tiempo posible. Algunas demandas fueron presentadas aún en vida del padre, cuando ya era prácticamente incapaz. Por consejo legal, Adam suspendió operaciones en sus cuentas personales."
+    },
+    "2021-07-asset-freeze": {
+      "when_label": "Desde Jul 2021",
+      "title": "Congelación total de activos y restricciones",
+      "summary": "Medidas de congelación de activos y movimientos.",
+      "details": "Se impusieron medidas de congelación total de activos y restricciones de movimiento, abarcando cuentas y bienes inmuebles. Estas medidas siguen vigentes."
+    },
+    "2021-09-apartment-dispute": {
+      "when_label": "Sep 2021",
+      "title": "Disputa por el apartamento de Adam",
+      "summary": "La hermana negó estadía temporal; disputa por desalojo.",
+      "details": "Durante su visita a EE.UU. para diagnóstico CAR-T, Adam contactó a su hermana que vivía en su apartamento, pidiendo quedarse temporalmente. Ella se negó, alegando ‘incomodidad’. Adam entonces le informó que ya no quería que siguiera viviendo gratis y le pidió que se mudara. Ella se negó, afirmando que bajo la congelación Adam no tenía derecho a desalojarla."
+    },
+    "2021-11-prelim-scheduled": {
+      "when_label": "Nov 2021",
+      "title": "Audiencia preliminar fijada",
+      "summary": "Audiencia preliminar fijada para julio de 2024.",
+      "details": "El tribunal fijó una audiencia preliminar sobre la herencia para julio de 2024."
+    },
+    "2022-03-hearing-travel": {
+      "when_label": "Mar 2022 (inic.)",
+      "title": "Audiencia sobre derecho a viajar para tratamiento",
+      "summary": "Se debatió permiso para viajar a EE.UU.; familiares se opusieron.",
+      "details": "El tribunal examinó la solicitud de Adam para viajar a EE.UU. a recibir terapia CAR-T. Los familiares se opusieron. Se realizó un examen médico forense."
+    },
+    "2022-03-permission-travel": {
+      "when_label": "Mar 2022 (fin)",
+      "title": "Autorización para viajar a tratamiento",
+      "summary": "Tribunal permitió viajar a EE.UU. para terapia.",
+      "details": "El tribunal concedió la solicitud de Adam y le permitió viajar a EE.UU. para la terapia."
+    },
+    "2022-05-visit-med-exam": {
+      "when_label": "May 2022",
+      "title": "Visita de familiares; exigencia de examen médico",
+      "summary": "Intervino la policía; restricciones a los familiares.",
+      "details": "Los familiares llegaron a la casa de Adam exigiendo llevarlo a un examen médico, alegando posible tutela. Adam se opuso y el personal médico no les dio acceso. Intervino la policía. El tribunal determinó que tales exigencias eran ilegales sin consentimiento de Adam, y como sanción impuso un mes de detención y prohibición de entrada al país por seis meses por intentar sacarlo por la fuerza."
+    },
+    "2024-06-eviction-start": {
+      "when_label": "Jun 2024 (fin)",
+      "title": "Inicio de procedimiento de desalojo contra hermana",
+      "summary": "Se inició proceso de desalojo del apartamento de Adam.",
+      "details": "A finales de junio de 2024 Adam inició proceso de desalojo contra su hermana, al enterarse de que era la principal impulsora de la demanda. Ella anteriormente (2021-09) le negó estadía temporal. Luego alegó ante el tribunal que el desalojo fue ilegal, pero el tribunal no encontró infracciones."
+    },
+    "2024-07-docs-fee": {
+      "when_label": "Jul 2024 (inic.)",
+      "title": "Presentación de documentos; pago de tasa",
+      "summary": "Se entregaron documentos financieros/médicos; se pagó tasa $5 350.",
+      "details": "Antes de la audiencia preliminar Adam presentó documentos financieros y médicos y pagó una tasa judicial de $5 350."
+    },
+    "2024-07-prelim-hearing": {
+      "when_label": "Jul 2024 (med.)",
+      "title": "Audiencia preliminar; dos posibles resultados",
+      "summary": "Tribunal indicó 2 escenarios; rechazo de acuerdo.",
+      "details": "El tribunal planteó dos escenarios: (1) confirmar los testamentos y asegurar la herencia para Adam; (2) dividir la herencia entre todos los hijos si se probaba presión sobre los padres. Los familiares rechazaron acuerdo."
+    },
+    "2024-07-motion-freeze-relatives": {
+      "when_label": "Jul 2024 (med.)",
+      "title": "Moción para congelar cuentas de familiares",
+      "summary": "Se solicitó congelación y revisión financiera.",
+      "details": "En la misma audiencia Adam presentó una moción para congelar cuentas de familiares y revisar sus operaciones financieras."
+    },
+    "2024-08-relatives-freeze": {
+      "when_label": "Ago 2024",
+      "title": "Cuentas de familiares congeladas",
+      "summary": "Tribunal aceptó la moción de congelación.",
+      "details": "El tribunal aceptó la moción de Adam para congelar cuentas de familiares con el fin de revisar sus operaciones financieras."
+    },
+    "2025-07-unfreeze-motion": {
+      "when_label": "Jul 2025",
+      "title": "Moción para descongelar activos",
+      "summary": "Se solicitó descongelación total/parcial.",
+      "details": "Por su estado de salud y una nueva forma de leucemia, Adam solicitó descongelación total o parcial de los activos. Su abogado se opuso, temiendo demoras. Pero Adam no tenía otra opción: necesitaba urgentemente fondos para tratamiento y mantenimiento de la remisión."
+    },
+    "2026-11-hearing-scheduled": {
+      "when_label": "Nov 2026",
+      "title": "Audiencia fijada sobre la moción",
+      "summary": "Tribunal fijó audiencia para nov. 2026.",
+      "details": "En agosto de 2025 el tribunal admitió la moción de Adam y fijó audiencia para noviembre de 2026."
+    }
+  }
+}

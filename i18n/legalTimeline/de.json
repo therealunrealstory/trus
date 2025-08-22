@@ -1,0 +1,126 @@
+{
+  "meta": {
+    "updated_at": "2025-08-22T00:00:00Z",
+    "updated_by": "Nico",
+    "version": "legal.v1.3",
+    "lang_default": "de"
+  },
+  "legend": {
+    "roles": {
+      "plaintiff": "Handlungen der Verwandten (Kläger)",
+      "defendant": "Adams Handlungen (Beklagter)",
+      "court": "Gericht",
+      "admin": "Maßnahmen/Einschränkungen"
+    },
+    "status": {
+      "done": "abgeschlossen",
+      "current": "aktuell",
+      "planned": "geplant",
+      "tentative": "vorläufig"
+    },
+    "dot": "Ereignispunkt (anklickbar)"
+  },
+  "ui": {
+    "btn_details": "Mehr Details",
+    "btn_hide": "Weniger",
+    "tooltip_event": "Klicken, um Details zu lesen"
+  },
+  "items": {
+    "2020-09-will-mother": {
+      "when_label": "Sep 2020",
+      "title": "Testament der Mutter zugunsten von Adam",
+      "summary": "Mutter verstorben; Testament zugunsten Adams.",
+      "details": "Im September 2020 verstarb Adams Mutter und hinterließ ein Testament zu seinen Gunsten. In den folgenden Monaten nutzte er das geerbte Vermögen nicht. Verwandte erhoben keine Ansprüche, solange der Vater lebte."
+    },
+    "2021-04-father-dx-will": {
+      "when_label": "Apr 2021",
+      "title": "Diagnose des Vaters; Testament zugunsten von Adam",
+      "summary": "Beim Vater wurde Krebs diagnostiziert; Testament bereits erstellt.",
+      "details": "Im April 2021 wurde bei Adams Vater Krebs im fortgeschrittenen Stadium diagnostiziert. Zu diesem Zeitpunkt hatte er bereits ein Testament zugunsten Adams erstellt."
+    },
+    "2021-07-father-death-claims": {
+      "when_label": "Jul 2021",
+      "title": "Tod des Vaters; internationale Klagen",
+      "summary": "Verwandte reichten Klagen ein; umfangreiche Schriftsätze (~100 S.).",
+      "details": "Im Juli 2021 verstarb Adams Vater. Fast gleichzeitig reichten Verwandte internationale Klagen ein, um die Testamente der Eltern anzufechten. Die Schriftsätze umfassten Dutzende Seiten (etwa 100) und zielten darauf ab, Adams Rechte und Vermögen möglichst lange zu blockieren. Einige Klagen wurden eingereicht, als der Vater noch lebte, aber bereits geschäftsunfähig war. Auf anwaltlichen Rat hin setzte Adam Transaktionen auf seinen Konten aus."
+    },
+    "2021-07-asset-freeze": {
+      "when_label": "Seit Jul 2021",
+      "title": "Vollständige Vermögenssperre und Einschränkungen",
+      "summary": "Sperren von Vermögen und Bewegungen in Kraft.",
+      "details": "Es wurden vollständige Vermögenssperren und Bewegungseinschränkungen verhängt, die Konten und Immobilien betreffen. Diese Maßnahmen gelten weiterhin."
+    },
+    "2021-09-apartment-dispute": {
+      "when_label": "Sep 2021",
+      "title": "Streit um Adams Wohnung",
+      "summary": "Schwester verweigerte vorübergehenden Aufenthalt; Streit um Räumung.",
+      "details": "Während CAR‑T‑Untersuchungen in den USA bat Adam seine Schwester, die in seiner Wohnung lebte, vorübergehend dort wohnen zu dürfen. Sie lehnte mit dem Hinweis auf „Unbehagen“ ab. Adam erklärte daraufhin, dass er ihr kostenloses Wohnen nicht länger dulde und forderte sie zum Auszug auf. Sie weigerte sich mit der Begründung, Adam habe unter der Sperre kein Recht zur Räumung."
+    },
+    "2021-11-prelim-scheduled": {
+      "when_label": "Nov 2021",
+      "title": "Vorläufige Anhörung angesetzt",
+      "summary": "Vorläufige Anhörung für Juli 2024 angesetzt.",
+      "details": "Das Gericht setzte eine vorläufige Anhörung zur Erbsache für Juli 2024 an."
+    },
+    "2022-03-hearing-travel": {
+      "when_label": "Mär 2022 (Anfang)",
+      "title": "Anhörung zum Recht auf Ausreise zur Behandlung",
+      "summary": "Erlaubnis zur Reise in die USA von Verwandten angefochten.",
+      "details": "Das Gericht prüfte Adams Antrag, für eine CAR‑T‑Therapie in die USA zu reisen. Verwandte widersprachen. Es wurde ein forensisch‑medizinisches Gutachten durchgeführt."
+    },
+    "2022-03-permission-travel": {
+      "when_label": "Mär 2022 (Ende)",
+      "title": "Erlaubnis zur Ausreise zur Behandlung",
+      "summary": "Gericht gestattete Reise in die USA zur Therapie.",
+      "details": "Das Gericht gab Adams Antrag statt und erlaubte ihm die Ausreise zur Therapie in die USA."
+    },
+    "2022-05-visit-med-exam": {
+      "when_label": "Mai 2022",
+      "title": "Besuch der Verwandten; Forderung nach ärztlicher Untersuchung",
+      "summary": "Polizei griff ein; Beschränkungen für Verwandte ausgesprochen.",
+      "details": "Verwandte kamen zu Adams Wohnung und verlangten, ihn zu einer ärztlichen Untersuchung zu bringen, mit Verweis auf eine mögliche Vormundschaft. Adam widersprach, das medizinische Personal gewährte keinen Zugang. Die Polizei griff ein. Das Gericht entschied, dass solche Forderungen ohne Adams Zustimmung unzulässig seien, verhängte einen Monat Gewahrsam und ein sechsmonatiges Einreiseverbot wegen des Versuchs, ihn gewaltsam zu entfernen."
+    },
+    "2024-06-eviction-start": {
+      "when_label": "Jun 2024 (Ende)",
+      "title": "Einleitung des Räumungsverfahrens gegen die Schwester",
+      "summary": "Verfahren eingeleitet, um sie aus Adams Wohnung zu räumen.",
+      "details": "Ende Juni 2024 leitete Adam ein Räumungsverfahren gegen seine Schwester ein, nachdem er erfahren hatte, dass sie Hauptinitiatorin der Klage war. Zuvor (2021‑09) hatte sie ihm einen vorübergehenden Aufenthalt verweigert. Später behauptete sie vor Gericht, die Räumung sei unrechtmäßig gewesen, doch das Gericht sah keine Verstöße."
+    },
+    "2024-07-docs-fee": {
+      "when_label": "Jul 2024 (Anfang)",
+      "title": "Einreichung von Unterlagen; Gebühr gezahlt",
+      "summary": "Finanz-/medizinische Unterlagen eingereicht; Gebühr von 5.350 $ gezahlt.",
+      "details": "Vor der vorläufigen Anhörung reichte Adam finanzielle und medizinische Unterlagen ein und zahlte eine Gerichtsgebühr von 5.350 $."
+    },
+    "2024-07-prelim-hearing": {
+      "when_label": "Jul 2024 (Mitte)",
+      "title": "Vorläufige Anhörung; zwei mögliche Ergebnisse",
+      "summary": "Gericht skizzierte 2 Szenarien; Vergleich abgelehnt.",
+      "details": "Das Gericht nannte zwei Szenarien: (1) Bestätigung der Testamente und Zuweisung des Erbes an Adam; (2) Teilung des Erbes unter allen Kindern, falls Druck auf die Eltern bewiesen wird. Verwandte lehnten einen Vergleich ab."
+    },
+    "2024-07-motion-freeze-relatives": {
+      "when_label": "Jul 2024 (Mitte)",
+      "title": "Antrag auf Einfrieren der Konten der Verwandten",
+      "summary": "Einfrieren und finanzielle Prüfung beantragt.",
+      "details": "In derselben Anhörung stellte Adam einen Antrag, die Konten der Verwandten einzufrieren und ihre Transaktionen zu prüfen."
+    },
+    "2024-08-relatives-freeze": {
+      "when_label": "Aug 2024",
+      "title": "Konten der Verwandten eingefroren",
+      "summary": "Gericht gab dem Antrag auf Einfrieren statt.",
+      "details": "Das Gericht gab Adams Antrag statt, die Konten der Verwandten einzufrieren, um finanzielle Transaktionen zu überprüfen."
+    },
+    "2025-07-unfreeze-motion": {
+      "when_label": "Jul 2025",
+      "title": "Antrag auf Entsperrung von Vermögenswerten",
+      "summary": "Vollständige/teilweise Entsperrung beantragt.",
+      "details": "Aufgrund seiner Gesundheit und einer neuen Form von Leukämie beantragte Adam die vollständige oder teilweise Entsperrung von Vermögenswerten. Sein Anwalt war dagegen, aus Sorge vor Verzögerungen. Doch Adam hatte keine andere Wahl: Mittel wurden dringend für Behandlung und Remissionserhalt benötigt."
+    },
+    "2026-11-hearing-scheduled": {
+      "when_label": "Nov 2026",
+      "title": "Anhörung zum Antrag terminiert",
+      "summary": "Gericht terminierte Anhörung für Nov. 2026.",
+      "details": "Im August 2025 nahm das Gericht Adams Antrag an und setzte die Anhörung für November 2026 an."
+    }
+  }
+}
