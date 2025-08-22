@@ -1,176 +1,195 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Юридическая хронология — демо</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Подключаем АКТУАЛЬНЫЙ стиль сайта -->
-  <link rel="stylesheet" href="https://therealunrealstory.com/assets/styles.css" />
+  <!-- Подключение актуального стиля сайта -->
+  <link rel="stylesheet" href="https://therealunrealstory.com/assets/styles.css">
 
   <style>
-    /* Локальные вспомогательные стили демо */
-    body{ margin:0; background:#0f172a; color:#e2e8f0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
-    .wrap{ padding:40px 18px 28px; max-width:1200px; margin:0 auto; }
-
-    .timeline-container{
-      position:relative;
-      width:100%;
-      padding:48px 48px 64px;
-      box-sizing:border-box;
-      overflow:hidden;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.08);
-      background:rgba(0,0,0,.18);
+    /* Локальные вспомогательные стили для демо */
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+    .timeline-container {
+      width: 100%;
+      overflow-x: hidden;
+      padding: 40px 60px;
+    }
+    .timeline-line {
+      position: relative;
+      height: 4px;
+      background: #4f46e5; /* Indigo 600 */
+      margin: 60px auto;
+    }
+    .timeline-point {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      background: #4f46e5;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .timeline-label {
+      position: absolute;
+      top: -35px;
+      transform: translateX(-50%);
+      font-size: 13px;
+      white-space: nowrap;
     }
 
-    /* Базовая тонкая линия (Indigo 600) */
-    .base-line{
-      position:relative;
-      height:4px;
-      background:#4f46e5; /* Indigo 600 */
-      margin:80px auto 40px;
-      border-radius:999px;
+    /* Анимация для «сейчас» */
+    .timeline-point.current {
+      background: #ef4444; /* красный */
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); }
+      70% { box-shadow: 0 0 0 12px rgba(239,68,68,0); }
+      100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
     }
 
-    /* Точки и подписи */
-    .point{ position:absolute; top:50%; transform:translate(-50%,-50%); width:14px; height:14px; background:#4f46e5; border-radius:50%; cursor:pointer; }
-    .label{ position:absolute; top:-40px; transform:translateX(-50%); font-size:13px; white-space:nowrap; color:#dbeafe; }
-
-    /* Сообщение об ошибке */
-    .error{
-      display:none; margin:10px 0 0; padding:10px 12px; border-radius:10px;
-      border:1px solid rgba(255,255,255,.12); background:rgba(127,29,29,.25);
-      color:#fecaca; font-size:14px;
+    /* Модалка */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+      display: none;
+      z-index: 9999;
     }
-
-    /* Модалка — каркас (визуал берём из общего styles.css) */
-    .modal-backdrop{ position:fixed; inset:0; display:none; z-index:9999; }
-    .modal-backdrop.show{ display:block; }
-    .modal-dialog{ max-width:700px; width:clamp(320px,92vw,700px); }
-
-    .ev{ padding:10px 0; border-top:1px dashed rgba(255,255,255,.12); }
-    .ev:first-child{ border-top:none; }
-    .ev h4{ margin:2px 0 4px; font-size:16px; color:#fff; }
-    .ev time{ display:block; font-size:12px; color:#cbd5e1; margin-bottom:6px; }
-    .ev p{ margin:0 0 6px; color:#e2e8f0; }
+    .modal-backdrop.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-dialog {
+      background: rgba(30,41,59,0.95);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      max-width: 640px;
+      width: 90%;
+      padding: 20px;
+      color: #e2e8f0;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .modal-dialog h2 {
+      margin-top: 0;
+      font-size: 20px;
+      color: #fff;
+    }
+    .modal-dialog p {
+      margin: 8px 0;
+      font-size: 15px;
+    }
+    .modal-dialog .btn {
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="timeline-container">
-      <div id="baseLine" class="base-line"></div>
-      <div id="error" class="error"></div>
-    </div>
-    <div class="text-sm text-slate-300 mt-3">Шкала вписана в ширину экрана с отступами. Клик по точке — модалка.</div>
+
+<div class="timeline-container">
+  <div class="timeline-line" id="timeline"></div>
+</div>
+
+<!-- Модалка -->
+<div class="modal-backdrop" id="modalBack">
+  <div class="modal-dialog">
+    <h2 id="modalTitle"></h2>
+    <div id="modalContent"></div>
+    <button class="btn btn-primary mt-3" onclick="closeModal()">Закрыть</button>
   </div>
+</div>
 
-  <!-- Унифицированная модалка (стили берутся из assets/styles.css) -->
-  <div id="modalBack" class="modal-backdrop" aria-modal="true" role="dialog" aria-labelledby="modalTitle">
-    <div class="modal-dialog">
-      <h2 id="modalTitle" class="text-lg font-semibold mb-2"></h2>
-      <div id="modalBody"></div>
-      <div class="mt-4" style="text-align:right">
-        <button type="button" class="btn" id="modalClose">Закрыть</button>
-      </div>
-    </div>
-  </div>
+<script>
+  async function loadTimeline() {
+    const resp = await fetch('legal-timeline.json');
+    const data = await resp.json();
+    renderTimeline(data);
+  }
 
-  <script>
-    const $ = s => document.querySelector(s);
-    const esc = s => String(s||'').replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+  function renderTimeline(events) {
+    const timeline = document.getElementById('timeline');
+    const minDate = new Date(events[0].date);
+    const maxDate = new Date(events[events.length - 1].date);
 
-    function parseYMD(ymd){
-      if(!ymd) return null;
-      const p = ymd.split('-');
-      const y = +p[0], m = +p[1] || 1, d = +p[2] || 1;
-      if(!y || !m) return null;
-      return new Date(y, m-1, d);
-    }
-    function monthKey(s){ const d = parseYMD(s); return d ? (d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')) : null; }
+    events.forEach(ev => {
+      const date = new Date(ev.date);
+      const pos = (date - minDate) / (maxDate - minDate) * 100;
+      const point = document.createElement('div');
+      point.className = 'timeline-point';
+      if (ev.current) point.classList.add('current');
+      point.style.left = pos + '%';
 
-    function showError(msg){ const el = $('#error'); el.textContent = msg; el.style.display = 'block'; }
+      const label = document.createElement('div');
+      label.className = 'timeline-label';
+      label.style.left = pos + '%';
+      label.textContent = ev.label;
 
-    // Загружаем JSON (объект с items)
-    (async function init(){
-      try{
-        const res = await fetch('legal-timeline.json?v=' + Date.now()); // анти‑кеш для теста
-        if(!res.ok) throw new Error('HTTP ' + res.status);
-        const data = await res.json();
-        const items = Array.isArray(data) ? data : (data.items || []);
-        if(!items.length){ showError('Данные хронологии не найдены (items пустой).'); return; }
-        render(items);
-      }catch(e){
-        console.error(e);
-        showError('Не удалось загрузить legal-timeline.json. Проверь расположение файла.');
-      }
-    })();
+      point.addEventListener('click', () => openModal(ev));
+      timeline.appendChild(point);
+      timeline.appendChild(label);
+    });
+  }
 
-    function render(items){
-      // сортировка по дате начала
-      const sorted = items.slice().sort((a,b)=>(parseYMD(a.date_start)-parseYMD(b.date_start)));
-      const minD = parseYMD(sorted[0].date_start);
-      const maxD = parseYMD(sorted[sorted.length-1].date_start);
-      const span = (maxD - minD) || 1;
+  function openModal(event) {
+    const back = document.getElementById('modalBack');
+    document.getElementById('modalTitle').textContent = event.label;
+    const content = document.getElementById('modalContent');
+    content.innerHTML = '';
 
-      const host = document.querySelector('.timeline-container');
-      const base = $('#baseLine');
+    if (event.items && event.items.length) {
+      event.items.forEach(it => {
+        const wrap = document.createElement('div');
+        wrap.style.marginBottom = '12px';
 
-      // симметричные внутренние поля, чтобы крайние подписи не прилипали
-      const pad = 48; // px
-      base.style.marginLeft = pad+'px';
-      base.style.marginRight = pad+'px';
+        const p = document.createElement('p');
+        p.textContent = it.summary;
+        wrap.appendChild(p);
 
-      // группируем по месяцу
-      const groups = new Map();
-      for(const it of sorted){
-        const k = monthKey(it.date_start);
-        if(!k) continue;
-        (groups.get(k) || groups.set(k, []).get(k)).push(it);
-      }
+        const moreBtn = document.createElement('button');
+        moreBtn.textContent = 'Подробнее';
+        moreBtn.className = 'btn btn-primary mt-2';
+        moreBtn.onclick = () => {
+          alert(it.details); // здесь можно сделать второй модал, если нужно
+        };
+        wrap.appendChild(moreBtn);
 
-      // рисуем точки и подписи
-      for(const [k, arr] of groups){
-        const d = parseYMD(arr[0].date_start);
-        const x = ((d - minD) / span) * 100;
+        content.appendChild(wrap);
+      });
+    } else {
+      const p = document.createElement('p');
+      p.textContent = event.summary;
+      content.appendChild(p);
 
-        const pt = document.createElement('div');
-        pt.className = 'point';
-        pt.style.left = `calc(${x}% + ${pad}px)`;
-        host.appendChild(pt);
-
-        const lab = document.createElement('div');
-        lab.className = 'label';
-        lab.style.left = `calc(${x}% + ${pad}px)`;
-        lab.textContent = (arr.length > 1)
-          ? `${arr[0].when_label} — ${arr[arr.length-1].when_label}`
-          : `${arr[0].when_label}`;
-        host.appendChild(lab);
-
-        pt.addEventListener('click', ()=> openModal(arr));
-        lab.addEventListener('click', ()=> openModal(arr));
-      }
+      const moreBtn = document.createElement('button');
+      moreBtn.textContent = 'Подробнее';
+      moreBtn.className = 'btn btn-primary mt-2';
+      moreBtn.onclick = () => {
+        alert(event.details);
+      };
+      content.appendChild(moreBtn);
     }
 
-    // ----- Модалка -----
-    const back = $('#modalBack'), body = $('#modalBody'), title = $('#modalTitle'), closeBtn = $('#modalClose');
-    function openModal(arr){
-      // Заголовок: диапазон меток в группе
-      title.textContent = (arr.length>1) ? `${arr[0].when_label} — ${arr[arr.length-1].when_label}` : arr[0].when_label;
-      body.innerHTML = arr.map(it => `
-        <div class="ev">
-          <h4>${esc(it.title||'')}</h4>
-          <time>${esc(it.when_label||'')}</time>
-          <p>${esc(it.summary||'')}</p>
-          ${it.details ? `<button class="btn" onclick="alert(${JSON.stringify(esc(it.details))})">Подробнее</button>` : ``}
-        </div>
-      `).join('');
-      back.classList.add('show');
-    }
-    function closeModal(){ back.classList.remove('show'); }
-    closeBtn.addEventListener('click', closeModal);
-    back.addEventListener('click', e=>{ if(e.target===back) closeModal(); });
-    document.addEventListener('keydown', e=>{ if(e.key==='Escape' && back.classList.contains('show')) closeModal(); });
-  </script>
+    back.classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('modalBack').classList.remove('show');
+  }
+
+  loadTimeline();
+</script>
+
 </body>
 </html>
