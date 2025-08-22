@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Legal Timeline Demo — TRUS</title>
 
+<!-- общий CSS сайта -->
 <link rel="stylesheet" href="https://therealunrealstory.com/assets/styles.css" />
 
 <style>
@@ -13,12 +14,14 @@
   --indigo-600:#4f46e5;
   --red-500:#ef4444;
 
+  /* равные отступы контейнера до крайних линий */
   --tl-gutter-h:6%;
   --tl-gutter-v:8%;
+
   --lineY:62%;
   --freeze-offset:16px;
 
-  --label-gap:18px; /* фиксированный зазор подписи от точки (десктоп) */
+  --label-gap:18px; /* одинаковый зазор подписи от точки (десктоп) */
 }
 
 body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;}
@@ -69,7 +72,6 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
   white-space:nowrap; text-shadow:0 1px 0 rgba(0,0,0,.35); line-height:1.1;
 }
 @media (min-width:821px){
-  /* фиксируем единый зазор от точки: -100% (над точкой) минус константный gap */
   .label{
     top: var(--lineY);
     transform: translate(-50%, calc(-100% - var(--label-gap))) rotate(180deg);
@@ -97,7 +99,7 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
   /* Светлая: Сен 2020 → Июл 2021 (вертикаль) */
   .pre-cause-line{ left:44px; width:2px; transform:none; }
 
-  /* База: Июл 2021 → Ноя 2026 (вертикаль). Ничего выше FREEZE_START не рисуем */
+  /* База: Июл 2021 → Ноя 2026 (вертикаль) */
   .base-line{ left:44px; width:4px; transform:none; }
 
   /* Красная — СЛЕВА от базовой */
@@ -135,17 +137,13 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
     </div>
   </div>
 
-  <!-- Модалка -->
-  <div class="modal-backdrop" id="modalBack" aria-modal="true" role="dialog" aria-labelledby="modalTitle" style="position:fixed; inset:0; display:none; background:rgba(0,0,20,.55); backdrop-filter:blur(2px); z-index:9999;">
-    <div class="modal-dialog" role="document" style="max-width:720px; width:clamp(320px,90vw,720px); max-height:80vh; overflow:auto; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,.35); padding:16px 18px; margin:auto;">
-      <h2 id="modalTitle" style="margin:0 0 6px 0; font-size:18px;"></h2>
-      <div id="mWhen" class="muted" style="color:rgba(231,236,243,.7); font-size:13px; margin-bottom:8px;"></div>
-      <div id="mSummary" style="font-size:14px; margin-bottom:10px; color:#d9e2ee;"></div>
-      <div id="mDetails" style="font-size:14px; color:#c8d3e0; display:none;"></div>
-      <div id="mList" style="display:none;"></div>
-      <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn" id="toggleDetails" style="background:rgba(255,255,255,0.08); color:#e7ecf3; border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:8px 12px; font-size:13px; cursor:pointer;">Подробнее</button>
-        <button class="btn" id="closeModal" style="background:rgba(255,255,255,0.08); color:#e7ecf3; border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:8px 12px; font-size:13px; cursor:pointer; margin-left:auto;">Закрыть</button>
+  <!-- универсальная модалка — те же ID/классы, что и на сайте -->
+  <div id="modalBackdrop" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h3 id="modalTitle" style="margin:0 0 8px 0"></h3>
+      <div id="modalBody"></div>
+      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:14px;">
+        <button id="modalClose" class="btn" type="button">Закрыть</button>
       </div>
     </div>
   </div>
@@ -156,6 +154,7 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
   if(!res.ok){ document.getElementById('meta').textContent = 'Не удалось загрузить legal-timeline.json'; return; }
   const data = await res.json();
 
+  /* ---------- helpers ---------- */
   const parseYM = s=>{
     if(!s) return null;
     if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00Z');
@@ -178,7 +177,7 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
   document.getElementById('meta').textContent =
     `Обновлено: ${new Date(data.meta.updated_at).toLocaleString()} • ${data.meta.updated_by} • версия: ${data.meta.version}`;
 
-  /* Референсы */
+  /* ---------- domain & layout ---------- */
   const PRE_START = parseYM('2020-09-01');
   const FREEZE_START = parseYM('2021-07-01');
   const COURT_END = parseYM('2026-11-01');
@@ -193,7 +192,6 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
   const posH = r => GUTTER_H + r * (1 - GUTTER_H*2);
   const posV = r => GUTTER_V + r * (1 - GUTTER_V*2);
 
-  /* элементы линий */
   const preLine = document.getElementById('preLine');
   const baseLine = document.getElementById('baseLine');
   const freezeLine = document.getElementById('freezeLine');
@@ -205,7 +203,7 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
     const now = new Date();
 
     if(isMobile()){
-      // Светлая: 2020-09 → 2021-07
+      // Сен 2020 → Июл 2021
       const y0a = posV(posRatio(PRE_START))*100;
       const y0b = posV(posRatio(FREEZE_START))*100;
       preLine.style.left = '44px'; preLine.style.width = '2px';
@@ -213,7 +211,7 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
       preLine.style.height = Math.max(0.5, y0b - y0a) + '%';
       preLine.style.transform = 'translateX(-50%)';
 
-      // База: 2021-07 → 2026-11 (только этот участок)
+      // Июл 2021 → Ноя 2026
       const y1a = posV(posRatio(FREEZE_START))*100;
       const y1b = posV(posRatio(COURT_END))*100;
       baseLine.style.left = '44px'; baseLine.style.width = '4px';
@@ -221,7 +219,7 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
       baseLine.style.height = Math.max(2, y1b - y1a) + '%';
       baseLine.style.transform = 'none';
 
-      // Красная слева: 2021-07 → now
+      // Блокировка (красная) — слева
       const yf1 = posV(posRatio(FREEZE_START))*100;
       const yf2 = posV(posRatio(now))*100;
       freezeLine.style.left = `calc(44px - var(--freeze-offset))`;
@@ -229,7 +227,7 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
       freezeLine.style.height = Math.max(2, Math.abs(yf2 - yf1)) + '%';
       freezeLine.style.width = '12px';
 
-      // Пунктир: 2026-11 → FUTURE_END
+      // Пунктир будущего
       const yfe1 = posV(posRatio(COURT_END))*100;
       const yfe2 = posV(posRatio(FUTURE_END))*100;
       futureLine.style.left = '44px';
@@ -237,154 +235,179 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
       futureLine.style.height = Math.max(2, Math.abs(yfe2 - yfe1)) + '%';
       futureLine.style.width = '0';
 
-      // «Сейчас»
+      // «Сейчас» (горизонтально)
       nowEl.style.left = 0; nowEl.style.width = '100%'; nowEl.style.height = '3px';
       nowEl.style.top = (posV(posRatio(now))*100) + '%';
     } else {
-      // Светлая: 2020-09 → 2021-07
+      // Сен 2020 → Июл 2021
       const x0a = posH(posRatio(PRE_START))*100;
       const x0b = posH(posRatio(FREEZE_START))*100;
       preLine.style.left = x0a+'%';
       preLine.style.width = Math.max(0.5, x0b - x0a) + '%';
 
-      // База: 2021-07 → 2026-11
+      // Июл 2021 → Ноя 2026
       const x1a = posH(posRatio(FREEZE_START))*100;
       const x1b = posH(posRatio(COURT_END))*100;
       baseLine.style.left = x1a+'%';
       baseLine.style.width = Math.max(2, x1b - x1a) + '%';
 
-      // Красная: 2021-07 → now
+      // Блокировка → сейчас
       const xf1 = posH(posRatio(FREEZE_START))*100;
       const xf2 = posH(posRatio(new Date()))*100;
       freezeLine.style.left = Math.min(xf1, xf2) + '%';
       freezeLine.style.width = Math.max(2, Math.abs(xf2 - xf1)) + '%';
 
-      // Пунктир: 2026-11 → FUTURE_END
+      // Пунктир будущего
       const xfe1 = posH(posRatio(COURT_END))*100;
       const xfe2 = posH(posRatio(FUTURE_END))*100;
       futureLine.style.left = Math.min(xfe1,xfe2) + '%';
       futureLine.style.width = Math.max(2, Math.abs(xfe2 - xfe1)) + '%';
 
-      // «Сейчас»
+      // «Сейчас» (вертикально)
       const xr = posH(posRatio(new Date()))*100;
       nowEl.style.left = xr+'%'; nowEl.style.top = 0; nowEl.style.bottom = 0;
       nowEl.style.width = '3px'; nowEl.style.height = '';
     }
   }
 
-  /* Кластеры (≤ 2 мес) + точки/подписи */
+  /* ---------- кластеры (разрыв ≤ 60 дней) ---------- */
   const TWO_MONTHS = 1000*60*60*24*60;
   const pointItems = items.filter(it => !(it.date_start && it.date_end));
-  const clusters = [];
-  for(const it of pointItems){
-    const d = parseYM(it.date_start || it.date_end);
-    let c = clusters.find(x => Math.abs(x.center - d) <= TWO_MONTHS);
-    if(!c){ c = { center:d, items:[] }; clusters.push(c); }
-    else c.center = new Date((c.center.getTime()*c.items.length + d.getTime())/(c.items.length+1));
-    c.items.push(it);
-  }
-  clusters.sort((a,b)=>a.center - b.center);
+  const sorted = pointItems.slice().sort((a,b)=>{
+    const ad = parseYM(a.date_start||a.date_end);
+    const bd = parseYM(b.date_start||b.date_end);
+    return ad - bd;
+  });
 
-  clusters.forEach(c=>{
+  const clusters = [];
+  let bucket = [];
+  for (let i=0;i<sorted.length;i++){
+    const cur = sorted[i];
+    const curD = parseYM(cur.date_start||cur.date_end);
+    if (bucket.length===0){ bucket.push(cur); continue; }
+    const prevD = parseYM(bucket[bucket.length-1].date_start||bucket[bucket.length-1].date_end);
+    if (curD - prevD <= TWO_MONTHS) bucket.push(cur);
+    else { clusters.push(bucket); bucket=[cur]; }
+  }
+  if (bucket.length) clusters.push(bucket);
+
+  /* ---------- точки и подписи ---------- */
+  function fmtMonthYear(d){ return RU_MON[d.getUTCMonth()] + NBSP + d.getUTCFullYear(); }
+
+  const dotRefs = []; // для пересчёта позиций на resize
+
+  clusters.forEach(group=>{
+    const firstD = parseYM(group[0].date_start||group[0].date_end);
+    const lastD  = parseYM(group[group.length-1].date_start||group[group.length-1].date_end);
+    const center = new Date((firstD.getTime()+lastD.getTime())/2);
+
     const dot = document.createElement('div'); dot.className='cluster-dot';
     const label = document.createElement('div'); label.className='label';
 
-    if(isMobile()){
-      const y = (posV(posRatio(c.center))*100);
-      dot.style.top = `calc(${y}% - 8px)`; dot.style.left = '44px';
-      label.style.left='60px'; label.style.top = dot.style.top;
-    } else {
-      const x = (posH(posRatio(c.center))*100);
-      dot.style.left = x+'%'; dot.style.top = 'var(--lineY)';
-      label.style.left = dot.style.left; /* top задаётся через CSS и одинаков для всех */
-    }
+    dot.dataset.center = +center;
+    label.dataset.center = +center;
 
-    if(c.items.length===1){
-      label.textContent = c.items[0].when_label || '';
-      dot.addEventListener('click', ()=> openModalSingle(c.items[0]));
+    function place(){
+      if(isMobile()){
+        const y = (posV(posRatio(center))*100);
+        dot.style.top = `calc(${y}% - 8px)`; dot.style.left = '44px';
+        label.style.left='60px'; label.style.top = dot.style.top;
+      } else {
+        const x = (posH(posRatio(center))*100) + '%';
+        dot.style.left = x; dot.style.top = 'var(--lineY)';
+        label.style.left = x; /* top управляется через CSS */
+      }
+    }
+    place();
+
+    if(group.length===1){
+      label.textContent = group[0].when_label || '';
+      dot.addEventListener('click', ()=> openModalSingle(group[0]));
     } else {
-      const ds = c.items.map(i=>parseYM(i.date_start||i.date_end)).sort((a,b)=>a-b);
-      const fmt = d => RU_MON[d.getUTCMonth()] + NBSP + d.getUTCFullYear();
-      label.textContent = `${fmt(ds[0])} – ${fmt(ds[ds.length-1])}`;
-      dot.addEventListener('click', ()=> openModalCluster(c.items));
+      label.textContent = `${fmtMonthYear(firstD)} – ${fmtMonthYear(lastD)}`;
+      dot.addEventListener('click', ()=> openModalCluster(group));
     }
 
     track.appendChild(dot); track.appendChild(label);
+    dotRefs.push({dot,label,center});
   });
 
   setLineSegments();
-  window.addEventListener('resize', ()=> location.reload());
 
-  /* Модалки — форсируем оверлей инлайном, чтобы не зависеть от внешнего CSS */
-  const back = document.getElementById('modalBack');
-  const tTitle = document.getElementById('modalTitle');
-  const tWhen = document.getElementById('mWhen');
-  const tSummary = document.getElementById('mSummary');
-  const tDetails = document.getElementById('mDetails');
-  const tList = document.getElementById('mList');
-  const btnToggle = document.getElementById('toggleDetails');
-  const btnClose = document.getElementById('closeModal');
+  /* ---------- resize без reload ---------- */
+  let rszT;
+  window.addEventListener('resize', ()=>{
+    clearTimeout(rszT);
+    rszT = setTimeout(()=>{
+      setLineSegments();
+      dotRefs.forEach(ref=>{
+        const center = new Date(ref.center);
+        if(isMobile()){
+          const y = (posV(posRatio(center))*100);
+          ref.dot.style.top = `calc(${y}% - 8px)`; ref.dot.style.left = '44px';
+          ref.label.style.left='60px'; ref.label.style.top = ref.dot.style.top;
+        } else {
+          const x = (posH(posRatio(center))*100) + '%';
+          ref.dot.style.left = x; ref.dot.style.top = 'var(--lineY)';
+          ref.label.style.left = x;
+        }
+      });
+    }, 120);
+  });
 
-  function openBackdrop(){
-    back.style.display='flex'; back.style.alignItems='center'; back.style.justifyContent='center';
-    document.body.style.overflow='hidden';
+  /* ---------- модалка (совместимо с сайтом) ---------- */
+  const modal   = document.getElementById('modalBackdrop');
+  const mTitle  = document.getElementById('modalTitle');
+  const mBody   = document.getElementById('modalBody');
+  const mClose  = document.getElementById('modalClose');
+
+  function openModal(title, html){
+    mTitle.innerHTML = title || '';
+    mBody.innerHTML  = html  || '';
+    modal.classList.add('show');
+    document.body.classList.add('modal-open');
+    modal.querySelector('.modal-dialog')?.focus();
   }
-  function closeBackdrop(){
-    back.style.display='none';
-    document.body.style.overflow='';
+  function closeModal(){
+    modal.classList.remove('show');
+    document.body.classList.remove('modal-open');
   }
+  mClose.addEventListener('click', closeModal);
+  modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && modal.classList.contains('show')) closeModal(); });
 
   function openModalSingle(it){
-    tList.style.display='none'; tList.innerHTML='';
-    tTitle.textContent = it.title || '';
-    tWhen.textContent = it.when_label || '';
-    tSummary.innerHTML = esc(it.summary || '');
-    tDetails.innerHTML = esc(it.details || '');
-    tDetails.style.display = it.details ? 'none' : 'none';
-    btnToggle.style.display = it.details ? '' : 'none';
-    openBackdrop();
+    const more = it.details
+      ? `<p><button class="btn js-more">Подробнее</button></p><div class="js-morebox" style="display:none">${esc(it.details)}</div>`
+      : '';
+    openModal(
+      `${esc(it.when_label||'')} — ${esc(it.title||'')}`,
+      `<div class="muted" style="margin-bottom:8px">${esc(it.summary||'')}</div>${more}`
+    );
   }
-  function openModalCluster(items){
-    const sorted = items.slice().sort((a,b)=>{
-      const ad = parseYM(a.date_start||a.date_end), bd = parseYM(b.date_start||b.date_end);
-      return ad - bd;
-    });
-    tTitle.textContent = `События (${sorted.length})`;
-    tWhen.textContent = '';
-    tSummary.textContent = 'Сгруппированные по времени события.';
-    tDetails.style.display='none'; tDetails.innerHTML='';
-    btnToggle.style.display='none';
-    tList.innerHTML = sorted.map((it,idx)=>`
+
+  function openModalCluster(group){
+    const list = group.map((it,i)=>`
       <div style="padding-top:10px; margin-top:10px; border-top:1px dashed rgba(255,255,255,.12)">
         <div style="font-weight:600">${esc(it.title||'')}</div>
         <div class="muted" style="margin:4px 0 6px 0">${esc(it.when_label||'')}</div>
         <div>${esc(it.summary||'')}</div>
-        ${it.details?`<div id="d-${idx}" style="display:none; margin-top:6px">${esc(it.details)}</div>
-        <button class="btn btn-more" data-i="${idx}" style="margin-top:6px">Подробнее</button>`:''}
+        ${it.details?`<div class="js-morebox" style="display:none; margin-top:6px">${esc(it.details)}</div>
+        <button class="btn js-more" style="margin-top:6px">Подробнее</button>`:''}
       </div>
     `).join('');
-    tList.style.display='block';
-    openBackdrop();
+    openModal(`События (${group.length})`, list);
   }
 
-  document.addEventListener('click', e=>{
-    const btn = e.target.closest('.btn-more');
+  // делегирование на "Подробнее"
+  document.getElementById('modalBody').addEventListener('click', e=>{
+    const btn = e.target.closest('.js-more');
     if(!btn) return;
-    const id = 'd-'+btn.getAttribute('data-i');
-    const el = document.getElementById(id);
-    const vis = el.style.display==='block';
-    el.style.display = vis?'none':'block';
-    btn.textContent = vis?'Подробнее':'Свернуть';
+    const box = btn.previousElementSibling; // .js-morebox
+    const opened = box && box.style.display !== 'none';
+    if(box) box.style.display = opened ? 'none' : 'block';
+    btn.textContent = opened ? 'Подробнее' : 'Свернуть';
   });
-
-  btnToggle.addEventListener('click', ()=>{
-    const vis = tDetails.style.display==='block';
-    tDetails.style.display = vis ? 'none' : 'block';
-    btnToggle.textContent = vis ? 'Подробнее' : 'Свернуть';
-  });
-  btnClose.addEventListener('click', closeBackdrop);
-  back.addEventListener('click', (e)=>{ if(e.target === back) closeBackdrop(); });
-  window.addEventListener('keydown', e=>{ if(e.key==='Escape') closeBackdrop(); });
 
 })();
 </script>

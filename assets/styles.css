@@ -118,6 +118,9 @@ section, footer{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem
 }
 .modal-backdrop .modal-dialog .btn:hover{ filter: brightness(1.08); }
 
+/* НОВОЕ: фиксируем прокрутку при открытой модалке */
+body.modal-open{ overflow: hidden; }
+
 /* ---------- Pulse button ---------- */
 @keyframes pulse {
   0% { transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,.6); }
@@ -193,7 +196,6 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
 /* =========================
    Roadmap (Хронология)
    ========================= */
-
 .roadmap-head{
   display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap; margin-bottom:.25rem;
 }
@@ -364,4 +366,5 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
 .mini-player-seek input[type="range"]:active::-webkit-slider-thumb{ transform:scale(1.02); }
 .mini-player-seek input[type="range"]:active::-moz-range-thumb{ transform:scale(1.02); }
 
-
+/* ---- НОВОЕ для юр. хронологии (нейтрально, ничего не ломает) ---- */
+.now-marker{ pointer-events:none; } /* чтобы не перехватывала клики по точкам */
