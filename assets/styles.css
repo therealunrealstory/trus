@@ -121,6 +121,11 @@ section, footer{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem
 /* НОВОЕ: фиксируем прокрутку при открытой модалке */
 body.modal-open{ overflow: hidden; }
 
+/* Убираем системный outline у контейнера модалки */
+.modal-backdrop .modal-dialog { outline: none; }
+.modal-backdrop .modal-dialog:focus,
+.modal-backdrop .modal-dialog:focus-visible { outline: none; }
+
 /* ---------- Pulse button ---------- */
 @keyframes pulse {
   0% { transform:scale(1); box-shadow:0 0 0 0 rgba(99,102,241,.6); }
