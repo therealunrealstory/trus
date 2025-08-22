@@ -5,30 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Legal Timeline Demo — TRUS</title>
 
-<!-- Актуальные стили проекта (как в D-Story) -->
+<!-- Актуальные стили проекта (как в D‑Story) -->
 <link rel="stylesheet" href="https://therealunrealstory.com/assets/styles.css" />
 
 <style>
 :root{
   /* Палитра */
-  --indigo-300:#a5b4fc;      /* светлая линия (до суда) */
-  --indigo-600:#4f46e5;      /* основная линия (период суда) и пунктир будущего */
-  --red-500:#ef4444;         /* линия блокировки */
-  --muted: rgba(231,236,243,.7);
+  --indigo-300:#a5b4fc;   /* светлая линия (предпосылки) */
+  --indigo-600:#4f46e5;   /* основная линия (суд) и пунктир будущего */
+  --red-500:#ef4444;      /* линия блокировки */
 
   /* Геометрия и отступы */
-  --tl-gutter-h:6%;          /* равные отступы слева/справа */
-  --tl-gutter-v:8%;          /* вертикальные отступы (моб.) */
-  --lineY:62%;               /* опустить линии вниз контейнера */
-  --freeze-offset:16px;      /* смещение толстой линии относительно базовой */
+  --tl-gutter-h:6%;       /* равные отступы по крайним линиям */
+  --tl-gutter-v:8%;
+  --lineY:62%;            /* линии ниже середины, чтобы подписи «дышали» */
+  --freeze-offset:16px;   /* смещение красной линии относительно базовой */
 }
 
-/* Контейнер демо */
 body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;}
 .wrap{ max-width:1100px; margin:28px auto; padding:0 16px; }
 .roadmap-head{ background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:16px; padding:16px 18px; margin-bottom:16px; }
 .roadmap-title{ margin:0 0 6px 0; font-size:22px; }
-.roadmap-meta{ color:var(--muted); font-size:14px; }
+.roadmap-meta{ color:rgba(231,236,243,.7); font-size:14px; }
 
 .timeline{
   position:relative; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:16px;
@@ -39,27 +37,33 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
 .track{ position:relative; width:100%; height:360px; }
 
 /* ── ЛИНИИ ───────────────────────────────────────────────────────── */
-.base-line{                 /* 1) тонкая общая индиго 600: Сен 2020 → Ноя 2026 */
-  position:absolute; height:4px; background:var(--indigo-600);
-  left:var(--tl-gutter-h); right:var(--tl-gutter-h);
-  top:var(--lineY); transform:translateY(-50%); z-index:2;
-}
-.pre-cause-line{            /* 0) светлая индиго: Сен 2020 → Июл 2021 */
+/* 1) светлая предварительная: Сен 2020 → Июл 2021 (тонкая над базовой) */
+.pre-cause-line{
   position:absolute; height:2px; background:var(--indigo-300);
   top:calc(var(--lineY) - 1px); z-index:3; border-radius:2px;
 }
-.freeze-line{               /* 3) красная толстая: Июл 2021 → Сейчас */
+
+/* 2) базовая судебная: Июл 2021 → Ноя 2026 (тонкая indigo-600) */
+.base-line{
+  position:absolute; height:4px; background:var(--indigo-600);
+  top:var(--lineY); transform:translateY(-50%); z-index:2;
+}
+
+/* 3) красная блокировка: Июл 2021 → Сегодня (толстая, параллельно слева на мобайле) */
+.freeze-line{
   position:absolute; height:12px; background:var(--red-500); border-radius:8px;
   top: calc(var(--lineY) + var(--freeze-offset)); z-index:3;
   filter: drop-shadow(0 2px 6px rgba(0,0,0,.25));
 }
-.future-line{               /* 4) пунктир индиго 600: Ноя 2026 → будущее */
+
+/* 4) пунктир будущего: Ноя 2026 → короткий горизонт */
+.future-line{
   position:absolute; height:4px; background:transparent;
   top:var(--lineY); transform:translateY(-50%); z-index:2;
   border-top:4px dashed var(--indigo-600);
 }
 
-/* точки/кластеры — один аккуратный стиль */
+/* Точки/кластеры — единый аккуратный стиль */
 .cluster-dot{
   position:absolute; width:16px; height:16px; border-radius:50%;
   background:#ffffff; outline:1px solid rgba(255,255,255,0.12);
@@ -67,28 +71,45 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
   cursor:pointer; transform:translate(-50%,-50%); z-index:4;
 }
 
-/* подписи дат */
-.label{ position:absolute; font-size:12px; color:var(--muted); white-space:nowrap; text-shadow:0 1px 0 rgba(0,0,0,.35); }
+/* Подписи: десктоп — строго одинаковый отступ; мобайл — слева от линии */
+.label{
+  position:absolute; font-size:12px; color:rgba(231,236,243,.7);
+  white-space:nowrap; text-shadow:0 1px 0 rgba(0,0,0,.35); line-height:1.1;
+}
 @media (min-width: 821px){
-  .label{ transform: translate(-50%, -140%) rotate(180deg); writing-mode: vertical-rl; text-orientation: mixed; }
+  .label{ transform: translate(-50%, -150%) rotate(180deg); writing-mode: vertical-rl; text-orientation: mixed; }
 }
 
 /* Маркер «Сейчас» */
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(165,180,252,.6);}70%{box-shadow:0 0 0 12px rgba(165,180,252,0);}100%{box-shadow:0 0 0 0 rgba(165,180,252,0);} }
 .now-marker{ position:absolute; background:#a5b4fc; border-radius:2px; animation:pulse 1.9s ease-out infinite; z-index:5; }
 
-/* Подсказка */
-.hint{ padding:10px 12px; color:var(--muted); font-size:13px; border-top:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.05); }
+/* ── Легенда (графическая) ──────────────────────────────────────── */
+.legend{ display:flex; gap:18px; flex-wrap:wrap; padding:10px 12px; border-top:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.05); font-size:13px; color:rgba(231,236,243,.9); }
+.legend-item{ display:flex; align-items:center; gap:8px; }
+.legend-swatch{ height:6px; border-radius:4px; }
+.swatch-pre{ width:44px; background:var(--indigo-300); }
+.swatch-base{ width:44px; background:var(--indigo-600); }
+.swatch-freeze{ width:44px; height:12px; background:var(--red-500); border-radius:8px; }
+.swatch-future{ width:44px; background:transparent; border-top:4px dashed var(--indigo-600); height:0; }
 
 /* ── Мобильная вертикальная версия ──────────────────────────────── */
 @media (max-width:820px){
   .track{ height:1200px; }
+  /* База (верт.) только от Июл 2021 → Ноя 2026 */
   .base-line{
-    left:44px; width:4px; height:calc(100% - 44px); top:auto; bottom:auto; transform:none;
-    top: calc(var(--tl-gutter-v)); bottom: calc(var(--tl-gutter-v));
+    left:44px; width:4px; height:auto; transform:none;
   }
-  .pre-cause-line{ left:44px; width:2px; top:auto; transform:none; }
-  .freeze-line{ left: calc(44px + var(--freeze-offset)); width:12px; height:auto; top:auto; }
+  /* Светлая (верт.) Сен 2020 → Июл 2021 */
+  .pre-cause-line{
+    left:44px; width:2px; transform:none;
+  }
+  /* Красная линия — СЛЕВА от базовой, чтобы не перекрывать подписи */
+  .freeze-line{
+    left: calc(44px - var(--freeze-offset));
+    width:12px; height:auto;
+  }
+  /* Пунктир будущего — вертикальный, рядом с базой */
   .future-line{
     left:44px; width:0; height:auto; border-top:none; border-left:4px dashed var(--indigo-600);
     transform:none;
@@ -108,16 +129,24 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
 
   <div class="timeline">
     <div class="track" id="track">
-      <div class="base-line" id="baseLine"></div>
+      <!-- линии -->
       <div class="pre-cause-line" id="preLine"></div>
+      <div class="base-line" id="baseLine"></div>
       <div class="freeze-line" id="freezeLine"></div>
       <div class="future-line" id="futureLine"></div>
+      <!-- «сейчас» -->
       <div class="now-marker" id="now"></div>
     </div>
-    <div class="hint">Линии: светло‑индиго — предпосылки; индиго — период суда; красная — период блокировки; пунктир — судебные перспективы (неопределённо).</div>
+    <!-- легенда с мини‑отрезками -->
+    <div class="legend">
+      <div class="legend-item"><span class="legend-swatch swatch-pre"></span><span>Предпосылки (до иска)</span></div>
+      <div class="legend-item"><span class="legend-swatch swatch-base"></span><span>Период судебных разбирательств</span></div>
+      <div class="legend-item"><span class="legend-swatch swatch-freeze"></span><span>Период блокировки</span></div>
+      <div class="legend-item"><span class="legend-swatch swatch-future"></span><span>Судебные перспективы (впереди)</span></div>
+    </div>
   </div>
 
-  <!-- Модалка (как в D‑Story): используем только .modal-backdrop/.show -->
+  <!-- Модалка (как в D‑Story: .modal-backdrop/.show) -->
   <div class="modal-backdrop" id="modalBack" aria-modal="true" role="dialog" aria-labelledby="modalTitle">
     <div class="modal-dialog" role="document">
       <h2 id="modalTitle"></h2>
@@ -160,104 +189,101 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
   document.getElementById('meta').textContent =
     `Обновлено: ${new Date(data.meta.updated_at).toLocaleString()} • ${data.meta.updated_by} • версия: ${data.meta.version}`;
 
-  /* === ДАТЫ-ОПОРЫ ДЛЯ РАВНЫХ ОТСТУПОВ ПО КРАЙНИМ ЛИНИЯМ === */
-  const PRE_START = parseYM('2020-09-01'); // начало светлой линии
-  const FREEZE_START = parseYM('2021-07-01'); // старт блокировки + старт «судебного периода»
-  const COURT_END = parseYM('2026-11-01'); // Ноя 2026
-  const FUTURE_MONTHS = 6;                 // длина пунктирной будущей линии (короткая)
+  /* === Референсы для равных отступов по крайним линиям === */
+  const PRE_START = parseYM('2020-09-01'); // старт светлой
+  const FREEZE_START = parseYM('2021-07-01'); // старт суда/блокировки
+  const COURT_END = parseYM('2026-11-01');   // конец базовой
+  const FUTURE_MONTHS = 6;                   // длина пунктира
   const FUTURE_END = new Date(COURT_END);  FUTURE_END.setUTCMonth(FUTURE_END.getUTCMonth()+FUTURE_MONTHS);
 
-  // шкала теперь маппится: PRE_START → левый гуттер, FUTURE_END → правый гуттер
+  // шкала = PRE_START → FUTURE_END (для равных гуттеров)
   const GUTTER_H = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tl-gutter-h'))/100 || 0.06;
   const GUTTER_V = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tl-gutter-v'))/100 || 0.08;
 
-  const domainStart = PRE_START;
-  const domainEnd = FUTURE_END;
-  const spanMs = domainEnd - domainStart;
-
-  function posRatio(d){ return clamp((d - domainStart) / spanMs, 0, 1); }
+  const domainStart = PRE_START, domainEnd = FUTURE_END, spanMs = domainEnd - domainStart;
+  const posRatio = d => clamp((d - domainStart) / spanMs, 0, 1);
   const posH = r => GUTTER_H + r * (1 - GUTTER_H*2);
   const posV = r => GUTTER_V + r * (1 - GUTTER_V*2);
 
-  /* === ЛИНИИ === */
-  const baseLine = document.getElementById('baseLine');
+  const track = document.getElementById('track');
   const preLine = document.getElementById('preLine');
+  const baseLine = document.getElementById('baseLine');
   const freezeLine = document.getElementById('freezeLine');
   const futureLine = document.getElementById('futureLine');
   const nowEl = document.getElementById('now');
-  const track = document.getElementById('track');
 
   function setLineSegments(){
     const now = new Date();
 
     if(isMobile()){
-      // Вертикальная база (Сен 2020 → Ноя 2026)
-      const y1 = posV( posRatio(PRE_START) )*100;
-      const y2 = posV( posRatio(COURT_END) )*100;
-      baseLine.style.left = '44px'; baseLine.style.width = '4px';
-      baseLine.style.top = `calc(${y1}% )`;
-      baseLine.style.height = Math.max(2, y2 - y1) + '%';
-
-      // Светлая (Сен 2020 → Июл 2021)
-      const yp1 = posV( posRatio(PRE_START) )*100;
-      const yp2 = posV( posRatio(FREEZE_START) )*100;
+      // 0) Светлая: Сен 2020 → Июл 2021 (вертикаль)
+      const y0a = posV(posRatio(PRE_START))*100;
+      const y0b = posV(posRatio(FREEZE_START))*100;
       preLine.style.left = '44px'; preLine.style.width = '2px';
-      preLine.style.top = `calc(${yp1}% )`;
-      preLine.style.height = Math.max(0.5, yp2 - yp1) + '%';
+      preLine.style.top = `calc(${y0a}% )`;
+      preLine.style.height = Math.max(0.5, y0b - y0a) + '%';
       preLine.style.transform = 'translateX(-50%)';
 
-      // Красная (Июл 2021 → Сейчас), параллельно
-      const yf1 = posV( posRatio(FREEZE_START) )*100;
-      const yf2 = posV( posRatio(now) )*100;
-      freezeLine.style.left = `calc(44px + var(--freeze-offset))`;
+      // 1) База: Июл 2021 → Ноя 2026 (вертикаль). НЕТ линии выше FREEZE_START.
+      const y1a = posV(posRatio(FREEZE_START))*100;
+      const y1b = posV(posRatio(COURT_END))*100;
+      baseLine.style.left = '44px'; baseLine.style.width = '4px';
+      baseLine.style.top = `calc(${y1a}% )`;
+      baseLine.style.height = Math.max(2, y1b - y1a) + '%';
+      baseLine.style.transform = 'none';
+
+      // 2) Красная: Июл 2021 → Сегодня (СЛЕВА от базы)
+      const yf1 = posV(posRatio(FREEZE_START))*100;
+      const yf2 = posV(posRatio(now))*100;
+      freezeLine.style.left = `calc(44px - var(--freeze-offset))`;
       freezeLine.style.top = `calc(${Math.min(yf1,yf2)}% - 6px)`;
       freezeLine.style.height = Math.max(2, Math.abs(yf2 - yf1)) + '%';
       freezeLine.style.width = '12px';
 
-      // Пунктир (Ноя 2026 → FUTURE_END), параллельно базе
-      const yfe1 = posV( posRatio(COURT_END) )*100;
-      const yfe2 = posV( posRatio(FUTURE_END) )*100;
+      // 3) Пунктир: Ноя 2026 → FUTURE_END (вертикаль, рядом с базой)
+      const yfe1 = posV(posRatio(COURT_END))*100;
+      const yfe2 = posV(posRatio(FUTURE_END))*100;
       futureLine.style.left = '44px';
       futureLine.style.top = `calc(${Math.min(yfe1,yfe2)}% )`;
       futureLine.style.height = Math.max(2, Math.abs(yfe2 - yfe1)) + '%';
       futureLine.style.width = '0';
 
-      // «Сейчас» — горизонтальная полоска на уровне now
+      // Маркер «Сейчас»
       nowEl.style.left = 0; nowEl.style.width = '100%'; nowEl.style.height = '3px';
       nowEl.style.top = (posV(posRatio(now))*100) + '%';
     } else {
-      // Горизонтальная база (Сен 2020 → Ноя 2026)
-      const x1 = posH( posRatio(PRE_START) )*100;
-      const x2 = posH( posRatio(COURT_END) )*100;
-      baseLine.style.left = x1+'%';
-      baseLine.style.right = (100 - x2)+'%';
+      // 0) Светлая: Сен 2020 → Июл 2021 (горизонталь)
+      const x0a = posH(posRatio(PRE_START))*100;
+      const x0b = posH(posRatio(FREEZE_START))*100;
+      preLine.style.left = x0a+'%';
+      preLine.style.width = Math.max(0.5, x0b - x0a) + '%';
 
-      // Светлая (Сен 2020 → Июл 2021) над базовой
-      const xp1 = posH( posRatio(PRE_START) )*100;
-      const xp2 = posH( posRatio(FREEZE_START) )*100;
-      preLine.style.left = xp1+'%';
-      preLine.style.width = Math.max(0.5, xp2 - xp1) + '%';
+      // 1) База: Июл 2021 → Ноя 2026 (горизонталь). НЕТ базы до FREEZE_START.
+      const x1a = posH(posRatio(FREEZE_START))*100;
+      const x1b = posH(posRatio(COURT_END))*100;
+      baseLine.style.left = x1a+'%';
+      baseLine.style.width = Math.max(2, x1b - x1a) + '%';
 
-      // Красная (Июл 2021 → Сейчас), параллельно ниже
-      const xf1 = posH( posRatio(FREEZE_START) )*100;
-      const xf2 = posH( posRatio(new Date()) )*100;
+      // 2) Красная: Июл 2021 → Сегодня (горизонталь, параллельно ниже)
+      const xf1 = posH(posRatio(FREEZE_START))*100;
+      const xf2 = posH(posRatio(now))*100;
       freezeLine.style.left = Math.min(xf1, xf2) + '%';
       freezeLine.style.width = Math.max(2, Math.abs(xf2 - xf1)) + '%';
 
-      // Пунктир (Ноя 2026 → FUTURE_END)
-      const xfe1 = posH( posRatio(COURT_END) )*100;
-      const xfe2 = posH( posRatio(FUTURE_END) )*100;
+      // 3) Пунктир: Ноя 2026 → FUTURE_END
+      const xfe1 = posH(posRatio(COURT_END))*100;
+      const xfe2 = posH(posRatio(FUTURE_END))*100;
       futureLine.style.left = Math.min(xfe1,xfe2) + '%';
       futureLine.style.width = Math.max(2, Math.abs(xfe2 - xfe1)) + '%';
 
-      // «Сейчас» — вертикальная полоска в своей позиции
-      const xr = posH( posRatio(new Date()) )*100;
+      // Маркер «Сейчас»
+      const xr = posH(posRatio(now))*100;
       nowEl.style.left = xr+'%'; nowEl.style.top = 0; nowEl.style.bottom = 0;
       nowEl.style.width = '3px'; nowEl.style.height = '';
     }
   }
 
-  /* === КЛАСТЕРЫ (≤ 2 мес) и точки/подписи === */
+  /* === Кластеры (≤ 2 мес) + точки/подписи === */
   const TWO_MONTHS = 1000*60*60*24*60;
   const pointItems = items.filter(it => !(it.date_start && it.date_end));
   const clusters = [];
@@ -270,6 +296,7 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
   }
   clusters.sort((a,b)=>a.center - b.center);
 
+  const trackEl = document.getElementById('track');
   clusters.forEach(c=>{
     const dot = document.createElement('div'); dot.className='cluster-dot';
     const label = document.createElement('div'); label.className='label';
@@ -294,29 +321,13 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
       dot.addEventListener('click', ()=> openModalCluster(c.items));
     }
 
-    track.appendChild(dot); track.appendChild(label);
+    trackEl.appendChild(dot); trackEl.appendChild(label);
   });
 
   setLineSegments();
-  addFutureCaption();
   window.addEventListener('resize', ()=> location.reload());
 
-  /* === Подпись к пунктирной линии («будущее») === */
-  function addFutureCaption(){
-    const cap = document.createElement('div');
-    cap.className = 'label';
-    cap.textContent = 'Дальнейшее судебное разбирательство (период не определён)';
-    if(isMobile()){
-      const y = (posV(posRatio(COURT_END + 1))*100); // рядом с началом пунктира
-      cap.style.left = '60px'; cap.style.top = `calc(${y}% - 8px)`;
-    } else {
-      const x = (posH(posRatio(COURT_END))*100);
-      cap.style.left = (x + 2) + '%'; cap.style.top = 'var(--lineY)';
-    }
-    track.appendChild(cap);
-  }
-
-  /* === МОДАЛКИ (как в D‑Story: .modal-backdrop/.show) === */
+  /* === Модалки (как D‑Story: .modal-backdrop/.show) === */
   const back = document.getElementById('modalBack');
   const tTitle = document.getElementById('modalTitle');
   const tWhen = document.getElementById('mWhen');
