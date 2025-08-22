@@ -254,6 +254,11 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
 .roadmap-list{ padding:10px; display:block; }
 .roadmap-col.is-collapsed .roadmap-list{ display:none; }
 
+/* Roadmap: раскрытые детали — курсив */
+.roadmap-details {
+  font-style: italic;
+}
+
 /* Карточки */
 .roadmap-item{
   border:1px solid rgba(255,255,255,0.10);
