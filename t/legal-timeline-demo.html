@@ -5,12 +5,12 @@
   <title>Юридическая хронология — демо</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Подключаем актуальные стили сайта -->
+  <!-- Подключаем АКТУАЛЬНЫЙ стиль сайта -->
   <link rel="stylesheet" href="https://therealunrealstory.com/assets/styles.css" />
 
   <style>
     /* Локальные вспомогательные стили демо */
-    body{ margin:0; background:#0f172a; color:#e2e8f0; font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    body{ margin:0; background:#0f172a; color:#e2e8f0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
     .wrap{ padding:40px 18px 28px; max-width:1200px; margin:0 auto; }
 
     .timeline-container{
@@ -28,7 +28,7 @@
     .base-line{
       position:relative;
       height:4px;
-      background:#4f46e5;
+      background:#4f46e5; /* Indigo 600 */
       margin:80px auto 40px;
       border-radius:999px;
     }
@@ -37,45 +37,35 @@
     .point{ position:absolute; top:50%; transform:translate(-50%,-50%); width:14px; height:14px; background:#4f46e5; border-radius:50%; cursor:pointer; }
     .label{ position:absolute; top:-40px; transform:translateX(-50%); font-size:13px; white-space:nowrap; color:#dbeafe; }
 
-    /* Пульс для текущей точки (если потребуется) */
-    .point.current{ background:#ef4444; animation:pulse 1.6s infinite; }
-    @keyframes pulse{
-      0%{ box-shadow:0 0 0 0 rgba(239,68,68,.65) }
-      70%{ box-shadow:0 0 0 12px rgba(239,68,68,0) }
-      100%{ box-shadow:0 0 0 0 rgba(239,68,68,0) }
+    /* Сообщение об ошибке */
+    .error{
+      display:none; margin:10px 0 0; padding:10px 12px; border-radius:10px;
+      border:1px solid rgba(255,255,255,.12); background:rgba(127,29,29,.25);
+      color:#fecaca; font-size:14px;
     }
 
-    /* Модалка: каркас делаем здесь минимально, а вид тянем из глобального styles.css */
+    /* Модалка — каркас (визуал берём из общего styles.css) */
     .modal-backdrop{ position:fixed; inset:0; display:none; z-index:9999; }
     .modal-backdrop.show{ display:block; }
-    .modal-dialog{ max-width:700px; width:clamp(320px, 92vw, 700px); }
+    .modal-dialog{ max-width:700px; width:clamp(320px,92vw,700px); }
 
-    /* Контент модалки (кнопки — классы .btn из глобального CSS) */
     .ev{ padding:10px 0; border-top:1px dashed rgba(255,255,255,.12); }
     .ev:first-child{ border-top:none; }
     .ev h4{ margin:2px 0 4px; font-size:16px; color:#fff; }
     .ev time{ display:block; font-size:12px; color:#cbd5e1; margin-bottom:6px; }
     .ev p{ margin:0 0 6px; color:#e2e8f0; }
-
-    /* Сообщения об ошибке */
-    .error{
-      margin:10px 0 0; padding:10px 12px; border-radius:10px;
-      border:1px solid rgba(255,255,255,.12); background:rgba(127,29,29,.25);
-      color:#fecaca; font-size:14px;
-    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="timeline-container">
       <div id="baseLine" class="base-line"></div>
-      <div id="labels"></div>
-      <div id="error" class="error" style="display:none"></div>
+      <div id="error" class="error"></div>
     </div>
     <div class="text-sm text-slate-300 mt-3">Шкала вписана в ширину экрана с отступами. Клик по точке — модалка.</div>
   </div>
 
-  <!-- Модалка (фон/blur/кнопки — из глобального styles.css) -->
+  <!-- Унифицированная модалка (стили берутся из assets/styles.css) -->
   <div id="modalBack" class="modal-backdrop" aria-modal="true" role="dialog" aria-labelledby="modalTitle">
     <div class="modal-dialog">
       <h2 id="modalTitle" class="text-lg font-semibold mb-2"></h2>
@@ -87,133 +77,100 @@
   </div>
 
   <script>
-    // ---------- Утилиты ----------
     const $ = s => document.querySelector(s);
     const esc = s => String(s||'').replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
 
     function parseYMD(ymd){
       if(!ymd) return null;
-      // допускаем YYYY-MM и YYYY-MM-DD
       const p = ymd.split('-');
       const y = +p[0], m = +p[1] || 1, d = +p[2] || 1;
       if(!y || !m) return null;
       return new Date(y, m-1, d);
     }
+    function monthKey(s){ const d = parseYMD(s); return d ? (d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')) : null; }
 
-    function byMonthKey(dateStr){
-      const d = parseYMD(dateStr);
-      if(!d) return null;
-      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-    }
+    function showError(msg){ const el = $('#error'); el.textContent = msg; el.style.display = 'block'; }
 
-    function showError(msg){
-      const box = $('#error');
-      box.style.display = '';
-      box.textContent = msg;
-    }
-
-    // ---------- Загрузка JSON ----------
+    // Загружаем JSON (объект с items)
     (async function init(){
       try{
-        const resp = await fetch('legal-timeline.json', {cache:'no-cache'});
-        if(!resp.ok) throw new Error('HTTP ' + resp.status);
-        const data = await resp.json();
-
+        const res = await fetch('legal-timeline.json?v=' + Date.now()); // анти‑кеш для теста
+        if(!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
         const items = Array.isArray(data) ? data : (data.items || []);
-        if(!items.length){
-          showError('Данные хронологии не найдены (items пустой).');
-          return;
-        }
+        if(!items.length){ showError('Данные хронологии не найдены (items пустой).'); return; }
         render(items);
-      }catch(err){
-        console.error('Timeline load error:', err);
-        showError('Не удалось загрузить данные хронологии. Проверь расположение legal-timeline.json.');
+      }catch(e){
+        console.error(e);
+        showError('Не удалось загрузить legal-timeline.json. Проверь расположение файла.');
       }
     })();
 
-    // ---------- Рендер ----------
     function render(items){
-      // Сортируем по дате начала
-      const sorted = items.slice().sort((a,b)=>{
-        const ad = parseYMD(a.date_start)?.getTime() || 0;
-        const bd = parseYMD(b.date_start)?.getTime() || 0;
-        return ad - bd;
-      });
-
-      // Диапазон дат (для процента)
+      // сортировка по дате начала
+      const sorted = items.slice().sort((a,b)=>(parseYMD(a.date_start)-parseYMD(b.date_start)));
       const minD = parseYMD(sorted[0].date_start);
       const maxD = parseYMD(sorted[sorted.length-1].date_start);
-      const total = (maxD - minD) || 1;
+      const span = (maxD - minD) || 1;
 
-      // Отступы слева/справа, чтобы крайние подписи не прилипали
-      const container = $('.timeline-container');
+      const host = document.querySelector('.timeline-container');
       const base = $('#baseLine');
-      const pad = 48; // px
-      base.style.marginLeft = pad + 'px';
-      base.style.marginRight = pad + 'px';
 
-      // Группируем по месяцу (кластер: все события одного месяца = одна точка)
+      // симметричные внутренние поля, чтобы крайние подписи не прилипали
+      const pad = 48; // px
+      base.style.marginLeft = pad+'px';
+      base.style.marginRight = pad+'px';
+
+      // группируем по месяцу
       const groups = new Map();
       for(const it of sorted){
-        const key = byMonthKey(it.date_start);
-        if(!key) continue;
-        if(!groups.has(key)) groups.set(key, []);
-        groups.get(key).push(it);
+        const k = monthKey(it.date_start);
+        if(!k) continue;
+        (groups.get(k) || groups.set(k, []).get(k)).push(it);
       }
 
-      // Рисуем точки
-      const labelsHost = $('#labels');
-      labelsHost.innerHTML = '';
-      for(const [key, arr] of groups){
-        // позиция точки по первой дате в месяце
+      // рисуем точки и подписи
+      for(const [k, arr] of groups){
         const d = parseYMD(arr[0].date_start);
-        const x = ((d - minD) / total) * 100;
+        const x = ((d - minD) / span) * 100;
 
         const pt = document.createElement('div');
         pt.className = 'point';
-        pt.style.left = `calc(${x}% + ${pad}px - 7px)`; // -7px = половина ширины точки
+        pt.style.left = `calc(${x}% + ${pad}px)`;
+        host.appendChild(pt);
 
         const lab = document.createElement('div');
         lab.className = 'label';
-        // Показываем метку месяца по when_label первой записи (они у тебя унифицированы)
-        lab.textContent = arr.length > 1
-          ? `${arr[0].when_label.replace(/\s+/g,'\u00A0')} — ${arr[arr.length-1].when_label.replace(/\s+/g,'\u00A0')}`
-          : arr[0].when_label;
         lab.style.left = `calc(${x}% + ${pad}px)`;
+        lab.textContent = (arr.length > 1)
+          ? `${arr[0].when_label} — ${arr[arr.length-1].when_label}`
+          : `${arr[0].when_label}`;
+        host.appendChild(lab);
 
-        pt.addEventListener('click', () => openModalForGroup(key, arr));
-        container.appendChild(pt);
-        container.appendChild(lab);
+        pt.addEventListener('click', ()=> openModal(arr));
+        lab.addEventListener('click', ()=> openModal(arr));
       }
     }
 
-    // ---------- Модалка ----------
-    const back = $('#modalBack');
-    const dlgTitle = $('#modalTitle');
-    const dlgBody  = $('#modalBody');
-    const btnClose = $('#modalClose');
-
-    function openModalForGroup(key, arr){
-      // Заголовок — месяц (из первой записи)
-      dlgTitle.textContent = arr.length > 1
-        ? `${arr[0].when_label} — ${arr[arr.length-1].when_label}`
-        : `${arr[0].when_label}`;
-
-      dlgBody.innerHTML = arr.map(it => `
+    // ----- Модалка -----
+    const back = $('#modalBack'), body = $('#modalBody'), title = $('#modalTitle'), closeBtn = $('#modalClose');
+    function openModal(arr){
+      // Заголовок: диапазон меток в группе
+      title.textContent = (arr.length>1) ? `${arr[0].when_label} — ${arr[arr.length-1].when_label}` : arr[0].when_label;
+      body.innerHTML = arr.map(it => `
         <div class="ev">
           <h4>${esc(it.title||'')}</h4>
           <time>${esc(it.when_label||'')}</time>
           <p>${esc(it.summary||'')}</p>
-          ${it.details ? `<button class="btn btn-primary" onclick="(function(){alert(${JSON.stringify(esc(it.details))})})()">Подробнее</button>` : ``}
+          ${it.details ? `<button class="btn" onclick="alert(${JSON.stringify(esc(it.details))})">Подробнее</button>` : ``}
         </div>
       `).join('');
-
       back.classList.add('show');
     }
     function closeModal(){ back.classList.remove('show'); }
-    btnClose.addEventListener('click', closeModal);
-    back.addEventListener('click', (e)=>{ if(e.target === back) closeModal(); });
-    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && back.classList.contains('show')) closeModal(); });
+    closeBtn.addEventListener('click', closeModal);
+    back.addEventListener('click', e=>{ if(e.target===back) closeModal(); });
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape' && back.classList.contains('show')) closeModal(); });
   </script>
 </body>
 </html>
