@@ -1,126 +1,134 @@
 {
+  "page": {
+    "title": "Chronologie juridique",
+    "loading": "Chargement…",
+    "errorLoadGeneric": "Impossible de charger les données",
+    "errorLoadJson": "Impossible de charger legal-timeline.json"
+  },
   "meta": {
-    "updated_at": "2025-08-22T00:00:00Z",
-    "updated_by": "Nico",
-    "version": "legal.v1.3",
-    "lang_default": "fr"
+    "updated": "Mis à jour : {date} • {user} • version : {version}"
   },
   "legend": {
-    "roles": {
-      "plaintiff": "Actions des proches (demandeurs)",
-      "defendant": "Actions d’Adam (défendeur)",
-      "court": "Tribunal",
-      "admin": "Mesures/restrictions"
-    },
-    "status": {
-      "done": "terminé",
-      "current": "en cours",
-      "planned": "prévu",
-      "tentative": "éventuel"
-    },
-    "dot": "Point d’événement (cliquable)"
+    "pre": "Contexte (avant le procès)",
+    "base": "Période des procédures judiciaires",
+    "freeze": "Période de gel",
+    "future": "Perspectives judiciaires (à venir)",
+    "event": "Événement",
+    "eventHint": "(cliquable)"
   },
-  "ui": {
-    "btn_details": "Plus de détails",
-    "btn_hide": "Réduire",
-    "tooltip_event": "Cliquez pour lire les détails"
+  "tooltip": {
+    "dot": "Événement — cliquez pour plus de détails"
   },
+  "a11y": {
+    "dotButton": "Événement — cliquez pour plus de détails"
+  },
+  "modal": {
+    "close": "Fermer",
+    "more": "Voir plus",
+    "less": "Réduire",
+    "clusterTitle": "Événements ({count})",
+    "singleTitle": "{when} — {title}"
+  },
+  "monthShort": [
+    "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+    "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+  ],
   "items": {
     "2020-09-will-mother": {
-      "when_label": "sept. 2020",
+      "when_label": "Septembre 2020",
       "title": "Testament de la mère en faveur d’Adam",
       "summary": "La mère est décédée ; testament en faveur d’Adam.",
-      "details": "En septembre 2020, la mère d’Adam est décédée en laissant un testament en sa faveur. Dans les mois suivants, il n’a pas utilisé les biens hérités. Les proches n’ont pas fait de réclamations tant que le père était en vie."
+      "details": "En septembre 2020, la mère d’Adam est décédée, laissant un testament en sa faveur. Au cours des mois suivants, il n’a pas utilisé les biens hérités. Les proches n’ont formulé aucune réclamation tant que le père était en vie."
     },
     "2021-04-father-dx-will": {
-      "when_label": "avr. 2021",
+      "when_label": "Avril 2021",
       "title": "Diagnostic du père ; testament en faveur d’Adam",
-      "summary": "Cancer diagnostiqué chez le père ; testament déjà établi.",
-      "details": "En avril 2021, le père d’Adam a été diagnostiqué d’un cancer à un stade avancé. À ce moment‑là, il avait déjà fait un testament en faveur d’Adam."
+      "summary": "Le père a été diagnostiqué atteint d’un cancer ; testament déjà établi.",
+      "details": "En avril 2021, le père d’Adam a reçu un diagnostic de cancer en phase terminale. À ce moment-là, il avait déjà établi un testament en faveur d’Adam."
     },
     "2021-07-father-death-claims": {
-      "when_label": "juil. 2021",
-      "title": "Décès du père ; actions en justice internationales",
-      "summary": "Les proches ont déposé des actions ; dossiers volumineux (~100 pages).",
-      "details": "En juillet 2021, le père d’Adam est décédé. Presque simultanément, les proches ont déposé des actions internationales contestant les testaments des parents. Les dossiers comptaient des dizaines de pages (environ 100) et visaient à bloquer au maximum les droits et les biens d’Adam. Certaines actions ont été engagées alors que le père était encore en vie mais déjà incapable. Sur conseil juridique, Adam a suspendu les opérations sur ses comptes personnels."
+      "when_label": "Juillet 2021",
+      "title": "Décès du père ; dépôts de recours internationaux",
+      "summary": "Les proches ont déposé des recours ; dossiers volumineux (≈100 pages).",
+      "details": "En juillet 2021, le père d’Adam est décédé. Presque simultanément, les proches ont déposé des recours internationaux contestant les testaments des parents. Les dossiers comptaient des dizaines de pages (environ 100) et visaient à bloquer le plus longtemps possible les biens et droits d’Adam. Une partie des recours avait été déposée alors que le père était déjà pratiquement incapable. Sur recommandation de son avocat, Adam a suspendu les opérations sur ses comptes personnels."
     },
     "2021-07-asset-freeze": {
-      "when_label": "depuis juil. 2021",
-      "title": "Gel intégral des actifs et restrictions",
-      "summary": "Mesures de gel et restrictions de déplacement en vigueur.",
-      "details": "Un gel intégral des actifs et des restrictions de déplacement ont été imposés, couvrant comptes et biens immobiliers. Ces mesures restent en vigueur."
+      "when_label": "Depuis juillet 2021",
+      "title": "Gel complet des actifs et restrictions",
+      "summary": "Mesures de gel des actifs et limitations de déplacement en vigueur.",
+      "details": "Des mesures de gel complet des actifs et de restrictions de déplacement ont été mises en place. Le gel couvre les comptes et les biens immobiliers et reste en vigueur à ce jour."
     },
     "2021-09-apartment-dispute": {
-      "when_label": "sept. 2021",
-      "title": "Litige autour de l’appartement d’Adam",
-      "summary": "La sœur a refusé l’hébergement temporaire ; litige sur l’expulsion.",
-      "details": "Lors d’examens CAR‑T aux États‑Unis, Adam a demandé à sa sœur, qui occupait son appartement, d’y séjourner temporairement. Elle a refusé, invoquant un « inconfort ». Adam lui a alors signifié qu’il ne souhaitait plus sa présence gratuite et lui a demandé de partir. Elle a refusé, affirmant qu’avec le gel, Adam n’avait pas le droit de l’expulser."
+      "when_label": "Septembre 2021",
+      "title": "Litige concernant l’appartement d’Adam",
+      "summary": "Refus de la sœur d’un hébergement temporaire ; litige sur le départ.",
+      "details": "Lors d’un séjour aux États-Unis pour un diagnostic CAR-T, Adam a contacté sa sœur, qui vivait dans son appartement, pour lui demander un hébergement temporaire. Elle a refusé, invoquant un « inconfort ». Adam a indiqué qu’il ne souhaitait plus qu’elle y vive gratuitement et lui a demandé de partir. Elle a refusé, affirmant qu’avec le gel en cours Adam n’avait pas le droit de l’expulser."
     },
     "2021-11-prelim-scheduled": {
-      "when_label": "nov. 2021",
+      "when_label": "Novembre 2021",
       "title": "Audience préliminaire fixée",
       "summary": "Audience préliminaire fixée à juillet 2024.",
-      "details": "Le tribunal a fixé une audience préliminaire sur la succession pour juillet 2024."
+      "details": "Le tribunal a fixé une audience préliminaire sur la succession en juillet 2024."
     },
     "2022-03-hearing-travel": {
-      "when_label": "mars 2022 (début)",
+      "when_label": "Mars 2022 (début)",
       "title": "Audience sur le droit de voyager pour traitement",
-      "summary": "Autorisation de voyager aux États‑Unis contestée par les proches.",
-      "details": "Le tribunal a examiné la demande d’Adam visant à voyager aux États‑Unis pour une thérapie CAR‑T. Les proches s’y sont opposés. Un examen médico‑légal a été réalisé."
+      "summary": "Examen du droit de voyager aux États-Unis ; objections des proches.",
+      "details": "Le tribunal a examiné la demande d’autorisation d’Adam de voyager aux États-Unis pour un traitement CAR-T. Les proches se sont opposés. Une expertise médico-légale a été réalisée."
     },
     "2022-03-permission-travel": {
-      "when_label": "mars 2022 (fin)",
+      "when_label": "Mars 2022 (fin)",
       "title": "Autorisation de voyager pour traitement",
-      "summary": "Le tribunal a autorisé le voyage aux États‑Unis pour la thérapie.",
-      "details": "Le tribunal a fait droit à la demande d’Adam, lui permettant de se rendre aux États‑Unis pour la thérapie."
+      "summary": "Le tribunal a accordé l’autorisation de voyager aux États-Unis pour thérapie.",
+      "details": "Le tribunal a accepté la requête d’Adam et lui a accordé l’autorisation de voyager aux États-Unis pour suivre une thérapie."
     },
     "2022-05-visit-med-exam": {
-      "when_label": "mai 2022",
-      "title": "Visite des proches ; exigence d’examen médical",
-      "summary": "Intervention de la police ; restrictions imposées aux proches.",
-      "details": "Les proches se sont rendus au domicile d’Adam en exigeant de l’emmener à un examen médical, invoquant une éventuelle tutelle. Adam s’y est opposé et le personnel médical ne leur a pas donné accès. La police est intervenue. Le tribunal a jugé ces exigences illégales sans le consentement d’Adam, et a condamné les proches à un mois de détention et à une interdiction d’entrée dans le pays de six mois pour tentative de l’emmener de force."
+      "when_label": "Mai 2022",
+      "title": "Visite des proches ; exigence d’un examen médical",
+      "summary": "La police est intervenue ; restrictions imposées aux proches.",
+      "details": "Les proches se sont présentés au domicile d’Adam, exigeant qu’il se soumette à un examen médical, invoquant une possible décision judiciaire de mise sous tutelle. Adam a refusé, et le personnel médical ne leur a pas donné accès. La police est intervenue dans le conflit. Le tribunal a jugé que de telles exigences n’étaient pas recevables sans le consentement d’Adam, et a condamné les proches à un mois de détention ainsi qu’à une interdiction d’entrer dans le pays pendant six mois pour tentative de l’emmener de force dans un lieu inconnu."
     },
     "2024-06-eviction-start": {
-      "when_label": "juin 2024 (fin)",
-      "title": "Procédure d’expulsion de la sœur engagée",
-      "summary": "Procédure lancée pour l’expulser de l’appartement d’Adam.",
-      "details": "Fin juin 2024, Adam a engagé une procédure d’expulsion contre sa sœur, apprenant qu’elle était la principale initiatrice de l’action. Auparavant (2021‑09), elle lui avait refusé un séjour temporaire. Elle a ensuite allégué que l’expulsion était illégale, mais le tribunal n’a constaté aucune violation."
+      "when_label": "Juin 2024 (fin)",
+      "title": "Procédure d’expulsion de la sœur initiée",
+      "summary": "Procédure d’expulsion engagée concernant l’appartement d’Adam.",
+      "details": "Fin juin 2024, Adam a initié la procédure d’expulsion de sa sœur de son appartement, après avoir appris qu’elle était la principale initiatrice du recours. Auparavant (en 2021-09), elle lui avait refusé un hébergement temporaire. Plus tard, elle a affirmé devant le tribunal que l’expulsion était illégale, mais celui-ci n’a constaté aucune violation."
     },
     "2024-07-docs-fee": {
-      "when_label": "juil. 2024 (début)",
-      "title": "Dépôt de documents ; paiement de la taxe",
-      "summary": "Documents financiers/médicaux déposés ; taxe de 5 350 $ payée.",
-      "details": "Avant l’audience préliminaire, Adam a déposé des documents financiers et médicaux et a payé une taxe judiciaire de 5 350 $."
+      "when_label": "Juillet 2024 (début)",
+      "title": "Présentation de documents ; paiement des frais",
+      "summary": "Documents présentés avant l’audience ; frais de 5 350 $ payés.",
+      "details": "Avant l’audience préliminaire, Adam a présenté des documents financiers concernant ses comptes et des dossiers médicaux, et a payé les frais judiciaires de 5 350 $."
     },
     "2024-07-prelim-hearing": {
-      "when_label": "juil. 2024 (milieu)",
+      "when_label": "Juillet 2024 (milieu)",
       "title": "Audience préliminaire ; deux issues possibles",
-      "summary": "Le tribunal a présenté 2 scénarios ; accord refusé.",
-      "details": "Le tribunal a présenté deux scénarios : (1) confirmer les testaments et attribuer l’héritage à Adam ; (2) partager l’héritage entre tous les enfants si une pression sur les parents est prouvée. Les proches ont refusé un accord."
+      "summary": "Le tribunal a indiqué 2 issues possibles ; refus d’un accord amiable.",
+      "details": "Le tribunal a identifié deux options : (1) valider les testaments et attribuer l’héritage à Adam ; (2) partager l’héritage entre tous les enfants si une pression sur les parents lors de la rédaction des testaments est prouvée. Les proches ont refusé un accord amiable."
     },
     "2024-07-motion-freeze-relatives": {
-      "when_label": "juil. 2024 (milieu)",
+      "when_label": "Juillet 2024 (milieu)",
       "title": "Requête de gel des comptes des proches",
-      "summary": "Gel et contrôle financier demandés.",
-      "details": "Lors de la même audience, Adam a déposé une requête pour geler les comptes des proches et examiner leurs opérations financières."
+      "summary": "Demande de gel et de vérification des opérations financières.",
+      "details": "Lors de la même audience, Adam a déposé une requête visant à geler les comptes des proches et à vérifier leurs opérations financières."
     },
     "2024-08-relatives-freeze": {
-      "when_label": "août 2024",
-      "title": "Comptes des proches gelés",
-      "summary": "Le tribunal a fait droit à la requête de gel.",
-      "details": "Le tribunal a fait droit à la requête d’Adam visant à geler les comptes des proches afin d’examiner leurs opérations financières."
+      "when_label": "Août 2024",
+      "title": "Gel des comptes des proches",
+      "summary": "Le tribunal a approuvé la requête de gel.",
+      "details": "Le tribunal a approuvé la requête d’Adam visant à geler les comptes des proches pour vérifier leurs opérations financières."
     },
     "2025-07-unfreeze-motion": {
-      "when_label": "juil. 2025",
+      "when_label": "Juillet 2025",
       "title": "Requête de dégel des actifs",
-      "summary": "Dégel total/partiel demandé.",
-      "details": "En raison de son état de santé et d’une nouvelle forme de leucémie, Adam a demandé le dégel total ou partiel de ses actifs. Son avocat s’y est opposé, craignant des retards. Mais Adam n’avait pas d’autre option : des fonds étaient urgemment nécessaires pour le traitement et le maintien de la rémission."
+      "summary": "Demande de dégel total ou partiel.",
+      "details": "En raison de son état de santé et d’une nouvelle forme de leucémie diagnostiquée, Adam a déposé une requête de dégel total ou partiel des actifs, bien que son avocat s’y soit opposé, estimant que cela retarderait le processus. Cependant, Adam n’avait plus d’autre option : il avait un besoin urgent de fonds à cause de sa nouvelle forme de leucémie et du scénario incertain du traitement et du maintien de la rémission."
     },
     "2026-11-hearing-scheduled": {
-      "when_label": "nov. 2026",
-      "title": "Audience fixée sur la requête",
-      "summary": "Audience fixée pour nov. 2026.",
-      "details": "En août 2025, le tribunal a admis la requête d’Adam et a fixé une audience pour novembre 2026."
+      "when_label": "Novembre 2026",
+      "title": "Audience sur la requête fixée",
+      "summary": "Le tribunal a fixé une audience pour novembre 2026.",
+      "details": "En août 2025, le tribunal a accepté d’examiner la requête d’Adam et a fixé une audience pour novembre 2026."
     }
   }
 }
