@@ -3,22 +3,22 @@
     "updated_at": "2025-08-22T00:00:00Z",
     "updated_by": "Nico",
     "version": "legal.v1.3",
-    "lang_default": "ru"
+    "lang_default": "en"
   },
-  "legend": {
-    "roles": {
-      "plaintiff": "Действия родственников (истцы)",
-      "defendant": "Действия Адама (ответчик)",
-      "court": "Суд",
-      "admin": "Меры/ограничения"
-    },
-    "status": {
-      "done": "совершилось",
-      "current": "текущее",
-      "planned": "запланировано",
-      "tentative": "возможно"
-    }
-  },
+	"legend": {
+	  "roles": {
+		"plaintiff": "Relatives’ actions (plaintiffs)",
+		"defendant": "Adam’s actions (defendant)",
+		"court": "Court",
+		"admin": "Measures / restrictions"
+	  },
+	  "status": {
+		"done": "completed",
+		"current": "current",
+		"planned": "planned",
+		"tentative": "tentative"
+	  }
+	},
   "items": [
     {
       "id": "2020-09-will-mother",
@@ -27,10 +27,10 @@
       "status": "done",
       "date_start": "2020-09",
       "date_end": null,
-      "when_label": "Сентябрь 2020",
-      "title": "Завещание матери в пользу Адама",
-      "summary": "Мать умерла; завещание в пользу Адама.",
-      "details": "В сентябре 2020 года мать Адама умерла, оставив завещание в пользу Адама. В последующие месяцы он не пользовался завещанным имуществом. Родственники не предъявляли претензий, пока был жив отец."
+      "when_label": "September 2020",
+      "title": "Mother’s will in favor of Adam",
+      "summary": "Mother died; will in Adam’s favor.",
+      "details": "In September 2020, Adam’s mother died, leaving a will in his favor. In the following months he did not use the inherited property. The relatives raised no claims while his father was alive."
     },
     {
       "id": "2021-04-father-dx-will",
@@ -39,10 +39,10 @@
       "status": "done",
       "date_start": "2021-04",
       "date_end": null,
-      "when_label": "Апрель 2021",
-      "title": "Диагноз отца; завещание в пользу Адама",
-      "summary": "У отца диагностирован рак; завещание уже оформлено.",
-      "details": "В апреле 2021 года у отца Адама диагностирован рак в последней стадии. К этому моменту он уже оформил завещание в пользу Адама."
+      "when_label": "April 2021",
+      "title": "Father’s diagnosis; will in favor of Adam",
+      "summary": "Father diagnosed with cancer; will already executed.",
+      "details": "In April 2021, Adam’s father was diagnosed with late‑stage cancer. By that time he had already made a will in Adam’s favor."
     },
     {
       "id": "2021-07-father-death-claims",
@@ -51,10 +51,10 @@
       "status": "done",
       "date_start": "2021-07",
       "date_end": null,
-      "when_label": "Июль 2021",
-      "title": "Смерть отца; подача международных исков",
-      "summary": "Родственники подали иски; объёмные заявления (≈100 стр.).",
-      "details": "В июле 2021 года отец Адама умер. Почти одновременно родственники подали международные иски, оспаривая завещания родителей. Исковые заявления включали десятки страниц (около 100) и были направлены на максимально длительную блокировку имущества и прав Адама. Часть заявлений подана ещё при жизни отца, когда он был фактически недееспособен. По рекомендации юриста Адам приостановил операции по личным счетам."
+      "when_label": "July 2021",
+      "title": "Father’s death; international lawsuits filed",
+      "summary": "Relatives filed lawsuits; lengthy claims (~100 pages).",
+      "details": "In July 2021, Adam’s father died. Almost simultaneously, relatives filed international lawsuits contesting the parents’ wills. The claims ran dozens of pages (about 100) and were aimed at keeping Adam’s rights and assets blocked for as long as possible. Some claims were filed while the father was still alive but already incapacitated. On legal advice, Adam suspended transactions on his personal accounts."
     },
     {
       "id": "2021-07-asset-freeze",
@@ -63,10 +63,10 @@
       "status": "current",
       "date_start": "2021-07",
       "date_end": null,
-      "when_label": "С Июль 2021",
-      "title": "Полная блокировка активов и ограничений",
-      "summary": "Действуют меры блокировки активов и перемещений.",
-      "details": "Введены меры полной блокировки активов и ограничений на перемещения. Блокировка охватывает счета и недвижимость и действует по настоящее время."
+      "when_label": "From July 2021",
+      "title": "Full asset freeze and restrictions",
+      "summary": "Asset and movement restrictions in force.",
+      "details": "Full asset freeze and movement restrictions were imposed, covering accounts and real estate. The freeze remains in effect."
     },
     {
       "id": "2021-09-apartment-dispute",
@@ -75,10 +75,10 @@
       "status": "done",
       "date_start": "2021-09",
       "date_end": null,
-      "when_label": "Сентябрь 2021",
-      "title": "Спор по проживанию в квартире Адама",
-      "summary": "Отказ сестры во временном проживании; спор о выезде.",
-      "details": "Во время приезда в США для диагностики CAR‑T Адам связался с сестрой, проживавшей в его квартире, с просьбой временно остановиться. Сестра отказала, сославшись на «некомфортность». Адам сообщил, что не желает её дальнейшего бесплатного проживания и попросил выехать. Сестра отказалась, заявив, что при действующей блокировке у Адама нет прав на выселение."
+      "when_label": "September 2021",
+      "title": "Dispute over Adam’s apartment",
+      "summary": "Sister refused temporary stay; dispute over eviction.",
+      "details": "While in the United States for CAR‑T diagnostics, Adam contacted his sister, who was living in his apartment, asking to stay there temporarily. She refused, citing “discomfort.” Adam then stated that he no longer wished her to live there for free and asked her to move out. She refused, claiming that under the freeze Adam had no right to evict her."
     },
     {
       "id": "2021-11-prelim-scheduled",
@@ -87,10 +87,10 @@
       "status": "done",
       "date_start": "2021-11",
       "date_end": null,
-      "when_label": "Ноябрь 2021",
-      "title": "Назначено предварительное заседание",
-      "summary": "Предварительное заседание назначено на июль 2024.",
-      "details": "Суд вынес определение о проведении предварительного заседания по делу о наследстве в июле 2024 года."
+      "when_label": "November 2021",
+      "title": "Preliminary hearing scheduled",
+      "summary": "Preliminary hearing set for July 2024.",
+      "details": "The court scheduled a preliminary hearing on the inheritance case for July 2024."
     },
     {
       "id": "2022-03-hearing-travel",
@@ -99,10 +99,10 @@
       "status": "done",
       "date_start": "2022-03-05",
       "date_end": null,
-      "when_label": "Март 2022 (нач.)",
-      "title": "Заседание о праве выезда на лечение",
-      "summary": "Рассмотрение права выезда в США; возражения родственников.",
-      "details": "Суд рассмотрел вопрос о разрешении Адаму выезда на лечение (CAR‑T) в США. Родственники возражали. Проведено судебное медицинское освидетельствование."
+      "when_label": "March 2022 (beginning)",
+      "title": "Hearing on the right to travel for treatment",
+      "summary": "Consideration of permission to travel to the US; relatives objected.",
+      "details": "The court considered granting Adam permission to travel for CAR‑T treatment in the United States. The relatives objected. A forensic medical examination was conducted."
     },
     {
       "id": "2022-03-permission-travel",
@@ -111,10 +111,10 @@
       "status": "done",
       "date_start": "2022-03-25",
       "date_end": null,
-      "when_label": "Март 2022 (кон.)",
-      "title": "Разрешение на выезд для лечения",
-      "summary": "Суд разрешил выезд в США для терапии.",
-      "details": "Суд удовлетворил ходатайство Адама и предоставил разрешение на выезд для прохождения терапии в США."
+      "when_label": "March 2022 (end)",
+      "title": "Permission to travel for treatment granted",
+      "summary": "Court authorized travel to the US for therapy.",
+      "details": "The court granted Adam’s request and allowed him to travel to the United States for therapy."
     },
     {
       "id": "2022-05-visit-med-exam",
@@ -123,10 +123,10 @@
       "status": "done",
       "date_start": "2022-05",
       "date_end": null,
-      "when_label": "Май 2022",
-      "title": "Визит родственников; требование медосвидетельствования",
-      "summary": "Вмешалась полиция; последовали ограничения для родственников.",
-      "details": "Родственники прибыли к дому Адама, настаивая на его сопровождении на медицинское освидетельствование, ссылаясь на возможное решение суда об установлении опеки. Адам возразил, и медперсонал не предоставил им доступ к нему. В возникший конфликт вмешалась полиция. Суд установил, что без согласия Адама подобные требования недопустимы, и в качестве меры наказания назначил родственникам месяц заключения, а также запрет на въезд в страну сроком на шесть месяцев за попытку его принудительного вывоза из дома в неизвестном направлении."
+      "when_label": "May 2022",
+      "title": "Relatives’ visit; demand for medical examination",
+      "summary": "Police intervened; restrictions imposed on the relatives.",
+      "details": "Relatives came to Adam’s home insisting on taking him for a medical examination, citing a possible guardianship order. Adam objected, and the medical staff did not grant them access to him. Police intervened. The court held that such demands were unlawful without Adam’s consent and, as a sanction, imposed one month of custody on the relatives and a six‑month ban on entering the country for attempting to forcibly remove him from his home to an undisclosed location."
     },
     {
       "id": "2024-06-eviction-start",
@@ -135,10 +135,10 @@
       "status": "done",
       "date_start": "2024-06-25",
       "date_end": null,
-      "when_label": "Июнь 2024 (кон.)",
-      "title": "Инициирована процедура выселения сестры",
-      "summary": "Начат процесс выселения из квартиры Адама.",
-      "details": "В конце июня 2024 года Адам инициировал процесс выселения сестры из своей квартиры, узнав, что именно она являлась главным инициатором иска. Ранее (в 2021‑09) она отказала ему во временном проживании. Позднее сестра заявила в суде, что выселение было незаконным, однако суд не усмотрел в этом нарушений."
+      "when_label": "June 2024 (end)",
+      "title": "Eviction procedure against sister initiated",
+      "summary": "Process started to evict her from Adam’s apartment.",
+      "details": "In late June 2024, Adam initiated eviction proceedings against his sister after learning that she was the main initiator of the lawsuit. Earlier (in September 2021) she had refused him a temporary stay. Later she claimed in court that the eviction was unlawful, but the court found no violations."
     },
     {
       "id": "2024-07-docs-fee",
@@ -147,10 +147,10 @@
       "status": "done",
       "date_start": "2024-07-05",
       "date_end": null,
-      "when_label": "Июль 2024 (нач.)",
-      "title": "Представление документов; уплата пошлины",
-      "summary": "Перед заседанием представлены документы; оплачена пошлина $5 350.",
-      "details": "Перед предварительным заседанием Адам представил финансовые документы по своим счетам и медицинские материалы, а также уплатил судебную пошлину $5 350."
+      "when_label": "July 2024 (beginning)",
+      "title": "Submission of documents; court fee paid",
+      "summary": "Financial and medical documents submitted; $5,350 fee paid.",
+      "details": "Before the preliminary hearing, Adam submitted financial documents on his accounts and medical materials, and paid a court fee of $5,350."
     },
     {
       "id": "2024-07-prelim-hearing",
@@ -159,10 +159,10 @@
       "status": "done",
       "date_start": "2024-07-15",
       "date_end": null,
-      "when_label": "Июль 2024 (сред.)",
-      "title": "Предварительное заседание; два возможных исхода",
-      "summary": "Суд указал 2 исхода; отказ от мирового.",
-      "details": "Суд обозначил два варианта: (1) признание завещаний действительными и закрепление наследства за Адамом; (2) раздел наследства между всеми детьми, если будет доказано давление на родителей при составлении завещаний. Родственники отказались от мирового соглашения."
+      "when_label": "July 2024 (middle)",
+      "title": "Preliminary hearing; two possible outcomes",
+      "summary": "Court outlined two outcomes; settlement refused.",
+      "details": "The court outlined two scenarios: (1) confirm the wills and secure the inheritance for Adam; (2) divide the inheritance among all children if pressure on the parents is proven. The relatives refused a settlement."
     },
     {
       "id": "2024-07-motion-freeze-relatives",
@@ -171,10 +171,10 @@
       "status": "done",
       "date_start": "2024-07-15",
       "date_end": null,
-      "when_label": "Июль 2024 (сред.)",
-      "title": "Ходатайство о блокировке счетов родственников",
-      "summary": "Заявлено о блокировке и проверке операций.",
-      "details": "На том же заседании Адам подал ходатайство о блокировке счетов родственников и проверке их финансовых операций."
+      "when_label": "July 2024 (middle)",
+      "title": "Motion to freeze relatives’ accounts",
+      "summary": "Freeze and financial review requested.",
+      "details": "At the same hearing, Adam filed a motion to freeze his relatives’ accounts and review their financial transactions."
     },
     {
       "id": "2024-08-relatives-freeze",
@@ -183,10 +183,10 @@
       "status": "done",
       "date_start": "2024-08",
       "date_end": null,
-      "when_label": "Август 2024",
-      "title": "Блокировка счетов родственников",
-      "summary": "Суд удовлетворил ходатайство о блокировке.",
-      "details": "Суд удовлетворил ходатайство Адама о блокировке счетов родственников для проведения проверки финансовых операций."
+      "when_label": "August 2024",
+      "title": "Relatives’ accounts frozen",
+      "summary": "Court granted the freeze motion.",
+      "details": "The court granted Adam’s motion to freeze the relatives’ accounts to review their financial transactions."
     },
     {
       "id": "2025-07-unfreeze-motion",
@@ -195,10 +195,10 @@
       "status": "done",
       "date_start": "2025-07",
       "date_end": null,
-      "when_label": "Июль 2025",
-      "title": "Ходатайство о разблокировке активов",
-      "summary": "Запрошено полное/частичное разблокирование.",
-      "details": "В связи с состоянием здоровья и новой диагностированной формой лейкемии Адам подал ходатайство о полном или частичном разблокировании активов, несмотря на то что его юрист выступал против подачи подобного рода документов, полагая, что это лишь дополнительно затянет процесс. Однако у Адама не осталось иных вариантов: средства ему необходимы в кратчайшие сроки из-за его новой формы лейкемии и неопределённого сценария предстоящего лечения и поддержания ремиссии."
+      "when_label": "July 2025",
+      "title": "Motion to unfreeze assets",
+      "summary": "Full or partial unfreeze requested.",
+      "details": "Due to his health and a newly diagnosed form of leukemia, Adam moved for a full or partial unfreeze of assets, despite his lawyer’s opposition on the ground that such filings would only prolong the proceedings. Adam had no other option: he urgently needed funds because of the new form of leukemia and the uncertain scenario of upcoming treatment and maintenance of remission."
     },
     {
       "id": "2026-11-hearing-scheduled",
@@ -207,10 +207,10 @@
       "status": "planned",
       "date_start": "2026-11",
       "date_end": null,
-      "when_label": "Ноябрь 2026",
-      "title": "Назначено заседание по ходатайству",
-      "summary": "Суд назначил заседание на ноябрь 2026.",
-      "details": "В августе 2025 года суд принял ходатайство Адама к рассмотрению и назначил заседание на ноябрь 2026 года."
+      "when_label": "November 2026",
+      "title": "Hearing on the motion scheduled",
+      "summary": "Court scheduled a hearing for November 2026.",
+      "details": "In August 2025, the court accepted Adam’s motion for consideration and scheduled a hearing for November 2026."
     }
   ]
 }
