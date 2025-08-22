@@ -9,6 +9,11 @@
   "audio.play": "القصة بالموسيقى",
   "audio.pause": "‖ إيقاف مؤقت",
   
+  "story.full.title": "الإصدار الكامل من قصتنا",
+"full.play": "▶︎ تشغيل",
+"full.pause": "‖ إيقاف مؤقت",
+"full.note": "القصة الكاملة بصوت الراوي",
+  
   "menu.story": "القصة",
   "menu.support": "الدعم",
   "menu.storyNow": "القصة الآن",

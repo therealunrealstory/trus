@@ -9,6 +9,11 @@
   "audio.play": "История в музыке",
   "audio.pause": "‖ Пауза",
   
+  "story.full.title": "Полная версия нашей истории",
+"full.play": "▶︎ Воспроизвести",
+"full.pause": "‖ Пауза",
+"full.note": "Полная озвученная история",
+  
   "menu.story": "История",
   "menu.support": "Поддержка",
   "menu.storyNow": "История сейчас",

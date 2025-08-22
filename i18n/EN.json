@@ -9,6 +9,11 @@
   "audio.play": "Story in music",
   "audio.pause": "‖ Pause",
   
+  "story.full.title": "Full version of our story",
+"full.play": "▶︎ Play",
+"full.pause": "‖ Pause",
+"full.note": "Complete narrated story",
+  
   "menu.story": "The Story",
   "menu.support": "Support",
   "menu.storyNow": "The Story Now",

@@ -9,6 +9,11 @@
   "audio.play": "História em música",
   "audio.pause": "‖ Pausar",
   
+  "story.full.title": "Versão completa da nossa história",
+"full.play": "▶︎ Reproduzir",
+"full.pause": "‖ Pausar",
+"full.note": "Relato completo narrado",
+  
   "menu.story": "A História",
   "menu.support": "Apoio",
   "menu.storyNow": "A História Agora",
