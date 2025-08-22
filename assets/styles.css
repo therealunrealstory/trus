@@ -333,15 +333,19 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
 /* маркер «сейчас» не должен перехватывать клики по точкам */
 .now-marker{ pointer-events:none; }
 
-/* Легенда: образец «Судебные перспективы» — пунктир, как на шкале */
+/* --- Legal Timeline legend: dashed future sample --- */
+/* FIX: образец "Судебные перспективы" в легенде — как на шкале */
 .legend .swatch-future,
 .timeline-legend .swatch-future,
 .legend-swatch.swatch-future{
   background: transparent !important;
   border: 0 !important;
-  width:44px !important; height:0 !important;
-  border-top:4px dashed #4f46e5 !important; /* var(--indigo-600) */
+  width: 44px !important;
+  height: 0 !important;
+  border-top: 4px dashed var(--indigo-600) !important; /* десктоп — горизонтально */
+  border-radius: 0 !important;
 }
+
 @media (max-width: 820px){
   .legend .swatch-future,
   .timeline-legend .swatch-future,
