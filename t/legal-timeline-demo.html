@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Legal Timeline Demo</title>
+<style>
+  :root{
+    --bg: #0b0f18;
+    --panel: rgba(255,255,255,0.05);
+    --panel-2: rgba(255,255,255,0.08);
+    --text: #e7ecf3;
+    --muted: #a9b4c0;
+    --border: rgba(255,255,255,0.12);
+    --now: #9ae6b4;
+
+    /* Роли (подобраны под стиль мед. хронологии) */
+    --role-plaintiff: #f59e0b; /* янтарный */
+    --role-defendant: #3b82f6; /* синий */
+    --role-court:     #a78bfa; /* фиолетовый */
+    --role-admin:     #10b981; /* зелёный */
+
+    /* Статусы (интенсивность) */
+    --alpha-done: 1;
+    --alpha-current: 1;
+    --alpha-planned: .55;
+    --alpha-tentative: .4;
+
+    --radius: 14px;
+    --shadow: 0 8px 30px rgba(0,0,0,.35);
+  }
+
+  html,body{height:100%;}
+  body{
+    margin:0; background:linear-gradient(180deg,#0b0f18,#0a1122);
+    color:var(--text); font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  }
+
+  .wrap{
+    max-width:1100px; margin:28px auto; padding:0 16px;
+  }
+
+  .head{
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow);
+    margin-bottom:16px;
+  }
+  .head h1{ margin:0 0 6px 0; font-size:22px; }
+  .meta{ color:var(--muted); font-size:14px; }
+
+  .timeline{
+    position:relative; background:var(--panel); border:1px solid var(--border);
+    border-radius:var(--radius); box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+
+  /* Контейнер трека (скролл) */
+  .track-scroll{
+    position:relative; overflow:auto; -webkit-overflow-scrolling:touch;
+  }
+
+  /* Горизонтальная/вертикальная ориентация */
+  .track{
+    position:relative; min-height:220px; min-width:800px;
+  }
+  .line{
+    position:absolute; left:0; right:0; top:50%; height:3px; background:var(--panel-2);
+    transform:translateY(-50%);
+  }
+
+  /* Вертикальная версия (мобайл) */
+  @media (max-width: 820px){
+    .track{ min-height:800px; min-width:100%; }
+    .line{ left:40px; width:3px; height:calc(100% - 40px); top:20px; bottom:20px; transform:none; }
+  }
+
+  /* Now (текущая дата) */
+  .now-marker{
+    position:absolute; top:0; bottom:0; width:2px; background:var(--now); opacity:.8;
+  }
+  @media (max-width: 820px){
+    .now-marker{ left:0; top:0; width:100%; height:2px; }
+  }
+
+  /* Сегменты (периоды) */
+  .segment{
+    position:absolute; height:8px; border-radius:6px;
+    background:var(--role-admin);
+    opacity:var(--alpha-current);
+  }
+  .segment.planned{ opacity:var(--alpha-planned); }
+  .segment.tentative{ opacity:var(--alpha-tentative); }
+  .segment.done{ opacity:var(--alpha-done); }
+  .segment.role-plaintiff{ background:var(--role-plaintiff); }
+  .segment.role-defendant{ background:var(--role-defendant); }
+  .segment.role-court{ background:var(--role-court); }
+  .segment.role-admin{ background:var(--role-admin); }
+
+  /* Точки событий */
+  .dot{
+    position:absolute; width:14px; height:14px; border-radius:50%;
+    box-shadow:0 0 0 2px rgba(0,0,0,.25);
+    outline:1px solid var(--border);
+    cursor:pointer; transform:translate(-50%, -50%);
+  }
+  .dot.role-plaintiff{ background:var(--role-plaintiff); }
+  .dot.role-defendant{ background:var(--role-defendant); }
+  .dot.role-court{ background:var(--role-court); }
+  .dot.role-admin{ background:var(--role-admin); }
+  .dot.status-planned{ opacity:var(--alpha-planned); outline-style:dashed; }
+  .dot.status-tentative{ opacity:var(--alpha-tentative); outline-style:dashed; }
+
+  /* В вертикальной версии позиционируем по оси Y, а по X — у линии */
+  @media (max-width: 820px){
+    .dot{ left:40px; transform:translate(-50%, 0); }
+    .segment{ left:40px; transform:translateX(-50%); width:6px; }
+  }
+
+  /* Карточка события */
+  .card{
+    position:absolute; min-width:260px; max-width:360px;
+    background:#0f1624; border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow);
+    padding:12px 14px; z-index:20; display:none;
+  }
+  .card h3{ margin:0 0 4px 0; font-size:16px; }
+  .card .when{ color:var(--muted); font-size:13px; margin-bottom:6px; }
+  .card .summary{ font-size:14px; margin-bottom:8px; color:#d9e2ee; }
+  .card .details{ font-size:14px; color:#c8d3e0; display:none; }
+  .card .actions{ margin-top:10px; display:flex; gap:8px; }
+  .btn{
+    background:var(--panel-2); color:var(--text); border:1px solid var(--border);
+    border-radius:9px; padding:6px 10px; font-size:13px; cursor:pointer;
+  }
+  .btn:hover{ filter:brightness(1.1); }
+
+  /* Подписи точек (для быстрого ориентира) */
+  .label{
+    position:absolute; transform:translate(-50%, 8px);
+    font-size:12px; color:var(--muted); white-space:nowrap;
+  }
+  @media (max-width: 820px){
+    .label{ left:56px; transform:none; }
+  }
+
+  .hint{
+    padding:10px 12px; color:var(--muted); font-size:13px;
+    border-top:1px solid var(--border); background:var(--panel);
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head">
+      <h1>Юридическая хронология (демо)</h1>
+      <div class="meta" id="meta">Загрузка…</div>
+    </div>
+
+    <div class="timeline">
+      <div class="track-scroll" id="scroll">
+        <div class="track" id="track">
+          <div class="line"></div>
+          <div class="now-marker" id="now"></div>
+          <!-- Сегменты и точки будут вставлены скриптом -->
+        </div>
+      </div>
+      <div class="hint">Совет: на десктопе используйте колёсико мыши (или Shift+колёсико) для прокрутки шкалы; нажмите на точку, чтобы раскрыть детали.</div>
+    </div>
+  </div>
+
+<script>
+(async function(){
+  const res = await fetch('./legal-timeline.json', {cache:'no-store'});
+  if(!res.ok){ document.getElementById('meta').textContent = 'Не удалось загрузить legal-timeline.json'; return; }
+  const data = await res.json();
+
+  /* ===== Utilities ===== */
+  const parseYM = s=>{
+    if(!s) return null;
+    if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00Z');
+    if(/^\d{4}-\d{2}$/.test(s)) return new Date(s+'-01T00:00:00Z');
+    if(/^\d{4}$/.test(s)) return new Date(s+'-01-01T00:00:00Z');
+    return new Date(s);
+  };
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+  /* ===== Time domain ===== */
+  const items = data.items.slice().sort((a,b)=>{
+    const ad = parseYM(a.date_start||a.date_end);
+    const bd = parseYM(b.date_start||b.date_end);
+    return ad - bd;
+  });
+
+  const firstDate = parseYM(items[0].date_start || items[0].date_end);
+  const lastRef   = items.reduce((d,it)=> {
+    const p = parseYM(it.date_end || it.date_start);
+    return p>d ? p : d;
+  }, firstDate);
+
+  const today = new Date();
+  const domainStart = firstDate;
+  const domainEnd = new Date(Math.max(today.getTime(), lastRef.getTime()));
+  const spanMs = domainEnd - domainStart;
+
+  const fmtMeta = (iso)=> new Date(iso).toLocaleString();
+  document.getElementById('meta').textContent =
+    `Обновлено: ${fmtMeta(data.meta.updated_at)} • ${data.meta.updated_by} • версии: ${data.meta.version}`;
+
+  /* Layout references */
+  const track = document.getElementById('track');
+  const scroll = document.getElementById('scroll');
+  const nowEl = document.getElementById('now');
+
+  const isMobile = () => window.matchMedia('(max-width: 820px)').matches;
+
+  function posRatio(d){
+    if(!d) return 0;
+    return clamp((d - domainStart) / spanMs, 0, 1);
+  }
+
+  function placeNow(){
+    const r = posRatio(today);
+    if(isMobile()){
+      // горизонтальная линия "Now" на мобиле сверху — не позиционируем по Y
+      nowEl.style.left = '0';
+      nowEl.style.top = '0';
+      nowEl.style.right = '0';
+      nowEl.style.bottom = '';
+      nowEl.style.height = '2px';
+    } else {
+      nowEl.style.left = (r*100)+'%';
+      nowEl.style.top = '0';
+      nowEl.style.bottom = '0';
+      nowEl.style.width = '2px';
+      nowEl.style.height = '';
+    }
+  }
+
+  function roleClass(role){
+    return 'role-' + (role||'admin');
+  }
+  function statusClass(st){
+    return 'status-' + (st||'done');
+  }
+
+  /* ===== Render segments (periods) ===== */
+  for(const it of items){
+    const start = parseYM(it.date_start);
+    const end = it.date_end ? parseYM(it.date_end) : null;
+    const isPeriod = !!(start && end) || (!!start && it.type==='freeze' && it.status!=='done');
+
+    if(isPeriod){
+      const seg = document.createElement('div');
+      seg.className = `segment ${roleClass(it.role)} ${statusClass(it.status)}`;
+      if(isMobile()){
+        const y1 = posRatio(start)*100;
+        const y2 = posRatio(end || domainEnd)*100;
+        const len = Math.max(2, y2 - y1);
+        seg.style.top = `calc(${y1}% - 4px)`;
+        seg.style.height = len+'%';
+      } else {
+        const x1 = posRatio(start)*100;
+        const x2 = posRatio(end || domainEnd)*100;
+        const len = Math.max(2, x2 - x1);
+        seg.style.left = x1+'%';
+        seg.style.top = 'calc(50% - 4px)';
+        seg.style.width = len+'%';
+      }
+      seg.dataset.id = it.id;
+      seg.title = (it.title||'') + (it.when_label?(' — '+it.when_label):'');
+      seg.addEventListener('click', (e)=> openCard(it, e.currentTarget));
+      track.appendChild(seg);
+    }
+  }
+
+  /* ===== Render points (events) ===== */
+  for(const it of items){
+    const start = parseYM(it.date_start || it.date_end);
+    const end = it.date_end ? parseYM(it.date_end) : null;
+    const isPeriod = !!(start && end) || (!!start && it.type==='freeze' && it.status!=='done');
+    if(isPeriod) continue; // у периодов уже есть сегменты; точку можем опустить
+
+    const dot = document.createElement('div');
+    dot.className = `dot ${roleClass(it.role)} ${statusClass(it.status)}`;
+    if(isMobile()){
+      const y = posRatio(start)*100;
+      dot.style.top = `calc(${y}% - 7px)`;
+    } else {
+      const x = posRatio(start)*100;
+      dot.style.left = x+'%';
+      dot.style.top = '50%';
+    }
+    dot.dataset.id = it.id;
+    dot.title = (it.title||'') + (it.when_label?(' — '+it.when_label):'');
+
+    const label = document.createElement('div');
+    label.className = 'label';
+    label.textContent = it.when_label || '';
+    if(isMobile()){
+      label.style.top = dot.style.top;
+    } else {
+      label.style.left = dot.style.left;
+      label.style.top = 'calc(50% + 10px)';
+    }
+
+    dot.addEventListener('click', (e)=> openCard(it, e.currentTarget));
+    track.appendChild(dot);
+    track.appendChild(label);
+  }
+
+  placeNow();
+  window.addEventListener('resize', ()=>{
+    // перерисовать позиционирование
+    // проще перезагрузить страницу при смене брейкпоинта
+    // но здесь сделаем минимально: очистим и перерисуем
+    track.querySelectorAll('.segment,.dot,.label').forEach(n=>n.remove());
+    for(const it of items){
+      const start = parseYM(it.date_start || it.date_end);
+      const end = it.date_end ? parseYM(it.date_end) : null;
+      const isPeriod = !!(start && end) || (!!start && it.type==='freeze' && it.status!=='done');
+      if(isPeriod){
+        const seg = document.createElement('div');
+        seg.className = `segment ${roleClass(it.role)} ${statusClass(it.status)}`;
+        if(isMobile()){
+          const y1 = posRatio(start)*100;
+          const y2 = posRatio(end || domainEnd)*100;
+          const len = Math.max(2, y2 - y1);
+          seg.style.top = `calc(${y1}% - 4px)`;
+          seg.style.height = len+'%';
+        } else {
+          const x1 = posRatio(start)*100;
+          const x2 = posRatio(end || domainEnd)*100;
+          const len = Math.max(2, x2 - x1);
+          seg.style.left = x1+'%';
+          seg.style.top = 'calc(50% - 4px)';
+          seg.style.width = len+'%';
+        }
+        seg.dataset.id = it.id;
+        seg.addEventListener('click', (e)=> openCard(it, e.currentTarget));
+        track.appendChild(seg);
+      } else {
+        const dot = document.createElement('div');
+        dot.className = `dot ${roleClass(it.role)} ${statusClass(it.status)}`;
+        if(isMobile()){
+          const y = posRatio(start)*100;
+          dot.style.top = `calc(${y}% - 7px)`;
+        } else {
+          const x = posRatio(start)*100;
+          dot.style.left = x+'%';
+          dot.style.top = '50%';
+        }
+        dot.dataset.id = it.id;
+        dot.addEventListener('click', (e)=> openCard(it, e.currentTarget));
+        const label = document.createElement('div');
+        label.className = 'label';
+        label.textContent = it.when_label || '';
+        if(isMobile()){
+          label.style.top = dot.style.top;
+        } else {
+          label.style.left = dot.style.left;
+          label.style.top = 'calc(50% + 10px)';
+        }
+        track.appendChild(dot);
+        track.appendChild(label);
+      }
+    }
+    placeNow();
+  });
+
+  /* ===== Card (popover) ===== */
+  let openEl = null;
+  function openCard(item, anchor){
+    // закрыть предыдущую
+    track.querySelectorAll('.card').forEach(n=>n.remove());
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <h3>${escapeHtml(item.title||'')}</h3>
+      <div class="when">${escapeHtml(item.when_label||'')}</div>
+      <div class="summary">${escapeHtml(item.summary||'')}</div>
+      <div class="details">${escapeHtml(item.details||'')}</div>
+      <div class="actions">
+        <button class="btn btn-more">Подробнее</button>
+        <button class="btn btn-close">Закрыть</button>
+      </div>
+    `;
+    track.appendChild(card);
+
+    // позиционирование
+    const rect = anchor.getBoundingClientRect();
+    const srect = track.getBoundingClientRect();
+    if(isMobile()){
+      card.style.left = '72px';
+      card.style.top = `calc(${anchor.style.top} + 8px)`;
+    } else {
+      const left = rect.left - srect.left;
+      card.style.left = Math.min(Math.max(left - 120, 8), srect.width - 380) + 'px';
+      card.style.top = (srect.height/2 + 16) + 'px';
+    }
+    card.style.display = 'block';
+
+    const btnMore = card.querySelector('.btn-more');
+    const btnClose = card.querySelector('.btn-close');
+    const details = card.querySelector('.details');
+    btnMore.addEventListener('click', ()=>{
+      const vis = details.style.display === 'block';
+      details.style.display = vis ? 'none' : 'block';
+      btnMore.textContent = vis ? 'Подробнее' : 'Свернуть';
+    });
+    btnClose.addEventListener('click', ()=> card.remove());
+    openEl = card;
+  }
+
+  function escapeHtml(s){ return String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  /* Приятный горизонтальный скролл на десктопе */
+  if(!isMobile()){
+    scroll.addEventListener('wheel', (e)=>{
+      if(e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)){
+        scroll.scrollLeft += e.deltaY + e.deltaX;
+        e.preventDefault();
+      }
+    }, {passive:false});
+  }
+})();
+</script>
+</body>
+</html>
