@@ -363,3 +363,5 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
 }
 .mini-player-seek input[type="range"]:active::-webkit-slider-thumb{ transform:scale(1.02); }
 .mini-player-seek input[type="range"]:active::-moz-range-thumb{ transform:scale(1.02); }
+
+
