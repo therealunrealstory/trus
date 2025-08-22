@@ -3,15 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Legal Timeline Demo (TRUS style)</title>
+<title>Legal Timeline Demo (TRUS style, full-width)</title>
 
-<!-- Подключаем твой общий стиль проекта -->
+<!-- Подключаем общий стиль проекта -->
 <link rel="stylesheet" href="https://therealunrealstory.com/assets/styles.css" />
 
 <style>
-/* ===== Локальные подстройки с опорой на переменные из styles.css (есть фоллбэки) ===== */
+/* ===== Локальные токены с опорой на твои переменные (есть фоллбэки) ===== */
 :root{
-  /* фон/текст/бордеры берём из проекта, иначе — фоллбэки */
   --trus-bg: var(--page-bg, #0b0f18);
   --trus-panel: var(--card-bg, rgba(255,255,255,0.05));
   --trus-panel-2: var(--card-bg-2, rgba(255,255,255,0.08));
@@ -19,12 +18,10 @@
   --trus-muted: var(--muted-color, #a9b4c0);
   --trus-border: var(--border-color, rgba(255,255,255,0.12));
 
-  /* индиго‑палитра и «Now» — из токенов проекта, с фоллбэками */
   --indigo-300: var(--indigo-300, #a5b4fc);
   --indigo-500: var(--indigo-500, #6366f1);
   --now-color: var(--roadmap-now, var(--indigo-300));
 
-  /* роли/статусы — подгоняемся под мед. блок */
   --role-plaintiff: var(--status-planned, #f59e0b);
   --role-defendant: var(--status-current, #3b82f6);
   --role-court:     var(--status-tentative, #a78bfa);
@@ -53,7 +50,7 @@ body{
   font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
 }
 
-/* Шапка — визуально как мед. блок */
+/* Шапка — как у мед. блока */
 .wrap{ max-width:1100px; margin:28px auto; padding:0 16px; }
 .roadmap-head{
   background:var(--trus-panel); border:1px solid var(--trus-border);
@@ -63,14 +60,29 @@ body{
 .roadmap-title{ margin:0 0 6px 0; font-size:22px; }
 .roadmap-meta{ color:var(--trus-muted); font-size:14px; }
 
-/* Корпус таймлайна */
+/* ===== Таймлайн: full-bleed на десктопе, без горизонтального скролла ===== */
 .timeline{
   position:relative; background:var(--trus-panel);
   border:1px solid var(--trus-border); border-radius:var(--radius);
   box-shadow:var(--shadow); overflow:hidden;
+
+  /* full-bleed трюк: тянем контейнер почти на весь экран */
+  width: min(1400px, calc(100vw - 32px));
+  margin-left: max(16px, calc(50% - 50vw + 16px));
+  margin-right: max(16px, calc(50% - 50vw + 16px));
 }
-.track-scroll{ position:relative; overflow:auto; -webkit-overflow-scrolling:touch; }
-.track{ position:relative; min-height:260px; min-width:980px; }
+@media (max-width: 820px){
+  .timeline{ width:auto; margin:0 16px; }
+}
+
+/* Без полосы прокрутки: всё вписываем в ширину */
+.track-scroll{ position:relative; overflow:hidden; }
+.track{
+  position:relative;
+  /* важное: ширина 100% — масштаб времени вписываем в доступную ширину */
+  width:100%;
+  height: 280px;
+}
 
 /* Базовая линия — индиго */
 .line{
@@ -112,19 +124,23 @@ body{
 .dot.status-planned,.cluster-dot.status-planned{ opacity:var(--alpha-planned); outline-style:dashed; }
 .dot.status-tentative,.cluster-dot.status-tentative{ opacity:var(--alpha-tentative); outline-style:dashed; }
 
-/* Подписи дат: ДЕСКТОП — вертикальные И НАД линией; мобайл — обычные слева */
+/* Подписи дат:
+   — Десктоп: вертикально и НАД линией (чтобы не наезжали).
+   — Мобайл: слева от линии, обычные. */
 .label{
-  position:absolute; font-size:12px; color:var(--trus-muted); white-space:nowrap;
-  text-shadow:0 1px 0 rgba(0,0,0,.35);
+  position:absolute; font-size:12px; color:var(--trus-muted);
+  text-shadow:0 1px 0 rgba(0,0,0,.35); white-space:nowrap;
 }
-@media (min-width:821px){
+@media (min-width: 821px){
   .label{
-    transform:translate(-50%,-110%) rotate(180deg);
-    writing-mode:vertical-rl; text-orientation:mixed;
+    transform: translate(-50%, -120%) rotate(180deg);
+    writing-mode: vertical-rl; text-orientation: mixed;
   }
 }
-@media (max-width:820px){
-  .track{ min-height:1000px; min-width:100%; }
+
+/* Мобильная вертикальная версия */
+@media (max-width: 820px){
+  .track{ height: 1100px; }
   .line{ left:44px; width:4px; height:calc(100% - 44px); top:22px; bottom:22px; transform:none; }
   .now-marker{ left:0; top:0; width:100%; height:3px; bottom:auto; }
   .dot,.cluster-dot{ left:44px; transform:translate(-50%,0); }
@@ -132,10 +148,12 @@ body{
   .label{ left:60px; transform:none; }
 }
 
-.hint{ padding:10px 12px; color:var(--trus-muted); font-size:13px;
-  border-top:1px solid var(--trus-border); background:var(--trus-panel); }
+.hint{
+  padding:10px 12px; color:var(--trus-muted); font-size:13px;
+  border-top:1px solid var(--trus-border); background:var(--trus-panel);
+}
 
-/* ===== МОДАЛКА ===== */
+/* ===== Модалка ===== */
 .lt-modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,20,.55); backdrop-filter:blur(2px); display:none; z-index:1000; }
 .lt-modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:1001; }
 .lt-modal.open,.lt-modal-backdrop.open{ display:flex; }
@@ -165,17 +183,18 @@ body{
       <h1 class="roadmap-title">Юридическая хронология (демо)</h1>
       <div class="roadmap-meta" id="meta">Загрузка…</div>
     </div>
+  </div>
 
-    <div class="timeline">
-      <div class="track-scroll" id="scroll">
-        <div class="track" id="track">
-          <div class="line"></div>
-          <div class="now-marker" id="now"></div>
-          <!-- элементы рендерятся JS -->
-        </div>
+  <!-- Вынес таймлайн в отдельный блок, чтобы сделать full-bleed по ширине экрана -->
+  <div class="timeline">
+    <div class="track-scroll" id="scroll">
+      <div class="track" id="track">
+        <div class="line"></div>
+        <div class="now-marker" id="now"></div>
+        <!-- элементы рендерятся JS -->
       </div>
-      <div class="hint">Совет: на десктопе прокручивайте по горизонтали колёсиком (или Shift+колёсико); нажмите на точку, чтобы открыть модалку.</div>
     </div>
+    <div class="hint">Десктоп: шкала вписана в ширину экрана без прокрутки. Нажмите на точку, чтобы открыть модалку.</div>
   </div>
 
   <!-- Modal -->
@@ -232,7 +251,6 @@ body{
     `Обновлено: ${fmtMeta(data.meta.updated_at)} • ${data.meta.updated_by} • версия: ${data.meta.version}`;
 
   const track = document.getElementById('track');
-  const scroll = document.getElementById('scroll');
   const nowEl = document.getElementById('now');
   const isMobile = () => window.matchMedia('(max-width: 820px)').matches;
 
@@ -259,7 +277,7 @@ body{
   function roleClass(r){ return 'role-' + (r||'admin'); }
   function statusClass(s){ return 'status-' + (s||'done'); }
 
-  /* Render period segments */
+  /* Периоды — вписываемся в доступную ширину/высоту */
   function renderSegment(it){
     if(!isPeriod(it)) return;
     const start = parseYM(it.date_start);
@@ -275,12 +293,11 @@ body{
       const x1 = posRatio(start)*100, x2 = posRatio(end || domainEnd)*100;
       seg.style.left = x1+'%'; seg.style.top = 'calc(50% - 5px)'; seg.style.width = Math.max(2, x2 - x1) + '%';
     }
-    seg.dataset.id = it.id;
     seg.addEventListener('click', ()=> openModalSingle(it));
     track.appendChild(seg);
   }
 
-  /* Clustering (≤ ~2 months) */
+  /* Кластеризация близких точек (≤ ~2 месяцев) */
   const TWO_MONTHS = 1000*60*60*24*60;
   const points = items.filter(it=>!isPeriod(it));
   const clusters = [];
@@ -292,16 +309,17 @@ body{
     c.items.push(it);
   }
 
-  /* Render all */
+  /* Рендер */
   items.forEach(renderSegment);
 
   clusters.forEach(c=>{
-    const dot = document.createElement('div');
-    // доминирующую роль/статус используем для цвета точки
+    // цвет точки по доминирующей роли/статусу
     const prRole = { court:3, plaintiff:2, defendant:1, admin:0 };
     const prStatus = { current:3, done:2, planned:1, tentative:0 };
     const role = c.items.slice().sort((a,b)=>(prRole[(b.role||'admin')] - prRole[(a.role||'admin')]))[0].role || 'admin';
     const status = c.items.slice().sort((a,b)=>(prStatus[(b.status||'done')] - prStatus[(a.status||'done')]))[0].status || 'done';
+
+    const dot = document.createElement('div');
     dot.className = `cluster-dot ${roleClass(role)} ${statusClass(status)}`;
 
     if(isMobile()){
@@ -310,9 +328,7 @@ body{
       const x = posRatio(c.center)*100; dot.style.left = x+'%'; dot.style.top = '50%';
     }
 
-    /* Лейбл даты:
-       — на десктопе вертикально НАД линией, без числовых бейджей;
-       — на мобайле слева от линии (обычный текст). */
+    // подпись даты (десктоп — вертикально над линией; мобайл — слева)
     const label = document.createElement('div');
     label.className = 'label';
     if(c.items.length===1){
@@ -341,7 +357,7 @@ body{
   placeNow();
   window.addEventListener('resize', ()=> location.reload());
 
-  /* ===== MODAL ===== */
+  /* ===== Модалка ===== */
   const modal = document.getElementById('modal');
   const back = document.getElementById('modalBack');
   const tTitle = document.getElementById('ltTitle');
@@ -398,12 +414,12 @@ body{
   back.addEventListener('click', closeBackdrop);
   window.addEventListener('keydown', e=>{ if(e.key==='Escape') closeBackdrop(); });
 
-  /* a11y focus trap */
+  /* focus trap */
   let lastFocus = null;
   function trapFocus(){
     lastFocus = document.activeElement;
-    const focusables = modal.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
-    const first = focusables[0], last = focusables[focusables.length-1];
+    const f = modal.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+    const first = f[0], last = f[f.length-1];
     first && first.focus();
     modal.addEventListener('keydown', onTrap);
     function onTrap(e){
@@ -413,15 +429,6 @@ body{
     }
   }
   function releaseFocus(){ if(lastFocus) lastFocus.focus(); }
-  /* горизонтальная прокрутка на десктопе */
-  if(!isMobile()){
-    scroll.addEventListener('wheel', (e)=>{
-      if(e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)){
-        scroll.scrollLeft += e.deltaY + e.deltaX;
-        e.preventDefault();
-      }
-    }, {passive:false});
-  }
 })();
 </script>
 </body>
