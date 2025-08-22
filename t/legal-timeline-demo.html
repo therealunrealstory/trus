@@ -3,45 +3,27 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Legal Timeline Demo (TRUS, gutters + intro road + fixed modals)</title>
+<title>Legal Timeline Demo — TRUS</title>
 
+<!-- Подключаем твой общий стиль проекта -->
 <link rel="stylesheet" href="https://therealunrealstory.com/assets/styles.css" />
 
 <style>
 :root{
-  --trus-bg: var(--page-bg, #0b0f18);
-  --trus-panel: var(--card-bg, rgba(255,255,255,0.05));
-  --trus-panel-2: var(--card-bg-2, rgba(255,255,255,0.08));
-  --trus-text: var(--text-color, #e7ecf3);
-  --trus-muted: var(--muted-color, #a9b4c0);
-  --trus-border: var(--border-color, rgba(255,255,255,0.12));
+  --trus-bg:#0b0f18;
+  --trus-panel:rgba(255,255,255,0.05);
+  --trus-panel-2:rgba(255,255,255,0.08);
+  --trus-text:#e7ecf3; --trus-muted:#a9b4c0; --trus-border:rgba(255,255,255,0.12);
+  --indigo-300:#a5b4fc; --indigo-600:#4f46e5;
+  --now-color: var(--indigo-300); --dot-color: var(--indigo-300);
+  --radius:16px; --shadow:0 8px 30px rgba(0,0,0,.35);
 
-  /* индикатор и палитра */
-  --indigo-300: var(--indigo-300, #a5b4fc);
-  --indigo-600: var(--indigo-600, #4f46e5);
-  --now-color: var(--roadmap-now, var(--indigo-300));
-  --dot-color: var(--indigo-300);
-
-  /* роли (для сегментов); точки будут единым цветом */
-  --role-plaintiff: var(--status-planned, #f59e0b);
-  --role-defendant: var(--status-current, #3b82f6);
-  --role-court:     var(--status-tentative, #a78bfa);
-  --role-admin:     var(--status-done, #10b981);
-
-  --alpha-done: 1; --alpha-current: 1; --alpha-planned: .55; --alpha-tentative: .4;
-  --radius: var(--radius-lg, 16px);
-  --shadow: 0 8px 30px rgba(0,0,0,.35);
-
-  /* гуттеры */
-  --tl-gutter-h: 5%;
-  --tl-gutter-v: 6%;
+  /* гуттеры шкалы */
+  --tl-gutter-h:5%;  /* горизонтальные отступы внутри контейнера */
+  --tl-gutter-v:6%;  /* вертикальные отступы для мобильной вертикальной шкалы */
 }
 
-@keyframes trusPulse {
-  0% { box-shadow:0 0 0 0 rgba(165,180,252,.60); }
-  70%{ box-shadow:0 0 0 12px rgba(165,180,252,0); }
-  100%{ box-shadow:0 0 0 0 rgba(165,180,252,0); }
-}
+@keyframes trusPulse{0%{box-shadow:0 0 0 0 rgba(165,180,252,.6);}70%{box-shadow:0 0 0 12px rgba(165,180,252,0);}100%{box-shadow:0 0 0 0 rgba(165,180,252,0);} }
 
 html,body{height:100%}
 body{margin:0; background:linear-gradient(180deg, var(--trus-bg), #0a1122); color:var(--trus-text);
@@ -52,7 +34,6 @@ body{margin:0; background:linear-gradient(180deg, var(--trus-bg), #0a1122); colo
 .roadmap-title{ margin:0 0 6px 0; font-size:22px; }
 .roadmap-meta{ color:var(--trus-muted); font-size:14px; }
 
-/* full-width таймлайн без горизонтальной прокрутки */
 .timeline{
   position:relative; background:var(--trus-panel); border:1px solid var(--trus-border); border-radius:var(--radius);
   box-shadow:var(--shadow); overflow:hidden;
@@ -65,40 +46,40 @@ body{margin:0; background:linear-gradient(180deg, var(--trus-bg), #0a1122); colo
 .track-scroll{ position:relative; overflow:hidden; }
 .track{ position:relative; width:100%; height: 330px; }
 
-/* базовая линия — Indigo 600, внутри гуттеров */
+/* БАЗОВАЯ ЛИНИЯ — Indigo 600 и всегда сверху */
 .line{
   position:absolute; height:4px; top:50%; transform:translateY(-50%);
   left: var(--tl-gutter-h); right: var(--tl-gutter-h);
-  background: var(--indigo-600); opacity:.95;
+  background: var(--indigo-600) !important;
+  opacity:.98; z-index:2;
 }
 
-/* «тонкая дорога» между Сен 2020 и Июл 2021 */
+/* «дорога» Сен 2020 → Июл 2021 (тонкая) */
 .intro-road{ position:absolute; height:2px; top:calc(50% - 1px); background:var(--indigo-300); opacity:.9; border-radius:2px; z-index:2; }
 .intro-road-vert{ position:absolute; width:2px; left:44px; background:var(--indigo-300); opacity:.9; border-radius:2px; z-index:2; }
 
-/* Now — пульс, позиция вычисляется и на мобиле тоже ПО ВРЕМЕНИ */
+/* пульс «Сейчас» */
 .now-marker{ position:absolute; background:var(--now-color); border-radius:2px; animation: trusPulse 1.9s ease-out infinite; z-index:3; }
 
-/* периоды (сегменты) */
-.segment{ position:absolute; height:10px; border-radius:6px; filter:drop-shadow(0 2px 6px rgba(0,0,0,.25)); }
-.segment.role-plaintiff{ background:var(--role-plaintiff); }
-.segment.role-defendant{ background:var(--role-defendant); }
-.segment.role-court{ background:var(--role-court); }
-.segment.role-admin{ background:var(--role-admin); }
-.segment.status-done{ opacity:var(--alpha-done); }
-.segment.status-current{ opacity:var(--alpha-current); }
-.segment.status-planned{ opacity:var(--alpha-planned); }
-.segment.status-tentative{ opacity:var(--alpha-tentative); }
+/* периоды (сегменты) — УХОДЯТ ПОД ЛИНИЮ */
+.segment{ position:absolute; height:10px; border-radius:6px; filter:drop-shadow(0 2px 6px rgba(0,0,0,.25)); z-index:1; }
+.segment.role-plaintiff{ background:#f59e0b; }
+.segment.role-defendant{ background:#3b82f6; }
+.segment.role-court{     background:#a78bfa; }
+.segment.role-admin{     background:#10b981; }
+.segment.status-planned{ opacity:.55 }
+.segment.status-tentative{ opacity:.4 }
 
-/* точки/кластеры — ОДИН цвет */
+/* точки/кластеры — один цвет, непрозрачные, поверх всего */
 .dot,.cluster-dot{
   position:absolute; width:16px; height:16px; border-radius:50%;
+  background: var(--dot-color, var(--indigo-300)) !important;
   outline:1px solid var(--trus-border); box-shadow:0 0 0 2px rgba(0,0,0,.25);
   cursor:pointer; transform:translate(-50%,-50%);
-  background: var(--dot-color) !important;  /* принудительно единый цвет */
+  opacity:1 !important; z-index:3;
 }
 
-/* подписи: десктоп — вертикально над линией; мобайл — слева */
+/* подписи: на десктопе — вертикально над линией; на мобиле — слева от линии */
 .label{ position:absolute; font-size:12px; color:var(--trus-muted); text-shadow:0 1px 0 rgba(0,0,0,.35); white-space:nowrap; }
 @media (min-width: 821px){
   .label{ transform: translate(-50%, -120%) rotate(180deg); writing-mode: vertical-rl; text-orientation: mixed; }
@@ -115,7 +96,7 @@ body{margin:0; background:linear-gradient(180deg, var(--trus-bg), #0a1122); colo
 
 .hint{ padding:10px 12px; color:var(--trus-muted); font-size:13px; border-top:1px solid var(--trus-border); background:var(--trus-panel); }
 
-/* ===== Модалка: используем проектные классы .modal-backdrop/.show (с мягким fallback) ===== */
+/* === Модалка (используем проектные классы .modal-backdrop/.show) === */
 .modal-backdrop{ position:fixed; inset:0; display:none; background:rgba(0,0,20,.55); backdrop-filter:blur(2px); z-index:9999; }
 .modal-backdrop.show{ display:flex; align-items:center; justify-content:center; }
 .modal-dialog{
@@ -159,7 +140,7 @@ body{margin:0; background:linear-gradient(180deg, var(--trus-bg), #0a1122); colo
     <div class="hint">Шкала вписана в ширину экрана с отступами. Клик по точке — модалка.</div>
   </div>
 
-  <!-- Модалка (проектные классы) -->
+  <!-- Модалка -->
   <div class="modal-backdrop" id="modalBack" aria-modal="true" role="dialog" aria-labelledby="modalTitle">
     <div class="modal-dialog" role="document">
       <h2 class="modal-title" id="modalTitle"></h2>
@@ -191,12 +172,12 @@ body{margin:0; background:linear-gradient(180deg, var(--trus-bg), #0a1122); colo
     return new Date(s);
   };
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-  const esc = s => String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const esc = s => String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]});
   const NBSP = '\u00A0';
   const RU_MON = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
 
   /* ===== Domain ===== */
-  const items = data.items.slice().sort((a,b)=>{
+  const items = (data.items||[]).slice().sort((a,b)=>{
     const ad = parseYM(a.date_start||a.date_end);
     const bd = parseYM(b.date_start||b.date_end);
     return ad - bd;
@@ -219,7 +200,7 @@ body{margin:0; background:linear-gradient(180deg, var(--trus-bg), #0a1122); colo
   const nowEl = document.getElementById('now');
   const isMobile = () => window.matchMedia('(max-width: 820px)').matches;
 
-  // гуттеры (как проценты)
+  // гуттеры
   const GUTTER_H = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tl-gutter-h'))/100 || 0.05;
   const GUTTER_V = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tl-gutter-v'))/100 || 0.06;
   function posRatio(d){ if(!d) return 0; return clamp((d - domainStart) / spanMs, 0, 1); }
@@ -230,14 +211,14 @@ body{margin:0; background:linear-gradient(180deg, var(--trus-bg), #0a1122); colo
   function placeNow(){
     const r = posRatio(today);
     if(isMobile()){
-      nowEl.style.left = 0;
+      nowEl.style.left = '0';
       nowEl.style.width = '100%';
       nowEl.style.height = '3px';
-      nowEl.style.top = (posV(r)*100) + '%';  // точное положение по времени
+      nowEl.style.top = (posV(r)*100) + '%';  // строго по времени
       nowEl.style.bottom = '';
     } else {
       nowEl.style.left = (posH(r)*100) + '%';
-      nowEl.style.top = 0; nowEl.style.bottom = 0;
+      nowEl.style.top = '0'; nowEl.style.bottom = '0';
       nowEl.style.width = '3px'; nowEl.style.height = '';
     }
   }
@@ -281,7 +262,7 @@ body{margin:0; background:linear-gradient(180deg, var(--trus-bg), #0a1122); colo
   }
   clusters.sort((a,b)=>a.center - b.center);
 
-  /* ===== Render all ===== */
+  /* ===== Render ===== */
   items.forEach(renderSegment);
 
   // точки и подписи
@@ -332,6 +313,7 @@ body{margin:0; background:linear-gradient(180deg, var(--trus-bg), #0a1122); colo
       road.className = 'intro-road-vert';
       road.style.top = `calc(${Math.min(y1,y2)}% - 1px)`;
       road.style.height = Math.max(0.5, Math.abs(y2 - y1)) + '%';
+      road.style.zIndex = '2';
       track.appendChild(road);
     } else {
       const x1 = posH(posRatio(cStart.center))*100;
@@ -340,6 +322,7 @@ body{margin:0; background:linear-gradient(180deg, var(--trus-bg), #0a1122); colo
       road.className = 'intro-road';
       road.style.left = Math.min(x1,x2) + '%';
       road.style.width = Math.max(0.5, Math.abs(x2 - x1)) + '%';
+      road.style.zIndex = '2';
       track.appendChild(road);
     }
   }
@@ -347,7 +330,7 @@ body{margin:0; background:linear-gradient(180deg, var(--trus-bg), #0a1122); colo
   placeNow();
   window.addEventListener('resize', ()=> location.reload());
 
-  /* ===== MODALS (единый UX и для кластеров) ===== */
+  /* ===== MODALS ===== */
   const back = document.getElementById('modalBack');
   const tTitle = document.getElementById('modalTitle');
   const tWhen = document.getElementById('mWhen');
@@ -383,7 +366,6 @@ body{margin:0; background:linear-gradient(180deg, var(--trus-bg), #0a1122); colo
     tDetails.style.display='none'; tDetails.innerHTML='';
     btnToggle.style.display='none';
 
-    // каждый элемент: заголовок, краткое описание, кнопка «Подробнее» => раскрывает детали
     tList.innerHTML = sorted.map((it,idx) => `
       <div class="modal-item" data-i="${idx}">
         <div class="modal-item-row">
@@ -403,11 +385,9 @@ body{margin:0; background:linear-gradient(180deg, var(--trus-bg), #0a1122); colo
     openBackdrop();
   }
 
-  // Делегирование кликов по «Подробнее» в списке кластера
   document.addEventListener('click', (e)=>{
     const btn = e.target.closest('.btn-more');
     if(!btn) return;
-    const i = btn.getAttribute('data-i');
     const container = btn.closest('.modal-item');
     const details = container.querySelector('.modal-item-details');
     const vis = details.style.display === 'block';
