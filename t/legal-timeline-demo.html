@@ -1,195 +1,219 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Юридическая хронология — демо</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Подключение актуального стиля сайта -->
-  <link rel="stylesheet" href="https://therealunrealstory.com/assets/styles.css">
+  <!-- Подключаем актуальные стили сайта -->
+  <link rel="stylesheet" href="https://therealunrealstory.com/assets/styles.css" />
 
   <style>
-    /* Локальные вспомогательные стили для демо */
-    body {
-      margin: 0;
-      font-family: system-ui, sans-serif;
-      background: #0f172a;
-      color: #e2e8f0;
-    }
-    .timeline-container {
-      width: 100%;
-      overflow-x: hidden;
-      padding: 40px 60px;
-    }
-    .timeline-line {
-      position: relative;
-      height: 4px;
-      background: #4f46e5; /* Indigo 600 */
-      margin: 60px auto;
-    }
-    .timeline-point {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 14px;
-      height: 14px;
-      background: #4f46e5;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-    .timeline-label {
-      position: absolute;
-      top: -35px;
-      transform: translateX(-50%);
-      font-size: 13px;
-      white-space: nowrap;
+    /* Локальные вспомогательные стили демо */
+    body{ margin:0; background:#0f172a; color:#e2e8f0; font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    .wrap{ padding:40px 18px 28px; max-width:1200px; margin:0 auto; }
+
+    .timeline-container{
+      position:relative;
+      width:100%;
+      padding:48px 48px 64px;
+      box-sizing:border-box;
+      overflow:hidden;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(0,0,0,.18);
     }
 
-    /* Анимация для «сейчас» */
-    .timeline-point.current {
-      background: #ef4444; /* красный */
-      animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); }
-      70% { box-shadow: 0 0 0 12px rgba(239,68,68,0); }
-      100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+    /* Базовая тонкая линия (Indigo 600) */
+    .base-line{
+      position:relative;
+      height:4px;
+      background:#4f46e5;
+      margin:80px auto 40px;
+      border-radius:999px;
     }
 
-    /* Модалка */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(6px);
-      display: none;
-      z-index: 9999;
+    /* Точки и подписи */
+    .point{ position:absolute; top:50%; transform:translate(-50%,-50%); width:14px; height:14px; background:#4f46e5; border-radius:50%; cursor:pointer; }
+    .label{ position:absolute; top:-40px; transform:translateX(-50%); font-size:13px; white-space:nowrap; color:#dbeafe; }
+
+    /* Пульс для текущей точки (если потребуется) */
+    .point.current{ background:#ef4444; animation:pulse 1.6s infinite; }
+    @keyframes pulse{
+      0%{ box-shadow:0 0 0 0 rgba(239,68,68,.65) }
+      70%{ box-shadow:0 0 0 12px rgba(239,68,68,0) }
+      100%{ box-shadow:0 0 0 0 rgba(239,68,68,0) }
     }
-    .modal-backdrop.show {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .modal-dialog {
-      background: rgba(30,41,59,0.95);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 12px;
-      max-width: 640px;
-      width: 90%;
-      padding: 20px;
-      color: #e2e8f0;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-    .modal-dialog h2 {
-      margin-top: 0;
-      font-size: 20px;
-      color: #fff;
-    }
-    .modal-dialog p {
-      margin: 8px 0;
-      font-size: 15px;
-    }
-    .modal-dialog .btn {
-      display: inline-block;
+
+    /* Модалка: каркас делаем здесь минимально, а вид тянем из глобального styles.css */
+    .modal-backdrop{ position:fixed; inset:0; display:none; z-index:9999; }
+    .modal-backdrop.show{ display:block; }
+    .modal-dialog{ max-width:700px; width:clamp(320px, 92vw, 700px); }
+
+    /* Контент модалки (кнопки — классы .btn из глобального CSS) */
+    .ev{ padding:10px 0; border-top:1px dashed rgba(255,255,255,.12); }
+    .ev:first-child{ border-top:none; }
+    .ev h4{ margin:2px 0 4px; font-size:16px; color:#fff; }
+    .ev time{ display:block; font-size:12px; color:#cbd5e1; margin-bottom:6px; }
+    .ev p{ margin:0 0 6px; color:#e2e8f0; }
+
+    /* Сообщения об ошибке */
+    .error{
+      margin:10px 0 0; padding:10px 12px; border-radius:10px;
+      border:1px solid rgba(255,255,255,.12); background:rgba(127,29,29,.25);
+      color:#fecaca; font-size:14px;
     }
   </style>
 </head>
 <body>
-
-<div class="timeline-container">
-  <div class="timeline-line" id="timeline"></div>
-</div>
-
-<!-- Модалка -->
-<div class="modal-backdrop" id="modalBack">
-  <div class="modal-dialog">
-    <h2 id="modalTitle"></h2>
-    <div id="modalContent"></div>
-    <button class="btn btn-primary mt-3" onclick="closeModal()">Закрыть</button>
+  <div class="wrap">
+    <div class="timeline-container">
+      <div id="baseLine" class="base-line"></div>
+      <div id="labels"></div>
+      <div id="error" class="error" style="display:none"></div>
+    </div>
+    <div class="text-sm text-slate-300 mt-3">Шкала вписана в ширину экрана с отступами. Клик по точке — модалка.</div>
   </div>
-</div>
 
-<script>
-  async function loadTimeline() {
-    const resp = await fetch('legal-timeline.json');
-    const data = await resp.json();
-    renderTimeline(data);
-  }
+  <!-- Модалка (фон/blur/кнопки — из глобального styles.css) -->
+  <div id="modalBack" class="modal-backdrop" aria-modal="true" role="dialog" aria-labelledby="modalTitle">
+    <div class="modal-dialog">
+      <h2 id="modalTitle" class="text-lg font-semibold mb-2"></h2>
+      <div id="modalBody"></div>
+      <div class="mt-4" style="text-align:right">
+        <button type="button" class="btn" id="modalClose">Закрыть</button>
+      </div>
+    </div>
+  </div>
 
-  function renderTimeline(events) {
-    const timeline = document.getElementById('timeline');
-    const minDate = new Date(events[0].date);
-    const maxDate = new Date(events[events.length - 1].date);
+  <script>
+    // ---------- Утилиты ----------
+    const $ = s => document.querySelector(s);
+    const esc = s => String(s||'').replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
 
-    events.forEach(ev => {
-      const date = new Date(ev.date);
-      const pos = (date - minDate) / (maxDate - minDate) * 100;
-      const point = document.createElement('div');
-      point.className = 'timeline-point';
-      if (ev.current) point.classList.add('current');
-      point.style.left = pos + '%';
-
-      const label = document.createElement('div');
-      label.className = 'timeline-label';
-      label.style.left = pos + '%';
-      label.textContent = ev.label;
-
-      point.addEventListener('click', () => openModal(ev));
-      timeline.appendChild(point);
-      timeline.appendChild(label);
-    });
-  }
-
-  function openModal(event) {
-    const back = document.getElementById('modalBack');
-    document.getElementById('modalTitle').textContent = event.label;
-    const content = document.getElementById('modalContent');
-    content.innerHTML = '';
-
-    if (event.items && event.items.length) {
-      event.items.forEach(it => {
-        const wrap = document.createElement('div');
-        wrap.style.marginBottom = '12px';
-
-        const p = document.createElement('p');
-        p.textContent = it.summary;
-        wrap.appendChild(p);
-
-        const moreBtn = document.createElement('button');
-        moreBtn.textContent = 'Подробнее';
-        moreBtn.className = 'btn btn-primary mt-2';
-        moreBtn.onclick = () => {
-          alert(it.details); // здесь можно сделать второй модал, если нужно
-        };
-        wrap.appendChild(moreBtn);
-
-        content.appendChild(wrap);
-      });
-    } else {
-      const p = document.createElement('p');
-      p.textContent = event.summary;
-      content.appendChild(p);
-
-      const moreBtn = document.createElement('button');
-      moreBtn.textContent = 'Подробнее';
-      moreBtn.className = 'btn btn-primary mt-2';
-      moreBtn.onclick = () => {
-        alert(event.details);
-      };
-      content.appendChild(moreBtn);
+    function parseYMD(ymd){
+      if(!ymd) return null;
+      // допускаем YYYY-MM и YYYY-MM-DD
+      const p = ymd.split('-');
+      const y = +p[0], m = +p[1] || 1, d = +p[2] || 1;
+      if(!y || !m) return null;
+      return new Date(y, m-1, d);
     }
 
-    back.classList.add('show');
-  }
+    function byMonthKey(dateStr){
+      const d = parseYMD(dateStr);
+      if(!d) return null;
+      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    }
 
-  function closeModal() {
-    document.getElementById('modalBack').classList.remove('show');
-  }
+    function showError(msg){
+      const box = $('#error');
+      box.style.display = '';
+      box.textContent = msg;
+    }
 
-  loadTimeline();
-</script>
+    // ---------- Загрузка JSON ----------
+    (async function init(){
+      try{
+        const resp = await fetch('legal-timeline.json', {cache:'no-cache'});
+        if(!resp.ok) throw new Error('HTTP ' + resp.status);
+        const data = await resp.json();
 
+        const items = Array.isArray(data) ? data : (data.items || []);
+        if(!items.length){
+          showError('Данные хронологии не найдены (items пустой).');
+          return;
+        }
+        render(items);
+      }catch(err){
+        console.error('Timeline load error:', err);
+        showError('Не удалось загрузить данные хронологии. Проверь расположение legal-timeline.json.');
+      }
+    })();
+
+    // ---------- Рендер ----------
+    function render(items){
+      // Сортируем по дате начала
+      const sorted = items.slice().sort((a,b)=>{
+        const ad = parseYMD(a.date_start)?.getTime() || 0;
+        const bd = parseYMD(b.date_start)?.getTime() || 0;
+        return ad - bd;
+      });
+
+      // Диапазон дат (для процента)
+      const minD = parseYMD(sorted[0].date_start);
+      const maxD = parseYMD(sorted[sorted.length-1].date_start);
+      const total = (maxD - minD) || 1;
+
+      // Отступы слева/справа, чтобы крайние подписи не прилипали
+      const container = $('.timeline-container');
+      const base = $('#baseLine');
+      const pad = 48; // px
+      base.style.marginLeft = pad + 'px';
+      base.style.marginRight = pad + 'px';
+
+      // Группируем по месяцу (кластер: все события одного месяца = одна точка)
+      const groups = new Map();
+      for(const it of sorted){
+        const key = byMonthKey(it.date_start);
+        if(!key) continue;
+        if(!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(it);
+      }
+
+      // Рисуем точки
+      const labelsHost = $('#labels');
+      labelsHost.innerHTML = '';
+      for(const [key, arr] of groups){
+        // позиция точки по первой дате в месяце
+        const d = parseYMD(arr[0].date_start);
+        const x = ((d - minD) / total) * 100;
+
+        const pt = document.createElement('div');
+        pt.className = 'point';
+        pt.style.left = `calc(${x}% + ${pad}px - 7px)`; // -7px = половина ширины точки
+
+        const lab = document.createElement('div');
+        lab.className = 'label';
+        // Показываем метку месяца по when_label первой записи (они у тебя унифицированы)
+        lab.textContent = arr.length > 1
+          ? `${arr[0].when_label.replace(/\s+/g,'\u00A0')} — ${arr[arr.length-1].when_label.replace(/\s+/g,'\u00A0')}`
+          : arr[0].when_label;
+        lab.style.left = `calc(${x}% + ${pad}px)`;
+
+        pt.addEventListener('click', () => openModalForGroup(key, arr));
+        container.appendChild(pt);
+        container.appendChild(lab);
+      }
+    }
+
+    // ---------- Модалка ----------
+    const back = $('#modalBack');
+    const dlgTitle = $('#modalTitle');
+    const dlgBody  = $('#modalBody');
+    const btnClose = $('#modalClose');
+
+    function openModalForGroup(key, arr){
+      // Заголовок — месяц (из первой записи)
+      dlgTitle.textContent = arr.length > 1
+        ? `${arr[0].when_label} — ${arr[arr.length-1].when_label}`
+        : `${arr[0].when_label}`;
+
+      dlgBody.innerHTML = arr.map(it => `
+        <div class="ev">
+          <h4>${esc(it.title||'')}</h4>
+          <time>${esc(it.when_label||'')}</time>
+          <p>${esc(it.summary||'')}</p>
+          ${it.details ? `<button class="btn btn-primary" onclick="(function(){alert(${JSON.stringify(esc(it.details))})})()">Подробнее</button>` : ``}
+        </div>
+      `).join('');
+
+      back.classList.add('show');
+    }
+    function closeModal(){ back.classList.remove('show'); }
+    btnClose.addEventListener('click', closeModal);
+    back.addEventListener('click', (e)=>{ if(e.target === back) closeModal(); });
+    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && back.classList.contains('show')) closeModal(); });
+  </script>
 </body>
 </html>
