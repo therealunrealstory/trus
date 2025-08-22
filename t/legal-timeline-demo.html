@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Legal Timeline Demo — TRUS</title>
 
-<!-- Подключаем твой общий стиль проекта -->
+<!-- Общий стиль проекта -->
 <link rel="stylesheet" href="https://therealunrealstory.com/assets/styles.css" />
 
 <style>
@@ -162,6 +162,7 @@ body{margin:0; background:linear-gradient(180deg, var(--trus-bg), #0a1122); colo
   const res = await fetch('./legal-timeline.json', {cache:'no-store'});
   if(!res.ok){ document.getElementById('meta').textContent = 'Не удалось загрузить legal-timeline.json'; return; }
   const data = await res.json();
+  console.log('Legal timeline items:', data?.items?.length);
 
   /* ===== Utils ===== */
   const parseYM = s=>{
@@ -172,7 +173,7 @@ body{margin:0; background:linear-gradient(180deg, var(--trus-bg), #0a1122); colo
     return new Date(s);
   };
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-  const esc = s => String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]});
+  const esc = s => String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const NBSP = '\u00A0';
   const RU_MON = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
 
