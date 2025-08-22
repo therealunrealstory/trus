@@ -2,7 +2,7 @@
   "meta": {
     "updated_at": "2025-08-22T00:00:00Z",
     "updated_by": "Nico",
-    "version": "legal.v1.1",
+    "version": "legal.v1.2",
     "lang_default": "ru"
   },
   "legend": {
@@ -201,7 +201,7 @@
       "details": "В связи с состоянием здоровья и новой диагностированной формой лейкемии Адам подал ходатайство о полном или частичном разблокировании активов."
     },
     {
-      "id": "2025-08-hearing-scheduled-2026-11",
+      "id": "2026-11-hearing-scheduled",
       "role": "court",
       "type": "hearing",
       "status": "planned",
