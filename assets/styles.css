@@ -370,17 +370,30 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
 .now-marker{ pointer-events:none; } /* чтобы не перехватывала клики по точкам */
 
 /* --- Legal Timeline legend: dashed future sample --- */
-/* FIX: пунктир «судебные перспективы» в легенде */
+/* FIX: образец "Судебные перспективы" в легенде — как на шкале */
 .legend .swatch-future,
 .timeline-legend .swatch-future,
-.legend [class*="swatch-future"],
 .legend-swatch.swatch-future{
-  background:transparent !important;
-  height:0 !important;
-  border:0 !important;
-  border-top:4px dashed var(--indigo-600) !important;
-  width:44px;
+  background: transparent !important;
+  border: 0 !important;
+  width: 44px !important;
+  height: 0 !important;
+  border-top: 4px dashed var(--indigo-600) !important; /* десктоп — горизонтально */
+  border-radius: 0 !important;
 }
+
+/* На мобильных сама линия будущего вертикальная — делаем так же и в легенде */
+@media (max-width: 820px){
+  .legend .swatch-future,
+  .timeline-legend .swatch-future,
+  .legend-swatch.swatch-future{
+    width: 0 !important;
+    height: 44px !important;
+    border-top: 0 !important;
+    border-left: 4px dashed var(--indigo-600) !important; /* мобильный — вертикально */
+  }
+}
+
 
 /* --- Unified modal panel look --- */
 :root{
