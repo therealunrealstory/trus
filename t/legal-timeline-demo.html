@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Legal Timeline Demo — TRUS</title>
 
-<!-- общий CSS сайта -->
+<!-- общий CSS сайта (держим внешний URL проекта) -->
 <link rel="stylesheet" href="https://therealunrealstory.com/assets/styles.css" />
 
 <style>
@@ -58,7 +58,7 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
   border-top:4px dashed var(--indigo-600);
 }
 
-/* Точки/кластеры (на шкале) */
+/* Точки/кластеры */
 .cluster-dot{
   position:absolute; width:16px; height:16px; border-radius:50%;
   background:#ffffff; outline:1px solid rgba(255,255,255,0.12);
@@ -91,13 +91,6 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
 .swatch-base{ width:44px; background:var(--indigo-600); }
 .swatch-freeze{ width:44px; height:12px; background:var(--red-500); border-radius:8px; }
 .swatch-future{ width:44px; background:transparent; border-top:4px dashed var(--indigo-600); height:0; }
-
-/* НОВОЕ: образец «точки» в легенде — как на шкале */
-.swatch-dot{
-  width:16px; height:16px; border-radius:50%;
-  background:#ffffff; outline:1px solid rgba(255,255,255,0.12);
-  box-shadow:0 0 0 2px rgba(79,70,229,.45);
-}
 
 /* ── Мобильная версия ───────────────────────────────────────────── */
 @media (max-width:820px){
@@ -141,7 +134,7 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
       <div class="legend-item"><span class="legend-swatch swatch-base"></span><span>Период судебных разбирательств</span></div>
       <div class="legend-item"><span class="legend-swatch swatch-freeze"></span><span>Период блокировки</span></div>
       <div class="legend-item"><span class="legend-swatch swatch-future"></span><span>Судебные перспективы (впереди)</span></div>
-      <!-- НОВОЕ: точка события (кликабельно) -->
+      <!-- Образец точки события в легенде -->
       <div class="legend-item">
         <span class="swatch-dot" aria-hidden="true"></span>
         <span>Событие <span style="opacity:.8">(кликабельно)</span></span>
@@ -316,7 +309,7 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
     const dot = document.createElement('div'); dot.className='cluster-dot';
     const label = document.createElement('div'); label.className='label';
 
-    // НОВОЕ: подсказка и доступность
+    // Подсказка и доступность
     dot.setAttribute('title','Событие — нажмите для подробностей');
     dot.setAttribute('aria-label','Событие — нажмите для подробностей');
     dot.setAttribute('role','button');
@@ -395,7 +388,8 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
 
   function openModalSingle(it){
     const more = it.details
-      ? `<p><button class="btn js-more">Подробнее</button></p><div class="js-morebox" style="display:none">${esc(it.details)}</div>`
+      ? `<div class="js-morebox" style="display:none">${esc(it.details)}</div>
+         <p><button class="btn js-more">Подробнее</button></p>`
       : '';
     openModal(
       `${esc(it.when_label||'')} — ${esc(it.title||'')}`,
@@ -404,34 +398,40 @@ body{margin:0; color:#e7ecf3; font:16px/1.5 system-ui,-apple-system,Segoe UI,Rob
   }
 
   function openModalCluster(group){
-    const list = group.map((it,i)=>`
+    const list = group.map((it)=>`
       <div style="padding-top:10px; margin-top:10px; border-top:1px dashed rgba(255,255,255,.12)">
         <div style="font-weight:600">${esc(it.title||'')}</div>
         <div class="muted" style="margin:4px 0 6px 0">${esc(it.when_label||'')}</div>
         <div>${esc(it.summary||'')}</div>
-        ${it.details?`<div class="js-morebox" style="display:none; margin-top:6px">${esc(it.details)}</div>
+        ${it.details?`<div class="js-morebox" style="display:none">${esc(it.details)}</div>
         <button class="btn js-more" style="margin-top:6px">Подробнее</button>`:''}
       </div>
     `).join('');
     openModal(`События (${group.length})`, list);
   }
 
-  // НОВОЕ: делегирование на "Подробнее" — устойчиво к обоим вариантам разметки
+  // Делегирование на "Подробнее" — устойчиво к обеим разметкам
   document.getElementById('modalBody').addEventListener('click', e=>{
     const btn = e.target.closest('.js-more');
     if(!btn) return;
 
-    // ищем соседний .js-morebox (в кластере он до кнопки, в одиночном событии — после <p>)
-    const findMoreBox = (button)=>{
-      const isBox = el => el && el.classList && el.classList.contains('js-morebox');
-      let el = button.previousElementSibling; if(isBox(el)) return el;
-      el = button.nextElementSibling;         if(isBox(el)) return el;
-      el = button.closest('p')?.nextElementSibling; if(isBox(el)) return el;
-      return null;
-    };
+    const isBox = el => el && el.classList && el.classList.contains('js-morebox');
 
-    const box = findMoreBox(btn);
-    if(!box) return;
+    // 1) сосед до кнопки
+    let box = btn.previousElementSibling;
+    if(!isBox(box)){
+      // 2) сосед после кнопки
+      box = btn.nextElementSibling;
+    }
+    if(!isBox(box)){
+      // 3) если кнопка обёрнута в <p>, смотрим соседей этого <p>
+      const p = btn.closest('p');
+      if(p){
+        box = p.previousElementSibling && isBox(p.previousElementSibling) ? p.previousElementSibling : box;
+        box = (!isBox(box) && p.nextElementSibling && isBox(p.nextElementSibling)) ? p.nextElementSibling : box;
+      }
+    }
+    if(!isBox(box)) return;
 
     const opened = box.style.display !== 'none';
     box.style.display = opened ? 'none' : 'block';
