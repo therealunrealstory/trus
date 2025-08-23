@@ -7,11 +7,17 @@ import * as I18N from '../core/i18n.js';
 let root = null;
 let offLocaleCb = null;
 let onResizeHandler = null;
-let resizeTimer = null;
+let resizeTimer = null; // оставляем, но больше не используем — для совместимости
 
 // Делегированный обработчик "Подробнее", чтобы не ломался через раз при повторном открытии модалки
 let onDocMoreClick = null;
 let currentDict = null;
+
+// ► NEW: окружение для layout
+let PROJ = null;        // { posH, posV }
+let isMobile = false;   // media-flag
+let mql = null;         // MediaQueryList
+let ro = null;          // ResizeObserver
 
 /* ---------- СТИЛИ (как было: вертикальные подписи + мигающая NOW) ---------- */
 const TPL_STYLE = `
@@ -137,6 +143,7 @@ const parseYM = (s)=>{
   if (/^\d{4}$/.test(s))             return new Date(s+'-01-01T00:00:00Z');
   return new Date(s);
 };
+// Оставляем posHelpers для совместимости, но далее кэшируем значения и не вызываем его в циклах
 function posHelpers(){
   const cs = getComputedStyle(document.documentElement);
   const gh = parseFloat(cs.getPropertyValue('--tl-gutter-h'))/100 || 0.06;
@@ -148,6 +155,22 @@ function posHelpers(){
 }
 const getLang = () => (I18N.getLangFromQuery?.() || document.documentElement.lang || 'EN').toLowerCase();
 const fmt = (tpl, vars={}) => String(tpl||'').replace(/\{(\w+)\}/g,(_,k)=> (vars[k] ?? ''));
+
+// ► NEW: кэшируем проекторы и media-flag
+function computeProjectors(){
+  const cs = getComputedStyle(document.documentElement);
+  const gh = parseFloat(cs.getPropertyValue('--tl-gutter-h'))/100 || 0.06;
+  const gv = parseFloat(cs.getPropertyValue('--tl-gutter-v'))/100 || 0.08;
+  return {
+    posH:r => gh + r * (1 - gh*2),
+    posV:r => gv + r * (1 - gv*2)
+  };
+}
+function refreshEnv(){
+  PROJ = computeProjectors();
+  if (!mql) mql = window.matchMedia('(max-width:820px)');
+  isMobile = mql.matches;
+}
 
 /* ---------- ЗАГРУЗКА ДАННЫХ + СЛОВАРЕЙ ---------- */
 async function loadBase() {
@@ -353,40 +376,40 @@ export async function mount(container) {
   const domainEnd   = FUTURE_END;
   const spanMs      = domainEnd - domainStart;
 
-  const { posH:PH, posV:PV } = posHelpers();
   const posR = d => clamp((d - domainStart) / spanMs, 0, 1);
 
-  function placeLines(){
-    const now = new Date();
+  // ► NEW: первичная инициализация окружения
+  refreshEnv();
 
-    if (matchMedia('(max-width:820px)').matches){
+  function placeLines(now){
+    if (isMobile){
       // Sep 2020 → Jul 2021
-      const y0a = PV(posR(PRE_START))*100;
-      const y0b = PV(posR(FREEZE_START))*100;
+      const y0a = PROJ.posV(posR(PRE_START))*100;
+      const y0b = PROJ.posV(posR(FREEZE_START))*100;
       preLine.style.left = '44px'; preLine.style.width = '2px';
       preLine.style.top = `calc(${y0a}% )`;
       preLine.style.height = Math.max(0.5, y0b - y0a) + '%';
       preLine.style.transform = 'translateX(-50%)';
 
       // Jul 2021 → Nov 2026
-      const y1a = PV(posR(FREEZE_START))*100;
-      const y1b = PV(posR(COURT_END))*100;
+      const y1a = PROJ.posV(posR(FREEZE_START))*100;
+      const y1b = PROJ.posV(posR(COURT_END))*100;
       baseLine.style.left = '44px'; baseLine.style.width = '4px';
       baseLine.style.top = `calc(${y1a}% )`;
       baseLine.style.height = Math.max(2, y1b - y1a) + '%';
       baseLine.style.transform = 'none';
 
       // Freeze (красная) — слева от base
-      const yf1 = PV(posR(FREEZE_START))*100;
-      const yf2 = PV(posR(now))*100;
+      const yf1 = PROJ.posV(posR(FREEZE_START))*100;
+      const yf2 = PROJ.posV(posR(now))*100;
       freezeLn.style.left = `calc(44px - var(--freeze-offset))`;
       freezeLn.style.top = `calc(${Math.min(yf1,yf2)}% - 6px)`;
       freezeLn.style.height = Math.max(2, Math.abs(yf2 - yf1)) + '%';
       freezeLn.style.width = '12px';
 
       // Future (пунктир)
-      const yfe1 = PV(posR(COURT_END))*100;
-      const yfe2 = PV(posR(FUTURE_END))*100;
+      const yfe1 = PROJ.posV(posR(COURT_END))*100;
+      const yfe2 = PROJ.posV(posR(FUTURE_END))*100;
       futureLn.style.left = '44px';
       futureLn.style.top = `calc(${Math.min(yfe1,yfe2)}% )`;
       futureLn.style.height = Math.max(2, Math.abs(yfe2 - yfe1)) + '%';
@@ -394,30 +417,30 @@ export async function mount(container) {
 
       // Now — горизонтальная на мобиле
       nowEl.style.left = 0; nowEl.style.width = '100%'; nowEl.style.height = '3px';
-      nowEl.style.top = (PV(posR(now))*100) + '%';
+      nowEl.style.top = (PROJ.posV(posR(now))*100) + '%';
     } else {
-      const x0a = PH(posR(PRE_START))*100;
-      const x0b = PH(posR(FREEZE_START))*100;
+      const x0a = PROJ.posH(posR(PRE_START))*100;
+      const x0b = PROJ.posH(posR(FREEZE_START))*100;
       preLine.style.left = x0a+'%';
       preLine.style.width = Math.max(0.5, x0b - x0a) + '%';
 
-      const x1a = PH(posR(FREEZE_START))*100;
-      const x1b = PH(posR(COURT_END))*100;
+      const x1a = PROJ.posH(posR(FREEZE_START))*100;
+      const x1b = PROJ.posH(posR(COURT_END))*100;
       baseLine.style.left = x1a+'%';
       baseLine.style.width = Math.max(2, x1b - x1a) + '%';
 
-      const xf1 = PH(posR(FREEZE_START))*100;
-      const xf2 = PH(posR(new Date()))*100;
+      const xf1 = PROJ.posH(posR(FREEZE_START))*100;
+      const xf2 = PROJ.posH(posR(now))*100;
       freezeLn.style.left = Math.min(xf1, xf2) + '%';
       freezeLn.style.width = Math.max(2, Math.abs(xf2 - xf1)) + '%';
 
-      const xfe1 = PH(posR(COURT_END))*100;
-      const xfe2 = PH(posR(FUTURE_END))*100;
+      const xfe1 = PROJ.posH(posR(COURT_END))*100;
+      const xfe2 = PROJ.posH(posR(FUTURE_END))*100;
       futureLn.style.left = Math.min(xfe1,xfe2) + '%';
       futureLn.style.width = Math.max(2, Math.abs(xfe2 - xfe1)) + '%';
 
       // Now — вертикальная (мигает)
-      const xr = PH(posR(new Date()))*100;
+      const xr = PROJ.posH(posR(now))*100;
       nowEl.style.left = xr+'%'; nowEl.style.top = 0; nowEl.style.bottom = 0;
       nowEl.style.width = '3px'; nowEl.style.height = '';
     }
@@ -463,14 +486,12 @@ export async function mount(container) {
       : `${fmtMonthYear(firstD, monthNames)} – ${fmtMonthYear(lastD, monthNames)}`;
 
     function place(){
-      if (matchMedia('(max-width:820px)').matches){
-        const { posV } = posHelpers();
-        const y = (posV(posR(center))*100);
+      if (isMobile){
+        const y = (PROJ.posV(posR(center))*100);
         dot.style.top = `calc(${y}% - 8px)`; dot.style.left = '44px';
         label.style.left='60px'; label.style.top = dot.style.top;
       } else {
-        const { posH } = posHelpers();
-        const x = (posH(posR(center))*100) + '%';
+        const x = (PROJ.posH(posR(center))*100) + '%';
         dot.style.left = x; dot.style.top = 'var(--lineY)';
         label.style.left = x; // top задаёт CSS (writing-mode)
       }
@@ -487,37 +508,44 @@ export async function mount(container) {
 
     track.appendChild(dot);
     track.appendChild(label);
-    dots.push({ dot, label, center });
+    dots.push({ dot, label, center, place });
   });
 
   // Легенда — отдельной нижней полосой (как и раньше)
   mountLegend(dict, wrap);
 
-  // Линии и NOW
-  placeLines();
+  // ► NEW: единая функция раскладки
+  function layout(){
+    const now = new Date();
+    placeLines(now);
+    dots.forEach(ref => ref.place());
+  }
 
-  // Resize (с очисткой)
-  onResizeHandler = function(){
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(()=>{
-      placeLines();
-      dots.forEach(ref=>{
-        const center = new Date(ref.center);
-        if (matchMedia('(max-width:820px)').matches){
-          const { posV } = posHelpers();
-          const y = (posV(posR(center))*100);
-          ref.dot.style.top = `calc(${y}% - 8px)`; ref.dot.style.left = '44px';
-          ref.label.style.left='60px'; ref.label.style.top = ref.dot.style.top;
-        } else {
-          const { posH } = posHelpers();
-          const x = (posH(posR(center))*100) + '%';
-          ref.dot.style.left = x; ref.dot.style.top = 'var(--lineY)';
-          ref.label.style.left = x;
-        }
-      });
-    }, 120);
-  };
+  // Первая раскладка
+  layout();
+
+  // ► NEW: rAF-расписание и слушатели
+  let scheduled = false;
+  function scheduleLayout(){
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(() => {
+      scheduled = false;
+      refreshEnv();  // обновить проекторы и флаг
+      layout();
+    });
+  }
+
+  // ResizeObserver отслеживает изменения размеров трека
+  ro = new ResizeObserver(scheduleLayout);
+  ro.observe(track);
+
+  // Window resize + media query change
+  onResizeHandler = scheduleLayout;
   window.addEventListener('resize', onResizeHandler, { passive:true });
+  if (!mql) mql = window.matchMedia('(max-width:820px)');
+  if (mql.addEventListener) mql.addEventListener('change', scheduleLayout);
+  else if (mql.addListener) mql.addListener(scheduleLayout); // Safari/старые движки
 
   // Перерисовывать при смене языка без изменения внешнего вида
   if (typeof I18N.onLocaleChanged === 'function') {
@@ -531,6 +559,14 @@ export async function mount(container) {
 export function unmount(){
   if (onResizeHandler) window.removeEventListener('resize', onResizeHandler);
   onResizeHandler = null;
+
+  if (mql){
+    if (mql.removeEventListener) mql.removeEventListener('change', scheduleLayout);
+    else if (mql.removeListener) mql.removeListener(scheduleLayout);
+  }
+
+  if (ro){ try { ro.disconnect(); } catch {} ro = null; }
+
   if (offLocaleCb) { try { offLocaleCb(); } catch {} offLocaleCb = null; }
   if (onDocMoreClick) { document.removeEventListener('click', onDocMoreClick); onDocMoreClick = null; }
   if (root) { root.innerHTML = ''; root = null; }
