@@ -119,3 +119,22 @@
   "alert.clickMapFirst": "Click on the map first!",
   "error.saveFailed": "Save error: "
 }
+{
+  "menu.reporting": "Reporting",
+
+  "reporting.title": "Reporting",
+  "reporting.desc": "Transparency hub for funding, campaigns, updates, and documents.",
+  "reporting.placeholder": "Content will appear here.",
+
+  "reporting.blocks.funds.title": "Financial overview",
+  "reporting.blocks.funds.desc": "Total collected, spent, planned — and overall availability.",
+
+  "reporting.blocks.campaigns.title": "Fundraising campaigns",
+  "reporting.blocks.campaigns.desc": "Timeline of campaigns across platforms (GoFundMe and others).",
+
+  "reporting.blocks.updates.title": "Accountability feed",
+  "reporting.blocks.updates.desc": "Structured reporting stream (planned Telegram integration).",
+
+  "reporting.blocks.documents.title": "Documents & proofs",
+  "reporting.blocks.documents.desc": "Medical and legal documents: diagnoses, receipts, case records."
+}

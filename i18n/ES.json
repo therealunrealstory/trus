@@ -118,3 +118,22 @@
   "alert.clickMapFirst": "¡Primero haz clic en el mapa!",
   "error.saveFailed": "Error al guardar: "
 }
+{
+  "menu.reporting": "Informes",
+
+  "reporting.title": "Informes",
+  "reporting.desc": "Centro de transparencia: financiación, campañas, actualizaciones y documentos.",
+  "reporting.placeholder": "El contenido aparecerá aquí.",
+
+  "reporting.blocks.funds.title": "Resumen financiero",
+  "reporting.blocks.funds.desc": "Total recaudado, gastado, planificado y disponibilidad general.",
+
+  "reporting.blocks.campaigns.title": "Campañas de recaudación",
+  "reporting.blocks.campaigns.desc": "Cronología de campañas en distintas plataformas (GoFundMe y otras).",
+
+  "reporting.blocks.updates.title": "Canal de rendición de cuentas",
+  "reporting.blocks.updates.desc": "Flujo de informes estructurados (integración con Telegram prevista).",
+
+  "reporting.blocks.documents.title": "Documentos y pruebas",
+  "reporting.blocks.documents.desc": "Documentos médicos y legales: diagnósticos, recibos y archivos del caso."
+}

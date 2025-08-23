@@ -118,3 +118,22 @@
   "alert.clickMapFirst": "Clicca prima sulla mappa!",
   "error.saveFailed": "Errore di salvataggio: "
 }
+{
+  "menu.reporting": "Report",
+
+  "reporting.title": "Report",
+  "reporting.desc": "Hub di trasparenza: fondi, campagne, aggiornamenti e documenti.",
+  "reporting.placeholder": "Il contenuto apparirà qui.",
+
+  "reporting.blocks.funds.title": "Panoramica finanziaria",
+  "reporting.blocks.funds.desc": "Totale raccolto, speso, pianificato — e disponibilità complessiva.",
+
+  "reporting.blocks.campaigns.title": "Campagne di raccolta fondi",
+  "reporting.blocks.campaigns.desc": "Cronologia delle campagne sulle varie piattaforme (GoFundMe e altre).",
+
+  "reporting.blocks.updates.title": "Feed di rendicontazione",
+  "reporting.blocks.updates.desc": "Flusso di report strutturato (integrazione Telegram prevista).",
+
+  "reporting.blocks.documents.title": "Documenti e prove",
+  "reporting.blocks.documents.desc": "Documenti medici e legali: diagnosi, ricevute, atti del caso."
+}

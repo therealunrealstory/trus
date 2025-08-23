@@ -118,3 +118,22 @@
   "alert.clickMapFirst": "请先点击地图！",
   "error.saveFailed": "保存失败："
 }
+{
+  "menu.reporting": "报告",
+
+  "reporting.title": "报告",
+  "reporting.desc": "透明中心：资金、募捐活动、更新与文件。",
+  "reporting.placeholder": "内容将显示在此处。",
+
+  "reporting.blocks.funds.title": "财务总览",
+  "reporting.blocks.funds.desc": "累计募集、支出、计划支出——以及可用余额。",
+
+  "reporting.blocks.campaigns.title": "募捐活动历史",
+  "reporting.blocks.campaigns.desc": "跨平台活动时间线（GoFundMe 等）。",
+
+  "reporting.blocks.updates.title": "问责更新流",
+  "reporting.blocks.updates.desc": "结构化报告流（计划接入 Telegram）。",
+
+  "reporting.blocks.documents.title": "文件与证明",
+  "reporting.blocks.documents.desc": "医疗与法律文件：诊断、收据、案件记录。"
+}

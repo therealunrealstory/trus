@@ -118,3 +118,22 @@
   "alert.clickMapFirst": "Cliquez d’abord sur la carte !",
   "error.saveFailed": "Erreur d’enregistrement : "
 }
+{
+  "menu.reporting": "Rapports",
+
+  "reporting.title": "Rapports",
+  "reporting.desc": "Pôle de transparence : financement, campagnes, mises à jour et documents.",
+  "reporting.placeholder": "Le contenu apparaîtra ici.",
+
+  "reporting.blocks.funds.title": "Vue d’ensemble financière",
+  "reporting.blocks.funds.desc": "Total collecté, dépensé, prévu — et disponibilité globale.",
+
+  "reporting.blocks.campaigns.title": "Campagnes de collecte",
+  "reporting.blocks.campaigns.desc": "Chronologie des campagnes sur différentes plateformes (GoFundMe et autres).",
+
+  "reporting.blocks.updates.title": "Fil de redevabilité",
+  "reporting.blocks.updates.desc": "Flux de rapports structuré (intégration Telegram prévue).",
+
+  "reporting.blocks.documents.title": "Documents et preuves",
+  "reporting.blocks.documents.desc": "Documents médicaux et juridiques : diagnostics, reçus, dossiers de l’affaire."
+}

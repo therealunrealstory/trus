@@ -118,3 +118,22 @@
   "alert.clickMapFirst": "انقر على الخريطة أولًا!",
   "error.saveFailed": "فشل الحفظ: "
 }
+{
+  "menu.reporting": "التقارير",
+
+  "reporting.title": "التقارير",
+  "reporting.desc": "مركز الشفافية: التمويل، الحملات، التحديثات والوثائق.",
+  "reporting.placeholder": "سيظهر المحتوى هنا.",
+
+  "reporting.blocks.funds.title": "نظرة عامة مالية",
+  "reporting.blocks.funds.desc": "إجمالي المُحصَّل والمصروف والمخطط — والرصيد المتاح.",
+
+  "reporting.blocks.campaigns.title": "حملات جمع التبرعات",
+  "reporting.blocks.campaigns.desc": "خط زمني للحملات عبر المنصات (GoFundMe وغيرها).",
+
+  "reporting.blocks.updates.title": "قناة المساءلة",
+  "reporting.blocks.updates.desc": "تدفق تقارير منظم (تكامل مع تيليجرام قيد التخطيط).",
+
+  "reporting.blocks.documents.title": "الوثائق والأدلة",
+  "reporting.blocks.documents.desc": "وثائق طبية وقانونية: تشخيصات، إيصالات، وسجلات القضية."
+}

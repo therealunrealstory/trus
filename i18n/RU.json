@@ -120,3 +120,22 @@
   "alert.clickMapFirst": "Сначала кликните по карте!",
   "error.saveFailed": "Ошибка сохранения: "
 }
+{
+  "menu.reporting": "Отчётность",
+
+  "reporting.title": "Отчётность",
+  "reporting.desc": "Центр прозрачности: финансы, кампании, обновления и документы.",
+  "reporting.placeholder": "Содержимое появится здесь.",
+
+  "reporting.blocks.funds.title": "Финансовый обзор",
+  "reporting.blocks.funds.desc": "Всего собрано, потрачено, запланировано — и доступный остаток.",
+
+  "reporting.blocks.campaigns.title": "История сборов",
+  "reporting.blocks.campaigns.desc": "Хронология кампаний на разных площадках (GoFundMe и др.).",
+
+  "reporting.blocks.updates.title": "Лента отчётности",
+  "reporting.blocks.updates.desc": "Структурированный поток отчётов (планируется интеграция с Telegram).",
+
+  "reporting.blocks.documents.title": "Документы и подтверждения",
+  "reporting.blocks.documents.desc": "Медицинские и юридические документы: диагнозы, квитанции, материалы дела."
+}

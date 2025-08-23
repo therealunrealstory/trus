@@ -118,3 +118,22 @@
   "alert.clickMapFirst": "Klicke zuerst auf die Karte!",
   "error.saveFailed": "Speicherfehler: "
 }
+{
+  "menu.reporting": "Berichte",
+
+  "reporting.title": "Berichte",
+  "reporting.desc": "Transparenz‑Hub: Finanzierung, Kampagnen, Updates und Dokumente.",
+  "reporting.placeholder": "Inhalt wird hier angezeigt.",
+
+  "reporting.blocks.funds.title": "Finanzüberblick",
+  "reporting.blocks.funds.desc": "Gesamt eingegangen, ausgegeben, geplant — und verfügbare Mittel.",
+
+  "reporting.blocks.campaigns.title": "Spendenkampagnen",
+  "reporting.blocks.campaigns.desc": "Zeitlinie der Kampagnen auf verschiedenen Plattformen (GoFundMe u. a.).",
+
+  "reporting.blocks.updates.title": "Rechenschafts‑Feed",
+  "reporting.blocks.updates.desc": "Strukturierter Berichtsstrom (geplante Telegram‑Integration).",
+
+  "reporting.blocks.documents.title": "Dokumente und Nachweise",
+  "reporting.blocks.documents.desc": "Medizinische und juristische Unterlagen: Diagnosen, Belege, Falldokumente."
+}
