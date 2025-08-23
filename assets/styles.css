@@ -259,41 +259,25 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
   font-style: italic;
 }
 
-/* =========================
-   Medical Timeline — оформление как у Legal (2 карточки)
-   Без влияния на обычную страницу /#/roadmap
-   ========================= */
+/* === Medical Timeline: двухконтейнерная компоновка как у Legal === */
 
-/* Карточка №1: шапка Medical (заголовок + Updated под ним) */
-.mtl-head{
-  background: rgba(0,0,0,0.2);
+/* 1) Шапка (подложка + рамка) */
+.roadmap-head{
+  background: rgba(0,0,0,0.20);
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 16px;
   padding: 16px 18px;
   margin-bottom: 16px;
 }
 
-/* Делаем .roadmap-head вертикальной только внутри медицинской шапки */
-.mtl-head .roadmap-head{ display:block; margin:0; }
-.mtl-head .roadmap-title{ margin:0 0 6px 0; font-size:22px; }
-.mtl-head .roadmap-meta{ color: rgba(231,236,243,0.70); font-size:14px; }
-
-/* Карточка №2: контейнер с тремя раскрывающимися списками */
-.mtl-body{
-  position: relative;
-  background: rgba(0,0,0,0.2);
+/* 2) Тело (подложка, внутри — 3 раскрывающихся списка) */
+.roadmap-body{
+  background: rgba(0,0,0,0.20);
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 16px;
-  padding: 12px;
-  overflow: hidden; /* как у lt-timeline */
+  padding: 10px;           /* мягкая внутренняя рамка */
+  overflow: visible;
 }
-
-/* Чуть аккуратнее внутренние отступы сетки в карточке */
-.mtl-body .roadmap-grid{ padding: 4px; }
-
-/* Небольшой отступ для примечания под сеткой */
-.mtl-body .roadmap-notice{ margin-top: 14px; }
-
 
 /* Карточки */
 .roadmap-item{
