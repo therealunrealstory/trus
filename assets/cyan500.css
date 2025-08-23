@@ -1,6 +1,5 @@
 /* === TRUS v230825 — Support page: Cyan-500 theme + SVG hearts === */
 
-/* Палитра */
 :root{
   --cyan-300:#67e8f9;
   --cyan-400:#22d3ee;
@@ -10,7 +9,7 @@
   --fuchsia-500:#d946ef;
 }
 
-/* Область страницы Support — подхватываем ВСЕ варианты разметки */
+/* область страницы Support */
 #subpage[data-page="support"],
 #subpage[data-route="support"],
 #support,
@@ -21,7 +20,6 @@ body[data-route="support"] #subpage{
   --support-accent-strong: var(--cyan-600);
   --heart-accent: var(--fuchsia-500);
 
-  /* Переназначаем любые green-* в этой области */
   --green-300: var(--cyan-300);
   --green-400: var(--cyan-400);
   --green-500: var(--cyan-500);
@@ -29,108 +27,61 @@ body[data-route="support"] #subpage{
   --green-700: var(--cyan-700);
 }
 
-/* Утилиты Tailwind вида *-green-500 → перекрас в Cyan 500 (только на Support) */
+/* замена bg/text/border-green-500 на cyan */
 #subpage[data-page="support"] .bg-green-500,
 #subpage[data-route="support"] .bg-green-500,
 #support .bg-green-500,
-.page--support .bg-green-500,
-body[data-route="support"] #subpage .bg-green-500{ background-color: var(--support-accent) !important; }
-
+.page--support .bg-green-500{
+  background-color: var(--support-accent) !important;
+}
 #subpage[data-page="support"] .text-green-500,
 #subpage[data-route="support"] .text-green-500,
 #support .text-green-500,
-.page--support .text-green-500,
-body[data-route="support"] #subpage .text-green-500{ color: var(--support-accent) !important; }
-
+.page--support .text-green-500{
+  color: var(--support-accent) !important;
+}
 #subpage[data-page="support"] .border-green-500,
 #subpage[data-route="support"] .border-green-500,
 #support .border-green-500,
-.page--support .border-green-500,
-body[data-route="support"] #subpage .border-green-500{ border-color: var(--support-accent) !important; }
+.page--support .border-green-500{
+  border-color: var(--support-accent) !important;
+}
 
-#subpage[data-page="support"] .ring-green-500,
-#subpage[data-route="support"] .ring-green-500,
-#support .ring-green-500,
-.page--support .ring-green-500,
-body[data-route="support"] #subpage .ring-green-500{ --tw-ring-color: var(--support-accent) !important; }
-
-#subpage[data-page="support"] .from-green-500,
-#subpage[data-route="support"] .from-green-500,
-#support .from-green-500,
-.page--support .from-green-500,
-body[data-route="support"] #subpage .from-green-500{ --tw-gradient-from: var(--support-accent) !important; }
-
-#subpage[data-page="support"] .to-green-500,
-#subpage[data-route="support"] .to-green-500,
-#support .to-green-500,
-.page--support .to-green-500,
-body[data-route="support"] #subpage .to-green-500{ --tw-gradient-to: var(--support-accent-strong) !important; }
-
-/* Кнопка «Отправить сердечко» */
-#subpage[data-page="support"] [data-action="send-heart"],
-#subpage[data-route="support"] [data-action="send-heart"],
+/* Кнопка "Отправить сердечко" */
 #support [data-action="send-heart"],
 .page--support [data-action="send-heart"],
-body[data-route="support"] #subpage [data-action="send-heart"],
 #support .btn-send-heart,
 .page--support .btn-send-heart{
   background-color: var(--support-accent);
   border-color: var(--support-accent);
   color:#fff;
-  transition: filter .15s ease, transform .05s ease;
 }
-#subpage[data-page="support"] [data-action="send-heart"]:hover,
-#subpage[data-route="support"] [data-action="send-heart"]:hover,
 #support [data-action="send-heart"]:hover,
 .page--support [data-action="send-heart"]:hover,
-body[data-route="support"] #subpage [data-action="send-heart"]:hover,
 #support .btn-send-heart:hover,
-.page--support .btn-send-heart:hover{ filter: brightness(1.08); }
-#subpage[data-page="support"] [data-action="send-heart"]:active,
-#subpage[data-route="support"] [data-action="send-heart"]:active,
+.page--support .btn-send-heart:hover{
+  filter: brightness(1.08);
+}
 #support [data-action="send-heart"]:active,
 .page--support [data-action="send-heart"]:active,
-body[data-route="support"] #subpage [data-action="send-heart"]:active,
 #support .btn-send-heart:active,
-.page--support .btn-send-heart:active{ transform: translateY(1px); }
+.page--support .btn-send-heart:active{
+  transform: translateY(1px);
+}
 
-/* Сердца — SVG через mask, цвет Fuchsia 500 */
-#subpage[data-page="support"] .hearts .heart-icon,
-#subpage[data-route="support"] .hearts .heart-icon,
+/* Сердца — SVG mask */
 #support .hearts .heart-icon,
-.page--support .hearts .heart-icon,
-body[data-route="support"] #subpage .hearts .heart-icon{
+.page--support .hearts .heart-icon{
   width: 1.15rem;
   height: 1.15rem;
   display: inline-block;
-  vertical-align: -0.15em;
   background-color: var(--heart-accent);
-  -webkit-mask: url("images/heart.mask.svg") no-repeat center / contain;
-  mask: url("images/heart.mask.svg") no-repeat center / contain;
+  -webkit-mask: url("../images/heart.mask.svg") no-repeat center / contain;
+  mask: url("../images/heart.mask.svg") no-repeat center / contain;
 }
 
-/* Скрываем PNG-версии, если они всё ещё в разметке */
-#subpage[data-page="support"] img.heart-icon[src$=".png"],
-#subpage[data-route="support"] img.heart-icon[src$=".png"],
+/* скрываем старые PNG */
 #support img.heart-icon[src$=".png"],
-.page--support img.heart-icon[src$=".png"],
-body[data-route="support"] #subpage img.heart-icon[src$=".png"]{
+.page--support img.heart-icon[src$=".png"]{
   display:none !important;
-}
-
-/* Альтернатива: добавить иконку через ::before на карточку сердца */
-#subpage[data-page="support"] .heart-card::before,
-#subpage[data-route="support"] .heart-card::before,
-#support .heart-card::before,
-.page--support .heart-card::before,
-body[data-route="support"] #subpage .heart-card::before{
-  content:"";
-  width: 1.15rem;
-  height: 1.15rem;
-  margin-right:.35rem;
-  display:inline-block;
-  vertical-align: -0.15em;
-  background-color: var(--heart-accent);
-  -webkit-mask:url("images/heart.mask.svg") no-repeat center / contain;
-  mask:url("images/heart.mask.svg") no-repeat center / contain;
 }
