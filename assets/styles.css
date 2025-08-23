@@ -492,3 +492,38 @@ body.modal-open{ overflow:hidden; }
     margin-top: 6px;
   }
 }
+
+/* =========================
+   FIX: Desktop columns width (equal + no overflow)
+   ========================= */
+@media (min-width: 900px){
+  /* 3 равные колонки, каждая может сжиматься, грид не расталкивается контентом */
+  html[data-route="timeline"] .roadmap-grid{
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    align-items: start;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Грид-элементы позволяют себя сжимать внутри трека */
+  html[data-route="timeline"] .roadmap-col{
+    min-width: 0;              /* критично для fr-треков */
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+  /* Внутренние блоки в шапке/контенте тоже не удерживают ширину трека */
+  html[data-route="timeline"] .roadmap-topline > *,
+  html[data-route="timeline"] .roadmap-list,
+  html[data-route="timeline"] .roadmap-item{
+    min-width: 0;
+  }
+
+  /* Перестраховка от редких длинных фрагментов на десктопе */
+  html[data-route="timeline"] .roadmap-title-sm,
+  html[data-route="timeline"] .roadmap-summary,
+  html[data-route="timeline"] .roadmap-details{
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
