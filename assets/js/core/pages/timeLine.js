@@ -1,39 +1,46 @@
-// assets/js/pages/timeline.js
-// Контейнер, который монтирует 2 независимых блока: Legal + Medical.
-
+// assets/js/core/pages/timeline.js
 import { mount as mountLegal, unmount as unmountLegal } from '../../features/legalTimeline.js';
 
-// Медицинский блок реиспользуем из текущей страницы /pages/roadmap.js
 let Roadmap = null;
-
 let cleanup = [];
+
+async function loadPartial(name) {
+  // грузим partial ОТНОСИТЕЛЬНО (без ведущего /)
+  const res = await fetch(`partials/${name}.json`, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`Failed to load partial: ${name}`);
+  const json = await res.json();
+  const html = json.html ?? json.markup ?? json.content ?? json.innerHTML ?? '';
+  return String(html);
+}
 
 export async function init(rootEl) {
   const el = rootEl || document.querySelector('#subpage');
   if (!el) return;
-  
-    // 👇 логируем контейнеры
-  console.debug(
-    '[timeline.init]',
-    'legal?', !!el.querySelector('#legal-timeline'),
-    'medical?', !!el.querySelector('#medical-timeline')
-  );
 
-  // Здесь partial уже вставлен роутером → просто находим контейнеры
   const legalRoot = el.querySelector('#legal-timeline');
   const medRoot   = el.querySelector('#medical-timeline');
 
-  // 1) Юридическая хронология
+  // 1) Юридическая
   if (legalRoot) mountLegal(legalRoot);
 
-  // 2) Медицинская — инициализируем существующий модуль pages/roadmap.js,
-  //    но ограничиваем область рендера корнем medRoot
+  // 2) Медицинская — подсуним её собственный partial прямо в контейнер
   if (medRoot) {
-    // динамический импорт, чтобы не тянуть модуль досрочно
-    const mod = Roadmap || (Roadmap = await import('./roadmap.js'));
-    // roadmap.init умеет принимать "mount" — и сам отрисует внутрь него
-    await mod.init(medRoot);
-    cleanup.push(() => { try { mod.destroy?.(); } catch {} });
+    try {
+      // ВАЖНО: подгружаем partial/roadmap и вставляем внутрь #medical-timeline
+      const roadmapHtml = await loadPartial('roadmap');
+      medRoot.innerHTML = roadmapHtml;
+
+      // Теперь инициализируем модуль страницы Roadmap поверх вставленной разметки
+      const mod = Roadmap || (Roadmap = await import('./roadmap.js'));
+      await mod.init(medRoot);
+
+      cleanup.push(() => { try { mod.destroy?.(); } catch {} });
+    } catch (e) {
+      // На всякий случай покажем что-то осмысленное
+      medRoot.innerHTML = '<div class="mtl-error">Failed to load medical timeline.</div>';
+      // eslint-disable-next-line no-console
+      console.error('[timeline] medical block failed:', e);
+    }
   }
 }
 
