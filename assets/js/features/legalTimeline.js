@@ -58,7 +58,7 @@ const TPL_STYLE = `
   box-shadow:0 0 0 2px rgba(79,70,229,0.45);
   cursor:pointer; transform:translate(-50%, -50%); z-index:4;
 }
-/* ВЕРТИКАЛЬ: как было — надпись «над» точкой, вертикально, вверх ногами (чтобы читать снизу вверх) */
+/* ВЕРТИКАЛЬ: надпись «над» точкой, вертикально, вверх ногами (читается снизу вверх) */
 .lt-label{
   position:absolute; font-size:12px; color:rgba(231,236,243,0.75);
   white-space:nowrap; text-shadow:0 1px 0 rgba(0,0,0,0.35); line-height:1.1;
@@ -82,7 +82,7 @@ const TPL_STYLE = `
   z-index:5;
 }
 
-/* Легенда — отдельным нижним блоком внутри того же контейнера, как прежде */
+/* Легенда — отдельным нижним блоком внутри того же контейнера */
 .lt-legend{
   display:flex; gap:18px; flex-wrap:wrap;
   padding:10px 12px;
@@ -184,6 +184,32 @@ function mountLegend(dict, wrap){
 }
 
 /* ---------- МОДАЛКИ ---------- */
+function bindMoreToggle(dict){
+  const handler = (e)=>{
+    const btn = e.target.closest('.js-more'); if(!btn) return;
+    let box = btn.previousElementSibling;
+    const isBox = el => el && el.classList && el.classList.contains('js-morebox');
+    if (!isBox(box)) box = btn.nextElementSibling;
+    const p = btn.closest('p');
+    if (!isBox(box) && p) {
+      if (isBox(p.previousElementSibling)) box = p.previousElementSibling;
+      else if (isBox(p.nextElementSibling)) box = p.nextElementSibling;
+    }
+    if (!isBox(box)) return;
+    const opened = box.style.display !== 'none';
+    box.style.display = opened ? 'none' : 'block';
+    btn.textContent = opened ? (dict?.modal?.more ?? 'More details') : (dict?.modal?.less ?? 'Collapse');
+  };
+
+  // Вешаем после того, как модалка гарантированно вставлена в DOM
+  const attach = () => {
+    const bodyEl = document.getElementById('modalBody');
+    if (!bodyEl) { requestAnimationFrame(attach); return; }
+    bodyEl.addEventListener('click', handler);
+  };
+  requestAnimationFrame(attach);
+}
+
 function openEventModal(dict, itemOrGroup){
   const tMore   = dict?.modal?.more         ?? 'More details';
   const tLess   = dict?.modal?.less         ?? 'Collapse';
@@ -213,23 +239,8 @@ function openEventModal(dict, itemOrGroup){
     );
   }
 
-  // Делегирование на кнопки «Подробнее/Свернуть»
-  const bodyEl = document.getElementById('modalBody');
-  const handler = (e)=>{
-    const btn = e.target.closest('.js-more'); if(!btn) return;
-    let box = btn.previousElementSibling;
-    const isBox = el => el && el.classList && el.classList.contains('js-morebox');
-    if (!isBox(box)) box = btn.nextElementSibling;
-    const p = btn.closest('p'); if (!isBox(box) && p) {
-      if (isBox(p.previousElementSibling)) box = p.previousElementSibling;
-      else if (isBox(p.nextElementSibling)) box = p.nextElementSibling;
-    }
-    if (!isBox(box)) return;
-    const opened = box.style.display !== 'none';
-    box.style.display = opened ? 'none' : 'block';
-    btn.textContent = opened ? (dict?.modal?.more ?? 'More details') : (dict?.modal?.less ?? 'Collapse');
-  };
-  bodyEl.addEventListener('click', handler, { once:false });
+  // привязка обработчика «Подробнее/Свернуть» (устойчиво к async-рендеру)
+  bindMoreToggle(dict);
 }
 
 /* ---------- ЖИЗНЕННЫЙ ЦИКЛ СТРАНИЦЫ ---------- */
@@ -283,14 +294,14 @@ export async function mount(container) {
     return;
   }
 
-  // «Updated …»
+  // «Updated …» — без версии
   const updated = new Date(base.meta?.updated_at || Date.now());
   const updatedDate = updated.toLocaleDateString(lang, { year:'numeric', month:'long', day:'numeric' });
-  const updTpl = dict?.meta?.updated ?? 'Updated: {date} • {user} • version: {version}';
+  // используем короткий шаблон, если есть, иначе дефолт «Updated: {date} • {user}»
+  const updTpl = (dict?.meta?.updated_short) || 'Updated: {date} • {user}';
   metaEl.textContent = fmt(updTpl, {
     date: updatedDate,
-    user: base.meta?.updated_by || '',
-    version: base.meta?.version || ''
+    user: base.meta?.updated_by || ''
   });
 
   // Локализуем элементы
@@ -422,15 +433,16 @@ export async function mount(container) {
 
     function place(){
       if (matchMedia('(max-width:820px)').matches){
-        const y = (PV(posR(center))*100);
+        const y = (posV(posR(center))*100);
         dot.style.top = `calc(${y}% - 8px)`; dot.style.left = '44px';
         label.style.left='60px'; label.style.top = dot.style.top;
       } else {
-        const x = (PH(posR(center))*100) + '%';
+        const x = (posH(posR(center))*100) + '%';
         dot.style.left = x; dot.style.top = 'var(--lineY)';
         label.style.left = x; // top задаёт CSS, плюс вертикальный writing-mode
       }
     }
+    const { posH, posV } = posHelpers();
     place();
 
     if (group.length === 1) {
@@ -443,7 +455,7 @@ export async function mount(container) {
 
     track.appendChild(dot);
     track.appendChild(label);
-    dots.push({ dot, label, center });
+    dots.push({ dot, label, center, posH, posV });
   });
 
   // Легенда — отдельной нижней полосой (как и раньше)
@@ -459,12 +471,13 @@ export async function mount(container) {
       placeLines();
       dots.forEach(ref=>{
         const center = new Date(ref.center);
+        const { posH, posV } = posHelpers();
         if (matchMedia('(max-width:820px)').matches){
-          const y = (PV(posR(center))*100);
+          const y = (posV(posR(center))*100);
           ref.dot.style.top = `calc(${y}% - 8px)`; ref.dot.style.left = '44px';
           ref.label.style.left='60px'; ref.label.style.top = ref.dot.style.top;
         } else {
-          const x = (PH(posR(center))*100) + '%';
+          const x = (posH(posR(center))*100) + '%';
           ref.dot.style.left = x; ref.dot.style.top = 'var(--lineY)';
           ref.label.style.left = x;
         }
