@@ -4,30 +4,67 @@ import { mount as mountLegal, unmount as unmountLegal } from '../../features/leg
 let Roadmap = null;
 let cleanup = [];
 
+/* ---------- robust partial loader ---------- */
+
+function stripCommentsAndCommas(raw) {
+  // убираем BOM
+  let s = raw.replace(/^\uFEFF/, '');
+  // блок-комментарии /* ... */
+  s = s.replace(/\/\*[\s\S]*?\*\//g, '');
+  // построчные // ...
+  s = s.replace(/(^|[^:])\/\/.*$/gm, '$1');
+  // убираем висящие запятые перед } или ]
+  s = s.replace(/,(\s*[}\]])/g, '$1');
+  // если встретится "].join("")" — удаляем хвост, оставляем чистый JSON-массив
+  s = s.replace(/\]\.join\(\s*["']{0,1}["']{0,1}\s*\)/g, ']');
+  return s.trim();
+}
+
+function sliceFirstJsonObject(cleaned) {
+  // Находим первый полноценный JSON-объект или массив в тексте и возвращаем его срез
+  const startIdxObj = cleaned.indexOf('{');
+  const startIdxArr = cleaned.indexOf('[');
+  let start = -1, opener = '', closer = '';
+  if (startIdxObj !== -1 && (startIdxArr === -1 || startIdxObj < startIdxArr)) {
+    start = startIdxObj; opener = '{'; closer = '}';
+  } else if (startIdxArr !== -1) {
+    start = startIdxArr; opener = '['; closer = ']';
+  }
+  if (start === -1) return null;
+
+  let depth = 0, inStr = false, esc = false;
+  for (let i = start; i < cleaned.length; i++) {
+    const ch = cleaned[i];
+    if (inStr) {
+      if (esc) { esc = false; continue; }
+      if (ch === '\\') { esc = true; continue; }
+      if (ch === '"') { inStr = false; continue; }
+      continue;
+    } else {
+      if (ch === '"') { inStr = true; continue; }
+      if (ch === opener) { depth++; }
+      else if (ch === closer) { depth--; if (depth === 0) return cleaned.slice(start, i + 1); }
+    }
+  }
+  return null;
+}
+
 async function loadPartial(name) {
   const res = await fetch(`partials/${name}.json`, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Failed to load partial: ${name}`);
 
-  // Берём как текст и чистим комментарии
   const raw = await res.text();
+  const cleaned = stripCommentsAndCommas(raw);
+  const firstJson = sliceFirstJsonObject(cleaned);
+  if (!firstJson) throw new Error(`No JSON found in partial: ${name}`);
 
-  // Удаляем /* ... */ и // ... комментарии
-  const cleaned = raw
-    .replace(/\/\*[\s\S]*?\*\//g, '')   // блок-комментарии
-    .replace(/^\s*\/\/.*$/gm, '');      // построчные комментарии
-
-  // Парсим вручную
-  const json = JSON.parse(cleaned || '{}');
-
-  // Достаём html из разных возможных ключей
+  const json = JSON.parse(firstJson);
   let html = json.html ?? json.markup ?? json.content ?? json.innerHTML ?? '';
-
-  // Если кто-то положил массив строк — склеим
   if (Array.isArray(html)) html = html.join('');
-
   return String(html);
 }
 
+/* ---------- page lifecycle ---------- */
 
 export async function init(rootEl) {
   const el = rootEl || document.querySelector('#subpage');
@@ -37,24 +74,21 @@ export async function init(rootEl) {
   const medRoot   = el.querySelector('#medical-timeline');
 
   // 1) Юридическая
-  if (legalRoot) mountLegal(legalRoot);
+  if (legalRoot) {
+    try { mountLegal(legalRoot); } catch (e) { console.error('[timeline] mount legal failed:', e); }
+  }
 
-  // 2) Медицинская — подсуним её собственный partial прямо в контейнер
+  // 2) Медицинская — сначала подгружаем её partial, затем инициализируем модуль
   if (medRoot) {
     try {
-      // ВАЖНО: подгружаем partial/roadmap и вставляем внутрь #medical-timeline
       const roadmapHtml = await loadPartial('roadmap');
       medRoot.innerHTML = roadmapHtml;
 
-      // Теперь инициализируем модуль страницы Roadmap поверх вставленной разметки
       const mod = Roadmap || (Roadmap = await import('./roadmap.js'));
       await mod.init(medRoot);
-
       cleanup.push(() => { try { mod.destroy?.(); } catch {} });
     } catch (e) {
-      // На всякий случай покажем что-то осмысленное
       medRoot.innerHTML = '<div class="mtl-error">Failed to load medical timeline.</div>';
-      // eslint-disable-next-line no-console
       console.error('[timeline] medical block failed:', e);
     }
   }
