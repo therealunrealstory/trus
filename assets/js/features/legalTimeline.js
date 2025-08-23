@@ -108,7 +108,7 @@ function posHelpers(track) {
 }
 
 async function loadData() {
-  const res = await fetch('/legal-timeline.json', { cache: 'no-store' });
+  const res = await fetch('/partials/legal-timeline.json', { cache: 'no-store' });
   if (!res.ok) throw new Error('Failed to load legal-timeline.json');
   return res.json();
 }
