@@ -18,14 +18,25 @@ const TPL_STYLE = `
   --label-gap:18px;
 }
 .lt-wrap { position:relative; }
-.lt-head { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12);
-  border-radius:16px; padding:16px 18px; margin-bottom:16px; }
+/* Шапка (заголовок + Updated …) — фон как у Medical */
+.lt-head{
+  background: rgba(0,0,0,0.2);              /* было светлее */
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius:16px;
+  padding:16px 18px;
+  margin-bottom:16px;
+}
 .lt-title{ margin:0 0 6px 0; font-size:22px; }
 .lt-meta { color:rgba(231,236,243,.7); font-size:14px; }
 
+/* Контейнер таймлайна — тёмная подложка как у Medical */
 .lt-timeline{
-  position:relative; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:16px;
-  overflow:hidden; width:100%;
+  position:relative;
+  background: rgba(0,0,0,0.2);              /* было rgba(255,255,255,0.05) */
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius:16px;
+  overflow:hidden;
+  width:100%;
 }
 .lt-track{ position:relative; width:100%; height:360px; }
 
@@ -59,8 +70,17 @@ const TPL_STYLE = `
 .lt-now{ position:absolute; background:#a5b4fc; border-radius:2px; animation:lt-pulse 1.9s ease-out infinite; z-index:5; }
 
 /* Legend (компактно) */
-.lt-legend{ display:flex; gap:18px; flex-wrap:wrap; padding:10px 12px; border-top:1px solid rgba(255,255,255,0.12);
-  background:rgba(255,255,255,0.05); font-size:13px; color:rgba(231,236,243,.9); }
+/* Легенда — тот же тёмный фон, чтобы не выбивалась */
+.lt-legend{
+  display:flex;
+  gap:18px;
+  flex-wrap:wrap;
+  padding:10px 12px;
+  border-top:1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,0.2);              /* было светлее */
+  font-size:13px;
+  color:rgba(231,236,243,.9);
+}
 .lt-leg-item{ display:flex; align-items:center; gap:8px; }
 .lt-swatch{ height:6px; border-radius:4px; }
 .lt-swatch.pre{ width:44px; background:var(--indigo-300); }
