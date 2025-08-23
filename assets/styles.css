@@ -259,26 +259,6 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
   font-style: italic;
 }
 
-/* === Medical Timeline: двухконтейнерная компоновка как у Legal === */
-
-/* 1) Шапка (подложка + рамка) */
-.roadmap-head{
-  background: rgba(0,0,0,0.20);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 16px;
-  padding: 16px 18px;
-  margin-bottom: 16px;
-}
-
-/* 2) Тело (подложка, внутри — 3 раскрывающихся списка) */
-.roadmap-body{
-  background: rgba(0,0,0,0.20);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 16px;
-  padding: 10px;           /* мягкая внутренняя рамка */
-  overflow: visible;
-}
-
 /* Карточки */
 .roadmap-item{
   border:1px solid rgba(255,255,255,0.10);
