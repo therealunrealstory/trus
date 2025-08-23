@@ -461,32 +461,34 @@ body.modal-open{ overflow:hidden; }
 }
 
 /* =========================
-   FIX: Mobile overflow (Medical Timeline)
+   FIX: Roadmap card header wrap on mobile
    ========================= */
 @media (max-width: 820px){
-
-  /* Отрезаем горизонтальное переполнение на контейнере страницы Timeline */
-  html[data-route="timeline"] #subpage > section{
-    overflow-x: hidden !important;
-  }
-
-  /* И на подложке Medical Timeline */
-  html[data-route="timeline"] .roadmap-body{
-    overflow-x: hidden !important;   /* вместо clip — надёжнее на Android */
-  }
-
-  /* Страховка: внутренности не могут быть шире контейнера */
-  html[data-route="timeline"] .roadmap-grid,
-  html[data-route="timeline"] .roadmap-list,
-  html[data-route="timeline"] .roadmap-item{
-    max-width: 100%;
+  /* Карточка — не шире контейнера */
+  .roadmap-item{
+    width: 100%;
     box-sizing: border-box;
   }
 
-  /* Если окажутся сверхдлинные слова/URL — переносим их внутри карточек */
-  html[data-route="timeline"] .roadmap-summary,
-  html[data-route="timeline"] .roadmap-details{
+  /* Шапка карточки: разрешаем перенос строк */
+  .roadmap-topline{
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  /* Оба внутренних блока могут сжиматься */
+  .roadmap-topline > *{
+    min-width: 0;            /* критично: иначе текст «держит» ширину и выталкивает вправо */
+  }
+
+  /* Заголовок не рвёт ширину длинными словами */
+  .roadmap-title-sm{
     overflow-wrap: anywhere;
     word-break: break-word;
+  }
+
+  /* Если бейджам тесно — они уходят на новую строку с небольшим отступом сверху */
+  .roadmap-badges{
+    flex-wrap: wrap;
+    margin-top: 6px;
   }
 }
