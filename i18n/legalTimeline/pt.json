@@ -15,7 +15,9 @@
     "freeze": "Período de bloqueio",
     "future": "Perspectivas judiciais (futuro)",
     "event": "Evento",
-    "eventHint": "(clicável)"
+    "eventHint": "(clicável)",
+    "eventClickable": "Evento (clicável)",
+    "now": "Momento atual"
   },
   "tooltip": {
     "dot": "Evento — clique para mais detalhes"

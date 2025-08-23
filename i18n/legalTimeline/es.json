@@ -15,7 +15,9 @@
     "freeze": "Periodo de congelación de activos",
     "future": "Perspectivas legales (por delante)",
     "event": "Evento",
-    "eventHint": "(clicable)"
+    "eventHint": "(clicable)",
+    "eventClickable": "Evento (clicable)",
+    "now": "Momento actual"
   },
   "tooltip": {
     "dot": "Evento — haga clic para más detalles"

@@ -15,7 +15,9 @@
     "freeze": "Période de gel",
     "future": "Perspectives judiciaires (à venir)",
     "event": "Événement",
-    "eventHint": "(cliquable)"
+    "eventHint": "(cliquable)",
+    "eventClickable": "Événement (cliquable)",
+    "now": "Moment actuel"
   },
   "tooltip": {
     "dot": "Événement — cliquez pour plus de détails"

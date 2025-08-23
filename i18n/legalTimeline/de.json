@@ -15,7 +15,9 @@
     "freeze": "Zeitraum der Sperrung",
     "future": "Juristische Perspektiven (bevorstehend)",
     "event": "Ereignis",
-    "eventHint": "(anklickbar)"
+    "eventHint": "(anklickbar)",
+    "eventClickable": "Ereignis (anklickbar)",
+    "now": "Aktueller Zeitpunkt"
   },
   "tooltip": {
     "dot": "Ereignis — klicken Sie für Details"

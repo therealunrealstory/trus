@@ -15,7 +15,9 @@
     "freeze": "冻结期间",
     "future": "未来的法律前景",
     "event": "事件",
-    "eventHint": "（可点击）"
+    "eventHint": "（可点击）",
+	"eventClickable": "事件（可点击）",
+    "now": "当前时间"
   },
   "tooltip": {
     "dot": "事件 — 点击查看详情"

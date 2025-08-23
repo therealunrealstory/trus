@@ -15,7 +15,9 @@
     "freeze": "Asset freeze period",
     "future": "Legal prospects (ahead)",
     "event": "Event",
-    "eventHint": "(clickable)"
+    "eventHint": "(clickable)",
+    "eventClickable": "Event (clickable)",
+    "now": "Current time"
   },
   "tooltip": {
     "dot": "Event — click for details"
