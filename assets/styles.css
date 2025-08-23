@@ -353,19 +353,6 @@ html[data-route="timeline"] .roadmap-meta{
 /* ---- НОВОЕ для юр. хронологии (нейтрально, ничего не ломает) ---- */
 .now-marker{ pointer-events:none; } /* чтобы не перехватывала клики по точкам */
 
-/* --- Legal Timeline legend: dashed future sample --- */
-/* FIX: образец "Судебные перспективы" в легенде — как на шкале */
-.legend .swatch-future,
-.timeline-legend .swatch-future,
-.legend-swatch.swatch-future{
-  background: transparent !important;
-  border: 0 !important;
-  width: 44px !important;
-  height: 0 !important;
-  border-top: 4px dashed var(--indigo-600) !important; /* десктоп — горизонтально */
-  border-radius: 0 !important;
-}
-
 /* --- НОВОЕ: образец точки события в легенде --- */
 .swatch-dot{
   width:16px; height:16px; border-radius:50%;
