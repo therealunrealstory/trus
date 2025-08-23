@@ -53,16 +53,65 @@ async function loadPartial(name) {
   const res = await fetch(`partials/${name}.json`, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Failed to load partial: ${name}`);
 
+  // 1) читаем как текст
   const raw = await res.text();
-  const cleaned = stripCommentsAndCommas(raw);
-  const firstJson = sliceFirstJsonObject(cleaned);
-  if (!firstJson) throw new Error(`No JSON found in partial: ${name}`);
 
-  const json = JSON.parse(firstJson);
-  let html = json.html ?? json.markup ?? json.content ?? json.innerHTML ?? '';
-  if (Array.isArray(html)) html = html.join('');
-  return String(html);
+  // 2) убираем BOM и комментарии (вне строк)
+  let s = raw.replace(/^\uFEFF/, '');
+  // блок-комментарии /* ... */
+  s = s.replace(/\/\*[\s\S]*?\*\//g, '');
+  // построчные // ... (не трогаем те, что внутри строк — проще: удаляем только если начинаются с начала строки/после пробелов)
+  s = s.replace(/^[ \t]*\/\/.*$/gm, '');
+  // висящие запятые перед } или ]
+  s = s.replace(/,(\s*[}\]])/g, '$1');
+  // .join("") → превращаем в просто массив
+  s = s.replace(/\]\s*\.join\(\s*(["'`])\1\s*\)/g, ']');
+
+  // 3) пробуем обычный JSON.parse
+  try {
+    const json = JSON.parse(s);
+    let html = json.html ?? json.markup ?? json.content ?? json.innerHTML ?? '';
+    if (Array.isArray(html)) html = html.join('');
+    return String(html);
+  } catch (_) {
+    // 4) ФОЛЛБЭК: вытащим только поле "html" без полного парсинга
+    // 4.1) Попробуем найти массив под "html": [ ... ]
+    const htmlArrStart = s.search(/"html"\s*:\s*\[/);
+    if (htmlArrStart !== -1) {
+      // вырежем подстроку от первой "[" после "html": до соответствующей "]"
+      const start = s.indexOf('[', htmlArrStart);
+      let depth = 0, inStr = false, esc = false, end = -1;
+      for (let i = start; i < s.length; i++) {
+        const ch = s[i];
+        if (inStr) {
+          if (esc) { esc = false; continue; }
+          if (ch === '\\') { esc = true; continue; }
+          if (ch === '"') { inStr = false; continue; }
+          continue;
+        } else {
+          if (ch === '"') { inStr = true; continue; }
+          if (ch === '[') depth++;
+          else if (ch === ']') { depth--; if (depth === 0) { end = i; break; } }
+        }
+      }
+      if (end !== -1) {
+        const arrBody = s.slice(start, end + 1); // строка вида ["…","…", …]
+        // вытащим все строковые литералы и распарсим их по отдельности
+        const strings = arrBody.match(/"(?:\\.|[^"\\])*"/g) || [];
+        const parts = strings.map(strLit => JSON.parse(strLit)); // корректно снимает экранирование
+        return parts.join('');
+      }
+    }
+    // 4.2) Попробуем найти строку под "html": "...."
+    const m = s.match(/"html"\s*:\s*("(?:\\.|[^"\\])*")/);
+    if (m && m[1]) {
+      const htmlStr = JSON.parse(m[1]); // корректно разэкранируем
+      return String(htmlStr);
+    }
+    throw new Error(`Partial ${name}: cannot extract html`);
+  }
 }
+
 
 /* ---------- page lifecycle ---------- */
 
