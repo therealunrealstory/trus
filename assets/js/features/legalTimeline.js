@@ -100,14 +100,14 @@ const TPL_STYLE = `
 .lt-swatch.pre{ width:44px; background:var(--indigo-300); }
 .lt-swatch.base{ width:44px; background:var(--indigo-600); }
 .lt-swatch.freeze{ width:44px; height:12px; background:var(--red-500); border-radius:8px; }
+/* такой lt-swatch.future гарантированно отрисовывает пунктирную линию, сохранять его именно таким */
 .lt-swatch.future{
-  background: transparent !important;
-  box-shadow: none !important;
-  border: 0 !important;
-  width: 44px !important;
-  height: 0 !important;
-  border-top: 4px dashed var(--indigo-600) !important; /* горизонтально, как на шкале */
-  border-radius: 0 !important;
+  width:44px;
+  background:transparent;
+  border:0;
+  height:0;
+  border-top:4px dashed var(--indigo-600);
+  border-radius:0;
 }
 
 /* ▼ ДОБАВЛЕНО: образцы для «мигающей линии» и точка в легенде */
