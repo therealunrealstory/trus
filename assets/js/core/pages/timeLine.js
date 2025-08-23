@@ -5,13 +5,29 @@ let Roadmap = null;
 let cleanup = [];
 
 async function loadPartial(name) {
-  // грузим partial ОТНОСИТЕЛЬНО (без ведущего /)
   const res = await fetch(`partials/${name}.json`, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Failed to load partial: ${name}`);
-  const json = await res.json();
-  const html = json.html ?? json.markup ?? json.content ?? json.innerHTML ?? '';
+
+  // Берём как текст и чистим комментарии
+  const raw = await res.text();
+
+  // Удаляем /* ... */ и // ... комментарии
+  const cleaned = raw
+    .replace(/\/\*[\s\S]*?\*\//g, '')   // блок-комментарии
+    .replace(/^\s*\/\/.*$/gm, '');      // построчные комментарии
+
+  // Парсим вручную
+  const json = JSON.parse(cleaned || '{}');
+
+  // Достаём html из разных возможных ключей
+  let html = json.html ?? json.markup ?? json.content ?? json.innerHTML ?? '';
+
+  // Если кто-то положил массив строк — склеим
+  if (Array.isArray(html)) html = html.join('');
+
   return String(html);
 }
+
 
 export async function init(rootEl) {
   const el = rootEl || document.querySelector('#subpage');
