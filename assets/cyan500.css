@@ -1,5 +1,6 @@
-/* === TRUS v230825 — Support page: Cyan-500 theme + SVG hearts === */
+/* === TRUS v230825 — Support page: Cyan-500 theme + SVG hearts (robust) === */
 
+/* Палитра */
 :root{
   --cyan-300:#67e8f9;
   --cyan-400:#22d3ee;
@@ -9,17 +10,14 @@
   --fuchsia-500:#d946ef;
 }
 
-/* область страницы Support */
-#subpage[data-page="support"],
-#subpage[data-route="support"],
-#support,
-.page--support,
-body[data-route="support"] #subpage{
+/* Область страницы Support — привяжем к классу .page--support (добавим его на Шаге 2) */
+.page--support{
   --support-accent: var(--cyan-500);
   --support-accent-weak: var(--cyan-400);
   --support-accent-strong: var(--cyan-600);
   --heart-accent: var(--fuchsia-500);
 
+  /* Переназначаем любые green-* токены внутри страницы */
   --green-300: var(--cyan-300);
   --green-400: var(--cyan-400);
   --green-500: var(--cyan-500);
@@ -27,61 +25,60 @@ body[data-route="support"] #subpage{
   --green-700: var(--cyan-700);
 }
 
-/* замена bg/text/border-green-500 на cyan */
-#subpage[data-page="support"] .bg-green-500,
-#subpage[data-route="support"] .bg-green-500,
-#support .bg-green-500,
-.page--support .bg-green-500{
+/* Перекрываем утилиты Tailwind-подобных классов на странице Support */
+.page--support :is([class*="bg-green-"],[class*="bg-emerald-"],[class*="bg-lime-"]){
   background-color: var(--support-accent) !important;
 }
-#subpage[data-page="support"] .text-green-500,
-#subpage[data-route="support"] .text-green-500,
-#support .text-green-500,
-.page--support .text-green-500{
+.page--support :is([class*="text-green-"],[class*="text-emerald-"],[class*="text-lime-"]){
   color: var(--support-accent) !important;
 }
-#subpage[data-page="support"] .border-green-500,
-#subpage[data-route="support"] .border-green-500,
-#support .border-green-500,
-.page--support .border-green-500{
+.page--support :is([class*="border-green-"],[class*="border-emerald-"],[class*="border-lime-"]){
   border-color: var(--support-accent) !important;
 }
+.page--support :is([class*="ring-green-"],[class*="ring-emerald-"],[class*="ring-lime-"]){
+  --tw-ring-color: var(--support-accent) !important;
+}
+.page--support :is([class*="from-green-"],[class*="from-emerald-"],[class*="from-lime-"]){
+  --tw-gradient-from: var(--support-accent) !important;
+}
+.page--support :is([class*="to-green-"],[class*="to-emerald-"],[class*="to-lime-"]){
+  --tw-gradient-to: var(--support-accent-strong) !important;
+}
 
-/* Кнопка "Отправить сердечко" */
-#support [data-action="send-heart"],
-.page--support [data-action="send-heart"],
-#support .btn-send-heart,
-.page--support .btn-send-heart{
+/* Кнопка «Отправить сердечко» (и её возможные классы) */
+.page--support :is([data-action="send-heart"], .btn-send-heart){
   background-color: var(--support-accent);
   border-color: var(--support-accent);
   color:#fff;
+  transition: filter .15s ease, transform .05s ease;
 }
-#support [data-action="send-heart"]:hover,
-.page--support [data-action="send-heart"]:hover,
-#support .btn-send-heart:hover,
-.page--support .btn-send-heart:hover{
-  filter: brightness(1.08);
-}
-#support [data-action="send-heart"]:active,
-.page--support [data-action="send-heart"]:active,
-#support .btn-send-heart:active,
-.page--support .btn-send-heart:active{
-  transform: translateY(1px);
-}
+.page--support :is([data-action="send-heart"], .btn-send-heart):hover{ filter: brightness(1.08); }
+.page--support :is([data-action="send-heart"], .btn-send-heart):active{ transform: translateY(1px); }
 
-/* Сердца — SVG mask */
-#support .hearts .heart-icon,
+/* Сердца: SVG-маска (Fuchsia 500) */
 .page--support .hearts .heart-icon{
   width: 1.15rem;
   height: 1.15rem;
   display: inline-block;
+  vertical-align: -0.15em;
   background-color: var(--heart-accent);
   -webkit-mask: url("../images/heart.mask.svg") no-repeat center / contain;
   mask: url("../images/heart.mask.svg") no-repeat center / contain;
 }
 
-/* скрываем старые PNG */
-#support img.heart-icon[src$=".png"],
-.page--support img.heart-icon[src$=".png"]{
-  display:none !important;
+/* Если в разметке остались PNG, скрыть их */
+.page--support img.heart-icon[src$=".png"]{ display:none !important; }
+
+/* Фолбэк: если иконки нет как отдельный элемент, добавим через ::before на карточку */
+.page--support .heart-card::before,
+.page--support .hearts .splide__slide::before{
+  content:"";
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-right:.35rem;
+  display:inline-block;
+  vertical-align: -0.15em;
+  background-color: var(--heart-accent);
+  -webkit-mask:url("../images/heart.mask.svg") no-repeat center / contain;
+  mask:url("../images/heart.mask.svg") no-repeat center / contain;
 }
