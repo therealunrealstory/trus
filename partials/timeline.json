@@ -8,5 +8,4 @@
       "<h2 class=\"h2\" data-i18n=\"roadmap.title\">Treatment roadmap</h2>",
       "<div id=\"medical-timeline\"></div>",
     "</section>"
-  ].join("")
 }
