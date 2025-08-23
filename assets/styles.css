@@ -262,13 +262,33 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
 /* === Medical Timeline: двухконтейнерная компоновка как у Legal === */
 
 /* 1) Шапка (подложка + рамка) */
-.roadmap-head{
-  background: rgba(0,0,0,0.20);
+/* Timeline → Medical header: 1:1 как у Legal */
+html[data-route="timeline"] .roadmap-head{
+  background: rgba(0,0,0,0.2);
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 16px;
   padding: 16px 18px;
   margin-bottom: 16px;
+
+  /* критично: мета под заголовком, а не сбоку */
+  display: block;
 }
+
+html[data-route="timeline"] .roadmap-head .roadmap-title{
+  /* как у .lt-title */
+  margin: 0 0 6px 0;
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 600; /* можно убрать, если у вас другой вес в теме */
+}
+
+html[data-route="timeline"] .roadmap-head .roadmap-meta{
+  /* как у .lt-meta */
+  font-size: 14px;
+  color: rgba(231,236,243,0.70);
+  margin: 0; /* чтобы мета не «подпрыгивала» рядом */
+}
+
 
 /* 2) Тело (подложка, внутри — 3 раскрывающихся списка) */
 .roadmap-body{
