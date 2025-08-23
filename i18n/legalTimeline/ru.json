@@ -6,7 +6,8 @@
     "errorLoadJson": "Не удалось загрузить json"
   },
   "meta": {
-    "updated": "Обновлено: {date} • {user} • версия: {version}"
+    "updated": "Обновлено: {date} • {user} • версия: {version}",
+	"updated_short": "Обновлено: {date} • {user}"
   },
   "legend": {
     "pre": "Предпосылки (до иска)",

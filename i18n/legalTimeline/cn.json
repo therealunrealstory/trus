@@ -6,7 +6,8 @@
     "errorLoadJson": "加载 legal-timeline.json 失败"
   },
   "meta": {
-    "updated": "更新于: {date} • {user} • 版本: {version}"
+    "updated": "更新于: {date} • {user} • 版本: {version}",
+	"updated_short": "更新于: {date} • {user}"
   },
   "legend": {
     "pre": "前提（起诉前）",

@@ -6,7 +6,8 @@
     "errorLoadJson": "فشل في تحميل legal-timeline.json"
   },
   "meta": {
-    "updated": "تم التحديث: {date} • {user} • الإصدار: {version}"
+    "updated": "تم التحديث: {date} • {user} • الإصدار: {version}",
+	"updated_short": "تم التحديث: {date} • {user}"
   },
   "legend": {
     "pre": "المقدمات (قبل الدعوى)",

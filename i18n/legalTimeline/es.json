@@ -6,7 +6,8 @@
     "errorLoadJson": "Error al cargar json"
   },
   "meta": {
-    "updated": "Actualizado: {date} • {user} • versión: {version}"
+    "updated": "Actualizado: {date} • {user} • versión: {version}",
+	"updated_short": "Actualizado: {date} • {user}"
   },
   "legend": {
     "pre": "Antecedentes (antes de la demanda)",

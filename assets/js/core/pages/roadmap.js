@@ -195,7 +195,7 @@ function render(container, data, dict, { medicalWrap = true } = {}){
   container.innerHTML = '';
 
   const ui = dict?.ui || {};
-  const tTitle = ui.medical_title || ui.page_title || 'Medical Timeline';
+  const tTitle        = ui.medical_title      || 'Medical Timeline';
   const tMetaUpd      = ui.meta_updated       || 'Updated';
   const tSecCompleted = ui.section_completed  || 'Completed';
   const tSecNow       = ui.section_now        || 'Now';

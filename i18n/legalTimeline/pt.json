@@ -6,7 +6,8 @@
     "errorLoadJson": "Falha ao carregar legal-timeline.json"
   },
   "meta": {
-    "updated": "Atualizado: {date} • {user} • versão: {version}"
+    "updated": "Atualizado: {date} • {user} • versão: {version}",
+	"updated_short": "Atualizado: {date} • {user}"
   },
   "legend": {
     "pre": "Contexto (antes do processo)",

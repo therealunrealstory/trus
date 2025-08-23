@@ -6,7 +6,8 @@
     "errorLoadJson": "Failed to load json"
   },
   "meta": {
-    "updated": "Updated: {date} • {user} • version: {version}"
+    "updated": "Updated: {date} • {user} • version: {version}",
+	"updated_short": "Updated: {date} • {user}"
   },
   "legend": {
     "pre": "Prerequisites (before lawsuit)",
