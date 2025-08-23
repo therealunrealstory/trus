@@ -1,39 +1,43 @@
 // assets/js/features/legalTimeline.js
-// Лёгкий рендер юридической шкалы (линии + точки + модалка) в переданный контейнер.
+// Юридическая шкала (линии + точки + модалка) — с локализацией и исходным внешним видом.
 
 import { openModal } from '../core/modal.js';
+import * as I18N from '../core/i18n.js';
 
 let root = null;
+let offLocaleCb = null;
+let onResizeHandler = null;
 let resizeTimer = null;
 
+/* ---------- СТИЛИ (как было: вертикальные подписи + мигающая NOW) ---------- */
 const TPL_STYLE = `
 :root{
   --indigo-300:#a5b4fc;
   --indigo-600:#4f46e5;
   --red-500:#ef4444;
+
   --tl-gutter-h:6%;
   --tl-gutter-v:8%;
   --lineY:62%;
   --freeze-offset:16px;
+
   --label-gap:18px;
 }
-.lt-wrap { position:relative; }
-/* Шапка (заголовок + Updated …) — фон как у Medical */
+
 .lt-head{
-  background: rgba(0,0,0,0.2);              /* было светлее */
-  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.12);
   border-radius:16px;
   padding:16px 18px;
   margin-bottom:16px;
 }
-.lt-title{ margin:0 0 6px 0; font-size:22px; }
-.lt-meta { color:rgba(231,236,243,.7); font-size:14px; }
+.lt-title{ margin:0 0 6px; font-size:22px; line-height:1.25; }
+.lt-meta { color:rgba(231,236,243,0.7); font-size:14px; }
 
-/* Контейнер таймлайна — тёмная подложка как у Medical */
 .lt-timeline{
   position:relative;
-  background: rgba(0,0,0,0.2);              /* было rgba(255,255,255,0.05) */
-  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,0.20);
+  border: 1px solid rgba(255,255,255,0.12);
   border-radius:16px;
   overflow:hidden;
   width:100%;
@@ -43,19 +47,21 @@ const TPL_STYLE = `
 .lt-pre{ position:absolute; height:2px; background:var(--indigo-300); top:calc(var(--lineY) - 1px); z-index:3; border-radius:2px; }
 .lt-base{ position:absolute; height:4px; background:var(--indigo-600); top:var(--lineY); transform:translateY(-50%); z-index:2; }
 .lt-freeze{ position:absolute; height:12px; background:var(--red-500); border-radius:8px; top: calc(var(--lineY) + var(--freeze-offset));
-  z-index:3; filter: drop-shadow(0 2px 6px rgba(0,0,0,.25)); }
+  z-index:3; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.25)); }
 .lt-future{ position:absolute; height:4px; background:transparent; top:var(--lineY); transform:translateY(-50%); z-index:2;
   border-top:4px dashed var(--indigo-600); }
 
+/* Точка + вертикальная подпись */
 .lt-dot{
   position:absolute; width:16px; height:16px; border-radius:50%;
   background:#ffffff; outline:1px solid rgba(255,255,255,0.12);
-  box-shadow:0 0 0 2px rgba(79,70,229,.45);
+  box-shadow:0 0 0 2px rgba(79,70,229,0.45);
   cursor:pointer; transform:translate(-50%, -50%); z-index:4;
 }
+/* ВЕРТИКАЛЬ: как было — надпись «над» точкой, вертикально, вверх ногами (чтобы читать снизу вверх) */
 .lt-label{
-  position:absolute; font-size:12px; color:rgba(231,236,243,.75);
-  white-space:nowrap; text-shadow:0 1px 0 rgba(0,0,0,.35); line-height:1.1;
+  position:absolute; font-size:12px; color:rgba(231,236,243,0.75);
+  white-space:nowrap; text-shadow:0 1px 0 rgba(0,0,0,0.35); line-height:1.1;
 }
 @media (min-width:821px){
   .lt-label{
@@ -65,111 +71,149 @@ const TPL_STYLE = `
   }
 }
 
-/* Now marker */
-@keyframes lt-pulse{0%{box-shadow:0 0 0 0 rgba(165,180,252,.6);}70%{box-shadow:0 0 0 12px rgba(165,180,252,0);}100%{box-shadow:0 0 0 0 rgba(165,180,252,0);} }
-.lt-now{ position:absolute; background:#a5b4fc; border-radius:2px; animation:lt-pulse 1.9s ease-out infinite; z-index:5; }
+@keyframes lt-pulse{
+  0% { box-shadow:0 0 0 0 rgba(165,180,252,0.60); }
+  50%{ box-shadow:0 0 0 6px rgba(165,180,252,0.00); }
+  100%{ box-shadow:0 0 0 0 rgba(165,180,252,0.00); }
+}
+.lt-now{
+  position:absolute; background:#a5b4fc; border-radius:2px;
+  animation: lt-pulse 1.9s ease-out infinite;
+  z-index:5;
+}
 
-/* Legend (компактно) */
-/* Легенда — тот же тёмный фон, чтобы не выбивалась */
+/* Легенда — отдельным нижним блоком внутри того же контейнера, как прежде */
 .lt-legend{
-  display:flex;
-  gap:18px;
-  flex-wrap:wrap;
+  display:flex; gap:18px; flex-wrap:wrap;
   padding:10px 12px;
-  border-top:1px solid rgba(255,255,255,.12);
-  background: rgba(0,0,0,0.2);              /* было светлее */
-  font-size:13px;
-  color:rgba(231,236,243,.9);
+  border-top:1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.20);
+  font-size:13px; color:rgba(231,236,243,0.9);
 }
 .lt-leg-item{ display:flex; align-items:center; gap:8px; }
-.lt-swatch{ height:6px; border-radius:4px; }
+.lt-swatch{ display:inline-block; height:4px; border-radius:4px; }
 .lt-swatch.pre{ width:44px; background:var(--indigo-300); }
 .lt-swatch.base{ width:44px; background:var(--indigo-600); }
 .lt-swatch.freeze{ width:44px; height:12px; background:var(--red-500); border-radius:8px; }
 .lt-swatch.future{ width:44px; background:transparent; border-top:4px dashed var(--indigo-600); height:0; }
 
-/* Mobile layout */
+/* MOBILE: вертикальная шкала слева */
 @media (max-width:820px){
   .lt-track{ height:1200px; }
   .lt-pre{ left:44px; width:2px; transform:none; }
   .lt-base{ left:44px; width:4px; transform:none; }
   .lt-freeze{ left: calc(44px - var(--freeze-offset)); width:12px; height:auto; }
   .lt-future{ left:44px; width:0; height:auto; border-top:none; border-left:4px dashed var(--indigo-600); transform:none; }
+  .lt-label{ transform:none; left:60px; top:auto; writing-mode:initial; text-orientation:initial; }
 }
 `;
 
-function html(strings, ...vals) {
-  return strings.reduce((acc, s, i) => acc + s + (vals[i] ?? ''), '');
-}
-
-function parseYM(s){
+/* ---------- УТИЛИТЫ ---------- */
+const NBSP = '\u00A0';
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const html = (ss,...vv) => ss.reduce((a,s,i)=> a+s+(vv[i]??''), '');
+const parseYM = (s)=>{
   if (!s) return null;
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00Z');
-  if (/^\d{4}-\d{2}$/.test(s)) return new Date(s+'-01T00:00:00Z');
-  if (/^\d{4}$/.test(s)) return new Date(s+'-01-01T00:00:00Z');
+  if (/^\d{4}-\d{2}$/.test(s))       return new Date(s+'-01T00:00:00Z');
+  if (/^\d{4}$/.test(s))             return new Date(s+'-01-01T00:00:00Z');
   return new Date(s);
-}
-
-const EN_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const NBSP = '\u00A0';
-const isMobile = () => matchMedia('(max-width:820px)').matches;
-const clamp    = (v,a,b)=>Math.max(a,Math.min(b,v));
-const esc      = (s)=>String(s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const fmtMonthYear = d => EN_MONTHS[d.getUTCMonth()] + NBSP + d.getUTCFullYear();
-
-function posHelpers(track) {
+};
+function posHelpers(){
   const cs = getComputedStyle(document.documentElement);
   const gh = parseFloat(cs.getPropertyValue('--tl-gutter-h'))/100 || 0.06;
   const gv = parseFloat(cs.getPropertyValue('--tl-gutter-v'))/100 || 0.08;
   return {
-    posH: r => gh + r * (1 - gh*2),
-    posV: r => gv + r * (1 - gv*2)
+    posH:r => gh + r * (1 - gh*2),
+    posV:r => gv + r * (1 - gv*2)
   };
 }
+const getLang = () => (I18N.getLangFromQuery?.() || document.documentElement.lang || 'EN').toLowerCase();
+const fmt = (tpl, vars={}) => String(tpl||'').replace(/\{(\w+)\}/g,(_,k)=> (vars[k] ?? ''));
 
-async function loadData() {
-  const res = await fetch('/partials/legal-timeline.json', { cache: 'no-store' });
+/* ---------- ЗАГРУЗКА ДАННЫХ + СЛОВАРЕЙ ---------- */
+async function loadBase() {
+  const res = await fetch('/partials/legal-timeline.json', { cache:'no-store' });
   if (!res.ok) throw new Error('Failed to load legal-timeline.json');
   return res.json();
 }
+async function loadDict(lang){
+  try{
+    const r = await fetch(`/i18n/legalTimeline/${lang}.json`, { cache:'no-store' });
+    if (!r.ok) throw 0;
+    return await r.json();
+  } catch { return {}; }
+}
+function mergeLocalized(data, dict){
+  const out = structuredClone(data || {});
+  const map = dict?.items || {};
+  if (Array.isArray(out.items)){
+    out.items = out.items.map(it=>{
+      if (!it?.id) return it;
+      const tr = map[it.id];
+      if (tr){
+        if (tr.when_label) it.when_label = tr.when_label;
+        if (tr.title)      it.title      = tr.title;
+        if (tr.summary)    it.summary    = tr.summary;
+        if (tr.details)    it.details    = tr.details;
+      }
+      return it;
+    });
+  }
+  return out;
+}
+const DEFAULT_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const fmtMonthYear = (d, months) => (months[d.getUTCMonth()]||DEFAULT_MONTHS[d.getUTCMonth()]) + NBSP + d.getUTCFullYear();
 
-function mountLegend(legend, wrap){
+/* ---------- ЛЕГЕНДА ---------- */
+function mountLegend(dict, wrap){
+  const tPre    = dict?.legend?.pre    ?? 'Prerequisites';
+  const tBase   = dict?.legend?.base   ?? 'Litigation period';
+  const tFreeze = dict?.legend?.freeze ?? 'Asset freeze';
+  const tFuture = dict?.legend?.future ?? 'Legal prospects';
   const el = document.createElement('div');
   el.className = 'lt-legend';
   el.innerHTML = html`
-    <div class="lt-leg-item"><span class="lt-swatch pre"></span><span>Prerequisites</span></div>
-    <div class="lt-leg-item"><span class="lt-swatch base"></span><span>Litigation period</span></div>
-    <div class="lt-leg-item"><span class="lt-swatch freeze"></span><span>Asset freeze</span></div>
-    <div class="lt-leg-item"><span class="lt-swatch future"></span><span>Legal prospects</span></div>
+    <div class="lt-leg-item"><span class="lt-swatch pre"></span><span>${esc(tPre)}</span></div>
+    <div class="lt-leg-item"><span class="lt-swatch base"></span><span>${esc(tBase)}</span></div>
+    <div class="lt-leg-item"><span class="lt-swatch freeze"></span><span>${esc(tFreeze)}</span></div>
+    <div class="lt-leg-item"><span class="lt-swatch future"></span><span>${esc(tFuture)}</span></div>
   `;
   wrap.appendChild(el);
 }
 
-function openEventModal(itemOrGroup){
+/* ---------- МОДАЛКИ ---------- */
+function openEventModal(dict, itemOrGroup){
+  const tMore   = dict?.modal?.more         ?? 'More details';
+  const tLess   = dict?.modal?.less         ?? 'Collapse';
+  const tClust  = dict?.modal?.clusterTitle ?? 'Events ({count})';
+  const tSingle = dict?.modal?.singleTitle  ?? '{when} — {title}';
+
   if (Array.isArray(itemOrGroup)){
     const body = itemOrGroup.map(it => `
-      <div style="padding-top:10px; margin-top:10px; border-top:1px dashed rgba(255,255,255,.12)">
+      <div style="padding-top:10px; margin-top:10px; border-top:1px dashed rgba(255,255,255,0.12)">
         <div style="font-weight:600">${esc(it.title||'')}</div>
         <div class="muted" style="margin:4px 0 6px 0">${esc(it.when_label||'')}</div>
         <div>${esc(it.summary||'')}</div>
         ${it.details ? `<div class="js-morebox" style="display:none; font-style:italic; color:#dfe7fb; margin-top:6px">${esc(it.details)}</div>
-        <button class="btn js-more" style="margin-top:6px">More details</button>`:''}
+        <button class="btn js-more" style="margin-top:6px">${esc(tMore)}</button>`:''}
       </div>
     `).join('');
-    openModal(`Events (${itemOrGroup.length})`, body);
+    openModal(fmt(tClust, { count:itemOrGroup.length }), body);
   } else {
     const it = itemOrGroup;
     const more = it.details
       ? `<div class="js-morebox" style="display:none; font-style:italic; color:#dfe7fb; margin-top:6px">${esc(it.details)}</div>
-         <p><button class="btn js-more">More details</button></p>`
+         <p><button class="btn js-more">${esc(tMore)}</button></p>`
       : '';
     openModal(
-      `${esc(it.when_label||'')} — ${esc(it.title||'')}`,
+      fmt(tSingle, { when: esc(it.when_label||''), title: esc(it.title||'') }),
       `<div class="muted" style="margin-bottom:8px">${esc(it.summary||'')}</div>${more}`
     );
   }
 
-  // Делегирование на кнопки "More details"
+  // Делегирование на кнопки «Подробнее/Свернуть»
   const bodyEl = document.getElementById('modalBody');
   const handler = (e)=>{
     const btn = e.target.closest('.js-more'); if(!btn) return;
@@ -183,16 +227,17 @@ function openEventModal(itemOrGroup){
     if (!isBox(box)) return;
     const opened = box.style.display !== 'none';
     box.style.display = opened ? 'none' : 'block';
-    btn.textContent = opened ? 'More details' : 'Collapse';
+    btn.textContent = opened ? (dict?.modal?.more ?? 'More details') : (dict?.modal?.less ?? 'Collapse');
   };
   bodyEl.addEventListener('click', handler, { once:false });
 }
 
+/* ---------- ЖИЗНЕННЫЙ ЦИКЛ СТРАНИЦЫ ---------- */
 export async function mount(container) {
   root = container;
   root.innerHTML = '';
 
-  // Вставляем локальные стили
+  // локальные стили — как было
   const style = document.createElement('style');
   style.textContent = TPL_STYLE;
 
@@ -216,23 +261,41 @@ export async function mount(container) {
 
   root.append(style, head, wrap);
 
+  // Ссылки на элементы
   const track     = wrap.querySelector('.lt-track');
   const preLine   = wrap.querySelector('.lt-pre');
   const baseLine  = wrap.querySelector('.lt-base');
   const freezeLn  = wrap.querySelector('.lt-freeze');
   const futureLn  = wrap.querySelector('.lt-future');
   const nowEl     = wrap.querySelector('.lt-now');
+  const titleEl   = head.querySelector('.lt-title');
+  const metaEl    = head.querySelector('.lt-meta');
 
-  // Загружаем данные
-  const data = await loadData().catch(() => null);
-  if (!data) {
-    head.querySelector('.lt-meta').textContent = 'Failed to load legal-timeline.json';
+  // Словарь и данные
+  const lang = getLang();
+  const dict = await loadDict(lang);
+  titleEl.textContent = dict?.page?.title   ?? 'Legal Timeline';
+  metaEl.textContent  = dict?.page?.loading ?? 'Loading…';
+
+  const base = await loadBase().catch(() => null);
+  if (!base){
+    metaEl.textContent = dict?.page?.errorLoadJson ?? 'Failed to load json';
     return;
   }
-  head.querySelector('.lt-meta').textContent =
-    `Updated: ${new Date(data.meta?.updated_at || Date.now()).toLocaleString()} • ${data.meta?.updated_by || ''} • version: ${data.meta?.version || ''}`;
 
-  const items = (data.items || []).slice().sort((a,b)=>{
+  // «Updated …»
+  const updated = new Date(base.meta?.updated_at || Date.now());
+  const updatedDate = updated.toLocaleDateString(lang, { year:'numeric', month:'long', day:'numeric' });
+  const updTpl = dict?.meta?.updated ?? 'Updated: {date} • {user} • version: {version}';
+  metaEl.textContent = fmt(updTpl, {
+    date: updatedDate,
+    user: base.meta?.updated_by || '',
+    version: base.meta?.version || ''
+  });
+
+  // Локализуем элементы
+  const data = mergeLocalized(base, dict);
+  const items = (data.items||[]).slice().sort((a,b)=>{
     const ad = parseYM(a.date_start||a.date_end);
     const bd = parseYM(b.date_start||b.date_end);
     return ad - bd;
@@ -248,77 +311,77 @@ export async function mount(container) {
   const domainEnd   = FUTURE_END;
   const spanMs      = domainEnd - domainStart;
 
-  const { posH, posV } = posHelpers(track);
-  const posRatio = d => clamp((d - domainStart) / spanMs, 0, 1);
+  const { posH:PH, posV:PV } = posHelpers();
+  const posR = d => clamp((d - domainStart) / spanMs, 0, 1);
 
   function placeLines(){
     const now = new Date();
 
-    if (isMobile()){
+    if (matchMedia('(max-width:820px)').matches){
       // Sep 2020 → Jul 2021
-      const y0a = posV(posRatio(PRE_START))*100;
-      const y0b = posV(posRatio(FREEZE_START))*100;
+      const y0a = PV(posR(PRE_START))*100;
+      const y0b = PV(posR(FREEZE_START))*100;
       preLine.style.left = '44px'; preLine.style.width = '2px';
       preLine.style.top = `calc(${y0a}% )`;
       preLine.style.height = Math.max(0.5, y0b - y0a) + '%';
       preLine.style.transform = 'translateX(-50%)';
 
       // Jul 2021 → Nov 2026
-      const y1a = posV(posRatio(FREEZE_START))*100;
-      const y1b = posV(posRatio(COURT_END))*100;
+      const y1a = PV(posR(FREEZE_START))*100;
+      const y1b = PV(posR(COURT_END))*100;
       baseLine.style.left = '44px'; baseLine.style.width = '4px';
       baseLine.style.top = `calc(${y1a}% )`;
       baseLine.style.height = Math.max(2, y1b - y1a) + '%';
       baseLine.style.transform = 'none';
 
-      // Freeze (red) — left of base
-      const yf1 = posV(posRatio(FREEZE_START))*100;
-      const yf2 = posV(posRatio(now))*100;
+      // Freeze (красная) — слева от base
+      const yf1 = PV(posR(FREEZE_START))*100;
+      const yf2 = PV(posR(now))*100;
       freezeLn.style.left = `calc(44px - var(--freeze-offset))`;
       freezeLn.style.top = `calc(${Math.min(yf1,yf2)}% - 6px)`;
       freezeLn.style.height = Math.max(2, Math.abs(yf2 - yf1)) + '%';
       freezeLn.style.width = '12px';
 
-      // Future (dashed)
-      const yfe1 = posV(posRatio(COURT_END))*100;
-      const yfe2 = posV(posRatio(FUTURE_END))*100;
+      // Future (пунктир)
+      const yfe1 = PV(posR(COURT_END))*100;
+      const yfe2 = PV(posR(FUTURE_END))*100;
       futureLn.style.left = '44px';
       futureLn.style.top = `calc(${Math.min(yfe1,yfe2)}% )`;
       futureLn.style.height = Math.max(2, Math.abs(yfe2 - yfe1)) + '%';
       futureLn.style.width = '0';
 
-      // Now — горизонтальная
+      // Now — горизонтальная на мобиле
       nowEl.style.left = 0; nowEl.style.width = '100%'; nowEl.style.height = '3px';
-      nowEl.style.top = (posV(posRatio(now))*100) + '%';
+      nowEl.style.top = (PV(posR(now))*100) + '%';
     } else {
-      const x0a = posH(posRatio(PRE_START))*100;
-      const x0b = posH(posRatio(FREEZE_START))*100;
+      const x0a = PH(posR(PRE_START))*100;
+      const x0b = PH(posR(FREEZE_START))*100;
       preLine.style.left = x0a+'%';
       preLine.style.width = Math.max(0.5, x0b - x0a) + '%';
 
-      const x1a = posH(posRatio(FREEZE_START))*100;
-      const x1b = posH(posRatio(COURT_END))*100;
+      const x1a = PH(posR(FREEZE_START))*100;
+      const x1b = PH(posR(COURT_END))*100;
       baseLine.style.left = x1a+'%';
       baseLine.style.width = Math.max(2, x1b - x1a) + '%';
 
-      const xf1 = posH(posRatio(FREEZE_START))*100;
-      const xf2 = posH(posRatio(new Date()))*100;
+      const xf1 = PH(posR(FREEZE_START))*100;
+      const xf2 = PH(posR(new Date()))*100;
       freezeLn.style.left = Math.min(xf1, xf2) + '%';
       freezeLn.style.width = Math.max(2, Math.abs(xf2 - xf1)) + '%';
 
-      const xfe1 = posH(posRatio(COURT_END))*100;
-      const xfe2 = posH(posRatio(FUTURE_END))*100;
+      const xfe1 = PH(posR(COURT_END))*100;
+      const xfe2 = PH(posR(FUTURE_END))*100;
       futureLn.style.left = Math.min(xfe1,xfe2) + '%';
       futureLn.style.width = Math.max(2, Math.abs(xfe2 - xfe1)) + '%';
 
-      // Now — вертикальная
-      const xr = posH(posRatio(new Date()))*100;
+      // Now — вертикальная (мигает)
+      const xr = PH(posR(new Date()))*100;
       nowEl.style.left = xr+'%'; nowEl.style.top = 0; nowEl.style.bottom = 0;
       nowEl.style.width = '3px'; nowEl.style.height = '';
     }
   }
 
-  // Кластеры точек (≤ 60 дней)
+  // Кластеры точек (в пределах 60 дней)
   const TWO_MONTHS = 1000*60*60*24*60;
   const pointItems = items.filter(it => !(it.date_start && it.date_end)).slice().sort((a,b)=>{
     const ad = parseYM(a.date_start||a.date_end);
@@ -338,8 +401,11 @@ export async function mount(container) {
   }
   if (bucket.length) clusters.push(bucket);
 
-  const { posH:PH, posV:PV } = posHelpers(track);
-  const posR = d => clamp((d - domainStart) / spanMs, 0, 1);
+  // Рендер точек и вертикальных подписей
+  const monthNames = Array.isArray(dict?.monthShort) && dict.monthShort.length===12 ? dict.monthShort : DEFAULT_MONTHS;
+  const tDotTip = dict?.tooltip?.dot ?? 'Event — click for details';
+  const tPluralEvent = dict?.legend?.event ?? 'Event';
+  const tHint = dict?.legend?.eventHint ?? 'click for details';
 
   const dots = [];
   clusters.forEach(group => {
@@ -350,32 +416,29 @@ export async function mount(container) {
     const dot = document.createElement('div'); dot.className = 'lt-dot';
     const label = document.createElement('div'); label.className = 'lt-label';
 
-    // Подпись
     label.textContent = (group.length === 1)
       ? (group[0].when_label || '')
-      : `${fmtMonthYear(firstD)} – ${fmtMonthYear(lastD)}`;
+      : `${fmtMonthYear(firstD, monthNames)} – ${fmtMonthYear(lastD, monthNames)}`;
 
-    // Позиционирование
     function place(){
-      if (isMobile()){
+      if (matchMedia('(max-width:820px)').matches){
         const y = (PV(posR(center))*100);
         dot.style.top = `calc(${y}% - 8px)`; dot.style.left = '44px';
         label.style.left='60px'; label.style.top = dot.style.top;
       } else {
         const x = (PH(posR(center))*100) + '%';
         dot.style.left = x; dot.style.top = 'var(--lineY)';
-        label.style.left = x; // top по CSS
+        label.style.left = x; // top задаёт CSS, плюс вертикальный writing-mode
       }
     }
     place();
 
-    // Клик
     if (group.length === 1) {
-      dot.title = 'Event — click for details';
-      dot.addEventListener('click', () => openEventModal(group[0]));
+      dot.title = tDotTip;
+      dot.addEventListener('click', () => openEventModal(dict, group[0]));
     } else {
-      dot.title = `Events (${group.length}) — click for details`;
-      dot.addEventListener('click', () => openEventModal(group));
+      dot.title = `${group.length} ${tPluralEvent} — ${tHint}`;
+      dot.addEventListener('click', () => openEventModal(dict, group));
     }
 
     track.appendChild(dot);
@@ -383,21 +446,20 @@ export async function mount(container) {
     dots.push({ dot, label, center });
   });
 
-  // Легенда
-  mountLegend(data.legend, wrap);
+  // Легенда — отдельной нижней полосой (как и раньше)
+  mountLegend(dict, wrap);
 
-  // Размещение линий
+  // Линии и NOW
   placeLines();
 
-  // Resize
-  window.addEventListener('resize', onResize, { passive:true });
-  function onResize(){
+  // Resize (с очисткой)
+  onResizeHandler = function(){
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(()=>{
       placeLines();
       dots.forEach(ref=>{
         const center = new Date(ref.center);
-        if (isMobile()){
+        if (matchMedia('(max-width:820px)').matches){
           const y = (PV(posR(center))*100);
           ref.dot.style.top = `calc(${y}% - 8px)`; ref.dot.style.left = '44px';
           ref.label.style.left='60px'; ref.label.style.top = ref.dot.style.top;
@@ -408,10 +470,23 @@ export async function mount(container) {
         }
       });
     }, 120);
+  };
+  window.addEventListener('resize', onResizeHandler, { passive:true });
+
+  // Перерисовывать при смене языка без изменения внешнего вида
+  if (typeof I18N.onLocaleChanged === 'function') {
+    offLocaleCb = I18N.onLocaleChanged(() => {
+      try { unmount(); } catch {}
+      try { mount(container); } catch {}
+    });
   }
 }
 
 export function unmount(){
-  window.removeEventListener('resize', ()=>{});
+  if (onResizeHandler) window.removeEventListener('resize', onResizeHandler);
+  onResizeHandler = null;
+  if (offLocaleCb) { try { offLocaleCb(); } catch {} offLocaleCb = null; }
   if (root) { root.innerHTML = ''; root = null; }
 }
+
+export default { mount, unmount };
