@@ -307,7 +307,7 @@ export async function mount(container) {
   // «Updated …» — без версии
   const updated = new Date(base.meta?.updated_at || Date.now());
   const updatedDate = updated.toLocaleDateString(lang, { year:'numeric', month:'long', day:'numeric' });
-  const updTpl = (dict?.meta?.updated_short) || 'Updated: {date} • {user}';
+  const updTpl = (dict?.meta?.updated_short) || (dict?.meta?.updated) || 'Updated: {date} • {user}';
   metaEl.textContent = fmt(updTpl, {
     date: updatedDate,
     user: base.meta?.updated_by || ''
