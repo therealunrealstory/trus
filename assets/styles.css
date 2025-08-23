@@ -267,11 +267,16 @@ html[data-route="timeline"] .roadmap-head{
   background: rgba(0,0,0,0.2);
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 16px;
-  padding: 16px 18px;
+  padding: 10px 16px 18px;
   margin-bottom: 16px;
 
   /* критично: мета под заголовком, а не сбоку */
   display: block;
+}
+
+/* на всякий случай убираем любые внешние "вспучивания" от первого элемента */
+html[data-route="timeline"] .roadmap-head > :first-child{
+  margin-top: 0;
 }
 
 html[data-route="timeline"] .roadmap-head .roadmap-title{
