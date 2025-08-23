@@ -32,7 +32,7 @@ async function fetchPartial(name, token) {
   const json = await res.json().catch(() => ({}));
   if (token !== navToken) return null;
   const html = json.html ?? json.markup ?? json.content ?? json.innerHTML ?? '';
-//  return { ...json, html: String(html) };
+//  return { ...json, html: String(html) }; ...json не нужно указывать, исправлено
 	return { html: String(html) };
 }
 
