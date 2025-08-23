@@ -11,6 +11,13 @@ let cleanup = [];
 export async function init(rootEl) {
   const el = rootEl || document.querySelector('#subpage');
   if (!el) return;
+  
+    // 👇 логируем контейнеры
+  console.debug(
+    '[timeline.init]',
+    'legal?', !!el.querySelector('#legal-timeline'),
+    'medical?', !!el.querySelector('#medical-timeline')
+  );
 
   // Здесь partial уже вставлен роутером → просто находим контейнеры
   const legalRoot = el.querySelector('#legal-timeline');

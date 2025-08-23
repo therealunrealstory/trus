@@ -33,6 +33,10 @@ async function fetchPartial(name, token) {
   if (token !== navToken) return null;
   const html = json.html ?? json.markup ?? json.content ?? json.innerHTML ?? '';
 //  return { ...json, html: String(html) }; ...json не нужно указывать, исправлено
+
+  // 👇 вот эту строчку добавь
+  console.debug('[partial]', name, 'loaded keys:', Object.keys(json));
+
 	return { html: String(html) };
 }
 
