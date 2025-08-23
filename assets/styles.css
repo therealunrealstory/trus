@@ -262,38 +262,27 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
 /* === Medical Timeline: двухконтейнерная компоновка как у Legal === */
 
 /* 1) Шапка (подложка + рамка) */
-/* Timeline → Medical header: 1:1 как у Legal */
+/* --- Align Medical header with Legal header (Timeline page only) --- */
 html[data-route="timeline"] .roadmap-head{
-  background: rgba(0,0,0,0.2);
+  display:block;                          /* мета уходит под заголовок */
+  background: rgba(0,0,0,0.2);            /* как у .lt-head */
   border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 16px;
-  padding: 10px 16px 18px;
-  margin-bottom: 16px;
-
-  /* критично: мета под заголовком, а не сбоку */
-  display: block;
+  border-radius:16px;
+  padding:16px 18px;                      /* тот же паддинг, что у Legal */
+  margin:0 0 16px;                        /* без лишнего отступа сверху */
 }
 
-/* на всякий случай убираем любые внешние "вспучивания" от первого элемента */
-html[data-route="timeline"] .roadmap-head > :first-child{
-  margin-top: 0;
+html[data-route="timeline"] .roadmap-title{
+  font-size:22px;                         /* как .lt-title */
+  margin:0 0 6px;                         /* как у Legal: небольшой зазор к мета */
+  line-height:1.25;
 }
 
-html[data-route="timeline"] .roadmap-head .roadmap-title{
-  /* как у .lt-title */
-  margin: 0 0 6px 0;
-  font-size: 22px;
-  line-height: 1.25;
-  font-weight: 600; /* можно убрать, если у вас другой вес в теме */
+html[data-route="timeline"] .roadmap-meta{
+  display:block;                          /* гарантируем перенос под заголовок */
+  font-size:14px;                         /* как .lt-meta */
+  color:rgba(231,236,243,0.7);
 }
-
-html[data-route="timeline"] .roadmap-head .roadmap-meta{
-  /* как у .lt-meta */
-  font-size: 14px;
-  color: rgba(231,236,243,0.70);
-  margin: 0; /* чтобы мета не «подпрыгивала» рядом */
-}
-
 
 /* 2) Тело (подложка, внутри — 3 раскрывающихся списка) */
 .roadmap-body{
