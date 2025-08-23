@@ -198,95 +198,6 @@ html[dir="rtl"] .icon-btn svg { margin-left: 6px; margin-right: 0; }
   .subnav-btn{ transition:none; }
 }
 
-/* =========================
-   Roadmap (Хронология)
-   ========================= */
-.roadmap-head{
-  display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap; margin-bottom:.25rem;
-}
-.roadmap-title{ font-size:1.75rem; margin:0; }
-.roadmap-meta{ color:rgba(255,255,255,0.75); font-size:.9rem; }
-
-.roadmap-legend{
-  display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 20px;
-}
-.roadmap-chip{
-  border:1px solid rgba(255,255,255,.12);
-  padding:4px 8px;
-  border-radius:999px;
-  font-size:.78rem;
-  color:rgba(255,255,255,0.8);
-}
-.roadmap-chip b{ color:#fff; font-weight:600 }
-
-.roadmap-grid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:16px;
-  width:100%;
-}
-@media (min-width: 900px){
-  .roadmap-grid{ grid-template-columns:1fr 1fr 1fr; }
-}
-
-.roadmap-col{
-  background: rgba(0,0,0,0.25);
-  border:1px solid rgba(255,255,255,.10);
-  border-radius:14px;
-  overflow:visible;
-}
-.roadmap-col > header{ margin:0; padding:6px; border-bottom:1px solid rgba(255,255,255,.10); }
-
-.roadmap-toggle{
-  display:block; width:100%; box-sizing:border-box;
-  background:transparent; color:#e5e7ff;
-  border:1.75px solid transparent; /* всегда тонкая */
-  border-radius:12px; padding:14px 16px; font-size:1rem; letter-spacing:.3px; cursor:pointer; margin:0;
-}
-.roadmap-col:not(.is-collapsed) .roadmap-toggle{ border-color:#4f46e5; }
-.roadmap-toggle:focus{ outline:none; box-shadow:none }
-.roadmap-toggle:focus-visible{ outline:1.75px solid #4f46e5; outline-offset:2px }
-.roadmap-col.is-collapsed .roadmap-toggle{ border-color:transparent; }
-
-.roadmap-caret{ transition:transform .2s ease; display:inline-block; margin-right:.4rem; }
-.roadmap-col.is-collapsed .roadmap-caret{ transform:rotate(-90deg); }
-
-.roadmap-list{ padding:10px; display:block; }
-.roadmap-col.is-collapsed .roadmap-list{ display:none; }
-
-/* Roadmap: раскрытые детали — курсив */
-.roadmap-details {
-  font-style: italic;
-}
-
-/* ---------------------------------------
-   FIX: мобильный горизонтальный скролл в Roadmap (Medical Timeline)
-   Карточки не должны выходить за подложку и ширину страницы.
-   --------------------------------------- */
-@media (max-width: 820px){
-  /* 1) Режем горизонтальный оверфлоу только в теле Roadmap */
-  .roadmap-body{
-    overflow-x: clip;      /* не меняет визуал, но не даёт странице появиться горизонтальному скроллу */
-  }
-
-  /* 2) Гарантируем, что контент списка и карточек не расширяется сверх 100% */
-  .roadmap-list{
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-  .roadmap-item{
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-
-  /* 3) Если внутри есть длинные «склеенные» куски (URL, коды и т.п.) — мягко переносим */
-  .roadmap-summary,
-  .roadmap-details{
-    overflow-wrap: anywhere;  /* переносим очень длинные слова/URL только при необходимости */
-    word-break: break-word;   /* страховка для старых движков */
-  }
-}
-
 
 /* === Medical Timeline: двухконтейнерная компоновка как у Legal === */
 
@@ -487,3 +398,95 @@ html[data-route="timeline"] .roadmap-meta{
 
 /* чтобы страница не прокручивалась под модалкой */
 body.modal-open{ overflow:hidden; }
+
+/* =========================
+   Roadmap (Хронология)
+   ========================= */
+.roadmap-head{
+  display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap; margin-bottom:.25rem;
+}
+.roadmap-title{ font-size:1.75rem; margin:0; }
+.roadmap-meta{ color:rgba(255,255,255,0.75); font-size:.9rem; }
+
+.roadmap-legend{
+  display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 20px;
+}
+.roadmap-chip{
+  border:1px solid rgba(255,255,255,.12);
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:.78rem;
+  color:rgba(255,255,255,0.8);
+}
+.roadmap-chip b{ color:#fff; font-weight:600 }
+
+.roadmap-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+  width:100%;
+}
+@media (min-width: 900px){
+  .roadmap-grid{ grid-template-columns:1fr 1fr 1fr; }
+}
+
+.roadmap-col{
+  background: rgba(0,0,0,0.25);
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:14px;
+  overflow:visible;
+}
+.roadmap-col > header{ margin:0; padding:6px; border-bottom:1px solid rgba(255,255,255,.10); }
+
+.roadmap-toggle{
+  display:block; width:100%; box-sizing:border-box;
+  background:transparent; color:#e5e7ff;
+  border:1.75px solid transparent; /* всегда тонкая */
+  border-radius:12px; padding:14px 16px; font-size:1rem; letter-spacing:.3px; cursor:pointer; margin:0;
+}
+.roadmap-col:not(.is-collapsed) .roadmap-toggle{ border-color:#4f46e5; }
+.roadmap-toggle:focus{ outline:none; box-shadow:none }
+.roadmap-toggle:focus-visible{ outline:1.75px solid #4f46e5; outline-offset:2px }
+.roadmap-col.is-collapsed .roadmap-toggle{ border-color:transparent; }
+
+.roadmap-caret{ transition:transform .2s ease; display:inline-block; margin-right:.4rem; }
+.roadmap-col.is-collapsed .roadmap-caret{ transform:rotate(-90deg); }
+
+.roadmap-list{ padding:10px; display:block; }
+.roadmap-col.is-collapsed .roadmap-list{ display:none; }
+
+/* Roadmap: раскрытые детали — курсив */
+.roadmap-details {
+  font-style: italic;
+}
+
+/* =========================
+   FIX: Mobile overflow (Medical Timeline)
+   ========================= */
+@media (max-width: 820px){
+
+  /* Отрезаем горизонтальное переполнение на контейнере страницы Timeline */
+  html[data-route="timeline"] #subpage > section{
+    overflow-x: hidden !important;
+  }
+
+  /* И на подложке Medical Timeline */
+  html[data-route="timeline"] .roadmap-body{
+    overflow-x: hidden !important;   /* вместо clip — надёжнее на Android */
+  }
+
+  /* Страховка: внутренности не могут быть шире контейнера */
+  html[data-route="timeline"] .roadmap-grid,
+  html[data-route="timeline"] .roadmap-list,
+  html[data-route="timeline"] .roadmap-item{
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Если окажутся сверхдлинные слова/URL — переносим их внутри карточек */
+  html[data-route="timeline"] .roadmap-summary,
+  html[data-route="timeline"] .roadmap-details{
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
