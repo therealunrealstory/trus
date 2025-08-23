@@ -16,7 +16,7 @@ let currentDict = null;
 /* ---------- СТИЛИ (как было: вертикальные подписи + мигающая NOW) ---------- */
 const TPL_STYLE = `
 :root{
-  --indigo-300:#a3bffa;
+  --indigo-400:#7f9cf5;
   --indigo-600:#4f46e5;
   --red-500:#ef4444;
 
