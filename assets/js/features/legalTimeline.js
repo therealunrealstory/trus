@@ -101,6 +101,10 @@ const TPL_STYLE = `
 .lt-swatch.freeze{ width:44px; height:12px; background:var(--red-500); border-radius:8px; }
 .lt-swatch.future{ width:44px; background:transparent; border-top:4px dashed var(--indigo-600); height:0; }
 
+/* ▼ ДОБАВЛЕНО: образцы для «мигающей линии» и точка в легенде */
+.lt-swatch.now{ width:44px; height:4px; background:#a5b4fc; border-radius:4px; animation: lt-pulse 1.9s ease-out infinite; }
+.lt-legend .lt-dot{ position:static; transform:none; cursor:default; }
+
 /* MOBILE: вертикальная шкала слева */
 @media (max-width:820px){
   .lt-track{ height:1200px; }
@@ -176,13 +180,22 @@ function mountLegend(dict, wrap){
   const tBase   = dict?.legend?.base   ?? 'Litigation period';
   const tFreeze = dict?.legend?.freeze ?? 'Asset freeze';
   const tFuture = dict?.legend?.future ?? 'Legal prospects';
+  const tEventClickable = dict?.legend?.eventClickable ?? 'Event (clickable)'; // ▼ ДОБАВЛЕНО
+  const tNow    = dict?.legend?.now    ?? 'Current time';                      // ▼ ДОБАВЛЕНО
+
   const el = document.createElement('div');
   el.className = 'lt-legend';
   el.innerHTML = html`
+    <!-- ▼ ДОБАВЛЕНО: точка события — первым пунктом -->
+    <div class="lt-leg-item"><span class="lt-dot" aria-hidden="true"></span><span>${esc(tEventClickable)}</span></div>
+
     <div class="lt-leg-item"><span class="lt-swatch pre"></span><span>${esc(tPre)}</span></div>
     <div class="lt-leg-item"><span class="lt-swatch base"></span><span>${esc(tBase)}</span></div>
     <div class="lt-leg-item"><span class="lt-swatch freeze"></span><span>${esc(tFreeze)}</span></div>
     <div class="lt-leg-item"><span class="lt-swatch future"></span><span>${esc(tFuture)}</span></div>
+
+    <!-- ▼ ДОБАВЛЕНО: «настоящее время» — мигающий отрезок -->
+    <div class="lt-leg-item"><span class="lt-swatch now" aria-hidden="true"></span><span>${esc(tNow)}</span></div>
   `;
   wrap.appendChild(el);
 }
