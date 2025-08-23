@@ -100,7 +100,7 @@ const TPL_STYLE = `
 .lt-swatch.pre{ width:44px; background:var(--indigo-300); }
 .lt-swatch.base{ width:44px; background:var(--indigo-600); }
 .lt-swatch.freeze{ width:44px; height:12px; background:var(--red-500); border-radius:8px; }
-.lt-swatch.future { 
+.lt-legend .lt-swatch.future { 
   background: transparent; border: 0; height: 0;
   border-top: 4px dashed var(--indigo-600); border-radius: 0;
 }
