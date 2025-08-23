@@ -1,8 +1,9 @@
 // /assets/js/core/pages/roadmap.js
 // Вкладка «Хронология»: без блока легенды, пульс перенесён в заголовок "Сейчас".
+// Теперь умеет рендерить Medical Timeline в «двухконтейнерной» схеме, как Legal.
 
-import * as DOM from '../dom.js';
-import * as I18N from '../i18n.js';
+import * as DOM from './dom.js';
+import * as I18N from './i18n.js';
 
 const qs        = DOM.qs        || ((sel, root = document) => root.querySelector(sel));
 const createEl  = DOM.createEl  || ((tag, attrs = {}) => {
@@ -54,7 +55,7 @@ function mergeLocalized(data, dict) {
 function statusLabel(s){ return (s==='done')?'done':(s==='current')?'current':(s==='planned')?'planned':(s==='tentative')?'tentative':(s||''); }
 function normalizeLabels(it){ if (Array.isArray(it.labels)&&it.labels.length) return it.labels.map(cleanLabel); if (typeof it.type==='string'&&it.type.trim()) return it.type.split('+').map(cleanLabel); return []; }
 function cleanLabel(s){ return (s||'').toString().trim().toLowerCase(); }
-function pretty(t){ const map={'rt':'RT','car-t':'CAR-T','car-t':'CAR-T','tki':'TKI','mi':'MI'}; if(map[t]) return map[t]; return t.split(' ').map(w=>w?(w[0].toUpperCase()+w.slice(1)):w).join(' '); }
+function pretty(t){ const map={'rt':'RT','car-t':'CAR-T','tki':'TKI','mi':'MI'}; if(map[t]) return map[t]; return t.split(' ').map(w=>w?(w[0].toUpperCase()+w.slice(1)):w).join(' '); }
 
 function tLabel(key, dict){
   const k = (key || '').toLowerCase();
@@ -80,47 +81,74 @@ function sortByTime(a,b){
   return getKey(a)>getKey(b)?1:-1;
 }
 
-function render(container, data, dict){
+/**
+ * Рендер страницы/блока.
+ * Если opts.medicalWrap === true, оборачиваем «шапку» и «сетки» в две карточки .mtl-head и .mtl-body
+ * (визуально как Legal Timeline).
+ */
+function render(container, data, dict, opts = {}){
+  const { medicalWrap = false } = opts;
   container.innerHTML='';
 
   const ui = dict?.ui || {};
-  const tTitle=ui.page_title||'Treatment Roadmap';
-  const tMetaUpd=ui.meta_updated||'Updated';
-  const tSecCompleted=ui.section_completed||'Completed';
-  const tSecNow=ui.section_now||'Now';
-  const tSecPlans=ui.section_plans||'Plans';
-  const tNoEntries=ui.no_entries||'No entries yet.';
-  const tBtnDetails=ui.btn_details||'Details';
-  const tBtnHide=ui.btn_hide||'Hide';
-  const tNotice=ui.notice_tbd||'“TBD” = “to be determined”…';
+  const tTitle = medicalWrap ? (ui.medical_title || 'Medical Timeline') : (ui.page_title || 'Treatment Roadmap');
+  const tMetaUpd     = ui.meta_updated   || 'Updated';
+  const tSecCompleted= ui.section_completed || 'Completed';
+  const tSecNow      = ui.section_now       || 'Now';
+  const tSecPlans    = ui.section_plans     || 'Plans';
+  const tNoEntries   = ui.no_entries        || 'No entries yet.';
+  const tBtnDetails  = ui.btn_details       || 'Details';
+  const tBtnHide     = ui.btn_hide          || 'Hide';
+  const tNotice      = ui.notice_tbd        || '“TBD” = “to be determined”…';
 
-  const header=createEl('div',{class:'roadmap-head'});
-  const h1=createEl('h1',{class:'roadmap-title'}); h1.textContent=tTitle;
-  const meta=createEl('div',{class:'roadmap-meta'});
-  const when=data?.meta?.updated_at?new Date(data.meta.updated_at).toLocaleString():'—';
-  const by=data?.meta?.updated_by?` • ${data.meta.updated_by}`:'';
-  meta.textContent=`${tMetaUpd} ${when}${by}`;
+  // header
+  const header = createEl('div',{class:'roadmap-head'});
+  const h1     = createEl('h1',{class:'roadmap-title'}); h1.textContent=tTitle;
+  const meta   = createEl('div',{class:'roadmap-meta'});
+  const when   = data?.meta?.updated_at ? new Date(data.meta.updated_at).toLocaleString() : '—';
+  const by     = data?.meta?.updated_by ? ` • ${data.meta.updated_by}` : '';
+  meta.textContent = `${tMetaUpd} ${when}${by}`;
   header.append(h1,meta);
-  container.appendChild(header);
 
-  const items=(data?.items||[]).slice().sort(sortByTime);
-  const done=items.filter(i=>i.status==='done');
-  const current=items.filter(i=>i.status==='current').slice(0,1);
-  const plans=items.filter(i=>i.status==='planned'||i.status==='tentative');
+  // data split
+  const items  = (data?.items||[]).slice().sort(sortByTime);
+  const done   = items.filter(i=>i.status==='done');
+  const current= items.filter(i=>i.status==='current').slice(0,1);
+  const plans  = items.filter(i=>i.status==='planned'||i.status==='tentative');
 
-  const grid=createEl('div',{class:'roadmap-grid'});
+  // grid
+  const grid = createEl('div',{class:'roadmap-grid'});
   grid.appendChild(makeColumn('completed',tSecCompleted,done,{collapsed:true,tNoEntries,tBtnDetails,tBtnHide}));
   grid.appendChild(makeColumn('now',tSecNow,current,{collapsed:false,tNoEntries,tBtnDetails,tBtnHide,emphasizeNow:true}));
   grid.appendChild(makeColumn('plans',tSecPlans,plans,{collapsed:true,tNoEntries,tBtnDetails,tBtnHide}));
-  container.appendChild(grid);
 
-  const notice=createEl('div',{class:'roadmap-notice'});
-  notice.innerHTML=esc(tNotice);
-  container.appendChild(notice);
+  // notice
+  const notice = createEl('div',{class:'roadmap-notice'});
+  notice.innerHTML = esc(tNotice);
 
-  const m=location.hash.match(/^#\/roadmap\/(.+)$/);
+  if (medicalWrap){
+    // Общая подложка из 2 карточек, как у Legal
+    const shell   = createEl('div', { class: 'mtl' });
+    const headBox = createEl('div', { class: 'mtl-head' });
+    const bodyBox = createEl('div', { class: 'mtl-body' });
+
+    headBox.appendChild(header);
+    bodyBox.appendChild(grid);
+    bodyBox.appendChild(notice);
+
+    shell.append(headBox, bodyBox);
+    container.appendChild(shell);
+  } else {
+    // Обычный режим страницы Roadmap
+    container.appendChild(header);
+    container.appendChild(grid);
+    container.appendChild(notice);
+  }
+
+  // якорь вида #/roadmap/<id> — раскрываем нужную колонку и подсвечиваем карточку
+  const m = location.hash.match(/^#\/roadmap\/(.+)$/);
   if(m&&m[1]){
-    const el=container.querySelector(`[data-id="${CSS.escape(m[1])}"]`);
+    const el = container.querySelector(`[data-id="${CSS.escape(m[1])}"]`);
     if(el){
       const col=el.closest('.roadmap-col');
       if(col?.classList.contains('is-collapsed')){
@@ -141,23 +169,24 @@ function makeColumn(kind,titleText,list,opts){
   const section=createEl('section',{class:'roadmap-col'+(collapsed?' is-collapsed':'')});
   const header=createEl('header');
   const toggle=createEl('button',{class:'roadmap-toggle','aria-expanded':String(!collapsed),'aria-controls':`list-${kind}`});
+  toggle.textContent=titleText;
+  const pulse=emphasizeNow?createEl('span',{class:'roadmap-nowpulse',title:'now'}):null;
+  if(pulse) toggle.prepend(pulse,' ');
+  const onToggle=()=>{
+    const cur=section.classList.contains('is-collapsed');
+    section.classList.toggle('is-collapsed',!cur);
+    toggle.setAttribute('aria-expanded',String(cur));
+  };
+  toggle.addEventListener('click',onToggle);
+  cleanup.push(()=>toggle.removeEventListener('click',onToggle));
 
-  // Добавляем пульсирующую точку в заголовок "Сейчас"
-  if (emphasizeNow) {
-    toggle.innerHTML=`<span class="roadmap-caret">▾</span><span>${esc(titleText)} <span class="roadmap-nowpulse" style="margin-left:6px"></span></span>`;
-  } else {
-    toggle.innerHTML=`<span class="roadmap-caret">▾</span><span>${esc(titleText)}</span>`;
-  }
+  header.append(toggle);
+  section.append(header);
 
-  header.appendChild(toggle);
-
-  const listEl=createEl('div',{class:'roadmap-list',id:`list-${kind}`,role:'region','aria-label':titleText});
-  const clickHandler=(e)=>{ if(e.target.closest('.roadmap-toggle')!==toggle) return; const isOpen=!section.classList.contains('is-collapsed'); section.classList.toggle('is-collapsed',isOpen); toggle.setAttribute('aria-expanded',String(isOpen?false:true)); };
-  header.addEventListener('click',clickHandler);
-  cleanup.push(()=>header.removeEventListener('click',clickHandler));
-
-  if(!list?.length){
-    const p=createEl('div',{class:'roadmap-item'}); p.textContent=tNoEntries||'No entries yet.'; listEl.appendChild(p);
+  const listEl=createEl('div',{class:'roadmap-list',id:`list-${kind}`});
+  if(!list.length){
+    const empty=createEl('div',{class:'roadmap-empty'}); empty.textContent=tNoEntries||'—';
+    listEl.appendChild(empty);
   }else{
     list.forEach(it=>listEl.appendChild(makeCard(it,{tBtnDetails,tBtnHide,emphasizeNow})));
   }
@@ -165,7 +194,7 @@ function makeColumn(kind,titleText,list,opts){
   return section;
 }
 
-function makeCard(it,{tBtnDetails,tBtnHide,emphasizeNow}){
+function makeCard(it,{tBtnDetails,tBtnHide}){
   const wrap=createEl('article',{class:`roadmap-item ${it.status||''}`,'data-id':it.id||''});
   const top=createEl('div',{class:'roadmap-topline'});
   const left=createEl('div');
@@ -219,11 +248,14 @@ export async function init(mountArg){
   root.appendChild(page);
 
   const merged = await loadAll();
-  render(page, merged, state.i18n);
+
+  // Авто-режим: если монтируемся в #medical-timeline — включаем medicalWrap
+  const medicalWrap = !!(root && (root.id === 'medical-timeline' || (root.closest && root.closest('#medical-timeline'))));
+  render(page, merged, state.i18n, { medicalWrap });
 
   const unSub = onLocaleChanged(async () => {
     const merged2 = await loadAll();
-    render(page, merged2, state.i18n);
+    render(page, merged2, state.i18n, { medicalWrap });
   });
   cleanup.push(unSub);
 
