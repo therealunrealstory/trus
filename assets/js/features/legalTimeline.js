@@ -100,9 +100,7 @@ const TPL_STYLE = `
 .lt-swatch.pre{ width:44px; background:var(--indigo-300); }
 .lt-swatch.base{ width:44px; background:var(--indigo-600); }
 .lt-swatch.freeze{ width:44px; height:12px; background:var(--red-500); border-radius:8px; }
-.lt-swatch.future{ width:44px; background:transparent; border-top:4px dashed var(--indigo-600); height:0; }
-/* hard override: future swatch in Legal Timeline legend */
-.lt-legend .lt-swatch.future{
+.lt-swatch.future{
   background: transparent !important;
   box-shadow: none !important;
   border: 0 !important;
