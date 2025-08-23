@@ -1,10 +1,13 @@
 // assets/js/features/legalTimeline.js
-// Лёгкий рендер юридической шкалы (линии + точки + модалка) в переданный контейнер.
+// Юридическая шкала (линии + точки + модалка) с локализацией.
 
 import { openModal } from '../core/modal.js';
+import * as I18N from '../core/i18n.js';
 
 let root = null;
 let resizeTimer = null;
+let offLocaleCb = null;
+let onResizeHandler = null;
 
 const TPL_STYLE = `
 :root{
@@ -18,22 +21,23 @@ const TPL_STYLE = `
   --label-gap:18px;
 }
 .lt-wrap { position:relative; }
-/* Шапка (заголовок + Updated …) — фон как у Medical */
+
+/* Шапка */
 .lt-head{
-  background: rgba(0,0,0,0.2);              /* было светлее */
-  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.12);
   border-radius:16px;
   padding:16px 18px;
   margin-bottom:16px;
 }
 .lt-title{ margin:0 0 6px 0; font-size:22px; }
-.lt-meta { color:rgba(231,236,243,.7); font-size:14px; }
+.lt-meta { color:rgba(231,236,243,0.7); font-size:14px; }
 
-/* Контейнер таймлайна — тёмная подложка как у Medical */
+/* Контейнер таймлайна */
 .lt-timeline{
   position:relative;
-  background: rgba(0,0,0,0.2);              /* было rgba(255,255,255,0.05) */
-  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.12);
   border-radius:16px;
   overflow:hidden;
   width:100%;
@@ -43,50 +47,45 @@ const TPL_STYLE = `
 .lt-pre{ position:absolute; height:2px; background:var(--indigo-300); top:calc(var(--lineY) - 1px); z-index:3; border-radius:2px; }
 .lt-base{ position:absolute; height:4px; background:var(--indigo-600); top:var(--lineY); transform:translateY(-50%); z-index:2; }
 .lt-freeze{ position:absolute; height:12px; background:var(--red-500); border-radius:8px; top: calc(var(--lineY) + var(--freeze-offset));
-  z-index:3; filter: drop-shadow(0 2px 6px rgba(0,0,0,.25)); }
+  z-index:3; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.25)); }
 .lt-future{ position:absolute; height:4px; background:transparent; top:var(--lineY); transform:translateY(-50%); z-index:2;
   border-top:4px dashed var(--indigo-600); }
 
 .lt-dot{
   position:absolute; width:16px; height:16px; border-radius:50%;
   background:#ffffff; outline:1px solid rgba(255,255,255,0.12);
-  box-shadow:0 0 0 2px rgba(79,70,229,.45);
+  box-shadow:0 0 0 2px rgba(79,70,229,0.45);
   cursor:pointer; transform:translate(-50%, -50%); z-index:4;
 }
 .lt-label{
-  position:absolute; font-size:12px; color:rgba(231,236,243,.75);
-  white-space:nowrap; text-shadow:0 1px 0 rgba(0,0,0,.35); line-height:1.1;
+  position:absolute; font-size:12px; color:rgba(231,236,243,0.75);
+  white-space:nowrap; text-shadow:0 1px 0 rgba(0,0,0,0.35);
+  transform: translate(-50%, 0);
+  top: calc(var(--lineY) - 26px);
 }
-@media (min-width:821px){
-  .lt-label{
-    top: var(--lineY);
-    transform: translate(-50%, calc(-100% - var(--label-gap))) rotate(180deg);
-    writing-mode: vertical-rl; text-orientation: mixed;
-  }
+.lt-label::before{
+  content: '';
+  position:absolute; left:50%; top:22px; width:1px; height:14px;
+  background:rgba(255,255,255,0.16);
 }
 
-/* Now marker */
-@keyframes lt-pulse{0%{box-shadow:0 0 0 0 rgba(165,180,252,.6);}70%{box-shadow:0 0 0 12px rgba(165,180,252,0);}100%{box-shadow:0 0 0 0 rgba(165,180,252,0);} }
-.lt-now{ position:absolute; background:#a5b4fc; border-radius:2px; animation:lt-pulse 1.9s ease-out infinite; z-index:5; }
-
-/* Legend (компактно) */
-/* Легенда — тот же тёмный фон, чтобы не выбивалась */
+/* Легенда */
 .lt-legend{
-  display:flex;
-  gap:18px;
-  flex-wrap:wrap;
-  padding:10px 12px;
-  border-top:1px solid rgba(255,255,255,.12);
-  background: rgba(0,0,0,0.2);              /* было светлее */
-  font-size:13px;
-  color:rgba(231,236,243,.9);
+  display:flex; gap:18px; flex-wrap:wrap;
+  padding:12px 16px 16px 16px; color:#dfe7fb; font-size:13px;
 }
 .lt-leg-item{ display:flex; align-items:center; gap:8px; }
-.lt-swatch{ height:6px; border-radius:4px; }
+.lt-swatch{ display:inline-block; height:4px; border-radius:4px; }
 .lt-swatch.pre{ width:44px; background:var(--indigo-300); }
 .lt-swatch.base{ width:44px; background:var(--indigo-600); }
 .lt-swatch.freeze{ width:44px; height:12px; background:var(--red-500); border-radius:8px; }
 .lt-swatch.future{ width:44px; background:transparent; border-top:4px dashed var(--indigo-600); height:0; }
+
+/* Маркер «сейчас» */
+.lt-now{
+  position:absolute; background:#ffffff; opacity:0.9; z-index:1;
+  pointer-events:none;
+}
 
 /* Mobile layout */
 @media (max-width:820px){
@@ -95,12 +94,21 @@ const TPL_STYLE = `
   .lt-base{ left:44px; width:4px; transform:none; }
   .lt-freeze{ left: calc(44px - var(--freeze-offset)); width:12px; height:auto; }
   .lt-future{ left:44px; width:0; height:auto; border-top:none; border-left:4px dashed var(--indigo-600); transform:none; }
+  .lt-label{
+    transform:none; left:60px; top:auto;
+  }
+  .lt-label::before{ display:none; }
 }
 `;
 
 function html(strings, ...vals) {
   return strings.reduce((acc, s, i) => acc + s + (vals[i] ?? ''), '');
 }
+
+function esc(s){ return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+const NBSP = '\u00A0';
+const isMobile = () => matchMedia('(max-width:820px)').matches;
 
 function parseYM(s){
   if (!s) return null;
@@ -109,13 +117,6 @@ function parseYM(s){
   if (/^\d{4}$/.test(s)) return new Date(s+'-01-01T00:00:00Z');
   return new Date(s);
 }
-
-const EN_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const NBSP = '\u00A0';
-const isMobile = () => matchMedia('(max-width:820px)').matches;
-const clamp    = (v,a,b)=>Math.max(a,Math.min(b,v));
-const esc      = (s)=>String(s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const fmtMonthYear = d => EN_MONTHS[d.getUTCMonth()] + NBSP + d.getUTCFullYear();
 
 function posHelpers(track) {
   const cs = getComputedStyle(document.documentElement);
@@ -127,49 +128,92 @@ function posHelpers(track) {
   };
 }
 
-async function loadData() {
+async function loadBase() {
   const res = await fetch('/partials/legal-timeline.json', { cache: 'no-store' });
   if (!res.ok) throw new Error('Failed to load legal-timeline.json');
   return res.json();
 }
+async function loadDict(locale) {
+  const lc = (locale || '').toLowerCase() || 'en';
+  try {
+    const res = await fetch(`/i18n/legalTimeline/${lc}.json`, { cache: 'no-store' });
+    if (!res.ok) throw 0;
+    return await res.json();
+  } catch { return {}; }
+}
 
-function mountLegend(legend, wrap){
+function mergeLocalized(data, dict) {
+  const out = structuredClone(data ?? {});
+  const items = Array.isArray(out.items) ? out.items : [];
+  const map = dict?.items || {};
+  out.items = items.map(it => {
+    if (!it?.id) return it;
+    const loc = map[it.id];
+    if (loc) {
+      it.when_label = loc.when_label ?? it.when_label;
+      it.title      = loc.title      ?? it.title;
+      it.summary    = loc.summary    ?? it.summary;
+      it.details    = loc.details    ?? it.details;
+    }
+    return it;
+  });
+  return out;
+}
+
+function fmtTpl(tpl, vars) {
+  return String(tpl || '').replace(/\{(\w+)\}/g, (_, k) => (vars?.[k] ?? ''));
+}
+
+function fmtMonthYear(d, monthNames) {
+  return (monthNames[d.getUTCMonth()] || '') + NBSP + d.getUTCFullYear();
+}
+
+function mountLegend(dict, wrap){
+  const tPre    = dict?.legend?.pre    ?? 'Prerequisites';
+  const tBase   = dict?.legend?.base   ?? 'Litigation period';
+  const tFreeze = dict?.legend?.freeze ?? 'Asset freeze';
+  const tFuture = dict?.legend?.future ?? 'Legal prospects';
   const el = document.createElement('div');
   el.className = 'lt-legend';
   el.innerHTML = html`
-    <div class="lt-leg-item"><span class="lt-swatch pre"></span><span>Prerequisites</span></div>
-    <div class="lt-leg-item"><span class="lt-swatch base"></span><span>Litigation period</span></div>
-    <div class="lt-leg-item"><span class="lt-swatch freeze"></span><span>Asset freeze</span></div>
-    <div class="lt-leg-item"><span class="lt-swatch future"></span><span>Legal prospects</span></div>
+    <div class="lt-leg-item"><span class="lt-swatch pre"></span><span>${esc(tPre)}</span></div>
+    <div class="lt-leg-item"><span class="lt-swatch base"></span><span>${esc(tBase)}</span></div>
+    <div class="lt-leg-item"><span class="lt-swatch freeze"></span><span>${esc(tFreeze)}</span></div>
+    <div class="lt-leg-item"><span class="lt-swatch future"></span><span>${esc(tFuture)}</span></div>
   `;
   wrap.appendChild(el);
 }
 
-function openEventModal(itemOrGroup){
+function openEventModal(dict, itemOrGroup){
+  const tMore   = dict?.modal?.more  ?? 'More details';
+  const tLess   = dict?.modal?.less  ?? 'Collapse';
+  const tClust  = dict?.modal?.clusterTitle ?? 'Events ({count})';
+  const tSingle = dict?.modal?.singleTitle  ?? '{when} — {title}';
+
   if (Array.isArray(itemOrGroup)){
     const body = itemOrGroup.map(it => `
-      <div style="padding-top:10px; margin-top:10px; border-top:1px dashed rgba(255,255,255,.12)">
+      <div style="padding-top:10px; margin-top:10px; border-top:1px dashed rgba(255,255,255,0.12)">
         <div style="font-weight:600">${esc(it.title||'')}</div>
         <div class="muted" style="margin:4px 0 6px 0">${esc(it.when_label||'')}</div>
         <div>${esc(it.summary||'')}</div>
         ${it.details ? `<div class="js-morebox" style="display:none; font-style:italic; color:#dfe7fb; margin-top:6px">${esc(it.details)}</div>
-        <button class="btn js-more" style="margin-top:6px">More details</button>`:''}
+        <button class="btn js-more" style="margin-top:6px">${esc(tMore)}</button>`:''}
       </div>
     `).join('');
-    openModal(`Events (${itemOrGroup.length})`, body);
+    openModal(fmtTpl(tClust, { count: itemOrGroup.length }), body);
   } else {
     const it = itemOrGroup;
     const more = it.details
       ? `<div class="js-morebox" style="display:none; font-style:italic; color:#dfe7fb; margin-top:6px">${esc(it.details)}</div>
-         <p><button class="btn js-more">More details</button></p>`
+         <p><button class="btn js-more">${esc(tMore)}</button></p>`
       : '';
     openModal(
-      `${esc(it.when_label||'')} — ${esc(it.title||'')}`,
+      fmtTpl(tSingle, { when: esc(it.when_label||''), title: esc(it.title||'') }),
       `<div class="muted" style="margin-bottom:8px">${esc(it.summary||'')}</div>${more}`
     );
   }
 
-  // Делегирование на кнопки "More details"
+  // Делегирование на кнопки «Подробнее/Свернуть»
   const bodyEl = document.getElementById('modalBody');
   const handler = (e)=>{
     const btn = e.target.closest('.js-more'); if(!btn) return;
@@ -183,7 +227,7 @@ function openEventModal(itemOrGroup){
     if (!isBox(box)) return;
     const opened = box.style.display !== 'none';
     box.style.display = opened ? 'none' : 'block';
-    btn.textContent = opened ? 'More details' : 'Collapse';
+    btn.textContent = opened ? (dict?.modal?.more ?? 'More details') : (dict?.modal?.less ?? 'Collapse');
   };
   bodyEl.addEventListener('click', handler, { once:false });
 }
@@ -192,14 +236,14 @@ export async function mount(container) {
   root = container;
   root.innerHTML = '';
 
-  // Вставляем локальные стили
+  // локальные стили
   const style = document.createElement('style');
   style.textContent = TPL_STYLE;
 
   // Шапка
   const head = document.createElement('div');
   head.className = 'lt-head';
-  head.innerHTML = `<h3 class="lt-title">Legal Timeline</h3><div class="lt-meta">Loading…</div>`;
+  head.innerHTML = `<h3 class="lt-title"></h3><div class="lt-meta"></div>`;
 
   // Таймлайн
   const wrap = document.createElement('div');
@@ -216,22 +260,42 @@ export async function mount(container) {
 
   root.append(style, head, wrap);
 
+  // Подготовим ссылки на элементы
   const track     = wrap.querySelector('.lt-track');
   const preLine   = wrap.querySelector('.lt-pre');
   const baseLine  = wrap.querySelector('.lt-base');
   const freezeLn  = wrap.querySelector('.lt-freeze');
   const futureLn  = wrap.querySelector('.lt-future');
   const nowEl     = wrap.querySelector('.lt-now');
+  const titleEl   = head.querySelector('.lt-title');
+  const metaEl    = head.querySelector('.lt-meta');
 
-  // Загружаем данные
-  const data = await loadData().catch(() => null);
-  if (!data) {
-    head.querySelector('.lt-meta').textContent = 'Failed to load legal-timeline.json';
+  // загрузка данных и словаря
+  const base = await loadBase().catch(() => null);
+  const locale = (I18N.getLangFromQuery?.() || document.documentElement.lang || 'EN');
+  const dict = await loadDict(locale);
+
+  // Заголовок/лоадер
+  titleEl.textContent = dict?.page?.title ?? 'Legal Timeline';
+  metaEl.textContent  = dict?.page?.loading ?? 'Loading…';
+
+  if (!base) {
+    metaEl.textContent = dict?.page?.errorLoadJson ?? 'Failed to load json';
     return;
   }
-  head.querySelector('.lt-meta').textContent =
-    `Updated: ${new Date(data.meta?.updated_at || Date.now()).toLocaleString()} • ${data.meta?.updated_by || ''} • version: ${data.meta?.version || ''}`;
 
+  // «Updated …»
+  const updStr = dict?.meta?.updated ?? 'Updated: {date} • {user} • version: {version}';
+  metaEl.textContent = fmtTpl(updStr, {
+    date: new Date(base.meta?.updated_at || Date.now()).toLocaleString(),
+    user: base.meta?.updated_by || '',
+    version: base.meta?.version || ''
+  });
+
+  // Мержим тексты
+  const data = mergeLocalized(base, dict);
+
+  // сортировка
   const items = (data.items || []).slice().sort((a,b)=>{
     const ad = parseYM(a.date_start||a.date_end);
     const bd = parseYM(b.date_start||b.date_end);
@@ -271,7 +335,7 @@ export async function mount(container) {
       baseLine.style.height = Math.max(2, y1b - y1a) + '%';
       baseLine.style.transform = 'none';
 
-      // Freeze (red) — left of base
+      // Freeze (красная) — слева от base
       const yf1 = posV(posRatio(FREEZE_START))*100;
       const yf2 = posV(posRatio(now))*100;
       freezeLn.style.left = `calc(44px - var(--freeze-offset))`;
@@ -279,7 +343,7 @@ export async function mount(container) {
       freezeLn.style.height = Math.max(2, Math.abs(yf2 - yf1)) + '%';
       freezeLn.style.width = '12px';
 
-      // Future (dashed)
+      // Future (пунктир)
       const yfe1 = posV(posRatio(COURT_END))*100;
       const yfe2 = posV(posRatio(FUTURE_END))*100;
       futureLn.style.left = '44px';
@@ -318,7 +382,7 @@ export async function mount(container) {
     }
   }
 
-  // Кластеры точек (≤ 60 дней)
+  // Точки-события (кластер ≤ 60 дней)
   const TWO_MONTHS = 1000*60*60*24*60;
   const pointItems = items.filter(it => !(it.date_start && it.date_end)).slice().sort((a,b)=>{
     const ad = parseYM(a.date_start||a.date_end);
@@ -342,6 +406,13 @@ export async function mount(container) {
   const posR = d => clamp((d - domainStart) / spanMs, 0, 1);
 
   const dots = [];
+  const monthNames = Array.isArray(dict?.monthShort) && dict.monthShort.length === 12
+    ? dict.monthShort
+    : ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  const dotHint = (dict?.tooltip?.dot ?? 'Event — click for details');
+  const a11yDot = (dict?.a11y?.dotButton ?? dotHint);
+
   clusters.forEach(group => {
     const firstD = parseYM(group[0].date_start||group[0].date_end);
     const lastD  = parseYM(group[group.length-1].date_start||group[group.length-1].date_end);
@@ -350,12 +421,10 @@ export async function mount(container) {
     const dot = document.createElement('div'); dot.className = 'lt-dot';
     const label = document.createElement('div'); label.className = 'lt-label';
 
-    // Подпись
     label.textContent = (group.length === 1)
       ? (group[0].when_label || '')
-      : `${fmtMonthYear(firstD)} – ${fmtMonthYear(lastD)}`;
+      : `${fmtMonthYear(firstD, monthNames)} – ${fmtMonthYear(lastD, monthNames)}`;
 
-    // Позиционирование
     function place(){
       if (isMobile()){
         const y = (PV(posR(center))*100);
@@ -364,18 +433,22 @@ export async function mount(container) {
       } else {
         const x = (PH(posR(center))*100) + '%';
         dot.style.left = x; dot.style.top = 'var(--lineY)';
-        label.style.left = x; // top по CSS
+        label.style.left = x;
       }
     }
     place();
 
-    // Клик
+    // Тултипы/aria и клик
     if (group.length === 1) {
-      dot.title = 'Event — click for details';
-      dot.addEventListener('click', () => openEventModal(group[0]));
+      dot.title = dotHint;
+      dot.setAttribute('aria-label', a11yDot);
+      dot.addEventListener('click', () => openEventModal(dict, group[0]));
     } else {
-      dot.title = `Events (${group.length}) — click for details`;
-      dot.addEventListener('click', () => openEventModal(group));
+      const plural = (dict?.legend?.event ?? 'Event');
+      const hint   = (dict?.legend?.eventHint ?? '(clickable)');
+      dot.title = `${group.length} ${plural} — ${hint}`;
+      dot.setAttribute('aria-label', `${group.length} ${plural}`);
+      dot.addEventListener('click', () => openEventModal(dict, group));
     }
 
     track.appendChild(dot);
@@ -384,14 +457,13 @@ export async function mount(container) {
   });
 
   // Легенда
-  mountLegend(data.legend, wrap);
+  mountLegend(dict, wrap);
 
-  // Размещение линий
+  // Линии + «сейчас»
   placeLines();
 
-  // Resize
-  window.addEventListener('resize', onResize, { passive:true });
-  function onResize(){
+  // Resize handler (с очисткой при unmount)
+  onResizeHandler = function(){
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(()=>{
       placeLines();
@@ -408,10 +480,24 @@ export async function mount(container) {
         }
       });
     }, 120);
+  };
+  window.addEventListener('resize', onResizeHandler, { passive:true });
+
+  // Перерисовка при смене языка (если роутер не перерисует страницу сам)
+  if (typeof I18N.onLocaleChanged === 'function') {
+    offLocaleCb = I18N.onLocaleChanged(() => {
+      // Простая стратегия: полностью размонтируем и монтируем заново.
+      try { unmount(); } catch {}
+      try { mount(container); } catch {}
+    });
   }
 }
 
 export function unmount(){
-  window.removeEventListener('resize', ()=>{});
+  if (onResizeHandler) window.removeEventListener('resize', onResizeHandler);
+  onResizeHandler = null;
+  if (offLocaleCb) { try { offLocaleCb(); } catch {} offLocaleCb = null; }
   if (root) { root.innerHTML = ''; root = null; }
 }
+
+export default { mount, unmount };
