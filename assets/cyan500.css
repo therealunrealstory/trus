@@ -15,7 +15,8 @@
   --support-accent: var(--cyan-500);
   --support-accent-weak: var(--cyan-400);
   --support-accent-strong: var(--cyan-600);
-  --heart-accent: var(--fuchsia-500);
+/*  --heart-accent: var(--fuchsia-500);*/
+  --heart-accent: #4f46e5; /* Indigo 600 */
 
   /* Переназначаем любые green-* токены внутри страницы */
   --green-300: var(--cyan-300);
