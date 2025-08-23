@@ -94,12 +94,23 @@ const TPL_STYLE = `
   background: rgba(0,0,0,0.20);
   font-size:13px; color:rgba(231,236,243,0.9);
 }
+
 .lt-leg-item{ display:flex; align-items:center; gap:8px; }
 .lt-swatch{ display:inline-block; height:4px; border-radius:4px; }
 .lt-swatch.pre{ width:44px; background:var(--indigo-300); }
 .lt-swatch.base{ width:44px; background:var(--indigo-600); }
 .lt-swatch.freeze{ width:44px; height:12px; background:var(--red-500); border-radius:8px; }
 .lt-swatch.future{ width:44px; background:transparent; border-top:4px dashed var(--indigo-600); height:0; }
+/* hard override: future swatch in Legal Timeline legend */
+.lt-legend .lt-swatch.future{
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  width: 44px !important;
+  height: 0 !important;
+  border-top: 4px dashed var(--indigo-600) !important; /* горизонтально, как на шкале */
+  border-radius: 0 !important;
+}
 
 /* ▼ ДОБАВЛЕНО: образцы для «мигающей линии» и точка в легенде */
 .lt-swatch.now{ width:44px; height:4px; background:#a5b4fc; border-radius:4px; animation: lt-pulse 1.9s ease-out infinite; }
