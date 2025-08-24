@@ -195,38 +195,26 @@ function renderCampaignCard(c, fallbackUrl) {
 function injectStyles() {
   if (document.getElementById('rep-b2-styles')) return;
   const css = `
-		/*Тут будут стили для именно этого блока - такое правило, стили для бока храним в файлах блока*/
-		.rep-b2{
-		  display:grid; gap:12px;
-		  background: transparent !important;
-		  padding: 0 !important;
-		  border: 0 !important;
-		}
-		/* «GoFundMe» и прочие платформы — без подложки */
-		.rep-b2 .platform{
-		  background: transparent !important;
-		  padding: 0 !important;
-		  border: 0 !important;
-		}
-		.rep-b2 .platform-title{ font-weight:600; margin-bottom:6px; }
-
-		/* Внутренние ОТСЕКИ кампаний — с подложкой */
-		.rep-b2 .campaigns{ display:grid; gap:8px; }
-		.rep-b2 .card{
-		  border-radius:14px; padding:12px;
-		  background: rgba(0,0,0,0.18);
-		  border: 0;                    /* без рамки */
-		}
-		.rep-b2 .row{ display:flex; flex-wrap:wrap; gap:10px; font-size:.95rem; }
-		.rep-b2 .label{ opacity:.75; }
-		.rep-b2 .spacer{ flex:1 1 auto; }
-		.rep-b2 .open-link{ text-decoration: underline; }
-		.rep-b2 .muted, .rep-b2 .empty{ opacity:.75; font-size:.95rem; }
-
-		@media (min-width:700px){
-		  .rep-b2{ gap:16px; }
-		  .rep-b2 .card{ padding:14px 16px; }
-		}
+    /*Тут будут стили для именно этого блока - такое правило, стили для блока храним в файлах блока*/
+    .rep-b2 { display: grid; gap: 12px; }
+    .rep-b2 .platform-title { font-weight: 600; margin-bottom: 6px; }
+    .rep-b2 .campaigns { display: grid; gap: 8px; }
+    .rep-b2 .card { border-radius: 14px; padding: 12px; background: rgba(0,0,0,0.18); }
+    .rep-b2 .row { display:flex; flex-wrap:wrap; gap:10px; font-size: 0.95rem; }
+    .rep-b2 .label { opacity: .75; }
+    .rep-b2 .spacer { flex:1 1 auto; }
+    .rep-b2 .open-link { text-decoration: underline; }
+    .rep-b2 .muted { opacity:.7; font-size:.95rem; }
+    .rep-b2 .empty { opacity:.8; font-size:.95rem; }
+    @media (min-width: 700px) {
+      .rep-b2 { gap: 16px; }
+      .rep-b2 .card { padding: 14px 16px; }
+    }
+  `;
+  const style = document.createElement('style');
+  style.id = 'rep-b2-styles';
+  style.textContent = css;
+  document.head.appendChild(style);
 }
 
 /* utils */

@@ -175,12 +175,10 @@ function injectStyles(){
     .doc-card{
       display:grid; grid-template-columns: 88px 1fr auto; gap:12px;
       align-items:center; border-radius:14px; padding:12px;
-      background: rgba(0,0,0,0.18);      /* ВОЗВРАЩАЕМ подложку внутренним отсекам */
+      background: rgba(0,0,0,0.18);
       text-decoration:none; color:inherit;
-      border: 1px solid rgba(255,255,255,0.08);
     }
     .doc-card:hover{ background: rgba(255,255,255,0.08); }
-
     .thumbbox{ width:88px; height:88px; display:flex; align-items:center; justify-content:center; }
     .thumb{
       max-width:100%; max-height:100%; border-radius:10px; display:block; object-fit:cover;
