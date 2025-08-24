@@ -1,0 +1,33 @@
+{
+  "platforms": [
+    {
+      "id": "gofundme",
+      "name": "GoFundMe",
+      "url": "https://example.com/gofundme", 
+      "campaigns": [
+        {
+          "id": "gfm-2025-main",
+          "title": "The Real Unreal — Main 2025",
+          "period": { "start": "2025-07-01", "end": null },
+          "status": "active",
+          "metrics": { "raised": 18000, "currency": "USD", "donors": 240 }
+        }
+      ]
+    },
+    {
+      "id": "self",
+      "name": "Direct / Self-hosted",
+      "url": "https://therealunrealstory.com/support",
+      "campaigns": [
+        {
+          "id": "self-2025",
+          "title": "Direct Support 2025",
+          "period": { "start": "2025-06-10", "end": null },
+          "status": "active",
+          "metrics": { "raised": 9200, "currency": "USD", "donors": 110 }
+        }
+      ]
+    }
+  ],
+  "updated_at": "2025-08-24T00:00:00Z"
+}
