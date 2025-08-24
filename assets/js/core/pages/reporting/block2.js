@@ -16,24 +16,28 @@ export async function init(root) {
   if (mounted) return;
   mounted = true;
 
-  // Было:
-  // const host = root.querySelector('#rep-block2 > div');
-  // if (!host) return;
-
-  // Стало — терпимее к верстке:
-  const section = root.querySelector('#rep-block2');
+  // 1) Найти секцию: сначала по id, потом по заголовку (i18n-ключ)
+  let section = root.querySelector('#rep-block2');
+  if (!section) {
+    const h = root.querySelector('[data-i18n="reporting.block2.title"]');
+    section = h ? h.closest('section') : null;
+  }
   if (!section) {
     console.warn('[rep-b2] section #rep-block2 not found');
     return;
   }
+
+  // 2) Внутренний хост-контейнер (создадим, если нет)
   let host = section.querySelector(':scope > div');
   if (!host) {
-    // если внутреннего контейнера нет — создаём
     host = document.createElement('div');
     section.appendChild(host);
   }
 
+  console.debug('[rep-b2] mount on section:', section.id || '(no id)');
+
   injectStyles();
+
   host.innerHTML = `<div class="rep-b2 muted">${t('reporting.block2.loading', 'Loading fundraising history…')}</div>`;
 
   const data = await loadData('/data/fundraising_history.json');
@@ -48,6 +52,7 @@ export async function init(root) {
   lastLang = getLang();
 }
 
+
 export function destroy() {
   mounted = false;
 }
@@ -55,8 +60,10 @@ export function destroy() {
 // Для локализованного динамического контента перерисуем при смене языка
 export async function onLocaleChanged(/*lang, root*/) {
   // Если язык сменился — перерисуем блок (данные не перезагружаем)
-  const host = document.querySelector('#rep-block2 > div');
-  if (!host || !mounted) return;
+const section = document.querySelector('#rep-block2') 
+  || document.querySelector('[data-i18n="reporting.block2.title"]')?.closest('section');
+const host = section?.querySelector(':scope > div');
+if (!host || !mounted) return;
 
   const curLang = getLang();
   if (curLang === lastLang) return;
