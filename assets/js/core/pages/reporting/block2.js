@@ -16,24 +16,33 @@ export async function init(root) {
   if (mounted) return;
   mounted = true;
 
-  const host = root.querySelector('#rep-block2 > div');
-  if (!host) return;
+  // Было:
+  // const host = root.querySelector('#rep-block2 > div');
+  // if (!host) return;
+
+  // Стало — терпимее к верстке:
+  const section = root.querySelector('#rep-block2');
+  if (!section) {
+    console.warn('[rep-b2] section #rep-block2 not found');
+    return;
+  }
+  let host = section.querySelector(':scope > div');
+  if (!host) {
+    // если внутреннего контейнера нет — создаём
+    host = document.createElement('div');
+    section.appendChild(host);
+  }
 
   injectStyles();
-
-  // Состояние загрузки
   host.innerHTML = `<div class="rep-b2 muted">${t('reporting.block2.loading', 'Loading fundraising history…')}</div>`;
 
-  // Загрузка данных
   const data = await loadData('/data/fundraising_history.json');
 
-  // Пусто/ошибка
   if (!data || !Array.isArray(data.platforms) || data.platforms.length === 0) {
     host.innerHTML = `<div class="rep-b2 empty">${t('reporting.block2.empty', 'No campaigns published yet.')}</div>`;
     return;
   }
 
-  // Рендер
   host.innerHTML = '';
   host.appendChild(renderPlatforms(data.platforms));
   lastLang = getLang();
