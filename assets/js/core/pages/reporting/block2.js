@@ -199,7 +199,11 @@ function injectStyles() {
     .rep-b2 { display: grid; gap: 12px; }
     .rep-b2 .platform-title { font-weight: 600; margin-bottom: 6px; }
     .rep-b2 .campaigns { display: grid; gap: 8px; }
-    .rep-b2 .card { border-radius: 14px; padding: 12px; background: rgba(0,0,0,0.18); }
+	   .rep-b2 .card {
+		  border-radius: 14px; padding: 12px;
+		  background: transparent;          /* без второй подложки */
+		  border: 1px solid transparent;    /* без рамки */
+		}
     .rep-b2 .row { display:flex; flex-wrap:wrap; gap:10px; font-size: 0.95rem; }
     .rep-b2 .label { opacity: .75; }
     .rep-b2 .spacer { flex:1 1 auto; }

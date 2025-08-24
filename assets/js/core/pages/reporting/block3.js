@@ -143,8 +143,9 @@ function injectStyles(){
     /*Тут будут стили для именно этого блока - такое правило, стили для бока храним в файлах блока*/
     .rep-b3.list { display:grid; gap:10px; }
     .b3-card{
-      border-radius:14px; padding:12px; background:rgba(0,0,0,0.18);
-      border:1px solid rgba(255,255,255,0.08);
+      border-radius:14px; padding:12px;
+      background: transparent;        /* без второй подложки */
+      border: 1px solid transparent;  /* без рамки */
     }
     .b3-card .row.top{ display:flex; align-items:center; gap:10px; }
     .b3-card .time{ font-size:.85rem; opacity:.8 }
