@@ -26,5 +26,12 @@
   "reporting.block2.metrics": "Собрано/Доноры",
 
   "reporting.block2.open": "Открыть кампанию",
-  "reporting.block2.nolink": "Ссылка будет добавлена позже."
+  "reporting.block2.nolink": "Ссылка будет добавлена позже.",
+  
+  "reporting.block3.title": "Лента отчётности по расходам",
+  "reporting.block3.note": "Здесь будут пояснения медицинских и организационных трат (на базе приватного Telegram‑канала).",
+  "reporting.block3.loading": "Загружаем ленту расходов…",
+  "reporting.block3.empty": "Пока нет опубликованных пояснений по расходам.",
+  "reporting.block3.open": "Открыть исходный пост",
+  "reporting.block3.noamount": "—"
 }
