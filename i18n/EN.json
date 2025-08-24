@@ -121,6 +121,8 @@
   "error.saveFailed": "Save error: ",
 
   /* Reporting page */
+  "menu.reporting": "Reporting",
+
   "reporting.title": "Reporting",
   "reporting.desc": "Transparency hub for funding, campaigns, updates, and documents.",
   "reporting.placeholder": "Content will appear here.",
