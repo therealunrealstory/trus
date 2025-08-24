@@ -46,9 +46,10 @@ export function destroy(){ mounted = false; }
 export async function onLocaleChanged(){
   if (!mounted) return;
   const cur = getLang();
-  if (cur === lastLang) return;
+  if (cur === lastLang) return;  // уже применено
   lastLang = cur;
 
+  // Перерисовываем заново (лента короткая, запрос лёгкий)
   const section = document.querySelector('#rep-block3')
      || document.querySelector('[data-i18n="reporting.block3.title"]')?.closest('section');
   const host = section?.querySelector(':scope > div');
@@ -106,11 +107,13 @@ function renderItem(x){
 
   const body = document.createElement('div');
   body.className = 'body';
-  body.innerHTML = escapeHtml((x?.text || '').replace(/\n/g,'\n')).replace(/\n/g,'<br>');
+  body.innerHTML = escapeHtml((x?.text || '').replace(/\n/g,'\n'))
+    .replace(/\n/g,'<br>');
 
   const meta = document.createElement('div');
   meta.className = 'meta';
 
+  // теги (например: "meds", "hospital", "transport")
   if (Array.isArray(x?.tags) && x.tags.length){
     const tg = document.createElement('div');
     tg.className = 'tags';
@@ -118,6 +121,7 @@ function renderItem(x){
     meta.appendChild(tg);
   }
 
+  // исходная ссылка
   if (x?.link){
     const a = document.createElement('a');
     a.href = x.link; a.target = '_blank'; a.rel='noopener';
@@ -137,17 +141,10 @@ function injectStyles(){
   if (document.getElementById('rep-b3-styles')) return;
   const css = `
     /*Тут будут стили для именно этого блока - такое правило, стили для бока храним в файлах блока*/
-    .rep-b3.list{
-      display:grid; gap:10px;
-      background: transparent !important;
-      padding: 0 !important;
-      border: 0 !important;
-    }
-    /* внутренние карточки расходов — с подложкой */
+    .rep-b3.list { display:grid; gap:10px; }
     .b3-card{
-      border-radius:14px; padding:12px;
-      background:rgba(0,0,0,0.18);
-      border:0;
+      border-radius:14px; padding:12px; background:rgba(0,0,0,0.18);
+      border:1px solid rgba(255,255,255,0.08);
     }
     .b3-card .row.top{ display:flex; align-items:center; gap:10px; }
     .b3-card .time{ font-size:.85rem; opacity:.8 }
