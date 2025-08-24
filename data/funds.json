@@ -15,5 +15,5 @@
     { "date": "2025-09-10", "amount": 2500, "category": "therapy" },
     { "date": "2025-09-25", "amount": 1400, "category": "diagnostics" }
   ],
-  "updated_at": "2025-08-24T00:00:00Z"
+  "updated_at": "2025-08-24"
 }
