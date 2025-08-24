@@ -42,5 +42,18 @@
   "reporting.block4.group.medical": "Медицинские документы",
   "reporting.block4.group.legal": "Юридические документы",
   "reporting.block4.open": "Открыть документ",
-  "reporting.block4.untitled": "Без названия"
+  "reporting.block4.untitled": "Без названия",
+  
+  "reporting.block1.title": "Актуальные данные поддержки",
+  "reporting.block1.note": "Здесь будут живые метрики: Собрано / Потрачено / Запланировано и процент Over‑norm.",
+  "reporting.block1.loading": "Загружаем финансовые метрики…",
+  "reporting.block1.empty": "Пока нет данных для расчёта.",
+  "reporting.block1.collected": "Собрано",
+  "reporting.block1.spent": "Потрачено",
+  "reporting.block1.planned": "Запланировано",
+  "reporting.block1.overnorm": "Сверх норматива",
+  "reporting.block1.ofTarget": "от цели",
+  "reporting.block1.spent.note": "Накопленные расходы",
+  "reporting.block1.planned.note": "Ожидаемые траты",
+  "reporting.block1.updated": "Обновлено"
 }
