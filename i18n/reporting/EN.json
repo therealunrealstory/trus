@@ -1,0 +1,35 @@
+{
+  "reporting.title": "Reporting",
+  "reporting.desc": "Transparency hub for funding, campaigns, updates, and documents.",
+  "reporting.placeholder": "Content will appear here.",
+
+  "reporting.blocks.funds.title": "Financial overview",
+  "reporting.blocks.funds.desc": "Total collected, spent, planned — and overall availability.",
+
+  "reporting.blocks.campaigns.title": "Fundraising campaigns",
+  "reporting.blocks.campaigns.desc": "Timeline of campaigns across platforms (GoFundMe and others).",
+
+  "reporting.blocks.updates.title": "Accountability feed",
+  "reporting.blocks.updates.desc": "Structured reporting stream (planned Telegram integration).",
+
+  "reporting.blocks.documents.title": "Documents & proofs",
+  "reporting.blocks.documents.desc": "Medical and legal documents: diagnoses, receipts, case records.",
+
+  "funds.collected": "Collected",
+  "funds.spent": "Spent",
+  "funds.planned": "Planned",
+  "funds.available": "Available",
+  "funds.available.none": "No funds available.",
+  "funds.safety": "Safety margin",
+  "funds.updatedAt": "Updated",
+  "funds.collected.tip": "Cumulative progress by date.",
+  "funds.total": "Total",
+  "funds.showNote": "Show note",
+  "funds.showFull": "Show full",
+  "funds.plannedTotal": "Planned total",
+
+  "modal.collected.title": "Collected — details",
+  "modal.spent.title": "Spending — details",
+  "modal.planned.title": "Planned — details",
+  "modal.available.title": "Available — details"
+}
