@@ -1,6 +1,6 @@
 // sw.js — The Real Unreal Story
 // Version must match the one in index.html registration query (?ver=...)
-const SW_VERSION = 'v1.3.4';
+const SW_VERSION = 'v1.3.5';
 const STATIC_CACHE = `static-${SW_VERSION}`;
 const RUNTIME_CACHE = `runtime-${SW_VERSION}`;
 
