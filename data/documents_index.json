@@ -10,7 +10,7 @@
       "ext": "pdf",
       "size": 3145728,
       "summary": "Summary of inpatient treatment, tests and discharge notes."
-    }
+    },
 	{
       "id": "med-002",
       "title": "Hospitalization summary — August 2025",
@@ -36,5 +36,5 @@
       "summary": "Excerpt of the filing related to the case."
     }
   ],
-  "updated_at": "2025-08-24T00:00:00Z"
+  "updated_at": "2025-08-24T00:10:00Z"
 }
