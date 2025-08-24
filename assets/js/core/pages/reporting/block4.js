@@ -166,7 +166,7 @@ function injectStyles(){
   const css = `
     /*Тут будут стили для именно этого блока - такое правило, стили для бока храним в файлах блока*/
     .rep-b4.list { display:grid; gap:18px; }
-    .b4-group { display:grid; gap:12px; }
+    .b4-group { display:grid; gap:12px; background: transparent; padding: 0; border: none; }
     .b4-group .group-title { font-weight:600; opacity:.92; }
     .doc-grid { display:grid; gap:10px; grid-template-columns: 1fr; }
     @media (min-width:700px){ .doc-grid{ grid-template-columns: repeat(2, 1fr); } }
@@ -175,11 +175,12 @@ function injectStyles(){
     .doc-card{
       display:grid; grid-template-columns: 88px 1fr auto; gap:12px;
       align-items:center; border-radius:14px; padding:12px;
-      background: transparent;           /* без второй подложки */
+      background: rgba(0,0,0,0.18);      /* ВОЗВРАЩАЕМ подложку внутренним отсекам */
       text-decoration:none; color:inherit;
-      border: 1px solid transparent;     /* без рамки */
+      border: 1px solid rgba(255,255,255,0.08);
     }
-    .doc-card:hover{ background: transparent; }
+    .doc-card:hover{ background: rgba(255,255,255,0.08); }
+
     .thumbbox{ width:88px; height:88px; display:flex; align-items:center; justify-content:center; }
     .thumb{
       max-width:100%; max-height:100%; border-radius:10px; display:block; object-fit:cover;

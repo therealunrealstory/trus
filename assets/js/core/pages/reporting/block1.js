@@ -209,12 +209,12 @@ function injectStyles(){
   if (document.getElementById('rep-b1-styles')) return;
   const css = `
     /*Тут будут стили для именно этого блока - такое правило, стили для бока храним в файлах блока*/
-    .rep-b1.grid { display:grid; gap:12px; }
+    .rep-b1.grid { background: transparent; padding: 0; border: none; }
     .b1-tile{
       border-radius:14px; padding:12px;
       display:grid; gap:6px;
-      background: transparent;       /* без второй подложки */
-      border: 1px solid transparent; /* без рамки */
+      background: rgba(0,0,0,0.18);  /* ВОЗВРАЩАЕМ подложку внутренним отсекам */
+      border: 1px solid rgba(255,255,255,0.08);
     }
     .b1-tile .label{ opacity:.8; font-size:.95rem; }
     .b1-tile .value{ font-weight:700; font-size:1.1rem; }

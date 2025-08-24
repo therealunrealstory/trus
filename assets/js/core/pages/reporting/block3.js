@@ -141,11 +141,11 @@ function injectStyles(){
   if (document.getElementById('rep-b3-styles')) return;
   const css = `
     /*Тут будут стили для именно этого блока - такое правило, стили для бока храним в файлах блока*/
-    .rep-b3.list { display:grid; gap:10px; }
+    .rep-b3.list { background: transparent; padding: 0; } /* список без подложки */
     .b3-card{
       border-radius:14px; padding:12px;
-      background: transparent;        /* без второй подложки */
-      border: 1px solid transparent;  /* без рамки */
+      background: rgba(0,0,0,0.18);   /* ВОЗВРАЩАЕМ подложку внутренним отсекам */
+      border:1px solid rgba(255,255,255,0.08);
     }
     .b3-card .row.top{ display:flex; align-items:center; gap:10px; }
     .b3-card .time{ font-size:.85rem; opacity:.8 }
