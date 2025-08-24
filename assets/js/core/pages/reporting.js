@@ -1,11 +1,16 @@
-// assets/js/core/pages/reporting.js
-import { el } from "../../core/dom.js";
+// /assets/js/core/pages/reporting.js
+// Page container for "Reporting" with 4 toggleable blocks.
+// Conforms to existing router/init({root,data,i18n}) pattern.
+
+import { el } from "../dom.js";
+import { renderFunds } from "../../features/reportingFunds.js";
 
 let rootEl = null;
 
 export async function init({ root, data }) {
   rootEl = root;
 
+  // If page is disabled in partials, render nothing
   if (!data?.page?.enabled) {
     rootEl.innerHTML = "";
     return;
@@ -18,7 +23,8 @@ export async function init({ root, data }) {
 
   const blocks = Array.isArray(data?.blocks) ? data.blocks : [];
 
-  const mountBlock = (id, titleKey, descKey, placeholderKey) => {
+  // helper to mount a block card; afterMount(card) can inject dynamic content
+  const mountBlock = (id, titleKey, descKey, placeholderKey, afterMount) => {
     const cfg = blocks.find(b => b.id === id);
     if (cfg?.enabled === false) return;
 
@@ -29,35 +35,56 @@ export async function init({ root, data }) {
     ]);
 
     page.appendChild(card);
+
+    if (typeof afterMount === "function") {
+      // use the placeholder area as a mount slot for the feature renderer
+      const slot = card.querySelector("[data-i18n='reporting.placeholder']");
+      if (slot) { slot.removeAttribute("data-i18n"); slot.textContent = ""; }
+      afterMount(card);
+    }
   };
 
-  // 1) Financial overview
-  mountBlock("funds",
+  // 1) Financial overview (wired up to /data/funds.json via reportingFunds)
+  mountBlock(
+    "funds",
     "reporting.blocks.funds.title",
     "reporting.blocks.funds.desc",
-    "reporting.placeholder");
+    "reporting.placeholder",
+    (card) => {
+      const slot = document.createElement("div");
+      card.appendChild(slot);
+      renderFunds(slot);
+    }
+  );
 
-  // 2) Fundraising campaigns history
-  mountBlock("campaigns",
+  // 2) Fundraising campaigns (placeholder for now)
+  mountBlock(
+    "campaigns",
     "reporting.blocks.campaigns.title",
     "reporting.blocks.campaigns.desc",
-    "reporting.placeholder");
+    "reporting.placeholder"
+  );
 
-  // 3) Accountability feed (Telegram)
-  mountBlock("updates",
+  // 3) Accountability feed / Telegram (placeholder for now)
+  mountBlock(
+    "updates",
     "reporting.blocks.updates.title",
     "reporting.blocks.updates.desc",
-    "reporting.placeholder");
+    "reporting.placeholder"
+  );
 
-  // 4) Documents & proofs
-  mountBlock("documents",
+  // 4) Documents & proofs (placeholder for now)
+  mountBlock(
+    "documents",
     "reporting.blocks.documents.title",
     "reporting.blocks.documents.desc",
-    "reporting.placeholder");
+    "reporting.placeholder"
+  );
 
   rootEl.replaceChildren(page);
 }
 
 export function destroy() {
+  // No timers/listeners to clean; keep symmetrical API
   rootEl = null;
 }

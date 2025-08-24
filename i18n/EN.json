@@ -138,3 +138,24 @@
   "reporting.blocks.documents.title": "Documents & proofs",
   "reporting.blocks.documents.desc": "Medical and legal documents: diagnoses, receipts, case records."
 }
+{
+  "funds.collected": "Collected",
+  "funds.spent": "Spent",
+  "funds.planned": "Planned",
+  "funds.available": "Available",
+  "funds.available.none": "No funds available.",
+  "funds.safety": "Safety margin",
+  "funds.updatedAt": "Updated"
+}
+{
+  "modal.collected.title": "Collected — details",
+  "modal.spent.title": "Spending — details",
+  "modal.planned.title": "Planned — details",
+  "modal.available.title": "Available — details",
+
+  "funds.collected.tip": "Cumulative progress by date.",
+  "funds.total": "Total",
+  "funds.showNote": "Show note",
+  "funds.showFull": "Show full",
+  "funds.plannedTotal": "Planned total"
+}
