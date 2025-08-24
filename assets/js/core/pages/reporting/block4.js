@@ -1,6 +1,8 @@
 // assets/js/core/reporting/block4.js
 // Block 4 — "Документы (медицинские и юридические)" (пока заглушка)
 
+import { I18N } from '../../i18n.js';
+
 let mounted = false;
 
 export async function init(root) {

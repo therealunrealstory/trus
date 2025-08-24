@@ -1,6 +1,8 @@
 // assets/js/core/reporting/block1.js
 // Block 1 — placeholder. Дальше сюда добавим реальные графики/метрики.
 
+import { I18N } from '../../i18n.js';
+
 let mounted = false;
 
 export async function init(root) {

@@ -33,10 +33,10 @@ export async function init(root) {
 
   // Динамически подключаем блоки (каждый — изолированный модуль)
   const [b1, b2, b3, b4] = await Promise.all([
-    import('../reporting/block1.js'),
-    import('../reporting/block2.js'),
-    import('../reporting/block3.js'),
-    import('../reporting/block4.js'),
+    import('./reporting/block1.js'),
+    import('./reporting/block2.js'),
+    import('./reporting/block3.js'),
+    import('./reporting/block4.js'),
   ]);
 
   blocks = [b1, b2, b3, b4];

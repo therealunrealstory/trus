@@ -1,6 +1,8 @@
 // assets/js/core/reporting/block3.js
 // Block 3 — рабочее имя: "Expense reports" / "Расходы и пояснения" (пока заглушка)
 
+import { I18N } from '../../i18n.js';
+
 let mounted = false;
 
 export async function init(root) {
