@@ -1,0 +1,29 @@
+{
+  "medical": [
+    {
+      "id": "med-001",
+      "title": "Hospitalization summary — July 2025",
+      "date": "2025-07-12",
+      "kind": "medical",
+      "url": "/docs/medical/hospitalization_jul2025.pdf",
+      "thumb": "/docs/medical/thumbs/hospitalization_jul2025.jpg",
+      "ext": "pdf",
+      "size": 3145728,
+      "summary": "Summary of inpatient treatment, tests and discharge notes."
+    }
+  ],
+  "legal": [
+    {
+      "id": "leg-001",
+      "title": "Court filing (excerpt)",
+      "date": "2025-06-03",
+      "kind": "legal",
+      "url": "/docs/legal/filing_excerpt.pdf",
+      "thumb": "/docs/legal/thumbs/filing_excerpt.jpg",
+      "ext": "pdf",
+      "size": 1048576,
+      "summary": "Excerpt of the filing related to the case."
+    }
+  ],
+  "updated_at": "2025-08-24T00:00:00Z"
+}
