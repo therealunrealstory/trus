@@ -33,5 +33,14 @@
   "reporting.block3.loading": "Загружаем ленту расходов…",
   "reporting.block3.empty": "Пока нет опубликованных пояснений по расходам.",
   "reporting.block3.open": "Открыть исходный пост",
-  "reporting.block3.noamount": "—"
+  "reporting.block3.noamount": "—",
+  
+  "reporting.block4.title": "Документы: медицинские и юридические",
+  "reporting.block4.note": "Здесь появятся проверенные документы (сканы и PDF), сгруппированные по медицине и праву.",
+  "reporting.block4.loading": "Загружаем список документов…",
+  "reporting.block4.empty": "Документы пока не опубликованы.",
+  "reporting.block4.group.medical": "Медицинские документы",
+  "reporting.block4.group.legal": "Юридические документы",
+  "reporting.block4.open": "Открыть документ",
+  "reporting.block4.untitled": "Без названия"
 }
