@@ -1,29 +1,33 @@
 // /assets/js/core/pages/reporting.js
-// Page container for "Reporting" with 4 toggleable blocks.
-// Conforms to existing router/init({root,data,i18n}) pattern.
+// Works with router.init(mount); fetches /partials/reporting.json itself.
 
 import { el } from "../dom.js";
 import { renderFunds } from "../../features/reportingFunds.js";
+import { renderCampaigns } from "../../features/reportingCampaigns.js";
 
 let rootEl = null;
 
-export async function init({ root, data }) {
-  rootEl = root;
+async function loadPartial() {
+  try {
+    const res = await fetch("/partials/reporting.json", { cache: "no-store" });
+    if (res.ok) return await res.json();
+  } catch {}
+  return { page: { enabled: true }, blocks: [] };
+}
 
-  // If page is disabled in partials, render nothing
-  if (!data?.page?.enabled) {
-    rootEl.innerHTML = "";
-    return;
-  }
+export async function init(root) {
+  rootEl = root || document.getElementById("subpage");
+  const data = await loadPartial();
+
+  if (!data?.page?.enabled) { rootEl.innerHTML = ""; return; }
 
   const page = el("section", { class: "container-section" }, [
     el("h1", { class: "h1 mb-4", "data-i18n": "reporting.title" }, "Reporting"),
     el("p",  { class: "muted mb-8", "data-i18n": "reporting.desc"  }, "Transparency hub for funding, campaigns, updates, and documents.")
   ]);
 
-  const blocks = Array.isArray(data?.blocks) ? data.blocks : [];
+  const blocks = Array.isArray(data.blocks) ? data.blocks : [];
 
-  // helper to mount a block card; afterMount(card) can inject dynamic content
   const mountBlock = (id, titleKey, descKey, placeholderKey, afterMount) => {
     const cfg = blocks.find(b => b.id === id);
     if (cfg?.enabled === false) return;
@@ -33,20 +37,17 @@ export async function init({ root, data }) {
       el("p",  { class: "muted mb-4", "data-i18n": descKey  }, ""),
       el("div", { class: "text-sm text-gray-300", "data-i18n": placeholderKey }, "Content will appear here.")
     ]);
-
     page.appendChild(card);
 
     if (typeof afterMount === "function") {
-      // use the placeholder area as a mount slot for the feature renderer
       const slot = card.querySelector("[data-i18n='reporting.placeholder']");
       if (slot) { slot.removeAttribute("data-i18n"); slot.textContent = ""; }
-      afterMount(card);
+      afterMount(card, cfg);
     }
   };
 
-  // 1) Financial overview (wired up to /data/funds.json via reportingFunds)
-  mountBlock(
-    "funds",
+  // 1) Financial overview
+  mountBlock("funds",
     "reporting.blocks.funds.title",
     "reporting.blocks.funds.desc",
     "reporting.placeholder",
@@ -57,25 +58,27 @@ export async function init({ root, data }) {
     }
   );
 
-  // 2) Fundraising campaigns (placeholder for now)
-  mountBlock(
-    "campaigns",
+  // 2) Campaigns
+  mountBlock("campaigns",
     "reporting.blocks.campaigns.title",
     "reporting.blocks.campaigns.desc",
-    "reporting.placeholder"
+    "reporting.placeholder",
+    (card) => {
+      const slot = document.createElement("div");
+      card.appendChild(slot);
+      renderCampaigns(slot);
+    }
   );
 
-  // 3) Accountability feed / Telegram (placeholder for now)
-  mountBlock(
-    "updates",
+  // 3) Updates (placeholder)
+  mountBlock("updates",
     "reporting.blocks.updates.title",
     "reporting.blocks.updates.desc",
     "reporting.placeholder"
   );
 
-  // 4) Documents & proofs (placeholder for now)
-  mountBlock(
-    "documents",
+  // 4) Documents (placeholder)
+  mountBlock("documents",
     "reporting.blocks.documents.title",
     "reporting.blocks.documents.desc",
     "reporting.placeholder"
@@ -84,7 +87,4 @@ export async function init({ root, data }) {
   rootEl.replaceChildren(page);
 }
 
-export function destroy() {
-  // No timers/listeners to clean; keep symmetrical API
-  rootEl = null;
-}
+export function destroy(){ rootEl = null; }
