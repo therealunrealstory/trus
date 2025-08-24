@@ -165,18 +165,32 @@ function injectStyles(){
   if (document.getElementById('rep-b4-styles')) return;
   const css = `
     /*Тут будут стили для именно этого блока - такое правило, стили для бока храним в файлах блока*/
-    .rep-b4.list { display:grid; gap:18px; }
-    .b4-group { display:grid; gap:12px; background: transparent; padding: 0; border: none; }
+    .rep-b4.list{
+      display:grid; gap:18px;
+      background: transparent !important;
+      padding: 0 !important;
+      border: 0 !important;
+    }
+    /* группы (medical / legal) — без дополнительной подложки */
+    .b4-group{
+      display:grid; gap:12px;
+      background: transparent !important;
+      padding: 0 !important;
+      border: 0 !important;
+    }
     .b4-group .group-title { font-weight:600; opacity:.92; }
+
     .doc-grid { display:grid; gap:10px; grid-template-columns: 1fr; }
     @media (min-width:700px){ .doc-grid{ grid-template-columns: repeat(2, 1fr); } }
     @media (min-width:1024px){ .doc-grid{ grid-template-columns: repeat(3, 1fr); } }
 
+    /* внутренние карточки документов — с подложкой */
     .doc-card{
       display:grid; grid-template-columns: 88px 1fr auto; gap:12px;
       align-items:center; border-radius:14px; padding:12px;
       background: rgba(0,0,0,0.18);
       text-decoration:none; color:inherit;
+      border: 0;
     }
     .doc-card:hover{ background: rgba(255,255,255,0.08); }
     .thumbbox{ width:88px; height:88px; display:flex; align-items:center; justify-content:center; }

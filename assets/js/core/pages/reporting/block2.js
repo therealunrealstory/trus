@@ -52,26 +52,20 @@ export async function init(root) {
   lastLang = getLang();
 }
 
-
 export function destroy() {
   mounted = false;
 }
 
-// Для локализованного динамического контента перерисуем при смене языка
-export async function onLocaleChanged(/*lang, root*/) {
-  // Если язык сменился — перерисуем блок (данные не перезагружаем)
-const section = document.querySelector('#rep-block2') 
-  || document.querySelector('[data-i18n="reporting.block2.title"]')?.closest('section');
-const host = section?.querySelector(':scope > div');
-if (!host || !mounted) return;
+export async function onLocaleChanged(){
+  const section = document.querySelector('#rep-block2') 
+    || document.querySelector('[data-i18n="reporting.block2.title"]')?.closest('section');
+  const host = section?.querySelector(':scope > div');
+  if (!host || !mounted) return;
 
   const curLang = getLang();
   if (curLang === lastLang) return;
   lastLang = curLang;
 
-  // Попробуем считать уже отрисованное и перегенерировать подписи,
-  // но проще (и стабильнее) — перерисовать по данным, если они ещё есть в DOM.
-  // Здесь поступим просто: покажем loading и перезагрузим файл (он небольшой).
   host.innerHTML = `<div class="rep-b2 muted">${t('reporting.block2.loading', 'Loading fundraising history…')}</div>`;
   const data = await loadData('/data/fundraising_history.json');
   if (!data || !Array.isArray(data.platforms) || data.platforms.length === 0) {
@@ -196,16 +190,34 @@ function injectStyles() {
   if (document.getElementById('rep-b2-styles')) return;
   const css = `
     /*Тут будут стили для именно этого блока - такое правило, стили для блока храним в файлах блока*/
-    .rep-b2 { display: grid; gap: 12px; }
+    .rep-b2{
+      display: grid; gap: 12px;
+      background: transparent !important;
+      padding: 0 !important;
+      border: 0 !important;
+    }
+    /* контейнер платформы (где "GoFundMe") --- без подложки */
+    .rep-b2 .platform{
+      background: transparent !important;
+      padding: 0 !important;
+      border: 0 !important;
+    }
     .rep-b2 .platform-title { font-weight: 600; margin-bottom: 6px; }
     .rep-b2 .campaigns { display: grid; gap: 8px; }
-    .rep-b2 .card { border-radius: 14px; padding: 12px; background: rgba(0,0,0,0.18); }
+
+    /* внутренние ОТСЕКИ кампаний — с подложкой */
+    .rep-b2 .card {
+      border-radius: 14px; padding: 12px;
+      background: rgba(0,0,0,0.18);
+      border: 0;
+    }
     .rep-b2 .row { display:flex; flex-wrap:wrap; gap:10px; font-size: 0.95rem; }
     .rep-b2 .label { opacity: .75; }
     .rep-b2 .spacer { flex:1 1 auto; }
     .rep-b2 .open-link { text-decoration: underline; }
     .rep-b2 .muted { opacity:.7; font-size:.95rem; }
     .rep-b2 .empty { opacity:.8; font-size:.95rem; }
+
     @media (min-width: 700px) {
       .rep-b2 { gap: 16px; }
       .rep-b2 .card { padding: 14px 16px; }
@@ -219,22 +231,10 @@ function injectStyles() {
 
 /* utils */
 function getLang() {
-  // Язык уже хранится в I18N под капотом, но для простоты вернём заглушку:
-  // если потребуется точный язык, можно пробросить его из onLocaleChanged.
-  // Здесь достаточно смены ссылочных текстов через I18N.
   return (document.documentElement.getAttribute('lang') || '').toUpperCase();
 }
-
-function numberOrZero(v) {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : 0;
-}
-
-function safeDate(s) {
-  // возвращаем исходную строку (YYYY-MM-DD) — не форматируем, чтобы не спорить с локалью.
-  return typeof s === 'string' ? s : null;
-}
-
+function numberOrZero(v) { const n = Number(v); return Number.isFinite(n) ? n : 0; }
+function safeDate(s) { return typeof s === 'string' ? s : null; }
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
