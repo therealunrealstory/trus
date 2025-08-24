@@ -432,6 +432,7 @@ function injectStyles(){
 
   .funds-updated{ margin-top:6px; opacity:.75; font-size:.92rem; }
   .funds-empty{ opacity:.85; }
+  
 
   /* Модалки */
   
