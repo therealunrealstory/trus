@@ -435,7 +435,6 @@ function injectStyles(){
 
   /* Модалки */
   
-  
     /* ALERT CTA (Available ≤ 0): красный пульсирующий бейдж */
   .modal-funds .alert-cta{
     padding: 10px 12px;
