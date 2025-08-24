@@ -1,35 +1,61 @@
 {
-  "currency": "EUR",
-  "norm": { "target": 50000 },
+  "meta": {
+    "currency": "USD",
+    "lang_default": "EN",
+    "updated_at": "2025-08-24T00:00:00Z"
+  },
 
   "collected": [
-    { "date": "2025-01-15", "value":  5000 },
-    { "date": "2025-02-10", "value":  9800 },
-    { "date": "2025-03-05", "value": 15500 },
-    { "date": "2025-04-09", "value": 22800 },
-    { "date": "2025-05-12", "value": 31250 },
-    { "date": "2025-06-18", "value": 41500 },
-    { "date": "2025-07-21", "value": 55200 },
-    { "date": "2025-08-24", "value": 65500 }
+    { "date": "2025-08-01", "amount": 12000 },
+    { "date": "2025-08-10", "amount": 13200 },
+    { "date": "2025-08-20", "amount": 14500 }
   ],
 
   "spent": [
-    { "date": "2025-02-01", "amount": 1200, "category": "medical", "note": "MRI + labs" },
-    { "date": "2025-03-20", "amount": 2400, "category": "medical", "note": "Chemo cycle 1 — meds" },
-    { "date": "2025-04-28", "amount": 1800, "category": "housing", "note": "Short-term stay" },
-    { "date": "2025-05-30", "amount": 2100, "category": "medical", "note": "Chemo cycle 2 — day care" },
-    { "date": "2025-06-22", "amount": 1600, "category": "transport", "note": "Medical transport (NYC)" },
-    { "date": "2025-07-19", "amount": 2350, "category": "medical", "note": "Rehab (2 weeks)" },
-    { "date": "2025-08-10", "amount": 1750, "category": "legal",   "note": "Consultations" }
+    {
+      "date": "2025-08-05",
+      "amount": 3500,
+      "note": {
+        "EN": "Hospital invoice — oncology ward",
+        "RU": "Счёт клиники — онкоотделение",
+        "FR": "Facture hôpital — oncologie"
+      }
+    },
+    {
+      "date": "2025-08-14",
+      "amount": 2200,
+      "note": {
+        "EN": "Rehabilitation (10 days)",
+        "RU": "Реабилитация (10 дней)",
+        "DE": "Rehabilitation (10 Tage)"
+      }
+    }
   ],
 
   "planned": [
-    { "date": "2025-09-05", "amount": 4500, "category": "medical", "note": "Diagnostics & consults" },
-    { "date": "2025-09-20", "amount": 3200, "category": "rehab",   "note": "Rehab program" },
-    { "date": "2025-10-12", "amount": 5400, "category": "medical", "note": "Therapy block" },
-    { "date": "2025-10-30", "amount": 1800, "category": "housing", "note": "Temporary stay" },
-    { "date": "2025-11-18", "amount": 2600, "category": "legal",   "note": "Case support" }
-  ],
-
-  "updated_at": "2025-08-24"
+    {
+      "amount": 7000,
+      "note": {
+        "EN": "Next chemotherapy cycle",
+        "ES": "Próximo ciclo de quimioterapia",
+        "DE": "Nächster Chemotherapiezyklus"
+      }
+    },
+    {
+      "amount": 3000,
+      "note": {
+        "EN": "Temporary housing (1 month)",
+        "RU": "Временное жильё (1 месяц)",
+        "FR": "Logement temporaire (1 mois)"
+      }
+    },
+    {
+      "amount": 2000,
+      "note": {
+        "EN": "Legal consultations and filings",
+        "ES": "Consultas y trámites legales",
+        "IT": "Consulenze legali e pratiche"
+      }
+    }
+  ]
 }
