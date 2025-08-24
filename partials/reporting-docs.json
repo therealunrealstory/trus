@@ -1,8 +1,0 @@
-{
-  "docs": [
-    /* пример структуры на будущее:
-    { "type": "medical", "title": "", "date": "YYYY-MM-DD", "files": [ {"name":"", "url":""} ], "note": "" },
-    { "type": "legal",   "title": "", "date": "YYYY-MM-DD", "files": [ {"name":"", "url":""} ], "note": "" }
-    */
-  ]
-}

@@ -57,15 +57,15 @@
   "news.title": "Die Geschichte geht jetzt weiter",
   "news.follow": "Folge unserer Geschichte auf Telegram",
 
-"engage.title": "Dein Engagement",
-"engage.desc": "Markiere, was du bereits getan hast — das ist auch Unterstützung",
-"engage.b1": "Materiell unterstützt",
-"engage.b2": "Kurzversion gelesen/angehört",
-"engage.b3": "Gesamte Geschichte gelesen/angehört",
-"engage.b4": "Lieder über unsere Geschichte angehört",
-"engage.b5": "TG/IG/X abonniert",
-"engage.b6": "Die Geschichte geteilt",
-"engage.note": "Deine Auswahl wird in deinem Browser gespeichert.",
+  "engage.title": "Dein Engagement",
+  "engage.desc": "Markiere, was du bereits getan hast — das ist auch Unterstützung",
+  "engage.b1": "Kurzfassung gelesen/gehört",
+  "engage.b2": "Vollständige Geschichte gelesen/gehört",
+  "engage.b3": "Tracks zu unserer Geschichte gehört",
+  "engage.b4": "Telegram-Kanal abonniert",
+  "engage.b5": "Instagram abonniert",
+  "engage.b6": "Geschichte geteilt",
+  "engage.note": "Deine Auswahl wird im Browser gespeichert.",
 
   "feed.loading": "Neuigkeiten werden geladen…",
   "feed.empty": "Noch keine Beiträge.",
@@ -117,23 +117,4 @@
   "alert.enterMessage": "Nachricht eingeben",
   "alert.clickMapFirst": "Klicke zuerst auf die Karte!",
   "error.saveFailed": "Speicherfehler: "
-}
-{
-  "menu.reporting": "Berichte",
-
-  "reporting.title": "Berichte",
-  "reporting.desc": "Transparenz‑Hub: Finanzierung, Kampagnen, Updates und Dokumente.",
-  "reporting.placeholder": "Inhalt wird hier angezeigt.",
-
-  "reporting.blocks.funds.title": "Finanzüberblick",
-  "reporting.blocks.funds.desc": "Gesamt eingegangen, ausgegeben, geplant — und verfügbare Mittel.",
-
-  "reporting.blocks.campaigns.title": "Spendenkampagnen",
-  "reporting.blocks.campaigns.desc": "Zeitlinie der Kampagnen auf verschiedenen Plattformen (GoFundMe u. a.).",
-
-  "reporting.blocks.updates.title": "Rechenschafts‑Feed",
-  "reporting.blocks.updates.desc": "Strukturierter Berichtsstrom (geplante Telegram‑Integration).",
-
-  "reporting.blocks.documents.title": "Dokumente und Nachweise",
-  "reporting.blocks.documents.desc": "Medizinische und juristische Unterlagen: Diagnosen, Belege, Falldokumente."
 }

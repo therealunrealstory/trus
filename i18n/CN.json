@@ -57,15 +57,15 @@
   "news.title": "故事现在继续",
   "news.follow": "在 Telegram 关注我们的故事",
 
-"engage.title": "你的参与",
-"engage.desc": "标记你已经做过的事 — 这也是一种支持",
-"engage.b1": "给予了物质支持",
-"engage.b2": "阅读/收听了简短版本",
-"engage.b3": "阅读/收听了完整故事",
-"engage.b4": "听了关于我们故事的歌曲",
-"engage.b5": "订阅了 TG/IG/X",
-"engage.b6": "分享了故事",
-"engage.note": "你的选择会保存在此浏览器中。",
+  "engage.title": "你的参与",
+  "engage.desc": "勾选你已做过的事——这也是一种支持",
+  "engage.b1": "已阅读/收听简版",
+  "engage.b2": "已阅读/收听完整版",
+  "engage.b3": "已收听与故事相关的曲目",
+  "engage.b4": "已关注 Telegram 频道",
+  "engage.b5": "已关注 Instagram",
+  "engage.b6": "已分享故事",
+  "engage.note": "你的选择会保存在浏览器中。",
 
   "feed.loading": "正在加载新闻…",
   "feed.empty": "暂时没有帖子。",
@@ -117,23 +117,4 @@
   "alert.enterMessage": "请输入留言",
   "alert.clickMapFirst": "请先点击地图！",
   "error.saveFailed": "保存失败："
-}
-{
-  "menu.reporting": "报告",
-
-  "reporting.title": "报告",
-  "reporting.desc": "透明中心：资金、募捐活动、更新与文件。",
-  "reporting.placeholder": "内容将显示在此处。",
-
-  "reporting.blocks.funds.title": "财务总览",
-  "reporting.blocks.funds.desc": "累计募集、支出、计划支出——以及可用余额。",
-
-  "reporting.blocks.campaigns.title": "募捐活动历史",
-  "reporting.blocks.campaigns.desc": "跨平台活动时间线（GoFundMe 等）。",
-
-  "reporting.blocks.updates.title": "问责更新流",
-  "reporting.blocks.updates.desc": "结构化报告流（计划接入 Telegram）。",
-
-  "reporting.blocks.documents.title": "文件与证明",
-  "reporting.blocks.documents.desc": "医疗与法律文件：诊断、收据、案件记录。"
 }

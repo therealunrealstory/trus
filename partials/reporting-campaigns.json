@@ -1,7 +1,0 @@
-{
-  "campaigns": [
-    /* пример структуры на будущее:
-    { "platform": "GoFundMe", "title": "", "start": "YYYY-MM-DD", "end": "YYYY-MM-DD", "amount": 0, "url": "" }
-    */
-  ]
-}

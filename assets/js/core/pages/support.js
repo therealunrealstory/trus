@@ -40,8 +40,7 @@ function drawMarksBatch(points, batch=300) {
       const m = points[i];
       const lat = Number(m.lat), lon = Number(m.lon);
       if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
-      // был 'lime' — перекрашиваем в Cyan 500 (#06b6d4)
-      L.circleMarker([lat, lon], { radius:4, color:'#06b6d4' })
+      L.circleMarker([lat, lon], { radius:4, color:'lime' })
         .bindPopup(`<b>${m.name||'Anon'}</b><br>${m.message||''}`)
         .addTo(layer);
     }
@@ -64,17 +63,7 @@ async function loadAllMarksPaged() {
 }
 
 function chunk(a,s){const out=[];for(let i=0;i<a.length;i+=s) out.push(a.slice(i,i+s));return out;}
-// Сердечко в карточке — теперь SVG через CSS-mask (класс .heart-icon)
-// (PNG не удаляем; просто здесь используем span для стилизации через CSS)
-function heartCard(n){
-  return `
-    <div class="p-4 rounded-2xl bg-gray-900/50 shadow-sm border border-gray-700 heart-card">
-      <div class="flex items-center gap-2">
-        <span class="heart-icon" aria-hidden="true"></span>
-        <div class="text-sm text-gray-200">${n||'Anon'}</div>
-      </div>
-    </div>`;
-}
+function heartCard(n){return `<div class="p-4 rounded-2xl bg-gray-900/50 shadow-sm border border-gray-700"><div class="flex items-center gap-2"><span class="text-xl">❤️</span><div class="text-sm text-gray-200">${n||'Anon'}</div></div></div>`;}
 function renderHeartsSlides(arr){
   const pages=chunk(arr,12);
   const ul = $('#heartsSlides');
@@ -90,22 +79,8 @@ function initEngagement(root){
   const ENG_KEY='engagement_v1';
   const loadEng=()=>{ try{return JSON.parse(localStorage.getItem(ENG_KEY)||'[]');}catch{return []} };
   const saveEng=a=>{ try{localStorage.setItem(ENG_KEY,JSON.stringify(a));}catch{} };
-  function applyEng(){
-    const on=loadEng();
-    root.querySelectorAll('.eng-btn').forEach((b,i)=>{
-      const s=on.includes(i);
-      // было: bg-green-700 / border-green-400
-      b.classList.toggle('bg-cyan-700', s);
-      b.classList.toggle('border-cyan-400', s);
-      // на всякий случай уберём старые зелёные классы, если они были в верстке
-      b.classList.toggle('bg-green-700', false);
-      b.classList.toggle('border-green-400', false);
-      b.setAttribute('aria-pressed', s?'true':'false');
-    });
-  }
-  root.querySelectorAll('.eng-btn').forEach((b,i)=>b.addEventListener('click',()=>{
-    const on=loadEng(); const p=on.indexOf(i); if(p>=0) on.splice(p,1); else on.push(i); saveEng(on); applyEng();
-  }));
+  function applyEng(){ const on=loadEng(); root.querySelectorAll('.eng-btn').forEach((b,i)=>{const s=on.includes(i); b.classList.toggle('bg-green-700',s); b.classList.toggle('border-green-400',s); b.setAttribute('aria-pressed', s?'true':'false');}); }
+  root.querySelectorAll('.eng-btn').forEach((b,i)=>b.addEventListener('click',()=>{const on=loadEng(); const p=on.indexOf(i); if(p>=0) on.splice(p,1); else on.push(i); saveEng(on); applyEng();}));
   applyEng();
 }
 
@@ -138,10 +113,10 @@ function renderDonateButtons(root){
   const { base, amounts, wrap } = cfg;
   wrap.innerHTML = '';
 
-  // Кнопки фиксированных сумм — был bg-green-600 → делаем bg-cyan-500
+  // Кнопки фиксированных сумм (как раньше)
   amounts.forEach((amt) => {
     const a = document.createElement('a');
-    a.className = 'px-3 py-2 rounded-xl bg-cyan-500 text-white text-sm';
+    a.className = 'px-3 py-2 rounded-xl bg-green-600 text-white text-sm';
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
     a.href = `${base}?amount=${encodeURIComponent(amt)}`;
@@ -149,9 +124,9 @@ function renderDonateButtons(root){
     wrap.appendChild(a);
   });
 
-  // Кнопка «без суммы» (Donate) — тоже cyan-500
+  // Кнопка «без суммы» ПОСЛЕ $500 — ключ btn.donate
   const custom = document.createElement('a');
-  custom.className = 'px-3 py-2 rounded-xl bg-cyan-500 text-white text-sm';
+  custom.className = 'px-3 py-2 rounded-xl bg-green-600 text-white text-sm';
   custom.target = '_blank';
   custom.rel = 'noopener noreferrer';
   custom.href = base;
@@ -164,10 +139,6 @@ function renderDonateButtons(root){
 }
 
 export async function init(root){
-  // Маркер страницы для тематического CSS (вешаем и снимаем в destroy)
-  const subpageEl = document.getElementById('subpage');
-  if (subpageEl) subpageEl.classList.add('page--support');
-
   // Вовлеченность
   initEngagement(root);
 
@@ -258,20 +229,13 @@ export async function init(root){
       btn?.removeAttribute('disabled'); btn?.classList.remove('opacity-50','cursor-not-allowed');
       loadMoreHearts();
     });
-
-    // Подсветим кнопку «Отправить сердечко» cyan-500 (на случай, если в верстке остался зелёный)
-    const addHeartBtn = root.querySelector('#addHeart');
-    if (addHeartBtn) {
-      addHeartBtn.classList.remove('bg-green-600','bg-green-500');
-      addHeartBtn.classList.add('bg-cyan-500','text-white');
-    }
   }
 
   // Modal: Practical help
   root.querySelector('#wantHelp')?.addEventListener('click', () => {
     openModal(
       t('modal.help.title', t('support.physical','Practical help')),
-      t('modal.help.body', 'If you are ready to help — whether legal, medical, or practical support (nurses, caregivers), or if you want to arrange a personal meeting — please write to: <a href="mailto:theRealUnrealStory@gmail.com" class="underline">theRealUnrealStory@gmail.com</a>.<br><br>We are sincerely grateful to everyone who responds.')
+      t('modal.help.body', 'If you are ready to help — whether legal, medical, or practical support (nurses, caregivers), or if you want to arrange a personal meeting — please write to: <a href=\"mailto:theRealUnrealStory@gmail.com\" class=\"underline\">theRealUnrealStory@gmail.com</a>.<br><br>We are sincerely grateful to everyone who responds.')
     );
   });
 }
@@ -285,10 +249,6 @@ export function destroy(){
   try { if (splide) splide.destroy(true); } catch {}
   splide = null;
   allHearts = [];
-
-  // снимаем маркер страницы
-  const subpageEl = document.getElementById('subpage');
-  if (subpageEl) subpageEl.classList.remove('page--support');
 }
 
 // На случай, если роутер ждёт default-экспорт

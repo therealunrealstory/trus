@@ -57,15 +57,15 @@
   "news.title": "La storia continua ora",
   "news.follow": "Segui la nostra storia su Telegram",
 
-"engage.title": "Il tuo coinvolgimento",
-"engage.desc": "Segna ciò che hai già fatto — è anche supporto",
-"engage.b1": "Ha sostenuto materialmente",
-"engage.b2": "Ha letto/ascoltato la versione breve",
-"engage.b3": "Ha letto/ascoltato la storia completa",
-"engage.b4": "Ha ascoltato i brani sulla nostra storia",
-"engage.b5": "Si è iscritto a TG/IG/X",
-"engage.b6": "Ha condiviso la storia",
-"engage.note": "Le tue scelte vengono salvate nel browser.",
+  "engage.title": "La tua partecipazione",
+  "engage.desc": "Segna ciò che hai già fatto — è anche questo un sostegno",
+  "engage.b1": "Letta/ascoltata la versione breve",
+  "engage.b2": "Letta/ascoltata la storia completa",
+  "engage.b3": "Ascoltate le tracce sulla nostra storia",
+  "engage.b4": "Iscritto al canale Telegram",
+  "engage.b5": "Seguito Instagram",
+  "engage.b6": "Condivisa la storia",
+  "engage.note": "Le tue selezioni sono salvate nel browser.",
 
   "feed.loading": "Caricamento notizie…",
   "feed.empty": "Nessun post al momento.",
@@ -117,23 +117,4 @@
   "alert.enterMessage": "Inserisci un messaggio",
   "alert.clickMapFirst": "Clicca prima sulla mappa!",
   "error.saveFailed": "Errore di salvataggio: "
-}
-{
-  "menu.reporting": "Report",
-
-  "reporting.title": "Report",
-  "reporting.desc": "Hub di trasparenza: fondi, campagne, aggiornamenti e documenti.",
-  "reporting.placeholder": "Il contenuto apparirà qui.",
-
-  "reporting.blocks.funds.title": "Panoramica finanziaria",
-  "reporting.blocks.funds.desc": "Totale raccolto, speso, pianificato — e disponibilità complessiva.",
-
-  "reporting.blocks.campaigns.title": "Campagne di raccolta fondi",
-  "reporting.blocks.campaigns.desc": "Cronologia delle campagne sulle varie piattaforme (GoFundMe e altre).",
-
-  "reporting.blocks.updates.title": "Feed di rendicontazione",
-  "reporting.blocks.updates.desc": "Flusso di report strutturato (integrazione Telegram prevista).",
-
-  "reporting.blocks.documents.title": "Documenti e prove",
-  "reporting.blocks.documents.desc": "Documenti medici e legali: diagnosi, ricevute, atti del caso."
 }

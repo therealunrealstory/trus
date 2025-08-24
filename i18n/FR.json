@@ -57,15 +57,15 @@
   "news.title": "L’histoire continue maintenant",
   "news.follow": "Suivez notre histoire sur Telegram",
 
-"engage.title": "Votre engagement",
-"engage.desc": "Indiquez ce que vous avez déjà fait — c’est aussi un soutien",
-"engage.b1": "A soutenu matériellement",
-"engage.b2": "A lu/écouté la version courte",
-"engage.b3": "A lu/écouté l’histoire complète",
-"engage.b4": "A écouté les morceaux sur notre histoire",
-"engage.b5": "S’est abonné à TG/IG/X",
-"engage.b6": "A partagé l’histoire",
-"engage.note": "Vos choix sont enregistrés dans votre navigateur.",
+  "engage.title": "Votre participation",
+  "engage.desc": "Cochez ce que vous avez déjà fait — c’est aussi un soutien",
+  "engage.b1": "Lu/écouté la version courte",
+  "engage.b2": "Lu/écouté l’histoire complète",
+  "engage.b3": "Écouté des morceaux sur notre histoire",
+  "engage.b4": "Abonné au canal Telegram",
+  "engage.b5": "Abonné à Instagram",
+  "engage.b6": "Partagé l’histoire",
+  "engage.note": "Vos choix sont enregistrés dans votre navigateur.",
 
   "feed.loading": "Chargement des actus…",
   "feed.empty": "Aucune publication pour le moment.",
@@ -117,23 +117,4 @@
   "alert.enterMessage": "Saisissez un message",
   "alert.clickMapFirst": "Cliquez d’abord sur la carte !",
   "error.saveFailed": "Erreur d’enregistrement : "
-}
-{
-  "menu.reporting": "Rapports",
-
-  "reporting.title": "Rapports",
-  "reporting.desc": "Pôle de transparence : financement, campagnes, mises à jour et documents.",
-  "reporting.placeholder": "Le contenu apparaîtra ici.",
-
-  "reporting.blocks.funds.title": "Vue d’ensemble financière",
-  "reporting.blocks.funds.desc": "Total collecté, dépensé, prévu — et disponibilité globale.",
-
-  "reporting.blocks.campaigns.title": "Campagnes de collecte",
-  "reporting.blocks.campaigns.desc": "Chronologie des campagnes sur différentes plateformes (GoFundMe et autres).",
-
-  "reporting.blocks.updates.title": "Fil de redevabilité",
-  "reporting.blocks.updates.desc": "Flux de rapports structuré (intégration Telegram prévue).",
-
-  "reporting.blocks.documents.title": "Documents et preuves",
-  "reporting.blocks.documents.desc": "Documents médicaux et juridiques : diagnostics, reçus, dossiers de l’affaire."
 }

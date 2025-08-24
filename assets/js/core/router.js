@@ -11,12 +11,11 @@ let current = { name: null, destroy: null };
 let navToken = 0;
 
 const ROUTES = {
-  story:     { partial: 'story',     module: () => import('./pages/story.js')     },
-  support:   { partial: 'support',   module: () => import('./pages/support.js')   },
-  now:       { partial: 'now',       module: () => import('./pages/now.js')       },
-  roadmap:   { partial: null,        module: () => import('./pages/roadmap.js')   },
-  timeline:  { partial: 'timeline',  module: () => import('./pages/timeline.js')  },
-  reporting: { partial: 'reporting', module: () => import('./pages/reporting.js') }
+  story:    { partial: 'story',    module: () => import('./pages/story.js')    },
+  support:  { partial: 'support',  module: () => import('./pages/support.js')  },
+  now:      { partial: 'now',      module: () => import('./pages/now.js')      },
+  roadmap:  { partial: null,       module: () => import('./pages/roadmap.js')  }, // оставим как было
+  timeline: { partial: 'timeline', module: () => import('./pages/timeline.js') } // НОВОЕ
 };
 
 function parseRoute() {
