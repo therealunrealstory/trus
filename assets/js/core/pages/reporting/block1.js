@@ -211,8 +211,10 @@ function injectStyles(){
     /*Тут будут стили для именно этого блока - такое правило, стили для бока храним в файлах блока*/
     .rep-b1.grid { display:grid; gap:12px; }
     .b1-tile{
-      border-radius:14px; padding:12px; background:rgba(0,0,0,0.18);
+      border-radius:14px; padding:12px;
       display:grid; gap:6px;
+      background: transparent;       /* без второй подложки */
+      border: 1px solid transparent; /* без рамки */
     }
     .b1-tile .label{ opacity:.8; font-size:.95rem; }
     .b1-tile .value{ font-weight:700; font-size:1.1rem; }
