@@ -208,37 +208,28 @@ function safeDate(s){ return typeof s==='string' ? s : ''; }
 function injectStyles(){
   if (document.getElementById('rep-b1-styles')) return;
   const css = `
-		/*Тут будут стили для именно этого блока - такое правило, стили для бока храним в файлах блока*/
-		.rep-b1.grid{
-		  display:grid; gap:14px;
-		  background: transparent !important;
-		  padding: 0 !important;
-		  border: 0 !important;
-		}
-		.b1-tile{
-		  display:grid; gap:6px;
-		  border-radius:14px; padding:12px;
-		  background: rgba(0,0,0,0.18);   /* подложка у ЧЕТЫРЁХ плиток — ОСТАВЛЯЕМ */
-		  border: 0;                      /* без рамок */
-		}
-		.b1-tile .label{ opacity:.8; font-size:.95rem; }
-		.b1-tile .value{ font-weight:700; font-size:1.1rem; }
-		.b1-tile .sub{ font-size:.9rem; }
-		.rep-b1 .updated{ font-size:.85rem; margin-top:2px; opacity:.75; }
-
-		.b1-progress .track{
-		  width:100%; height:8px; border-radius:999px;
-		  background:rgba(255,255,255,0.12); overflow:hidden;
-		}
-		.b1-progress .fill{ height:8px; width:0; background:rgba(255,255,255,0.55); }
-
-		@media (min-width:700px){
-		  .rep-b1.grid{ grid-template-columns: repeat(2, 1fr); }
-		  .rep-b1 .updated{ grid-column: 1 / -1; }
-		}
-		@media (min-width:1024px){
-		  .rep-b1.grid{ grid-template-columns: repeat(4, 1fr); }
-		}
+    /*Тут будут стили для именно этого блока - такое правило, стили для бока храним в файлах блока*/
+    .rep-b1.grid { display:grid; gap:12px; }
+    .b1-tile{
+      border-radius:14px; padding:12px; background:rgba(0,0,0,0.18);
+      display:grid; gap:6px;
+    }
+    .b1-tile .label{ opacity:.8; font-size:.95rem; }
+    .b1-tile .value{ font-weight:700; font-size:1.1rem; }
+    .b1-tile .sub{ font-size:.9rem; }
+    .rep-b1 .updated{ font-size:.85rem; margin-top:2px; }
+    .b1-progress .track{
+      width:100%; height:8px; border-radius:999px; background:rgba(255,255,255,0.12); overflow:hidden;
+    }
+    .b1-progress .fill{ height:8px; width:0; background:rgba(255,255,255,0.55); }
+    .b1-progress .ptext{ margin-top:6px; font-size:.9rem; opacity:.85; }
+    @media (min-width:700px){
+      .rep-b1.grid{ grid-template-columns: repeat(2, 1fr); }
+      .rep-b1 .updated{ grid-column: 1 / -1; }
+    }
+    @media (min-width:1024px){
+      .rep-b1.grid{ grid-template-columns: repeat(4, 1fr); }
+    }
   `;
   const st = document.createElement('style');
   st.id = 'rep-b1-styles';
