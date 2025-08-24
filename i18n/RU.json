@@ -117,5 +117,7 @@
 
   "alert.enterMessage": "Введите сообщение",
   "alert.clickMapFirst": "Сначала кликните по карте!",
-  "error.saveFailed": "Ошибка сохранения: "
+  "error.saveFailed": "Ошибка сохранения: ",
+  
+  "menu.reporting": "Отчётность"
 }

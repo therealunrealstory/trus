@@ -117,5 +117,7 @@
 
   "alert.enterMessage": "Enter a message",
   "alert.clickMapFirst": "Click on the map first!",
-  "error.saveFailed": "Save error: "
+  "error.saveFailed": "Save error: ",
+  
+  "menu.reporting": "Reporting"
 }
