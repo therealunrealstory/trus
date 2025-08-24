@@ -8,17 +8,16 @@
 
   "audio.play": "Story in music",
   "audio.pause": "‖ Pause",
-
+  
   "story.full.title": "Full version of our story",
-  "full.play": "▶︎ Play",
-  "full.pause": "‖ Pause",
-  "full.note": "Complete narrated story",
-
+"full.play": "▶︎ Play",
+"full.pause": "‖ Pause",
+"full.note": "Complete narrated story",
+  
   "menu.story": "The Story",
   "menu.support": "Support",
   "menu.storyNow": "The Story Now",
-  "menu.reporting": "Reporting",
-
+  
   "page.loading": "Loading page...",
   "page.error": "Failed to load page",
 
@@ -34,7 +33,7 @@
   "announce.play": "▶︎ Play",
   "announce.pause": "‖ Pause",
   "announce.langLabel": "Language: ",
-
+  
   "nav.roadmap": "Timeline",
 
   "video.title": "Video teaser",
@@ -44,20 +43,20 @@
   "short.play": "▶︎ Play",
   "short.pause": "‖ Pause",
   "short.langLabel": "Language: ",
-
+  
   "status.playing": "Playing…",
   "status.paused": "Paused",
 
   "support.title": "Support now",
   "support.money": "Donate funds",
   "support.physical": "Practical help",
-
+  
   "modal.help.title": "Practical and professional help",
   "modal.help.body": "If you are ready to help — whether legal, medical, or practical support (nurses, caregivers), or if you want to arrange a personal meeting — please write to: <a href=\"mailto:theRealUnrealStory@gmail.com\" class=\"underline\">theRealUnrealStory@gmail.com</a>.<br><br>We are sincerely grateful to everyone who responds.",
 
   "news.title": "The story continues now",
   "news.follow": "Follow our story on Telegram",
-
+  
   "map.locateMe": "Show my location",
   "map.locating": "Locating…",
   "map.geoUnsupported": "Geolocation is not supported on this device/browser.",
@@ -66,10 +65,10 @@
   "engage.title": "Your engagement",
   "engage.desc": "Mark what you've already done — that’s support too",
   "engage.b1": "Supported materially",
-  "engage.b2": "Read/listened to the short version",
-  "engage.b3": "Read/listened to the full story",
+  "engage.b2": "Read/listened to the short version", 
+  "engage.b3": "Read/listened to the full story", 
   "engage.b4": "Listened to tracks about our story",
-  "engage.b5": "Subscribed to TG/IG/X",
+  "engage.b5": "Subscribed to TG/IG/X", 
   "engage.b6": "Shared the story",
   "engage.note": "Your selections are saved in your browser.",
 
@@ -90,7 +89,7 @@
 
   "hearts.title": "Hearts of support",
   "hearts.empty": "No hearts yet.",
-
+  
   "placeholder.name": "Name",
   "placeholder.msg": "Message (up to 140 characters)",
 
@@ -118,44 +117,5 @@
 
   "alert.enterMessage": "Enter a message",
   "alert.clickMapFirst": "Click on the map first!",
-  "error.saveFailed": "Save error: ",
-
-  /* Reporting page */
-  "menu.reporting": "Reporting",
-
-  "reporting.title": "Reporting",
-  "reporting.desc": "Transparency hub for funding, campaigns, updates, and documents.",
-  "reporting.placeholder": "Content will appear here.",
-
-  "reporting.blocks.funds.title": "Financial overview",
-  "reporting.blocks.funds.desc": "Total collected, spent, planned — and overall availability.",
-
-  "reporting.blocks.campaigns.title": "Fundraising campaigns",
-  "reporting.blocks.campaigns.desc": "Timeline of campaigns across platforms (GoFundMe and others).",
-
-  "reporting.blocks.updates.title": "Accountability feed",
-  "reporting.blocks.updates.desc": "Structured reporting stream (planned Telegram integration).",
-
-  "reporting.blocks.documents.title": "Documents & proofs",
-  "reporting.blocks.documents.desc": "Medical and legal documents: diagnoses, receipts, case records.",
-
-  /* Funds block */
-  "funds.collected": "Collected",
-  "funds.spent": "Spent",
-  "funds.planned": "Planned",
-  "funds.available": "Available",
-  "funds.available.none": "No funds available.",
-  "funds.safety": "Safety margin",
-  "funds.updatedAt": "Updated",
-  "funds.collected.tip": "Cumulative progress by date.",
-  "funds.total": "Total",
-  "funds.showNote": "Show note",
-  "funds.showFull": "Show full",
-  "funds.plannedTotal": "Planned total",
-
-  /* Funds modals */
-  "modal.collected.title": "Collected — details",
-  "modal.spent.title": "Spending — details",
-  "modal.planned.title": "Planned — details",
-  "modal.available.title": "Available — details"
+  "error.saveFailed": "Save error: "
 }
