@@ -2,13 +2,14 @@
 // Блок 1 — Funds (Collected / Spent / Planned / Available) по плану db7a3031…
 // Источник данных: /data/funds.json (meta + collected/spent/planned с мультиязычными note).
 // Карточки: мягкие фоны (Cyan/Red/Amber/Green), модалки: горизонтальные линии Indigo-600.
-// Дизайн страницы не меняем — только локальные стили блока + стандартная модалка.
+// В модалках: убран footer "Updated", шапка с суммой по центру на индиговом фоне.
+// В Spent: явная кнопка-тогглер для заметок.
 
 import { t } from '../../i18n.js';
 import { openModal } from '../../modal.js';
 
 let mounted = false;
-let cache = null;         // последний успешный снапшот (нормализованные данные)
+let cache = null;
 let lastLang = null;
 
 export async function init(rootEl) {
@@ -22,7 +23,6 @@ export async function init(rootEl) {
 
   injectStyles();
 
-  // pre-skeleton
   section.innerHTML = `
     <div class="funds-grid">
       ${['','','',''].map(()=>`<div class="funds-tile skeleton"></div>`).join('')}
@@ -38,7 +38,6 @@ export async function init(rootEl) {
   cache = computeSnapshot(data);
   render(section, cache);
 
-  // клики по карточкам → модалки
   section.querySelector('[data-kind="collected"]')?.addEventListener('click', () => openCollectedModal(cache));
   section.querySelector('[data-kind="spent"]')?.addEventListener('click', () => openSpentModal(cache));
   section.querySelector('[data-kind="planned"]')?.addEventListener('click', () => openPlannedModal(cache));
@@ -92,14 +91,12 @@ function computeSnapshot(raw){
   const spent     = Array.isArray(raw?.spent)     ? [...raw.spent]     : [];
   const planned   = Array.isArray(raw?.planned)   ? [...raw.planned]   : [];
 
-  // нормализация
   collected.forEach(e => { e.amount = clamp(num(e.amount), 0, Infinity); });
   spent.forEach(e => { e.amount = clamp(num(e.amount), 0, Infinity); });
   planned.forEach(e => { e.amount = clamp(num(e.amount), 0, Infinity); });
 
-  // сортировки
   collected.sort(byDateAsc);
-  spent.sort(byDateAsc); // planned без дат — оставляем как есть
+  spent.sort(byDateAsc); // planned без дат — оставляем исходный порядок
 
   const totalCollected = collected.length ? collected[collected.length - 1].amount : 0;
   const totalSpent = spent.reduce((s,x)=>s+num(x.amount),0);
@@ -108,7 +105,6 @@ function computeSnapshot(raw){
   const available = totalCollected - totalSpent - totalPlanned;
   const safety = totalPlanned > 0 ? (available / totalPlanned) * 100 : 100;
 
-  // тона карточек
   const spentTone   = toneAgainstCollected(totalSpent, totalCollected);
   const plannedTone = toneAgainstCollected(totalPlanned, totalCollected);
   const availableTone = available <= 0
@@ -158,7 +154,6 @@ function render(section, m){
     value: fmtMoney(m.totals.planned, m.meta.currency),
   }));
 
-  // Available — показывает остаток; подпись статуса (none/low/ok)
   const statusText = m.totals.available <= 0
     ? t('funds.available.none','No reserve yet — additional support is needed.')
     : (m.totals.safety <= 50
@@ -172,7 +167,7 @@ function render(section, m){
     sub: statusText
   }));
 
-  // updated at
+  // "Updated" остаётся только под карточками, как ты просил
   const foot = document.createElement('div');
   foot.className = 'funds-updated';
   if (m.meta.updatedAt) {
@@ -193,13 +188,12 @@ function tile({ kind, tone, label, value, sub='' }){
   const el = document.createElement('div');
   el.className = `funds-tile tone-${tone}`;
   el.setAttribute('data-kind', kind);
-  el.tabIndex = 0; // focusable
+  el.tabIndex = 0;
   el.innerHTML = `
     <div class="ft-label">${label}</div>
     <div class="ft-value">${value}</div>
     ${sub ? `<div class="ft-sub">${sub}</div>` : ``}
   `;
-  // доступность
   el.setAttribute('role','button');
   el.setAttribute('aria-label', `${label}: ${value}`);
   el.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); el.click(); } });
@@ -218,7 +212,9 @@ function openCollectedModal(m){
     return `
       <div class="row">
         <div class="row-head">
-          <div class="row-date">${date}</div>
+          <div class="row-left">
+            <div class="row-date">${date}</div>
+          </div>
           <div class="row-amount">${fmtMoney(e.amount, m.meta.currency)}</div>
         </div>
         <div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div>
@@ -229,11 +225,9 @@ function openCollectedModal(m){
   const html = `
     <div class="modal-funds">
       <div class="sticky-summary">
-        <div class="sum-label">${t('funds.collected','Collected')}</div>
         <div class="sum-value">${total}</div>
       </div>
       <div class="list">${lines}</div>
-      ${footerMeta(m)}
     </div>
   `;
   openModal(title, html);
@@ -249,15 +243,18 @@ function openSpentModal(m){
   const lines = (m.series.spent || []).map((e, idx)=>{
     const pct = max>0 ? Math.max(0, Math.min(100, (e.amount / max)*100 )) : 0;
     const date = fmtDate(e.date);
-    const id = `spent-${idx}`;
+    const id = `spent-note-${idx}`;
     const note = pickNote(e.note, lang, def);
-    const noteBlock = note ? `<div class="note" id="${id}-note" hidden>${escapeHtml(note)}</div>` : '';
+    const noteBlock = note ? `<div class="note" id="${id}" hidden>${escapeHtml(note)}</div>` : '';
     return `
       <div class="row">
-        <button class="row-head as-button" aria-expanded="false" aria-controls="${id}-note" data-toggles="${id}-note">
-          <div class="row-date">${date}</div>
+        <div class="row-head">
+          <div class="row-left">
+            <button class="toggle-btn" aria-expanded="false" aria-controls="${id}" data-target="${id}" title="${t('funds.showDetails','Show details')}"></button>
+            <div class="row-date">${date}</div>
+          </div>
           <div class="row-amount">${fmtMoney(e.amount, m.meta.currency)}</div>
-        </button>
+        </div>
         ${noteBlock}
         <div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div>
       </div>
@@ -267,11 +264,9 @@ function openSpentModal(m){
   const html = `
     <div class="modal-funds">
       <div class="sticky-summary">
-        <div class="sum-label">${t('funds.spent','Spent')}</div>
         <div class="sum-value">${total}</div>
       </div>
       <div class="list">${lines}</div>
-      ${footerMeta(m)}
     </div>
   `;
   const modalId = openModal(title, html);
@@ -293,7 +288,9 @@ function openPlannedModal(m){
     return `
       <div class="row">
         <div class="row-head">
-          <div class="row-date">${fmtMoney(e.amount, m.meta.currency)}</div>
+          <div class="row-left">
+            <div class="row-date">${fmtMoney(e.amount, m.meta.currency)}</div>
+          </div>
         </div>
         ${noteBlock}
         <div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div>
@@ -304,11 +301,9 @@ function openPlannedModal(m){
   const html = `
     <div class="modal-funds">
       <div class="sticky-summary">
-        <div class="sum-label">${t('funds.planned','Planned')}</div>
         <div class="sum-value">${total}</div>
       </div>
       <div class="list">${lines}</div>
-      ${footerMeta(m)}
     </div>
   `;
   openModal(title, html);
@@ -323,23 +318,22 @@ function openAvailableModal(m){
   let body = `
     <div class="modal-funds">
       <div class="sticky-summary">
-        <div class="sum-label">${t('funds.available','Available balance')}</div>
         <div class="sum-value">${fmtMoney(avail, m.meta.currency)}</div>
       </div>
   `;
 
   if (avail <= 0) {
-    body += `
-      <div class="list">
-        <div class="empty">${t('funds.available.none','No reserve yet — additional support is needed.')}</div>
-      </div>
-      ${footerMeta(m)}
-    </div>`;
+		body += `
+		  <div class="list">
+			<div class="alert-cta" role="alert" aria-live="polite">
+			  ${t('funds.available.none','No reserve yet — additional support is needed.')}
+			</div>
+		  </div>
+		</div>`;
     openModal(title, body);
     return;
   }
 
-  // линейная шкала safety (0..100..>100)
   const pct = Math.max(0, safety);
   const tone = pct <= 50 ? 'amber' : 'green';
   const overflow = pct > 100 ? `<div class="gauge-overflow" title="${safetyText}"></div>` : '';
@@ -353,31 +347,28 @@ function openAvailableModal(m){
           <div class="gauge-label">${safetyText}</div>
         </div>
       </div>
-      ${footerMeta(m)}
     </div>
   `;
   openModal(title, body);
 }
 
-function footerMeta(m){
-  if (!m.meta.updatedAt) return '';
-  const d = new Date(m.meta.updatedAt);
-  const ds = isNaN(d.getTime()) ? String(m.meta.updatedAt)
-    : new Intl.DateTimeFormat(undefined, { year:'numeric', month:'short', day:'2-digit' }).format(d);
-  return `<div class="mf-meta">${t('funds.updated','Updated')}: ${ds}</div>`;
-}
-
+/* --- toggles --- */
 function wireToggles(modalId){
   const modal = modalId ? document.getElementById(modalId) : document.querySelector('.modal');
   if (!modal) return;
-  modal.querySelectorAll('[data-toggles]').forEach(btn=>{
+  modal.querySelectorAll('[data-target]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      const id = btn.getAttribute('data-toggles');
-      const note = modal.querySelector(`#${CSS.escape(id)}-note`) || modal.querySelector(`#${CSS.escape(id)}`);
+      const id = btn.getAttribute('data-target');
+      const note = modal.querySelector(`#${CSS.escape(id)}`);
       if (!note) return;
-      const open = note.hasAttribute('hidden') ? false : true;
-      if (open) { note.setAttribute('hidden',''); btn.setAttribute('aria-expanded','false'); }
-      else { note.removeAttribute('hidden'); btn.setAttribute('aria-expanded','true'); }
+      const isOpen = !note.hasAttribute('hidden');
+      if (isOpen) {
+        note.setAttribute('hidden','');
+        btn.setAttribute('aria-expanded','false');
+      } else {
+        note.removeAttribute('hidden');
+        btn.setAttribute('aria-expanded','true');
+      }
     });
   });
 }
@@ -432,55 +423,90 @@ function injectStyles(){
   .funds-tile.skeleton{ height:88px; background:linear-gradient(90deg,rgba(255,255,255,.05),rgba(255,255,255,.12),rgba(255,255,255,.05)); background-size:400% 100%; animation:funds-shimmer 1.1s linear infinite; border-color:transparent;}
   @keyframes funds-shimmer{ 0%{background-position:0 0} 100%{background-position:400% 0} }
 
-  /* тона карточек (мягкие RGBA, как в плане) */
+  /* тона карточек */
   .tone-cyan  { background: rgba(6,182,212,.14);  border-color: rgba(6,182,212,.35); }
   .tone-red   { background: rgba(239,68,68,.16);  border-color: rgba(239,68,68,.35); }
   .tone-amber { background: rgba(245,158,11,.16); border-color: rgba(245,158,11,.35); }
   .tone-green { background: rgba(34,197,94,.16);  border-color: rgba(34,197,94,.35); }
-  .tone-cyan:hover, .tone-red:hover, .tone-amber:hover, .tone-green:hover{
-    filter:brightness(1.05);
-  }
+  .tone-cyan:hover, .tone-red:hover, .tone-amber:hover, .tone-green:hover{ filter:brightness(1.05); }
 
   .funds-updated{ margin-top:6px; opacity:.75; font-size:.92rem; }
-
   .funds-empty{ opacity:.85; }
 
   /* Модалки */
+  
+  
+    /* ALERT CTA (Available ≤ 0): красный пульсирующий бейдж */
+  .modal-funds .alert-cta{
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(239, 68, 68, 0.12);           /* Red-500 с прозрачностью */
+    border: 1px solid rgba(239, 68, 68, 0.45);
+    color: #ef4444;                                 /* Red-500 текстом — «горит» */
+    font-weight: 700;
+    text-align: center;
+
+    /* мягкий пульс свечения */
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.55);
+    animation: alert-pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes alert-pulse{
+    0%   { box-shadow: 0 0 0 0   rgba(239,68,68,0.55); }
+    70%  { box-shadow: 0 0 0 14px rgba(239,68,68,0.00); }
+    100% { box-shadow: 0 0 0 0   rgba(239,68,68,0.00); }
+  }
+
+  /* уважение к настройкам пользователя — отключаем анимации при reduced motion */
+  @media (prefers-reduced-motion: reduce){
+    .modal-funds .alert-cta{ animation: none; }
+  }
+
+  
+  
   .modal-funds{ display:grid; gap:12px; }
+  /* шапка-монолит суммы: индиговый просвет + центрирование */
   .modal-funds .sticky-summary{
     position:sticky; top:0; z-index:1;
-    padding:10px 0 6px 0; background:inherit;
-    backdrop-filter: blur(0px);
-    display:flex; align-items:baseline; gap:10px;
-    border-bottom:1px solid rgba(255,255,255,.08);
+    padding:12px; border-radius:12px;
+    background: rgba(79,70,229,.12);
+    border:1px solid rgba(79,70,229,.35);
+    text-align:center;
   }
-  .modal-funds .sum-label{ font-weight:600; opacity:.92; }
-  .modal-funds .sum-value{ font-weight:700; font-size:1.15rem; }
+  .modal-funds .sum-value{ font-weight:800; font-size:1.2rem; }
 
   .modal-funds .list{ display:grid; gap:10px; }
   .modal-funds .row{ display:grid; gap:6px; }
-  .modal-funds .row-head{ display:flex; justify-content:space-between; gap:10px; align-items:baseline; }
+  .modal-funds .row-head{ display:flex; justify-content:space-between; gap:10px; align-items:center; }
+  .modal-funds .row-left{ display:flex; align-items:baseline; gap:8px; }
   .modal-funds .row-date{ opacity:.9; font-size:.95rem; }
   .modal-funds .row-amount{ font-weight:600; }
-  .modal-funds .as-button{
-    display:flex; justify-content:space-between; gap:10px; align-items:baseline;
-    background:none; border:none; padding:0; margin:0; color:inherit; cursor:pointer;
-    text-align:left; font:inherit;
+
+  /* явная кнопка-тогглер для Spent */
+  .modal-funds .toggle-btn{
+    width:28px; height:28px; border-radius:8px;
+    border:1px solid rgba(79,70,229,.55);
+    background: transparent; color:inherit; cursor:pointer;
+    display:inline-grid; place-items:center;
   }
-  .modal-funds .note{ opacity:.9; }
+  .modal-funds .toggle-btn::after{
+    content:'+'; font-weight:800; line-height:1; font-size:16px;
+  }
+  .modal-funds .toggle-btn[aria-expanded="true"]::after{
+    content:'–';
+  }
 
   /* горизонтальные линии (индиго) */
   .modal-funds .bar{
-    height:8px; border-radius:999px; background:rgba(79,70,229,.18); /* светлый трек */
+    height:8px; border-radius:999px; background:rgba(79,70,229,.18);
     overflow:hidden;
   }
   .modal-funds .bar-fill{
-    height:100%; background:#4f46e5; /* Indigo-600 */
+    height:100%; background:#4f46e5;
   }
 
+  .modal-funds .note{ opacity:.92; }
   .modal-funds .empty{ opacity:.8; }
-
-  .mf-meta{ margin-top:6px; opacity:.75; font-size:.92rem; border-top:1px solid rgba(255,255,255,.08); padding-top:6px; }
 
   /* gauge (available safety) */
   .gauge{ display:grid; gap:8px; }
@@ -490,7 +516,7 @@ function injectStyles(){
   .gauge-fill{ height:100%; }
   .gauge-label{ opacity:.9; }
   .gauge-overflow{
-    width:8px; height:14px; border-radius:2px; background:#4f46e5; /* маркер-«хвост» индиго */
+    width:8px; height:14px; border-radius:2px; background:#4f46e5;
     margin-left:auto; transform:translateY(-2px);
   }
   `;

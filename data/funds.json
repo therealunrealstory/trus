@@ -2,60 +2,215 @@
   "meta": {
     "currency": "USD",
     "lang_default": "EN",
-    "updated_at": "2025-08-25"
+    "updated_at": "2025-08-24T00:00:00Z"
   },
 
   "collected": [
-    { "date": "2025-08-01", "amount": 12000 },
-    { "date": "2025-08-10", "amount": 13200 },
-    { "date": "2025-08-20", "amount": 14500 }
+    { "date": "2025-01-05", "amount": 2000 },
+    { "date": "2025-01-12", "amount": 3500 },
+    { "date": "2025-01-20", "amount": 5300 },
+    { "date": "2025-02-01", "amount": 7000 },
+    { "date": "2025-02-10", "amount": 8500 },
+    { "date": "2025-02-20", "amount": 9800 },
+    { "date": "2025-03-05", "amount": 11500 },
+    { "date": "2025-03-15", "amount": 13200 },
+    { "date": "2025-03-28", "amount": 15000 },
+    { "date": "2025-04-05", "amount": 16800 },
+    { "date": "2025-04-18", "amount": 18700 },
+    { "date": "2025-05-01", "amount": 21000 },
+    { "date": "2025-05-14", "amount": 23500 },
+    { "date": "2025-05-28", "amount": 26000 },
+    { "date": "2025-06-10", "amount": 28500 },
+    { "date": "2025-06-24", "amount": 31200 },
+    { "date": "2025-07-08", "amount": 34000 },
+    { "date": "2025-07-22", "amount": 37000 },
+    { "date": "2025-08-10", "amount": 41000 },
+    { "date": "2025-08-24", "amount": 45000 }
   ],
 
   "spent": [
     {
-      "date": "2025-08-05",
-      "amount": 3500,
-      "note": {
-        "EN": "Hospital invoice — oncology ward",
-        "RU": "Счёт клиники — онкоотделение",
-        "FR": "Facture hôpital — oncologie"
-      }
+      "date": "2025-01-07",
+      "amount": 500,
+      "note": { "EN": "Initial labs", "RU": "Начальные анализы", "DE": "Erste Laborwerte" }
     },
     {
-      "date": "2025-08-14",
-      "amount": 2200,
-      "note": {
-        "EN": "Rehabilitation (10 days)",
-        "RU": "Реабилитация (10 дней)",
-        "DE": "Rehabilitation (10 Tage)"
-      }
+      "date": "2025-01-18",
+      "amount": 900,
+      "note": { "EN": "Consultation (oncology)", "ES": "Consulta (oncología)", "FR": "Consultation (oncologie)" }
+    },
+    {
+      "date": "2025-01-25",
+      "amount": 700,
+      "note": { "EN": "Medication (2 weeks)", "RU": "Лекарства (2 недели)" }
+    },
+    {
+      "date": "2025-02-03",
+      "amount": 800,
+      "note": { "EN": "Imaging (CT)", "DE": "Bildgebung (CT)" }
+    },
+    {
+      "date": "2025-02-12",
+      "amount": 1200,
+      "note": { "EN": "Day clinic", "RU": "Дневной стационар" }
+    },
+    {
+      "date": "2025-02-22",
+      "amount": 950,
+      "note": { "EN": "Transportation to clinic", "ES": "Transporte a la clínica" }
+    },
+    {
+      "date": "2025-03-06",
+      "amount": 1100,
+      "note": { "EN": "Lab tests", "RU": "Лабораторные анализы" }
+    },
+    {
+      "date": "2025-03-16",
+      "amount": 1300,
+      "note": { "EN": "Specialist visit", "FR": "Consultation spécialiste" }
+    },
+    {
+      "date": "2025-03-30",
+      "amount": 600,
+      "note": { "EN": "Nursing care (home)", "DE": "Pflege zu Hause" }
+    },
+    {
+      "date": "2025-04-06",
+      "amount": 1500,
+      "note": { "EN": "Short-term housing", "RU": "Краткосрочное жильё" }
+    },
+    {
+      "date": "2025-04-20",
+      "amount": 1000,
+      "note": { "EN": "Medication refill", "ES": "Reposición de medicamentos" }
+    },
+    {
+      "date": "2025-05-02",
+      "amount": 850,
+      "note": { "EN": "Ambulance (urgent)", "FR": "Ambulance (urgence)" }
+    },
+    {
+      "date": "2025-05-16",
+      "amount": 2000,
+      "note": { "EN": "Hospital invoice", "RU": "Счёт клиники" }
+    },
+    {
+      "date": "2025-05-29",
+      "amount": 1250,
+      "note": { "EN": "Rehabilitation (7 days)", "DE": "Reha (7 Tage)" }
+    },
+    {
+      "date": "2025-06-12",
+      "amount": 1750,
+      "note": { "EN": "Medical equipment rental", "RU": "Аренда медоборудования" }
+    },
+    {
+      "date": "2025-06-26",
+      "amount": 900,
+      "note": { "EN": "Transport to NYC", "ES": "Transporte a NYC" }
+    },
+    {
+      "date": "2025-07-09",
+      "amount": 950,
+      "note": { "EN": "Follow-up tests", "FR": "Analyses de suivi" }
+    },
+    {
+      "date": "2025-07-23",
+      "amount": 650,
+      "note": { "EN": "Supplies", "RU": "Медицинские расходники" }
+    },
+    {
+      "date": "2025-08-11",
+      "amount": 700,
+      "note": { "EN": "Legal consultation", "DE": "Rechtsberatung" }
+    },
+    {
+      "date": "2025-08-20",
+      "amount": 800,
+      "note": { "EN": "Nursing shift", "ES": "Turno de enfermería" }
     }
   ],
 
   "planned": [
     {
-      "amount": 7000,
-      "note": {
-        "EN": "Next chemotherapy cycle",
-        "ES": "Próximo ciclo de quimioterapia",
-        "DE": "Nächster Chemotherapiezyklus"
-      }
+      "amount": 1200,
+      "note": { "EN": "Next diagnostics", "RU": "Следующая диагностика", "DE": "Nächste Diagnostik" }
     },
     {
-      "amount": 3000,
-      "note": {
-        "EN": "Temporary housing (1 month)",
-        "RU": "Временное жильё (1 месяц)",
-        "FR": "Logement temporaire (1 mois)"
-      }
+      "amount": 800,
+      "note": { "EN": "Medication (month)", "ES": "Medicamentos (mes)" }
     },
     {
-      "amount": 2000,
-      "note": {
-        "EN": "Legal consultations and filings",
-        "ES": "Consultas y trámites legales",
-        "IT": "Consulenze legali e pratiche"
-      }
+      "amount": 1500,
+      "note": { "EN": "Specialist consultation", "FR": "Consultation spécialiste" }
+    },
+    {
+      "amount": 900,
+      "note": { "EN": "Transport (city)", "RU": "Транспорт по городу" }
+    },
+    {
+      "amount": 1100,
+      "note": { "EN": "Lab panels", "DE": "Labordiagnostik" }
+    },
+    {
+      "amount": 1300,
+      "note": { "EN": "Day clinic procedures", "ES": "Procedimientos en clínica de día" }
+    },
+    {
+      "amount": 750,
+      "note": { "EN": "Supplies restock", "RU": "Пополнение расходников" }
+    },
+    {
+      "amount": 1600,
+      "note": { "EN": "Rehabilitation block", "FR": "Bloc de rééducation" }
+    },
+    {
+      "amount": 1400,
+      "note": { "EN": "Housing (short-term)", "DE": "Kurzzeitunterkunft" }
+    },
+    {
+      "amount": 950,
+      "note": { "EN": "Dental check", "ES": "Revisión dental" }
+    },
+    {
+      "amount": 1250,
+      "note": { "EN": "Cardiology consult", "RU": "Консультация кардиолога" }
+    },
+    {
+      "amount": 1200,
+      "note": { "EN": "Therapy session set", "FR": "Séances de thérapie" }
+    },
+    {
+      "amount": 900,
+      "note": { "EN": "Emergency reserve", "DE": "Notfallreserve" }
+    },
+    {
+      "amount": 1000,
+      "note": { "EN": "Nutrition support", "ES": "Apoyo nutricional" }
+    },
+    {
+      "amount": 1200,
+      "note": { "EN": "Chemotherapy co-pay", "RU": "Доплата за химиотерапию" }
+    },
+    {
+      "amount": 1200,
+      "note": { "EN": "Home care shifts", "FR": "Soins à domicile" }
+    },
+    {
+      "amount": 700,
+      "note": { "EN": "Transport (intercity)", "DE": "Überlandtransport" }
+    },
+    {
+      "amount": 1200,
+      "note": { "EN": "Imaging (MRI)", "RU": "МРТ" }
+    },
+    {
+      "amount": 800,
+      "note": { "EN": "Legal paperwork", "ES": "Trámites legales" }
+    },
+    {
+      "amount": 900,
+      "note": { "EN": "Psychological support", "FR": "Soutien psychologique" }
     }
   ]
 }
