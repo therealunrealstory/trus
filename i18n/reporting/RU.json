@@ -9,5 +9,22 @@
   "reporting.block3.note": "Здесь будут пояснения медицинских и организационных трат (на базе нашего приватного Telegram‑канала).",
 
   "reporting.block4.title": "Документы: медицинские и юридические",
-  "reporting.block4.note": "Здесь появятся проверенные документы (сканы и PDF), сгруппированные по медицине и праву."
+  "reporting.block4.note": "Здесь появятся проверенные документы (сканы и PDF), сгруппированные по медицине и праву.",
+  
+  "reporting.block2.title": "История кампаний по сбору средств",
+  "reporting.block2.note": "Здесь покажем кампании на GoFundMe, самостоятельные и другие платформы.",
+
+  "reporting.block2.loading": "Загружаем историю кампаний…",
+  "reporting.block2.empty": "Кампании ещё не опубликованы.",
+
+  "reporting.block2.platform.unknown": "Платформа",
+  "reporting.block2.platform.empty": "На этой платформе пока нет кампаний.",
+
+  "reporting.block2.period": "Период",
+  "reporting.block2.period.now": "по наст. время",
+
+  "reporting.block2.metrics": "Собрано/Доноры",
+
+  "reporting.block2.open": "Открыть кампанию",
+  "reporting.block2.nolink": "Ссылка будет добавлена позже."
 }
