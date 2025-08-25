@@ -41,7 +41,6 @@ function drawMarksBatch(points, batch=300) {
       const m = points[i];
       const lat = Number(m.lat), lon = Number(m.lon);
       if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
-      // был 'lime' — перекрашиваем в Cyan 500 (#06b6d4)
       L.circleMarker([lat, lon], { radius:4, color:'#06b6d4' })
         .bindPopup(`<b>${m.name||'Anon'}</b><br>${m.message||''}`)
         .addTo(layer);
@@ -65,7 +64,6 @@ async function loadAllMarksPaged() {
 }
 
 function chunk(a,s){const out=[];for(let i=0;i<a.length;i+=s) out.push(a.slice(i,i+s));return out;}
-// Сердечко в карточке — теперь SVG через CSS-mask (класс .heart-icon)
 function heartCard(n){
   return `
     <div class="p-4 rounded-2xl bg-gray-900/50 shadow-sm border border-gray-700 heart-card">
@@ -136,10 +134,10 @@ function renderDonateButtons(root){
   const { base, amounts, wrap } = cfg;
   wrap.innerHTML = '';
 
-  // Фиксированные суммы — ghost-кнопки
+  // Фиксированные суммы — SOLID как активная кнопка «Вовлечённости»
   amounts.forEach((amt) => {
     const a = document.createElement('a');
-    a.className = 'btn-ghost px-3 py-2 rounded-xl text-sm donate-tier';
+    a.className = 'donate-tier px-3 py-2 rounded-xl text-sm';
     a.dataset.amount = String(amt);
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
@@ -148,9 +146,9 @@ function renderDonateButtons(root){
     wrap.appendChild(a);
   });
 
-  // Кнопка «Donate» — тоже ghost
+  // Кнопка «Donate» — тот же стиль
   const custom = document.createElement('a');
-  custom.className = 'btn-ghost px-3 py-2 rounded-xl text-sm donate-tier';
+  custom.className = 'donate-tier px-3 py-2 rounded-xl text-sm';
   custom.target = '_blank';
   custom.rel = 'noopener noreferrer';
   custom.href = base;
@@ -158,12 +156,11 @@ function renderDonateButtons(root){
   custom.textContent = t('btn.donate','Donate');
   wrap.appendChild(custom);
 
-  // Применить переводы, если i18n ещё не прошёл
   document.dispatchEvent(new CustomEvent('locale-apply-request'));
 }
 
 export async function init(root){
-  // Маркер страницы для тематического CSS (вешаем и снимаем в destroy)
+  // Маркер страницы для тематического CSS
   const subpageEl = document.getElementById('subpage');
   if (subpageEl) subpageEl.classList.add('page--support');
 
@@ -257,16 +254,14 @@ export async function init(root){
       btn?.removeAttribute('disabled'); btn?.classList.remove('opacity-50','cursor-not-allowed');
       loadMoreHearts();
     });
-
-    // (старую принудительную заливку cyan-500 убрали)
   }
 
-  // Унифицированный ghost-стиль для Add / Leave heart
+  // Единый SOLID-стайл (как у «Вовлечённости») для Add / Leave heart
   ['#addHeart', '#addMark'].forEach(sel => {
     const btn = root.querySelector(sel);
     if (btn) {
-      btn.classList.remove('bg-green-600','bg-green-500','bg-cyan-500','text-white');
-      btn.classList.add('btn-ghost','px-3','py-2','rounded-xl','text-sm');
+      btn.classList.remove('bg-green-600','bg-green-500','bg-cyan-500','text-white','btn-ghost');
+      btn.classList.add('donate-tier','px-3','py-2','rounded-xl','text-sm');
     }
   });
 
@@ -289,10 +284,8 @@ export function destroy(){
   splide = null;
   allHearts = [];
 
-  // снимаем маркер страницы
   const subpageEl = document.getElementById('subpage');
   if (subpageEl) subpageEl.classList.remove('page--support');
 }
 
-// На случай, если роутер ждёт default-экспорт
 export default { init, destroy };

@@ -1,147 +1,86 @@
-/* /assets/cyan500.css */
-/* === TRUS v230825 — Support page: Cyan-500 theme + SVG hearts (robust) === */
+/* === TRUS v230825 — Support page: Cyan-500 theme + SVG hearts === */
 
-/* Палитра */
 :root{
   --cyan-300:#67e8f9;
   --cyan-400:#22d3ee;
   --cyan-500:#06b6d4;
   --cyan-600:#0891b2;
   --cyan-700:#0e7490;
-  --fuchsia-500:#d946ef;
 }
 
-/* Область страницы Support — привязано к .page--support */
+/* применяется только на странице Support */
 .page--support{
-  --support-accent: var(--cyan-500);
   --support-accent-weak: var(--cyan-400);
-  --support-accent-strong: var(--cyan-600);
-  /* — сердца оставим индиго, как раньше */
-  --heart-accent: #4f46e5; /* Indigo 600 */
-
-  /* Переназначаем любые green-* токены внутри страницы */
-  --green-300: var(--cyan-300);
-  --green-400: var(--cyan-400);
-  --green-500: var(--cyan-500);
-  --green-600: var(--cyan-600);
-  --green-700: var(--cyan-700);
-
-  /* «Ghost»-рецепт (как у Your engagement), но в циановом тоне */
-  --ghost-bg: rgba(6,182,212,0.16);
-  --ghost-bg-hover: rgba(6,182,212,0.26);
-  --ghost-bg-active: rgba(6,182,212,0.36);
-  --ghost-border: rgba(6,182,212,0.36);
-  --ghost-outline: rgba(6,182,212,0.65);
-  --ghost-text: #ecfeff;
+  --support-accent-strong: var(--cyan-700); /* базовый фон, как у активной ENG-кнопки */
 }
 
-/* Перекрываем утилиты Tailwind-подобных классов на странице Support */
-.page--support :is([class*="bg-green-"],[class*="bg-emerald-"],[class*="bg-lime-"]){
-  background-color: var(--support-accent) !important;
+/* ====== ЕДИНЫЙ SOLID-СТАЙЛ (как активная «Вовлечённость») ====== */
+/* Используем класс .donate-tier для ВСЕХ нужных кнопок:
+   суммы, "Своя сумма", #addMark, #addHeart */
+.page--support .donate-tier{
+  background-color: var(--support-accent-strong);
+  border: 1px solid var(--support-accent-weak);
+  color: #ecfeff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.35);
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color .15s ease, border-color .15s ease, transform .02s ease;
 }
-.page--support :is([class*="text-green-"],[class*="text-emerald-"],[class*="text-lime-"]){
-  color: var(--support-accent) !important;
+.page--support .donate-tier:hover{
+  background-color: var(--cyan-600);
+  border-color: var(--cyan-500);
 }
-.page--support :is([class*="border-green-"],[class*="border-emerald-"],[class*="border-lime-"]){
-  border-color: var(--support-accent) !important;
-}
-.page--support :is([class*="ring-green-"],[class*="ring-emerald-"],[class*="ring-lime-"]){
-  --tw-ring-color: var(--support-accent) !important;
-}
-.page--support :is([class*="from-green-"],[class*="from-emerald-"],[class*="from-lime-"]){
-  --tw-gradient-from: var(--support-accent) !important;
-}
-.page--support :is([class*="to-green-"],[class*="to-emerald-"],[class*="to-lime-"]){
-  --tw-gradient-to: var(--support-accent-strong) !important;
-}
-
-/* ——— Кнопки в стиле Your engagement (ghost) для нужных зон ——— */
-/* 1) Суммы в Support now
-   2) Add на карте поддержки
-   3) Leave heart в Hearts of support
-*/
-.page--support :is(
-  [data-amount],
-  .donate-amount,
-  .donate-tier,
-  [data-action="add"],
-  [data-action="add-mark"],
-  .btn-add,
-  [data-action="send-heart"],
-  .btn-send-heart
-){
-  background: var(--ghost-bg) !important;
-  border: 1px solid var(--ghost-border) !important;
-  color: var(--ghost-text) !important;
-  backdrop-filter: saturate(120%) blur(2px);
-  -webkit-backdrop-filter: saturate(120%) blur(2px);
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.02) inset,
-    0 1px 2px rgba(0,0,0,0.35);
-  transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .02s ease;
-}
-.page--support :is(
-  [data-amount], .donate-amount, .donate-tier,
-  [data-action="add"], [data-action="add-mark"], .btn-add,
-  [data-action="send-heart"], .btn-send-heart
-):hover{
-  background: var(--ghost-bg-hover) !important;
-}
-.page--support :is(
-  [data-amount], .donate-amount, .donate-tier,
-  [data-action="add"], [data-action="add-mark"], .btn-add,
-  [data-action="send-heart"], .btn-send-heart
-):active{
-  background: var(--ghost-bg-active) !important;
-  transform: translateY(1px);
-}
-.page--support :is(
-  [data-amount], .donate-amount, .donate-tier,
-  [data-action="add"], [data-action="add-mark"], .btn-add,
-  [data-action="send-heart"], .btn-send-heart
-):focus-visible{
-  outline: 2px solid var(--ghost-outline);
+.page--support .donate-tier:active{ transform: translateY(1px); }
+.page--support .donate-tier:focus-visible{
+  outline: 2px solid rgba(34,211,238,0.65); /* cyan-400 */
   outline-offset: 2px;
 }
 
-/* ——— Сердечки (SVG mask) ——— */
-.page--support .hearts .heart-icon{
-  width: 1.15rem;
-  height: 1.15rem;
-  display: inline-block;
-  vertical-align: -0.15em;
-  background-color: var(--heart-accent);
-  -webkit-mask: url("../images/heart.mask.svg") no-repeat center / contain;
-  mask: url("../images/heart.mask.svg") no-repeat center / contain;
-}
-/* Если в разметке остались PNG, скрыть их */
-.page--support img.heart-icon[src$=".png"]{ display:none !important; }
-/* Фолбэк-иконка сердечка через ::before */
-.page--support .heart-card::before,
-.page--support .hearts .splide__slide::before{
-  content:"";
-  width: 1.15rem;
-  height: 1.15rem;
-  margin-right:.35rem;
-  display:inline-block;
-  vertical-align: -0.15em;
-  background-color: var(--heart-accent);
-  -webkit-mask:url("../images/heart.mask.svg") no-repeat center / contain;
-  mask:url("../images/heart.mask.svg") no-repeat center / contain;
-}
-
-/* Ghost buttons for Support page (match "Your engagement" look) */
+/* ====== (опционально) Ghost для других мест — НЕ применяется если есть .donate-tier ====== */
 .page--support .btn-ghost{
   background: rgba(6,182,212,0.16);
   border: 1px solid rgba(6,182,212,0.36);
   color: #ecfeff;
   backdrop-filter: saturate(120%) blur(2px);
   -webkit-backdrop-filter: saturate(120%) blur(2px);
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.02) inset,
-    0 1px 2px rgba(0,0,0,0.35);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.02) inset, 0 1px 2px rgba(0,0,0,0.35);
   transition: background-color .2s, border-color .2s, box-shadow .2s, transform .02s;
 }
-.page--support .btn-ghost:hover{ background: rgba(6,182,212,0.26); }
-.page--support .btn-ghost:active{ background: rgba(6,182,212,0.36); transform: translateY(1px); }
-.page--support .btn-ghost:focus-visible{ outline: 2px solid rgba(6,182,212,0.65); outline-offset: 2px; }
+.page--support :is([data-action="add"],[data-action="add-mark"],.btn-add,[data-action="send-heart"],.btn-send-heart):not(.donate-tier){
+  background: rgba(6,182,212,0.16);
+  border: 1px solid rgba(6,182,212,0.36);
+  color: #ecfeff;
+  backdrop-filter: saturate(120%) blur(2px);
+  -webkit-backdrop-filter: saturate(120%) blur(2px);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.02) inset, 0 1px 2px rgba(0,0,0,0.35);
+  transition: background-color .2s, border-color .2s, box-shadow .2s, transform .02s;
+}
+.page--support .btn-ghost:hover,
+.page--support :is([data-action="add"],[data-action="add-mark"],.btn-add,[data-action="send-heart"],.btn-send-heart):not(.donate-tier):hover{
+  background: rgba(6,182,212,0.26);
+}
+.page--support .btn-ghost:active,
+.page--support :is([data-action="add"],[data-action="add-mark"],.btn-add,[data-action="send-heart"],.btn-send-heart):not(.donate-tier):active{
+  background: rgba(6,182,212,0.36);
+  transform: translateY(1px);
+}
+.page--support .btn-ghost:focus-visible,
+.page--support :is([data-action="add"],[data-action="add-mark"],.btn-add,[data-action="send-heart"],.btn-send-heart):not(.donate-tier):focus-visible{
+  outline: 2px solid rgba(6,182,212,0.65);
+  outline-offset: 2px;
+}
+
+/* ====== Иконка сердца (CSS mask) ====== */
+.page--support .hearts .heart-icon{
+  width:1.15rem;height:1.15rem;display:inline-block;vertical-align:-0.15em;
+  background-color:#4f46e5; /* indigo-600 */
+  -webkit-mask:url("../images/heart.mask.svg") no-repeat center / contain;
+  mask:url("../images/heart.mask.svg") no-repeat center / contain;
+}
+.page--support img.heart-icon[src$=".png"]{ display:none !important; }
+.page--support .heart-card::before,
+.page--support .hearts .splide__slide::before{
+  content:"";width:1.15rem;height:1.15rem;margin-right:.35rem;display:inline-block;vertical-align:-0.15em;
+  background-color:#4f46e5;
+  -webkit-mask:url("../images/heart.mask.svg") no-repeat center / contain;
+  mask:url("../images/heart.mask.svg") no-repeat center / contain;
+}
