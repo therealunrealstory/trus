@@ -1,8 +1,8 @@
 // assets/js/core/pages/reporting/block1.js
 // Current support metrics: Collected / Spent / Planned / Available
-// - Collected: solid cyan как на Support (cyan500.css)
-// - Spent/Planned: показываем covered:% и красим по новым порогам
-// - Available: 80% порог + мигающая точка рядом с суммой
+// - усилили пульсацию точки в Available
+// - добавили Covered % и прогресс-полосы на Spent/Planned (100% cap)
+// - обновили цветовую логику (см. комментарии ниже)
 
 import { I18N } from '../../i18n.js';
 import { openModal } from '../../modal.js';
@@ -35,7 +35,7 @@ export async function init(root){
 
   renderTiles(host, cache);
 
-  // Делегирование кликов по «+»
+  // Делегирование кликов по «+» в модалках
   if (!document.__repB1Delegated__) {
     document.__repB1Delegated__ = true;
     document.addEventListener('click', onDelegatedClick, true);
@@ -72,7 +72,6 @@ function renderTiles(host, data){
     collected = [],
     spent = [],
     planned = [],
-    norm = { target: 0 },
     updated_at = null,
   } = data;
 
@@ -81,41 +80,29 @@ function renderTiles(host, data){
   const totalPlanned   = sum(planned, 'amount');
   const available      = totalCollected - totalSpent - totalPlanned;
 
-  // --- COVERED метрики ---
-  // Spent: сколько текущие сборы покрывают ПОДТВЕРЖДЁННЫЕ расходы
-  const coveredSpentPct = pctClamp(totalSpent > 0 ? (totalCollected / totalSpent) * 100 : 100);
+  // --- Покрытие (covered) и тона карточек ---
+  // Spent: covered = Collected / Spent
+  const coveredSpentRaw = totalSpent > 0 ? (totalCollected / totalSpent) * 100 : 100;
+  const coveredSpentForBar = clamp(Math.round(coveredSpentRaw), 0, 100);
+  const coveredSpentText   = clamp(round1(coveredSpentRaw), 0, 100);
+  const spentTone = (coveredSpentRaw >= 100) ? 'green' : 'red';
 
-  // Planned: как в твоём примере: (collected - planned)/spent*100
-  let coveredPlannedRaw;
-  if (totalSpent > 0) {
-    coveredPlannedRaw = ((totalCollected - totalPlanned) / totalSpent) * 100;
-  } else {
-    // если confirmed расходов нет — считаем по резерву vs планы
-    const reserve = totalCollected;
-    coveredPlannedRaw = totalPlanned > 0 ? (reserve / totalPlanned) * 100 : 100;
-  }
-  const coveredPlannedPct = pctClamp(coveredPlannedRaw);
+  // Planned: covered = (Collected - Spent) / Planned
+  const coveredPlannedRaw = totalPlanned > 0 ? ((totalCollected - totalSpent) / totalPlanned) * 100 : 100;
+  const coveredPlannedForBar = clamp(Math.round(coveredPlannedRaw), 0, 100);
+  const coveredPlannedText   = clamp(round1(coveredPlannedRaw), 0, 100);
+  const plannedTone = (coveredPlannedRaw >= 100) ? 'green' : (coveredPlannedRaw >= 50 ? 'amber' : 'red');
 
-  // --- Тоны карточек ---
-  // Spent: <100→red, ≥100→green
-  const spentTone   = (coveredSpentPct < 100) ? 'red' : 'green';
-
-  // Planned: <50→red, 50–<100→amber, ≥100→green
-  const plannedTone = (coveredPlannedPct >= 100) ? 'green' : (coveredPlannedPct >= 50 ? 'amber' : 'red');
-
-  // Available: safety vs planned с порогом 80%
+  // Available: safety = Available / Planned
   const safety = totalPlanned > 0 ? (available / totalPlanned) * 100 : 100;
   const safetyPct = Math.max(0, Math.round(safety));
   const availTone = (available <= 0) ? 'red' : (safetyPct <= 80 ? 'amber' : 'green');
-
-  const normTarget = Number(norm?.target) || 0;
-  void normTarget;
 
   host.innerHTML = '';
   const grid = document.createElement('div');
   grid.className = 'rep-b1 grid';
 
-  // (1) Collected — solid cyan (как donate-tier на Support)
+  // (1) Collected — solid как на Support
   grid.appendChild(tile({
     kind: 'collected',
     label: t('reporting.block1.collected','Collected'),
@@ -124,51 +111,59 @@ function renderTiles(host, data){
     onClick: () => openCollectedModal(collected, totalCollected, currency)
   }));
 
-  // (2) Spent + covered%
+  // (2) Spent — карточка с covered% и полосой
+  const spentBar = progress(
+    coveredSpentForBar,
+    coveredLabel(coveredSpentText),
+    toneToFill(spentTone)
+  );
   grid.appendChild(tile({
     kind: 'spent',
     label: t('reporting.block1.spent','Spent'),
     tone:  spentTone,
     value: fmtMoney(totalSpent, currency),
-    sub:   `${t('reporting.block1.covered','covered')}: ${fmtPct(coveredSpentPct)}`,
+    subNode: spentBar,
     onClick: () => openSpentModal(spent, currency)
   }));
 
-  // (3) Planned + covered%
+  // (3) Planned — карточка с covered% и полосой
+  const plannedBar = progress(
+    coveredPlannedForBar,
+    coveredLabel(coveredPlannedText),
+    toneToFill(plannedTone)
+  );
   grid.appendChild(tile({
     kind: 'planned',
     label: t('reporting.block1.planned','Planned'),
     tone:  plannedTone,
     value: fmtMoney(totalPlanned, currency),
-    sub:   `${t('reporting.block1.covered','covered')}: ${fmtPct(coveredPlannedPct)}`,
+    subNode: plannedBar,
     onClick: () => openPlannedModal(planned, currency)
   }));
 
-  // (4) Available — полоса и мигающая точка
-  const bar = progress(
+  // (4) Available — прогресс + пульсирующая точка рядом с суммой
+  const availBar = progress(
     Math.min(safetyPct, 100),
     t('funds.available.safety','Safety margin: {percent}%').replace('{percent}', String(safetyPct)),
     (safetyPct <= 80 ? 'amber' : 'green')
   );
-
-  const availEl = tile({
+  const availTile = tile({
     kind: 'available',
     label: t('reporting.block1.available','Available'),
     tone:  availTone,
     value: fmtMoney(available, currency),
-    subNode: bar,
+    subNode: availBar,
     onClick: () => openAvailableModal(available, safetyPct, currency)
   });
-
-  // добавляем «мигающую точку» рядом с суммой
-  const v = availEl.querySelector('.value');
-  if (v) {
+  // добавляем «точку»
+  const vEl = availTile.querySelector('.value');
+  if (vEl) {
     const dot = document.createElement('span');
-    dot.className = 'pulse-dot';
-    v.appendChild(dot);
+    dot.className = `pulse-dot ${toneClass(availTone)}`;
+    vEl.appendChild(dot);
   }
+  grid.appendChild(availTile);
 
-  grid.appendChild(availEl);
   host.appendChild(grid);
 
   if (updated_at){
@@ -396,12 +391,12 @@ function tile({ kind, label, value, sub='', subNode=null, tone='neutral', onClic
   return el;
 }
 
-function progress(pct, text, tone=null){
+function progress(pct, text, fillTone=null){
   const box = document.createElement('div');
   box.className = 'b1-progress';
   const track = document.createElement('div'); track.className='track';
   const fill  = document.createElement('div'); fill.className='fill';
-  if (tone) fill.classList.add(tone);
+  if (fillTone) fill.classList.add(fillTone);
   fill.style.width = `${pct}%`;
   const label = document.createElement('div'); label.className='ptext'; label.textContent = text;
   track.appendChild(fill);
@@ -410,10 +405,7 @@ function progress(pct, text, tone=null){
   return box;
 }
 
-function modalHead(bigText){
-  return `<div class="b1-modal-head">${escapeHtml(bigText)}</div>`;
-}
-
+function modalHead(bigText){ return `<div class="b1-modal-head">${escapeHtml(bigText)}</div>`; }
 function svgPlus(){
   return `
   <svg class="i-plus" viewBox="0 0 24 24" width="20" height="20"
@@ -431,8 +423,8 @@ function fmtMoney(n, cur){
   try { return new Intl.NumberFormat(undefined, { style:'currency', currency: cur }).format(v); }
   catch { return `${v.toLocaleString()} ${cur}`; }
 }
-function fmtPct(n){ const v = Math.max(0, Number(n)||0); return (Math.round(v)===v) ? `${v}%` : `${v.toFixed(1)}%`; }
-function pctClamp(v){ const x = Number(v); if (!Number.isFinite(x)) return 0; return Math.max(0, Math.round(x)); }
+function round1(x){ const n = Number(x)||0; return Math.round(n*10)/10; }
+function clamp(x,a,b){ return Math.max(a, Math.min(b, x)); }
 function getLang(){ return (document.documentElement.getAttribute('lang')||'').toUpperCase(); }
 function safeDate(s){ return typeof s==='string' ? s : ''; }
 function tryNote(noteObj, lang){
@@ -440,6 +432,14 @@ function tryNote(noteObj, lang){
   return noteObj[lang] ?? noteObj.EN ?? noteObj.RU ?? Object.values(noteObj)[0] ?? '';
 }
 function escapeHtml(str){ return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+// подпись covered
+function coveredLabel(p){
+  const tpl = t('funds.covered','Covered: {percent}%');
+  return tpl.replace('{percent}', String(p));
+}
+function toneToFill(tone){ return (tone==='red' || tone==='amber' || tone==='green') ? tone : 'green'; }
+function toneClass(tone){ return `tone-${tone}`; }
 
 /* ---------------- styles ---------------- */
 
@@ -463,10 +463,10 @@ function injectStyles(){
     .b1-tile:active{ transform: translateY(1px); }
 
     .b1-tile .label{ font-size:.9rem; opacity:.85; margin-bottom:4px; }
-    .b1-tile .value{ font-size:1.4rem; font-weight:700; letter-spacing:.2px; display:inline-flex; align-items:center; gap:8px; }
+    .b1-tile .value{ font-size:1.4rem; font-weight:700; letter-spacing:.2px; display:flex; align-items:center; gap:8px; }
     .b1-tile .sub{ margin-top:8px; }
 
-    /* Hover-насыщение для тонов */
+    /* Тоны карточек + hover-насыщение */
     .b1-tile.tone-red   { background: rgba(239, 68, 68, 0.16);  border-color: rgba(239, 68, 68, 0.35); }
     .b1-tile.tone-red:hover   { background: rgba(239, 68, 68, 0.26); border-color: rgba(239, 68, 68, 0.50); }
     .b1-tile.tone-amber { background: rgba(245,158, 11, 0.16);  border-color: rgba(245,158, 11, 0.35); }
@@ -474,7 +474,7 @@ function injectStyles(){
     .b1-tile.tone-green { background: rgba( 34,197, 94, 0.16);  border-color: rgba( 34,197, 94, 0.35); }
     .b1-tile.tone-green:hover { background: rgba( 34,197, 94, 0.26); border-color: rgba( 34,197, 94, 0.50); }
 
-    /* Collected — как donate-tier (solid) + hover из cyan500.css */
+    /* Collected — как donate-tier (solid) */
     .b1-tile--collected{
       background-color: var(--cyan-700);
       border: 1px solid var(--cyan-400);
@@ -482,36 +482,19 @@ function injectStyles(){
       text-shadow: 0 1px 0 rgba(0,0,0,.12);
       transition: background-color .15s ease, border-color .15s ease, transform .02s ease;
     }
-    .b1-tile--collected:hover{
-      background-color: var(--cyan-600);
-      border-color: var(--cyan-500);
-    }
+    .b1-tile--collected:hover{ background-color: var(--cyan-600); border-color: var(--cyan-500); }
 
-    /* Прогресс-полосы */
+    /* Прогресс-полосы (в карточках и модалке Available) */
     .b1-progress .track{
       height: 8px; border-radius:999px; overflow:hidden;
       background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.12);
     }
     .b1-progress .fill{ height:100%; width:0%; transition: width .35s ease; background: rgba(34,197, 94, 0.7); }
-    .b1-progress .fill.amber{ background: rgba(245,158,11, .7); }
-    .b1-progress .fill.green{ background: rgba( 34,197,94, .7); }
+    .b1-progress .fill.amber{ background: rgba(245,158,11, .78); }
+    .b1-progress .fill.green{ background: rgba( 34,197,94, .80); }
+    .b1-progress .fill.red  { background: rgba(239, 68, 68, .85); }
     .b1-progress .ptext{ margin-top:6px; font-size:.85rem; opacity:.85; }
-
-    /* Пульс-точка в Available */
-    .pulse-dot{
-      width:10px; height:10px; border-radius:999px; display:inline-block; vertical-align:middle;
-      box-shadow:0 0 0 0 rgba(255,255,255,0.0);
-      animation: dotPulse 2s infinite;
-    }
-    .b1-tile.tone-red   .pulse-dot{ background:#ef4444; box-shadow:0 0 0 0 rgba(239,68,68,.55); }
-    .b1-tile.tone-amber .pulse-dot{ background:#f59e0b; box-shadow:0 0 0 0 rgba(245,158,11,.55); }
-    .b1-tile.tone-green .pulse-dot{ background:#22c55e; box-shadow:0 0 0 0 rgba(34,197,94,.55); }
-    @keyframes dotPulse{
-      0%{ transform:scale(1); box-shadow:0 0 0 0 rgba(0,0,0,0.0); opacity:.95; }
-      70%{ transform:scale(1.06); box-shadow:0 0 0 10px rgba(0,0,0,0); opacity:1; }
-      100%{ transform:scale(1); box-shadow:0 0 0 0 rgba(0,0,0,0); opacity:.95; }
-    }
 
     /* Модальная шапка (индиго) — только сумма */
     .b1-modal-head{
@@ -539,8 +522,7 @@ function injectStyles(){
       margin-top:6px; font-size:.95rem; line-height:1.35;
       border-left: 3px solid rgba(79,70,229,0.55);
       padding: 6px 8px; background: rgba(79,70,229,0.08);
-      border-radius: 8px;
-      overflow:hidden; max-height:0; transition:max-height .25s ease;
+      border-radius: 8px; overflow:hidden; max-height:0; transition:max-height .25s ease;
     }
 
     /* Кнопка «+» */
@@ -567,6 +549,22 @@ function injectStyles(){
       margin-top:8px; padding:10px 12px;
       background: rgba(239,68,68,0.16); border:1px solid rgba(239,68,68,0.35);
       border-radius:10px; font-weight:600; text-align:center;
+    }
+
+    /* Пульсирующая точка у Available (усиленная анимация) */
+    .pulse-dot{
+      width:12px; height:12px; border-radius:999px; position:relative; flex:0 0 auto;
+      box-shadow:0 0 0 0 currentColor;
+      animation: b1PulseStrong 1.2s infinite ease-out;
+    }
+    .pulse-dot.tone-red{   background:#ef4444; color:rgba(239,68,68,.9); }
+    .pulse-dot.tone-amber{ background:#f59e0b; color:rgba(245,158,11,.9); }
+    .pulse-dot.tone-green{ background:#22c55e; color:rgba(34,197,94,.9); }
+
+    @keyframes b1PulseStrong{
+      0%   { transform:scale(1);   box-shadow:0 0 0 0 currentColor; }
+      60%  { transform:scale(1.28); box-shadow:0 0 0 12px transparent; }
+      100% { transform:scale(1);   box-shadow:0 0 0 0 transparent; }
     }
 
     .rep-b1 .muted, .rep-b1 .empty{ opacity:.75; font-size:.95rem; }
