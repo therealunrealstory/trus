@@ -154,22 +154,24 @@ function renderTiles(host, data){
 function openCollectedModal(collected = [], total, currency){
   const title = t('funds.modal.collected.title','Collected over time');
 
-  const rows = (Array.isArray(collected) ? collected : []).slice().sort(byDateAsc)
-    .map(x => {
-      const val = Number(x?.value ?? x?.amount) || 0;
-      const pct = total > 0 ? (val / total) * 100 : 0;
-      return `
-        <div class="b1-line">
-          <div class="line-head">
-            <div class="line-date">${escapeHtml(x?.date || '')}</div>
+  const items = (Array.isArray(collected) ? collected : []).slice().sort(byDateAsc);
+  const rows = items.length ? items.map(x => {
+    const val = Number(x?.value ?? x?.amount) || 0;
+    const pct = total > 0 ? (val / total) * 100 : 0;
+
+    return `
+      <div class="b1-line">
+        <div class="line-head">
+          <div class="line-title">
+            <span class="line-date">${escapeHtml(x?.date || '')}</span>
+            <span class="line-amt">${fmtMoney(val, currency)}</span>
           </div>
-          <div class="bar track">
-            <div class="fill indigo" style="width:${pct}%">
-              <div class="amt-inside">${escapeHtml(fmtMoney(val, currency))}</div>
-            </div>
-          </div>
-        </div>`;
-    }).join('') || `<div class="muted">${t('funds.empty','No records yet.')}</div>`;
+        </div>
+        <div class="bar track">
+          <div class="fill indigo" style="width:${pct}%"></div>
+        </div>
+      </div>`;
+  }).join('') : `<div class="muted">${t('funds.empty','No records yet.')}</div>`;
 
   const body = `
     ${modalHead(fmtMoney(total, currency))}
