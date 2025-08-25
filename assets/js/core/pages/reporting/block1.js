@@ -1,6 +1,8 @@
 // assets/js/core/pages/reporting/block1.js
 // Current support metrics: Collected / Spent / Planned / Available
-// Hover-насыщение как в cyan500.css; сумма в модалке Collected — внутри индиго-полосы.
+// - Collected: solid cyan как на Support (cyan500.css)
+// - Spent/Planned: показываем covered:% и красим по новым порогам
+// - Available: 80% порог + мигающая точка рядом с суммой
 
 import { I18N } from '../../i18n.js';
 import { openModal } from '../../modal.js';
@@ -33,7 +35,7 @@ export async function init(root){
 
   renderTiles(host, cache);
 
-  // Делегирование кликов по «+» (capture — надёжнее поверх слоёв модалки)
+  // Делегирование кликов по «+»
   if (!document.__repB1Delegated__) {
     document.__repB1Delegated__ = true;
     document.addEventListener('click', onDelegatedClick, true);
@@ -79,16 +81,32 @@ function renderTiles(host, data){
   const totalPlanned   = sum(planned, 'amount');
   const available      = totalCollected - totalSpent - totalPlanned;
 
-  // пороги
-  const spentRatio   = totalCollected > 0 ? (totalSpent   / totalCollected) : (totalSpent   > 0 ? Infinity : 0);
-  const plannedRatio = totalCollected > 0 ? (totalPlanned / totalCollected) : (totalPlanned > 0 ? Infinity : 0);
+  // --- COVERED метрики ---
+  // Spent: сколько текущие сборы покрывают ПОДТВЕРЖДЁННЫЕ расходы
+  const coveredSpentPct = pctClamp(totalSpent > 0 ? (totalCollected / totalSpent) * 100 : 100);
 
-  const spentTone   = totalSpent   > totalCollected ? 'red'   : (spentRatio   >= 0.8 ? 'amber' : 'green');
-  const plannedTone = totalPlanned > totalCollected ? 'red'   : (plannedRatio >= 0.8 ? 'amber' : 'green');
+  // Planned: как в твоём примере: (collected - planned)/spent*100
+  let coveredPlannedRaw;
+  if (totalSpent > 0) {
+    coveredPlannedRaw = ((totalCollected - totalPlanned) / totalSpent) * 100;
+  } else {
+    // если confirmed расходов нет — считаем по резерву vs планы
+    const reserve = totalCollected;
+    coveredPlannedRaw = totalPlanned > 0 ? (reserve / totalPlanned) * 100 : 100;
+  }
+  const coveredPlannedPct = pctClamp(coveredPlannedRaw);
 
+  // --- Тоны карточек ---
+  // Spent: <100→red, ≥100→green
+  const spentTone   = (coveredSpentPct < 100) ? 'red' : 'green';
+
+  // Planned: <50→red, 50–<100→amber, ≥100→green
+  const plannedTone = (coveredPlannedPct >= 100) ? 'green' : (coveredPlannedPct >= 50 ? 'amber' : 'red');
+
+  // Available: safety vs planned с порогом 80%
   const safety = totalPlanned > 0 ? (available / totalPlanned) * 100 : 100;
   const safetyPct = Math.max(0, Math.round(safety));
-  const availTone = (available <= 0) ? 'red' : (safetyPct <= 50 ? 'amber' : 'green');
+  const availTone = (available <= 0) ? 'red' : (safetyPct <= 80 ? 'amber' : 'green');
 
   const normTarget = Number(norm?.target) || 0;
   void normTarget;
@@ -97,7 +115,7 @@ function renderTiles(host, data){
   const grid = document.createElement('div');
   grid.className = 'rep-b1 grid';
 
-  // (1) Collected — solid, как donate-tier на Support (cyan500.css)
+  // (1) Collected — solid cyan (как donate-tier на Support)
   grid.appendChild(tile({
     kind: 'collected',
     label: t('reporting.block1.collected','Collected'),
@@ -106,40 +124,51 @@ function renderTiles(host, data){
     onClick: () => openCollectedModal(collected, totalCollected, currency)
   }));
 
-  // (2) Spent
+  // (2) Spent + covered%
   grid.appendChild(tile({
     kind: 'spent',
     label: t('reporting.block1.spent','Spent'),
     tone:  spentTone,
     value: fmtMoney(totalSpent, currency),
+    sub:   `${t('reporting.block1.covered','covered')}: ${fmtPct(coveredSpentPct)}`,
     onClick: () => openSpentModal(spent, currency)
   }));
 
-  // (3) Planned
+  // (3) Planned + covered%
   grid.appendChild(tile({
     kind: 'planned',
     label: t('reporting.block1.planned','Planned'),
     tone:  plannedTone,
     value: fmtMoney(totalPlanned, currency),
+    sub:   `${t('reporting.block1.covered','covered')}: ${fmtPct(coveredPlannedPct)}`,
     onClick: () => openPlannedModal(planned, currency)
   }));
 
-  // (4) Available — прогресс в карточке тоже по порогам
+  // (4) Available — полоса и мигающая точка
   const bar = progress(
     Math.min(safetyPct, 100),
     t('funds.available.safety','Safety margin: {percent}%').replace('{percent}', String(safetyPct)),
-    (safetyPct <= 50 ? 'amber' : 'green')
+    (safetyPct <= 80 ? 'amber' : 'green')
   );
 
-  grid.appendChild(tile({
+  const availEl = tile({
     kind: 'available',
     label: t('reporting.block1.available','Available'),
     tone:  availTone,
     value: fmtMoney(available, currency),
     subNode: bar,
     onClick: () => openAvailableModal(available, safetyPct, currency)
-  }));
+  });
 
+  // добавляем «мигающую точку» рядом с суммой
+  const v = availEl.querySelector('.value');
+  if (v) {
+    const dot = document.createElement('span');
+    dot.className = 'pulse-dot';
+    v.appendChild(dot);
+  }
+
+  grid.appendChild(availEl);
   host.appendChild(grid);
 
   if (updated_at){
@@ -275,7 +304,7 @@ function openAvailableModal(available, safetyPct, currency){
       ${modalHead(fmtMoney(available, currency))}
       <div class="b1-available-msg red">${escapeHtml(t('funds.available.none','No reserve yet — additional support is needed.'))}</div>`;
   } else {
-    const tone = (safetyPct <= 50) ? 'amber' : 'green';
+    const tone = (safetyPct <= 80) ? 'amber' : 'green';
     body = `
       ${modalHead(fmtMoney(available, currency))}
       <div class="b1-safety">
@@ -287,7 +316,7 @@ function openAvailableModal(available, safetyPct, currency){
           <div class="ptext">${safetyPct > 100 ? safetyPct + '%' : ''}</div>
         </div>
         <div class="s-comment muted">${escapeHtml(
-          (safetyPct <= 50)
+          (safetyPct <= 80)
             ? t('funds.reserve.low','Reserve covers less than half of the planned costs.')
             : t('funds.reserve.ok','Reserve sufficiently covers future costs.')
         )}</div>
@@ -402,7 +431,8 @@ function fmtMoney(n, cur){
   try { return new Intl.NumberFormat(undefined, { style:'currency', currency: cur }).format(v); }
   catch { return `${v.toLocaleString()} ${cur}`; }
 }
-function clamp(x,a,b){ return Math.max(a, Math.min(b, x)); }
+function fmtPct(n){ const v = Math.max(0, Number(n)||0); return (Math.round(v)===v) ? `${v}%` : `${v.toFixed(1)}%`; }
+function pctClamp(v){ const x = Number(v); if (!Number.isFinite(x)) return 0; return Math.max(0, Math.round(x)); }
 function getLang(){ return (document.documentElement.getAttribute('lang')||'').toUpperCase(); }
 function safeDate(s){ return typeof s==='string' ? s : ''; }
 function tryNote(noteObj, lang){
@@ -433,7 +463,7 @@ function injectStyles(){
     .b1-tile:active{ transform: translateY(1px); }
 
     .b1-tile .label{ font-size:.9rem; opacity:.85; margin-bottom:4px; }
-    .b1-tile .value{ font-size:1.4rem; font-weight:700; letter-spacing:.2px; }
+    .b1-tile .value{ font-size:1.4rem; font-weight:700; letter-spacing:.2px; display:inline-flex; align-items:center; gap:8px; }
     .b1-tile .sub{ margin-top:8px; }
 
     /* Hover-насыщение для тонов */
@@ -468,6 +498,21 @@ function injectStyles(){
     .b1-progress .fill.green{ background: rgba( 34,197,94, .7); }
     .b1-progress .ptext{ margin-top:6px; font-size:.85rem; opacity:.85; }
 
+    /* Пульс-точка в Available */
+    .pulse-dot{
+      width:10px; height:10px; border-radius:999px; display:inline-block; vertical-align:middle;
+      box-shadow:0 0 0 0 rgba(255,255,255,0.0);
+      animation: dotPulse 2s infinite;
+    }
+    .b1-tile.tone-red   .pulse-dot{ background:#ef4444; box-shadow:0 0 0 0 rgba(239,68,68,.55); }
+    .b1-tile.tone-amber .pulse-dot{ background:#f59e0b; box-shadow:0 0 0 0 rgba(245,158,11,.55); }
+    .b1-tile.tone-green .pulse-dot{ background:#22c55e; box-shadow:0 0 0 0 rgba(34,197,94,.55); }
+    @keyframes dotPulse{
+      0%{ transform:scale(1); box-shadow:0 0 0 0 rgba(0,0,0,0.0); opacity:.95; }
+      70%{ transform:scale(1.06); box-shadow:0 0 0 10px rgba(0,0,0,0); opacity:1; }
+      100%{ transform:scale(1); box-shadow:0 0 0 0 rgba(0,0,0,0); opacity:.95; }
+    }
+
     /* Модальная шапка (индиго) — только сумма */
     .b1-modal-head{
       text-align:center; font-size:1.35rem; font-weight:800; letter-spacing:.2px;
@@ -488,16 +533,6 @@ function injectStyles(){
       background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12)
     }
     .b1-line .fill.indigo{ background:#4f46e5; height:100%; position:relative; }
-
-    /* Сумма внутри индиго-полосы (правый край, не вылезает) */
-    .b1-line .amt-inside{
-      position:absolute; right:6px; top:50%; transform:translateY(-50%);
-      padding:2px 6px; border-radius:999px;
-      background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.28);
-      color:#e7ecf3; font-size:.80rem; line-height:1; white-space:nowrap;
-      max-width:calc(100% - 8px); overflow:hidden; text-overflow:clip;
-      pointer-events:none;  /* чтобы клик всегда попадал в строку/кнопку */
-    }
 
     /* Раскрывающиеся заметки */
     .b1-line .line-note{
