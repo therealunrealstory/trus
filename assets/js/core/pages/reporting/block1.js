@@ -3,7 +3,7 @@
 // Источник данных: /data/funds.json (meta + collected/spent/planned с мультиязычными note).
 // Карточки: мягкие фоны (Cyan/Red/Amber/Green), модалки: горизонтальные линии Indigo-600.
 // В модалках: убран footer "Updated", шапка с суммой по центру на индиговом фоне.
-// В Spent: явная кнопка-тогглер для заметок.
+// В Spent: явная кнопка-тогглер для заметок. 
 
 import { t } from '../../i18n.js';
 import { openModal } from '../../modal.js';
