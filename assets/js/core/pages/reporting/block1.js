@@ -1,6 +1,6 @@
 // assets/js/core/pages/reporting/block1.js
-// Финансовые метрики: Collected / Spent / Planned / Available
-// Модалки: индиго-подложка, в шапке — одна сумма по центру; в Spent — явные SVG-кнопки «плюс».
+// Current support metrics: Collected / Spent / Planned / Available
+// Hover-насыщение как в cyan500.css; сумма в модалке Collected — внутри индиго-полосы.
 
 import { I18N } from '../../i18n.js';
 import { openModal } from '../../modal.js';
@@ -9,7 +9,7 @@ const t = (k, f='') => I18N[k] ?? f;
 
 let mounted = false;
 let lastLang = null;
-let cache = null; // funds.json
+let cache = null;
 
 export async function init(root){
   if (mounted) return; mounted = true;
@@ -33,7 +33,7 @@ export async function init(root){
 
   renderTiles(host, cache);
 
-  // Делегирование кликов по кнопкам «+» (capture — надёжнее поверх вложенных слоёв модалки)
+  // Делегирование кликов по «+» (capture — надёжнее поверх слоёв модалки)
   if (!document.__repB1Delegated__) {
     document.__repB1Delegated__ = true;
     document.addEventListener('click', onDelegatedClick, true);
@@ -79,7 +79,7 @@ function renderTiles(host, data){
   const totalPlanned   = sum(planned, 'amount');
   const available      = totalCollected - totalSpent - totalPlanned;
 
-  // Пороги (из вашего ТЗ)
+  // пороги
   const spentRatio   = totalCollected > 0 ? (totalSpent   / totalCollected) : (totalSpent   > 0 ? Infinity : 0);
   const plannedRatio = totalCollected > 0 ? (totalPlanned / totalCollected) : (totalPlanned > 0 ? Infinity : 0);
 
@@ -90,17 +90,14 @@ function renderTiles(host, data){
   const safetyPct = Math.max(0, Math.round(safety));
   const availTone = (available <= 0) ? 'red' : (safetyPct <= 50 ? 'amber' : 'green');
 
-  // «Коллекшн» сверх норматива: пока не выводим отдельной плиткой (оставил расчёт на будущее)
   const normTarget = Number(norm?.target) || 0;
-  const overNormAmount  = Math.max(0, totalCollected - normTarget);
-  const overNormPercent = normTarget > 0 ? clamp((totalCollected / normTarget) * 100, 0, 999) : 0;
-  void overNormAmount; void overNormPercent;
+  void normTarget;
 
   host.innerHTML = '';
   const grid = document.createElement('div');
   grid.className = 'rep-b1 grid';
 
-  // (1) Collected — фон как на активных «ваша вовлечённость» (cyan500 + прозрачность)
+  // (1) Collected — solid, как donate-tier на Support (cyan500.css)
   grid.appendChild(tile({
     kind: 'collected',
     label: t('reporting.block1.collected','Collected'),
@@ -127,7 +124,7 @@ function renderTiles(host, data){
     onClick: () => openPlannedModal(planned, currency)
   }));
 
-  // (4) Available (+ safety bar в нужном тоне)
+  // (4) Available — прогресс в карточке тоже по порогам
   const bar = progress(
     Math.min(safetyPct, 100),
     t('funds.available.safety','Safety margin: {percent}%').replace('{percent}', String(safetyPct)),
@@ -145,7 +142,6 @@ function renderTiles(host, data){
 
   host.appendChild(grid);
 
-  // «Updated» — только под плитками (в модалках не показываем)
   if (updated_at){
     const upd = document.createElement('div');
     upd.className = 'updated muted';
@@ -167,7 +163,11 @@ function openCollectedModal(collected = [], total, currency){
           <div class="line-head">
             <div class="line-date">${escapeHtml(x?.date || '')}</div>
           </div>
-          <div class="bar track"><div class="fill indigo" style="width:${pct}%"></div></div>
+          <div class="bar track">
+            <div class="fill indigo" style="width:${pct}%">
+              <div class="amt-inside">${escapeHtml(fmtMoney(val, currency))}</div>
+            </div>
+          </div>
         </div>`;
     }).join('') || `<div class="muted">${t('funds.empty','No records yet.')}</div>`;
 
@@ -201,14 +201,12 @@ function openSpentModal(spent = [], currency){
             <span class="line-date">${escapeHtml(x?.date || '')}</span>
             <span class="line-amt">${fmtMoney(amt, currency)}</span>
           </div>
-
           <button class="icon-btn expander" type="button"
                   aria-expanded="false" aria-controls="${rowId}"
                   title="${escapeHtml(t('reporting.block1.more','More'))}">
             ${svgPlus()}
           </button>
         </div>
-
         <div class="bar track"><div class="fill indigo" style="width:${pct}%"></div></div>
         <div id="${rowId}" class="line-note" hidden>${note ? escapeHtml(note) : ''}</div>
       </div>`;
@@ -244,14 +242,12 @@ function openPlannedModal(planned = [], currency){
           <div class="line-title">
             <span class="line-amt">${fmtMoney(amt, currency)}</span>
           </div>
-
           <button class="icon-btn expander" type="button"
                   aria-expanded="false" aria-controls="${rowId}"
                   title="${escapeHtml(t('reporting.block1.more','More'))}">
             ${svgPlus()}
           </button>
         </div>
-
         <div class="bar track"><div class="fill indigo" style="width:${pct}%"></div></div>
         <div id="${rowId}" class="line-note" hidden>${note ? escapeHtml(note) : ''}</div>
       </div>`;
@@ -338,7 +334,6 @@ async function loadFunds(url){
 }
 
 function normalize(data){
-  // collected: value|amount → value
   if (Array.isArray(data?.collected)) {
     data.collected = data.collected.map(x => ({
       date: x.date,
@@ -389,7 +384,6 @@ function modalHead(bigText){
 }
 
 function svgPlus(){
-  // геометрически точный плюс; хорошо рендерится на ретине
   return `
   <svg class="i-plus" viewBox="0 0 24 24" width="20" height="20"
        fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
@@ -440,29 +434,34 @@ function injectStyles(){
     .b1-tile .value{ font-size:1.4rem; font-weight:700; letter-spacing:.2px; }
     .b1-tile .sub{ margin-top:8px; }
 
-    /* Тоны (Spent/Planned/Available) */
+    /* Hover-насыщение для тонов */
     .b1-tile.tone-red   { background: rgba(239, 68, 68, 0.16);  border-color: rgba(239, 68, 68, 0.35); }
+    .b1-tile.tone-red:hover   { background: rgba(239, 68, 68, 0.26); border-color: rgba(239, 68, 68, 0.50); }
     .b1-tile.tone-amber { background: rgba(245,158, 11, 0.16);  border-color: rgba(245,158, 11, 0.35); }
+    .b1-tile.tone-amber:hover { background: rgba(245,158, 11, 0.26); border-color: rgba(245,158, 11, 0.50); }
     .b1-tile.tone-green { background: rgba( 34,197, 94, 0.16);  border-color: rgba( 34,197, 94, 0.35); }
+    .b1-tile.tone-green:hover { background: rgba( 34,197, 94, 0.26); border-color: rgba( 34,197, 94, 0.50); }
 
-    /* Collected — как Cyan500 в поддержке (с прозрачностью) */
+    /* Collected — как donate-tier (solid) + hover из cyan500.css */
     .b1-tile--collected{
-      /* используем переменную из cyan500.css, если задана; иначе — явные RGBA для Cyan-500 */
-      background: rgba(6, 182, 212, 0.14);
-      border-color: rgba(6, 182, 212, 0.35);
-      color:#e7ecf3;
+      background-color: var(--cyan-700);
+      border: 1px solid var(--cyan-400);
+      color: #ecfeff;
       text-shadow: 0 1px 0 rgba(0,0,0,.12);
+      transition: background-color .15s ease, border-color .15s ease, transform .02s ease;
     }
-    .b1-tile--collected .label{ opacity:.95 }
-    .b1-tile--collected:hover{ filter: brightness(1.03); }
+    .b1-tile--collected:hover{
+      background-color: var(--cyan-600);
+      border-color: var(--cyan-500);
+    }
 
-    /* Прогресс-полосы в карточке/модалке */
+    /* Прогресс-полосы */
     .b1-progress .track{
       height: 8px; border-radius:999px; overflow:hidden;
       background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.12);
     }
-    .b1-progress .fill{ height:100%; width:0%; transition: width .35s ease; }
+    .b1-progress .fill{ height:100%; width:0%; transition: width .35s ease; background: rgba(34,197, 94, 0.7); }
     .b1-progress .fill.amber{ background: rgba(245,158,11, .7); }
     .b1-progress .fill.green{ background: rgba( 34,197,94, .7); }
     .b1-progress .ptext{ margin-top:6px; font-size:.85rem; opacity:.85; }
@@ -470,19 +469,33 @@ function injectStyles(){
     /* Модальная шапка (индиго) — только сумма */
     .b1-modal-head{
       text-align:center; font-size:1.35rem; font-weight:800; letter-spacing:.2px;
-      background: rgba(79,70,229,0.14); /* Indigo 600 */
+      background: rgba(79,70,229,0.14);
       border: 1px solid rgba(79,70,229,0.35);
       border-radius: 12px; padding: 12px 14px; margin-bottom: 12px;
     }
 
-    /* Список линий в модалках */
+    /* Список в модалках */
     .b1-list{ display:grid; gap:12px; }
     .b1-line .line-head{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
     .b1-line .line-title{ display:flex; gap:10px; align-items:baseline; }
     .b1-line .line-date{ font-size:.85rem; opacity:.85 }
     .b1-line .line-amt{ font-weight:700 }
-    .b1-line .bar.track{ height:8px; border-radius:999px; overflow:hidden; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12) }
-    .b1-line .fill.indigo{ background:#4f46e5; height:100% }
+    .b1-line .bar.track{
+      position:relative;
+      height:8px; border-radius:999px; overflow:hidden;
+      background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12)
+    }
+    .b1-line .fill.indigo{ background:#4f46e5; height:100%; position:relative; }
+
+    /* Сумма внутри индиго-полосы (правый край, не вылезает) */
+    .b1-line .amt-inside{
+      position:absolute; right:6px; top:50%; transform:translateY(-50%);
+      padding:2px 6px; border-radius:999px;
+      background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.28);
+      color:#e7ecf3; font-size:.80rem; line-height:1; white-space:nowrap;
+      max-width:calc(100% - 8px); overflow:hidden; text-overflow:clip;
+      pointer-events:none;  /* чтобы клик всегда попадал в строку/кнопку */
+    }
 
     /* Раскрывающиеся заметки */
     .b1-line .line-note{
@@ -493,7 +506,7 @@ function injectStyles(){
       overflow:hidden; max-height:0; transition:max-height .25s ease;
     }
 
-    /* Кнопка «плюс» */
+    /* Кнопка «+» */
     .icon-btn.expander{
       margin-left:auto;
       display:inline-flex; align-items:center; justify-content:center;
@@ -510,9 +523,9 @@ function injectStyles(){
       border-color: rgba(79,70,229,0.55);
     }
     .icon-btn.expander .i-plus{ transition: transform .18s ease; }
-    .icon-btn.expander.is-open .i-plus{ transform: rotate(45deg); } /* + → × */
+    .icon-btn.expander.is-open .i-plus{ transform: rotate(45deg); }
 
-    /* Available: сообщение при нулевом/отрицательном остатке */
+    /* Available: сообщение при нуле */
     .b1-available-msg.red{
       margin-top:8px; padding:10px 12px;
       background: rgba(239,68,68,0.16); border:1px solid rgba(239,68,68,0.35);
