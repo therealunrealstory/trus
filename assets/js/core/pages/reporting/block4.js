@@ -150,8 +150,9 @@ function renderDocCard(d){
     meta.appendChild(sm);
   }
 
+  // Кнопка «Open document» теперь под текстом
   const btn = document.createElement('div');
-  btn.className='open';
+  btn.className='open-btn';
   btn.textContent = t('reporting.block4.open','Open document');
 
   a.appendChild(thumbBox);
@@ -173,13 +174,19 @@ function injectStyles(){
     @media (min-width:1024px){ .doc-grid{ grid-template-columns: repeat(3, 1fr); } }
 
     .doc-card{
-      display:grid; grid-template-columns: 88px 1fr auto; gap:12px;
-      align-items:center; border-radius:14px; padding:12px;
+      display:grid;
+      grid-template-columns: 88px 1fr;     /* thumb | content */
+      grid-auto-rows: auto;                /* кнопка уходит на следующую строку */
+      gap:12px;
+      align-items:start;
+      border-radius:14px; padding:12px;
       background: rgba(0,0,0,0.18);
       text-decoration:none; color:inherit;
+      border:1px solid rgba(255,255,255,0.08);
     }
     .doc-card:hover{ background: rgba(255,255,255,0.08); }
-    .thumbbox{ width:88px; height:88px; display:flex; align-items:center; justify-content:center; }
+
+    .thumbbox{ width:88px; height:88px; display:flex; align-items:center; justify-content:center; grid-row:1 / span 2; }
     .thumb{
       max-width:100%; max-height:100%; border-radius:10px; display:block; object-fit:cover;
       background: rgba(255,255,255,0.06);
@@ -188,11 +195,38 @@ function injectStyles(){
       width:100%; height:100%; border-radius:10px; display:flex; align-items:center; justify-content:center;
       font-weight:700; letter-spacing:.04em; opacity:.85; background: rgba(255,255,255,0.06);
     }
-    .meta{ display:grid; gap:4px; }
+
+    .meta{ display:grid; gap:4px; grid-column:2; }
     .doc-title{ font-weight:600; }
     .doc-sub{ opacity:.75; font-size:.9rem; }
     .doc-summary{ opacity:.9; font-size:.95rem; line-height:1.35; }
-    .open{ margin-left:8px; white-space:nowrap; text-decoration:underline; opacity:.95; }
+
+    /* Лёгкая "ghost"-кнопка — под текстом, выравнена по колонке контента */
+    .open-btn{
+      grid-column:2;                       /* под текстом, в правой колонке */
+      width:fit-content;
+      margin-top:6px;
+      padding:8px 12px;
+      border-radius:10px;
+      font-size:.92rem;
+      background: rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.14);
+      color:rgba(231,236,243,.95);
+      text-decoration:none;
+      transition: background .18s ease, border-color .18s ease, transform .02s ease, color .18s ease;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+    }
+    .doc-card:hover .open-btn{
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.22);
+    }
+    .open-btn:active{ transform: translateY(1px); }
+    .open-btn:focus-visible{
+      outline:2px solid rgba(79,70,229,0.45);
+      outline-offset:2px;
+    }
+
+    .rep-b4 .muted, .rep-b4 .empty{ opacity:.75; font-size:.95rem; }
   `;
   const st = document.createElement('style');
   st.id = 'rep-b4-styles';
