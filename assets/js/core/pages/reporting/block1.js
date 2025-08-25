@@ -1,528 +1,528 @@
 // assets/js/core/pages/reporting/block1.js
-// Блок 1 — Funds (Collected / Spent / Planned / Available) по плану db7a3031…
-// Источник данных: /data/funds.json (meta + collected/spent/planned с мультиязычными note).
-// Карточки: мягкие фоны (Cyan/Red/Amber/Green), модалки: горизонтальные линии Indigo-600.
-// В модалках: убран footer "Updated", шапка с суммой по центру на индиговом фоне.
-// В Spent: явная кнопка-тогглер для заметок. 
+// Финансовые метрики: Collected / Spent / Planned / Available (+ over-norm прогресс)
+// Модалки: индиго-подложка под заголовком с ОДНОЙ суммой по центру; в Spent — явные SVG-кнопки «плюс».
 
-
-import { t } from '../../i18n.js';
+import { I18N } from '../../i18n.js';
 import { openModal } from '../../modal.js';
 
+const t = (k, f='') => I18N[k] ?? f;
+
 let mounted = false;
-let cache = null;
 let lastLang = null;
+let cache = null; // последняя загруженная funds.json
 
-export async function init(rootEl) {
-  if (mounted) return;
-  mounted = true;
+export async function init(root){
+  if (mounted) return; mounted = true;
 
-  const section =
-    rootEl.querySelector('#rep-block1') ||
-    rootEl.querySelector('[data-i18n="funds.title"]')?.closest('section') ||
-    rootEl;
+  let section = root.querySelector('#rep-block1')
+          || root.querySelector('[data-i18n="reporting.block1.title"]')?.closest('section');
+  if (!section) { console.warn('[rep-b1] section not found'); return; }
+
+  let host = section.querySelector(':scope > div');
+  if (!host) { host = document.createElement('div'); section.appendChild(host); }
 
   injectStyles();
 
-  section.innerHTML = `
-    <div class="funds-grid">
-      ${['','','',''].map(()=>`<div class="funds-tile skeleton"></div>`).join('')}
-    </div>
-  `;
+  host.innerHTML = `<div class="rep-b1 muted">${t('reporting.block1.loading','Loading financial metrics…')}</div>`;
 
-  const data = await loadFunds('/data/funds.json');
-  if (!data) {
-    section.innerHTML = `<div class="funds-empty">${t('funds.empty','No records yet.')}</div>`;
+  cache = await loadFunds('/data/funds.json');
+  if (!cache) {
+    host.innerHTML = `<div class="rep-b1 empty">${t('reporting.block1.empty','No financial data yet.')}</div>`;
     return;
   }
 
-  cache = computeSnapshot(data);
-  render(section, cache);
+  renderTiles(host, cache);
 
-  section.querySelector('[data-kind="collected"]')?.addEventListener('click', () => openCollectedModal(cache));
-  section.querySelector('[data-kind="spent"]')?.addEventListener('click', () => openSpentModal(cache));
-  section.querySelector('[data-kind="planned"]')?.addEventListener('click', () => openPlannedModal(cache));
-  section.querySelector('[data-kind="available"]')?.addEventListener('click', () => openAvailableModal(cache));
+  // Делегированная обработка кликов для модальных «плюсов» (Spent/Planned)
+  if (!document.__repB1Delegated__) {
+    document.__repB1Delegated__ = true;
+    document.addEventListener('click', onDelegatedClick, false);
+  }
 
   lastLang = getLang();
 }
 
 export function destroy(){ mounted = false; }
 
-export function onLocaleChanged(){
-  if (!mounted || !cache) return;
-  const cur = getLang();
-  if (cur === lastLang) return;
+export async function onLocaleChanged(){
+  if (!mounted) return;
+  const cur = getLang(); if (cur === lastLang) return;
   lastLang = cur;
 
-  const section =
-    document.querySelector('#rep-block1') ||
-    document.querySelector('[data-i18n="funds.title"]')?.closest('section');
-  if (!section) return;
+  const section = document.querySelector('#rep-block1')
+    || document.querySelector('[data-i18n="reporting.block1.title"]')?.closest('section');
+  const host = section?.querySelector(':scope > div'); if (!host) return;
 
-  render(section, cache);
-}
-
-/* ---------------- data & model ---------------- */
-
-async function loadFunds(url){
-  const LS = 'trus.funds.v1';
-  try{
-    const res = await fetch(url, { cache: 'no-store' });
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    try{ localStorage.setItem(LS, JSON.stringify(json)); }catch{}
-    return json;
-  }catch(e){
-    try{
-      const raw = localStorage.getItem(LS);
-      return raw ? JSON.parse(raw) : null;
-    }catch{ return null; }
+  host.innerHTML = `<div class="rep-b1 muted">${t('reporting.block1.loading','Loading financial metrics…')}</div>`;
+  if (!cache) cache = await loadFunds('/data/funds.json');
+  if (!cache) {
+    host.innerHTML = `<div class="rep-b1 empty">${t('reporting.block1.empty','No financial data yet.')}</div>`;
+    return;
   }
-}
-
-function computeSnapshot(raw){
-  const meta = {
-    currency: (raw?.meta?.currency || 'USD').toUpperCase(),
-    langDefault: (raw?.meta?.lang_default || 'EN').toUpperCase(),
-    updatedAt: raw?.meta?.updated_at || null,
-  };
-
-  const collected = Array.isArray(raw?.collected) ? [...raw.collected] : [];
-  const spent     = Array.isArray(raw?.spent)     ? [...raw.spent]     : [];
-  const planned   = Array.isArray(raw?.planned)   ? [...raw.planned]   : [];
-
-  collected.forEach(e => { e.amount = clamp(num(e.amount), 0, Infinity); });
-  spent.forEach(e => { e.amount = clamp(num(e.amount), 0, Infinity); });
-  planned.forEach(e => { e.amount = clamp(num(e.amount), 0, Infinity); });
-
-  collected.sort(byDateAsc);
-  spent.sort(byDateAsc); // planned без дат — оставляем исходный порядок
-
-  const totalCollected = collected.length ? collected[collected.length - 1].amount : 0;
-  const totalSpent = spent.reduce((s,x)=>s+num(x.amount),0);
-  const totalPlanned = planned.reduce((s,x)=>s+num(x.amount),0);
-
-  const available = totalCollected - totalSpent - totalPlanned;
-  const safety = totalPlanned > 0 ? (available / totalPlanned) * 100 : 100;
-
-  const spentTone   = toneAgainstCollected(totalSpent, totalCollected);
-  const plannedTone = toneAgainstCollected(totalPlanned, totalCollected);
-  const availableTone = available <= 0
-    ? 'red'
-    : (safety <= 50 ? 'amber' : 'green');
-
-  return {
-    meta,
-    totals: { collected: totalCollected, spent: totalSpent, planned: totalPlanned, available, safety },
-    tone: { collected: 'cyan', spent: spentTone, planned: plannedTone, available: availableTone },
-    series: { collected, spent, planned }
-  };
-}
-
-function toneAgainstCollected(value, collected){
-  if (collected <= 0) return value>0 ? 'red' : 'green';
-  if (value > collected) return 'red';
-  const ratio = value / collected;
-  if (ratio >= 0.8) return 'amber';
-  return 'green';
+  renderTiles(host, cache);
 }
 
 /* ---------------- render ---------------- */
 
-function render(section, m){
-  const g = document.createElement('div');
-  g.className = 'funds-grid';
+function renderTiles(host, data){
+  const {
+    currency = 'USD',
+    collected = [],
+    spent = [],
+    planned = [],
+    norm = { target: 0 },
+    updated_at = null,
+  } = data;
 
-  g.appendChild(tile({
+  const totalCollected = lastValue(collected) ?? 0;
+  const totalSpent     = sum(spent, 'amount');
+  const totalPlanned   = sum(planned, 'amount');
+  const available      = totalCollected - totalSpent - totalPlanned;
+
+  // пороги
+  const spentRatio   = totalCollected > 0 ? (totalSpent   / totalCollected) : (totalSpent   > 0 ? Infinity : 0);
+  const plannedRatio = totalCollected > 0 ? (totalPlanned / totalCollected) : (totalPlanned > 0 ? Infinity : 0);
+
+  const spentTone   = totalSpent   > totalCollected ? 'red'   : (spentRatio   >= 0.8 ? 'amber' : 'green');
+  const plannedTone = totalPlanned > totalCollected ? 'red'   : (plannedRatio >= 0.8 ? 'amber' : 'green');
+
+  const safety = totalPlanned > 0 ? (available / totalPlanned) * 100 : 100;
+  const availTone = (available <= 0) ? 'red' : (safety <= 50 ? 'amber' : 'green');
+
+  const normTarget = Number(norm?.target) || 0;
+  const overNormAmount  = Math.max(0, totalCollected - normTarget);
+  const overNormPercent = normTarget > 0 ? clamp((totalCollected / normTarget) * 100, 0, 999) : 0;
+
+  host.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'rep-b1 grid';
+
+  // (1) Collected — фон как у активных «your engagement» (cyan500)
+  grid.appendChild(tile({
     kind: 'collected',
-    tone: m.tone.collected,
-    label: t('funds.collected','Collected'),
-    value: fmtMoney(m.totals.collected, m.meta.currency),
+    label: t('reporting.block1.collected','Collected'),
+    tone:  'cyan',
+    value: fmtMoney(totalCollected, currency),
+    onClick: () => openCollectedModal(collected, totalCollected, currency)
   }));
 
-  g.appendChild(tile({
+  // (2) Spent
+  grid.appendChild(tile({
     kind: 'spent',
-    tone: m.tone.spent,
-    label: t('funds.spent','Spent'),
-    value: fmtMoney(m.totals.spent, m.meta.currency),
+    label: t('reporting.block1.spent','Spent'),
+    tone:  spentTone,
+    value: fmtMoney(totalSpent, currency),
+    onClick: () => openSpentModal(spent, currency)
   }));
 
-  g.appendChild(tile({
+  // (3) Planned
+  grid.appendChild(tile({
     kind: 'planned',
-    tone: m.tone.planned,
-    label: t('funds.planned','Planned'),
-    value: fmtMoney(m.totals.planned, m.meta.currency),
+    label: t('reporting.block1.planned','Planned'),
+    tone:  plannedTone,
+    value: fmtMoney(totalPlanned, currency),
+    onClick: () => openPlannedModal(planned, currency)
   }));
 
-  const statusText = m.totals.available <= 0
-    ? t('funds.available.none','No reserve yet — additional support is needed.')
-    : (m.totals.safety <= 50
-        ? t('funds.reserve.low','Reserve covers less than half of the planned costs.')
-        : t('funds.reserve.ok','Reserve sufficiently covers future costs.'));
-  g.appendChild(tile({
+  // (4) Available (+ safety bar)
+  const safetyPct = Math.max(0, Math.round(safety));
+  const bar = progress(Math.min(safetyPct, 100), t('funds.available.safety','Safety margin: {percent}%').replace('{percent}', String(safetyPct)));
+  grid.appendChild(tile({
     kind: 'available',
-    tone: m.tone.available,
-    label: t('funds.available','Available balance'),
-    value: fmtMoney(m.totals.available, m.meta.currency),
-    sub: statusText
+    label: t('reporting.block1.available','Available'),
+    tone:  availTone,
+    value: fmtMoney(available, currency),
+    subNode: bar,
+    onClick: () => openAvailableModal(available, safetyPct, currency)
   }));
 
-  // "Updated" остаётся только под карточками, как ты просил
-  const foot = document.createElement('div');
-  foot.className = 'funds-updated';
-  if (m.meta.updatedAt) {
-    const d = new Date(m.meta.updatedAt);
-    const dateStr = isNaN(d.getTime()) ? String(m.meta.updatedAt)
-      : new Intl.DateTimeFormat(undefined, { year:'numeric', month:'short', day:'2-digit' }).format(d);
-    foot.textContent = `${t('funds.updated','Updated')}: ${dateStr}`;
-  } else {
-    foot.textContent = '';
+  host.appendChild(grid);
+
+  // подпись Updated — ТОЛЬКО под плитками (в модалках её нет по вашему требованию)
+  if (updated_at){
+    const upd = document.createElement('div');
+    upd.className = 'updated muted';
+    upd.textContent = `${t('reporting.block1.updated','Updated')}: ${safeDate(updated_at)}`;
+    host.appendChild(upd);
   }
-
-  section.innerHTML = '';
-  section.appendChild(g);
-  if (foot.textContent) section.appendChild(foot);
 }
 
-function tile({ kind, tone, label, value, sub='' }){
-  const el = document.createElement('div');
-  el.className = `funds-tile tone-${tone}`;
-  el.setAttribute('data-kind', kind);
-  el.tabIndex = 0;
-  el.innerHTML = `
-    <div class="ft-label">${label}</div>
-    <div class="ft-value">${value}</div>
-    ${sub ? `<div class="ft-sub">${sub}</div>` : ``}
-  `;
-  el.setAttribute('role','button');
-  el.setAttribute('aria-label', `${label}: ${value}`);
-  el.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); el.click(); } });
-  return el;
-}
-
-/* ---------------- modals ---------------- */
-
-function openCollectedModal(m){
+/* ---------- modal: Collected ---------- */
+function openCollectedModal(collected = [], total, currency){
   const title = t('funds.modal.collected.title','Collected over time');
-  const total = fmtMoney(m.totals.collected, m.meta.currency);
 
-  const lines = (m.series.collected || []).map((e)=>{
-    const pct = m.totals.collected>0 ? Math.max(0, Math.min(100, (e.amount / m.totals.collected)*100 )) : 0;
-    const date = fmtDate(e.date);
-    return `
-      <div class="row">
-        <div class="row-head">
-          <div class="row-left">
-            <div class="row-date">${date}</div>
+  const rows = (Array.isArray(collected) ? collected : []).slice().sort(byDateAsc)
+    .map((x, i) => {
+      const val = Number(x?.value ?? x?.amount) || 0;
+      const pct = total > 0 ? (val / total) * 100 : 0;
+      return `
+        <div class="b1-line">
+          <div class="line-head">
+            <div class="line-date">${escapeHtml(x?.date || '')}</div>
           </div>
-          <div class="row-amount">${fmtMoney(e.amount, m.meta.currency)}</div>
-        </div>
-        <div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div>
-      </div>
-    `;
-  }).join('') || `<div class="empty">${t('funds.empty','No records yet.')}</div>`;
+          <div class="bar track"><div class="fill indigo" style="width:${pct}%"></div></div>
+        </div>`;
+    }).join('') || `<div class="muted">${t('funds.empty','No records yet.')}</div>`;
 
-  const html = `
-    <div class="modal-funds">
-      <div class="sticky-summary">
-        <div class="sum-value">${total}</div>
-      </div>
-      <div class="list">${lines}</div>
-    </div>
-  `;
-  openModal(title, html);
-}
+  const body = `
+    ${modalHead(fmtMoney(total, currency))}
+    <div class="b1-list">
+      ${rows}
+    </div>`;
 
-function openSpentModal(m){
-  const title = t('funds.modal.spent.title','Confirmed expenses');
-  const total = fmtMoney(m.totals.spent, m.meta.currency);
-  const lang = getLang(); const def = m.meta.langDefault;
-
-  const max = m.series.spent.reduce((mx, x)=>Math.max(mx, num(x.amount)), 0);
-
-  const lines = (m.series.spent || []).map((e, idx)=>{
-    const pct = max>0 ? Math.max(0, Math.min(100, (e.amount / max)*100 )) : 0;
-    const date = fmtDate(e.date);
-    const id = `spent-note-${idx}`;
-    const note = pickNote(e.note, lang, def);
-    const noteBlock = note ? `<div class="note" id="${id}" hidden>${escapeHtml(note)}</div>` : '';
-    return `
-      <div class="row">
-        <div class="row-head">
-          <div class="row-left">
-            <button class="toggle-btn" aria-expanded="false" aria-controls="${id}" data-target="${id}" title="${t('funds.showDetails','Show details')}"></button>
-            <div class="row-date">${date}</div>
-          </div>
-          <div class="row-amount">${fmtMoney(e.amount, m.meta.currency)}</div>
-        </div>
-        ${noteBlock}
-        <div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div>
-      </div>
-    `;
-  }).join('') || `<div class="empty">${t('funds.empty','No records yet.')}</div>`;
-
-  const html = `
-    <div class="modal-funds">
-      <div class="sticky-summary">
-        <div class="sum-value">${total}</div>
-      </div>
-      <div class="list">${lines}</div>
-    </div>
-  `;
-  const modalId = openModal(title, html);
-  wireToggles(modalId);
-}
-
-function openPlannedModal(m){
-  const title = t('funds.modal.planned.title','Planned expenses');
-  const total = fmtMoney(m.totals.planned, m.meta.currency);
-  const lang = getLang(); const def = m.meta.langDefault;
-
-  const max = m.series.planned.reduce((mx, x)=>Math.max(mx, num(x.amount)), 0);
-
-  const lines = (m.series.planned || []).map((e, idx)=>{
-    const pct = max>0 ? Math.max(0, Math.min(100, (e.amount / max)*100 )) : 0;
-    const id = `planned-${idx}`;
-    const note = pickNote(e.note, lang, def);
-    const noteBlock = note ? `<div class="note" id="${id}-note">${escapeHtml(note)}</div>` : '';
-    return `
-      <div class="row">
-        <div class="row-head">
-          <div class="row-left">
-            <div class="row-date">${fmtMoney(e.amount, m.meta.currency)}</div>
-          </div>
-        </div>
-        ${noteBlock}
-        <div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div>
-      </div>
-    `;
-  }).join('') || `<div class="empty">${t('funds.empty','No records yet.')}</div>`;
-
-  const html = `
-    <div class="modal-funds">
-      <div class="sticky-summary">
-        <div class="sum-value">${total}</div>
-      </div>
-      <div class="list">${lines}</div>
-    </div>
-  `;
-  openModal(title, html);
-}
-
-function openAvailableModal(m){
-  const title = t('funds.modal.available.title','Available balance & safety margin');
-  const avail = m.totals.available;
-  const safety = Math.round(m.totals.safety);
-  const safetyText = t('funds.available.safety','Safety margin: {percent}%').replace('{percent}', String(safety));
-
-  let body = `
-    <div class="modal-funds">
-      <div class="sticky-summary">
-        <div class="sum-value">${fmtMoney(avail, m.meta.currency)}</div>
-      </div>
-  `;
-
-  if (avail <= 0) {
-		body += `
-		  <div class="list">
-			<div class="alert-cta" role="alert" aria-live="polite">
-			  ${t('funds.available.none','No reserve yet — additional support is needed.')}
-			</div>
-		  </div>
-		</div>`;
-    openModal(title, body);
-    return;
-  }
-
-  const pct = Math.max(0, safety);
-  const tone = pct <= 50 ? 'amber' : 'green';
-  const overflow = pct > 100 ? `<div class="gauge-overflow" title="${safetyText}"></div>` : '';
-  body += `
-      <div class="list">
-        <div class="gauge">
-          <div class="gauge-track">
-            <div class="gauge-fill tone-${tone}" style="width:${Math.min(100,pct)}%"></div>
-          </div>
-          ${overflow}
-          <div class="gauge-label">${safetyText}</div>
-        </div>
-      </div>
-    </div>
-  `;
   openModal(title, body);
 }
 
-/* --- toggles --- */
-function wireToggles(modalId){
-  const modal = modalId ? document.getElementById(modalId) : document.querySelector('.modal');
-  if (!modal) return;
-  modal.querySelectorAll('[data-target]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const id = btn.getAttribute('data-target');
-      const note = modal.querySelector(`#${CSS.escape(id)}`);
-      if (!note) return;
-      const isOpen = !note.hasAttribute('hidden');
-      if (isOpen) {
-        note.setAttribute('hidden','');
-        btn.setAttribute('aria-expanded','false');
-      } else {
-        note.removeAttribute('hidden');
-        btn.setAttribute('aria-expanded','true');
-      }
-    });
-  });
+/* ---------- modal: Spent ---------- */
+function openSpentModal(spent = [], currency){
+  const title = t('funds.modal.spent.title','Confirmed expenses');
+
+  const items = (Array.isArray(spent) ? spent : []).slice().sort(byDateAsc);
+  const max = Math.max(0, ...items.map(x => Number(x?.amount) || 0));
+
+  const rows = items.length ? items.map((x, idx) => {
+    const amt = Number(x?.amount) || 0;
+    const pct = max > 0 ? (amt / max) * 100 : 0;
+    const lang = getLang();
+    const note = tryNote(x?.note, lang) || escapeHtml(x?.category || '');
+
+    const rowId = `spent-${idx}-${Math.random().toString(36).slice(2,8)}`;
+    return `
+      <div class="b1-line spend-row" data-row="${rowId}">
+        <div class="line-head">
+          <div class="line-title">
+            <span class="line-date">${escapeHtml(x?.date || '')}</span>
+            <span class="line-amt">${fmtMoney(amt, currency)}</span>
+          </div>
+
+          <button class="icon-btn expander" type="button" aria-expanded="false" aria-controls="${rowId}" title="${escapeHtml(t('reporting.block1.more','More'))}">
+            ${svgPlus()}
+          </button>
+        </div>
+
+        <div class="bar track"><div class="fill indigo" style="width:${pct}%"></div></div>
+        <div id="${rowId}" class="line-note" hidden>${note ? escapeHtml(note) : ''}</div>
+      </div>`;
+  }).join('') : `<div class="muted">${t('funds.empty','No records yet.')}</div>`;
+
+  const totalSpent = sum(spent, 'amount');
+  const body = `
+    ${modalHead(fmtMoney(totalSpent, currency))}
+    <div class="b1-list b1-list--spent">
+      ${rows}
+    </div>`;
+
+  openModal(title, body);
 }
 
-/* ---------------- utils ---------------- */
+/* ---------- modal: Planned ---------- */
+function openPlannedModal(planned = [], currency){
+  const title = t('funds.modal.planned.title','Planned expenses');
 
-function getLang(){ return (document.documentElement.getAttribute('lang') || 'EN').toUpperCase(); }
-function num(x){ const n = Number(x); return Number.isFinite(n) ? n : 0; }
-function clamp(x, a, b){ return Math.max(a, Math.min(b, x)); }
-function byDateAsc(a,b){
-  const ta = Date.parse(a?.date||''); const tb = Date.parse(b?.date||'');
-  if (Number.isFinite(ta) && Number.isFinite(tb)) return ta - tb;
-  return String(a?.date||'').localeCompare(String(b?.date||''));
-}
-function fmtMoney(v, cur){
-  try{ return new Intl.NumberFormat(undefined, { style:'currency', currency:cur }).format(v||0); }
-  catch{ return `${(v||0).toLocaleString()} ${cur}`; }
-}
-function fmtDate(s){
-  const d = new Date(s);
-  if (isNaN(d.getTime())) return String(s||'');
-  return new Intl.DateTimeFormat(undefined, { year:'numeric', month:'short', day:'2-digit' }).format(d);
-}
-function pickNote(note, lang, def){
-  if (!note || typeof note!=='object') return '';
-  return note[lang] ?? note[def] ?? '';
-}
-function escapeHtml(s){return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+  const items = (Array.isArray(planned) ? planned : []).slice();
+  const max = Math.max(0, ...items.map(x => Number(x?.amount) || 0));
 
-/* ---------------- styles (scoped) ---------------- */
+  const rows = items.length ? items.map((x, idx) => {
+    const amt = Number(x?.amount) || 0;
+    const pct = max > 0 ? (amt / max) * 100 : 0;
+    const lang = getLang();
+    const note = tryNote(x?.note, lang) || '';
+    const rowId = `planned-${idx}-${Math.random().toString(36).slice(2,8)}`;
+
+    return `
+      <div class="b1-line plan-row" data-row="${rowId}">
+        <div class="line-head">
+          <div class="line-title">
+            <span class="line-amt">${fmtMoney(amt, currency)}</span>
+          </div>
+
+          <button class="icon-btn expander" type="button" aria-expanded="false" aria-controls="${rowId}" title="${escapeHtml(t('reporting.block1.more','More'))}">
+            ${svgPlus()}
+          </button>
+        </div>
+
+        <div class="bar track"><div class="fill indigo" style="width:${pct}%"></div></div>
+        <div id="${rowId}" class="line-note" hidden>${note ? escapeHtml(note) : ''}</div>
+      </div>`;
+  }).join('') : `<div class="muted">${t('funds.empty','No records yet.')}</div>`;
+
+  const totalPlanned = sum(planned, 'amount');
+  const body = `
+    ${modalHead(fmtMoney(totalPlanned, currency))}
+    <div class="b1-list">
+      ${rows}
+    </div>`;
+
+  openModal(title, body);
+}
+
+/* ---------- modal: Available ---------- */
+function openAvailableModal(available, safetyPct, currency){
+  const title = t('funds.modal.available.title','Available balance & safety margin');
+
+  let body = '';
+  if (available <= 0) {
+    body = `
+      ${modalHead(fmtMoney(available, currency))}
+      <div class="b1-available-msg red">${escapeHtml(t('funds.available.none','No reserve yet — additional support is needed.'))}</div>`;
+  } else {
+    const tone = (safetyPct <= 50) ? 'amber' : 'green';
+    body = `
+      ${modalHead(fmtMoney(available, currency))}
+      <div class="b1-safety">
+        <div class="s-row">
+          <div class="s-label">${escapeHtml(t('funds.available.safety','Safety margin: {percent}%').replace('{percent}', String(safetyPct)))}</div>
+        </div>
+        <div class="b1-progress">
+          <div class="track"><div class="fill ${tone}" style="width:${Math.min(safetyPct,100)}%"></div></div>
+          <div class="ptext">${safetyPct > 100 ? safetyPct + '%' : ''}</div>
+        </div>
+        <div class="s-comment muted">${escapeHtml(
+          (safetyPct <= 50)
+            ? t('funds.reserve.low','Reserve covers less than half of the planned costs.')
+            : t('funds.reserve.ok','Reserve sufficiently covers future costs.')
+        )}</div>
+      </div>`;
+  }
+
+  openModal(title, body);
+}
+
+/* ---------------- events (delegated) ---------------- */
+
+function onDelegatedClick(e){
+  const btn = e.target.closest('.icon-btn.expander');
+  if (!btn) return;
+
+  e.preventDefault();
+  const row = btn.closest('[data-row]');
+  const id  = btn.getAttribute('aria-controls');
+  const note = id ? document.getElementById(id) : null;
+
+  const expanded = btn.getAttribute('aria-expanded') === 'true';
+  btn.setAttribute('aria-expanded', String(!expanded));
+  btn.classList.toggle('is-open', !expanded);
+
+  if (note) {
+    if (expanded) {
+      // hide
+      note.setAttribute('hidden','');
+      note.style.maxHeight = '0px';
+    } else {
+      // show
+      note.removeAttribute('hidden');
+      // для анимации высоты
+      note.style.maxHeight = note.scrollHeight + 'px';
+    }
+  }
+
+  // лёгкая пульсация активного ряда
+  row?.classList.toggle('active', !expanded);
+}
+
+/* ---------------- helpers ---------------- */
+
+async function loadFunds(url){
+  try{
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) return null;
+    const json = await r.json();
+    return normalize(json);
+  }catch{ return null; }
+}
+
+function normalize(data){
+  // collected может храниться с ключом value или amount; выравниваем, чтобы lastValue работал
+  if (Array.isArray(data?.collected)) {
+    data.collected = data.collected.map(x => ({
+      date: x.date,
+      value: Number(x.value ?? x.amount) || 0
+    }));
+  }
+  return data || null;
+}
+
+function tile({ kind, label, value, sub='', subNode=null, tone='neutral', onClick }){
+  const el = document.createElement('div');
+  el.className = `b1-tile tone-${tone} ${kind ? ('b1-tile--' + kind) : ''}`;
+  el.setAttribute('role','button');
+  el.setAttribute('tabindex','0');
+  el.addEventListener('click', onClick);
+  el.addEventListener('keydown', (e)=>{ if (e.key==='Enter' || e.key===' ') { e.preventDefault(); onClick(); } });
+
+  const l = document.createElement('div'); l.className='label'; l.textContent = label;
+  const v = document.createElement('div'); v.className='value'; v.textContent = value;
+  el.appendChild(l); el.appendChild(v);
+
+  if (subNode){
+    const box = document.createElement('div'); box.className='sub'; box.appendChild(subNode);
+    el.appendChild(box);
+  } else if (sub){
+    const s = document.createElement('div'); s.className='sub muted'; s.textContent = sub;
+    el.appendChild(s);
+  }
+  return el;
+}
+
+function progress(pct, text){
+  const box = document.createElement('div');
+  box.className = 'b1-progress';
+  const track = document.createElement('div'); track.className='track';
+  const fill  = document.createElement('div'); fill.className='fill';
+  fill.style.width = `${pct}%`;
+  const label = document.createElement('div'); label.className='ptext'; label.textContent = text;
+  track.appendChild(fill);
+  box.appendChild(track);
+  box.appendChild(label);
+  return box;
+}
+
+function modalHead(bigText){
+  // Индиго-подложка, только одна сумма по центру
+  return `<div class="b1-modal-head">${escapeHtml(bigText)}</div>`;
+}
+
+function svgPlus(){
+  // чистый, чёткий плюс (Lucide-like)
+  return `
+  <svg class="i-plus" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+    <path d="M12 5v14M5 12h14"/>
+  </svg>`;
+}
+
+function byDateAsc(a,b){ return String(a?.date||'').localeCompare(String(b?.date||'')); }
+function lastValue(series){ if (!Array.isArray(series) || series.length===0) return null; const last = series[series.length - 1]; return Number(last?.value) || 0; }
+function sum(arr, key){ if (!Array.isArray(arr)) return 0; return arr.reduce((acc, it) => acc + (Number(it?.[key]) || 0), 0); }
+function fmtMoney(n, cur){
+  const v = Number(n) || 0;
+  try { return new Intl.NumberFormat(undefined, { style:'currency', currency: cur }).format(v); }
+  catch { return `${v.toLocaleString()} ${cur}`; }
+}
+function clamp(x,a,b){ return Math.max(a, Math.min(b, x)); }
+function getLang(){ return (document.documentElement.getAttribute('lang')||'').toUpperCase(); }
+function safeDate(s){ return typeof s==='string' ? s : ''; }
+function tryNote(noteObj, lang){
+  if (!noteObj || typeof noteObj!=='object') return '';
+  return noteObj[lang] ?? noteObj.EN ?? noteObj.RU ?? Object.values(noteObj)[0] ?? '';
+}
+function escapeHtml(str){ return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+/* ---------------- styles ---------------- */
 
 function injectStyles(){
-  if (document.getElementById('funds-b1-styles')) return;
+  if (document.getElementById('rep-b1-styles')) return;
   const css = `
-  .funds-grid{
-    display:grid; gap:12px; grid-template-columns:1fr;
-  }
-  @media (min-width:560px){ .funds-grid{ grid-template-columns:repeat(2,1fr); } }
-  @media (min-width:960px){ .funds-grid{ grid-template-columns:repeat(4,1fr); } }
+    /* Базовая сетка */
+    .rep-b1.grid { display:grid; gap:12px; grid-template-columns: 1fr; }
+    @media (min-width:680px){ .rep-b1.grid { grid-template-columns: 1fr 1fr; } }
 
-  .funds-tile{
-    border-radius:14px; padding:12px;
-    background: rgba(0,0,0,.14);
-    border:1px solid rgba(255,255,255,.12);
-    cursor:pointer; transition:background .2s ease, border-color .2s ease;
-  }
-  .funds-tile:focus{ outline:2px solid var(--indigo-600,#4f46e5); outline-offset:2px; }
-  .funds-tile .ft-label{ font-weight:600; opacity:.9; }
-  .funds-tile .ft-value{ font-weight:700; font-size:1.1rem; margin-top:2px; }
-  .funds-tile .ft-sub{ margin-top:4px; opacity:.85; font-size:.94rem; }
+    /* Плитка */
+    .b1-tile{
+      border-radius:14px; padding:14px 14px 12px; position:relative;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.10);
+      cursor:pointer; user-select:none;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.35);
+      transition: transform .02s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+    .b1-tile:hover{ background:rgba(255,255,255,0.08); }
+    .b1-tile:active{ transform: translateY(1px); }
 
-  .funds-tile.skeleton{ height:88px; background:linear-gradient(90deg,rgba(255,255,255,.05),rgba(255,255,255,.12),rgba(255,255,255,.05)); background-size:400% 100%; animation:funds-shimmer 1.1s linear infinite; border-color:transparent;}
-  @keyframes funds-shimmer{ 0%{background-position:0 0} 100%{background-position:400% 0} }
+    .b1-tile .label{ font-size:.9rem; opacity:.85; margin-bottom:4px; }
+    .b1-tile .value{ font-size:1.4rem; font-weight:700; letter-spacing:.2px; }
+    .b1-tile .sub{ margin-top:8px; }
 
-  /* тона карточек */
-  .tone-cyan  { background: rgba(6,182,212,.14);  border-color: rgba(6,182,212,.35); }
-  .tone-red   { background: rgba(239,68,68,.16);  border-color: rgba(239,68,68,.35); }
-  .tone-amber { background: rgba(245,158,11,.16); border-color: rgba(245,158,11,.35); }
-  .tone-green { background: rgba(34,197,94,.16);  border-color: rgba(34,197,94,.35); }
-  .tone-cyan:hover, .tone-red:hover, .tone-amber:hover, .tone-green:hover{ filter:brightness(1.05); }
+    /* ТОНА для плиток Spent/Planned/Available */
+    .b1-tile.tone-red   { background: rgba(239, 68, 68, 0.16);  border-color: rgba(239, 68, 68, 0.35); }
+    .b1-tile.tone-amber { background: rgba(245,158, 11, 0.16);  border-color: rgba(245,158, 11, 0.35); }
+    .b1-tile.tone-green { background: rgba( 34,197, 94, 0.16);  border-color: rgba( 34,197, 94, 0.35); }
 
-  .funds-updated{ margin-top:6px; opacity:.75; font-size:.92rem; }
-  .funds-empty{ opacity:.85; }
-  
+    /* ТОН для Collected — как у активных «your engagement» (cyan500.css) */
+    .b1-tile--collected{
+      /* используем переменную, если она задана где-то глобально; иначе фолбэк к #06b6d4 */
+      --_c: var(--support-accent, #06b6d4);
+      background: var(--_c);
+      border-color: var(--_c);
+      color:#fff;
+      text-shadow: 0 1px 0 rgba(0,0,0,.12);
+    }
+    .b1-tile--collected .label{ opacity:.95 }
+    .b1-tile--collected:hover{ filter: brightness(1.03); }
 
-  /* Модалки */
-  
-    /* ALERT CTA (Available ≤ 0): красный пульсирующий бейдж */
-  .modal-funds .alert-cta{
-    padding: 10px 12px;
-    border-radius: 12px;
-    background: rgba(239, 68, 68, 0.12);           /* Red-500 с прозрачностью */
-    border: 1px solid rgba(239, 68, 68, 0.45);
-    color: #ef4444;                                 /* Red-500 текстом — «горит» */
-    font-weight: 700;
-    text-align: center;
+    /* Прогресс/полосы в блоке */
+    .b1-progress .track{
+      height: 8px; border-radius:999px; overflow:hidden;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .b1-progress .fill{
+      height:100%; width:0%; transition: width .35s ease;
+      background: rgba(34,197, 94, 0.7);
+    }
+    .b1-progress .fill.amber{ background: rgba(245,158,11, .7); }
+    .b1-progress .fill.green{ background: rgba( 34,197,94, .7); }
+    .b1-progress .ptext{ margin-top:6px; font-size:.85rem; opacity:.85; }
 
-    /* мягкий пульс свечения */
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.55);
-    animation: alert-pulse 1.4s ease-in-out infinite;
-  }
+    /* Модальная шапка-подложка (индиго) — ТОЛЬКО сумма по центру */
+    .b1-modal-head{
+      text-align:center; font-size:1.35rem; font-weight:800; letter-spacing:.2px;
+      background: rgba(79,70,229,0.14); /* Indigo 600 */
+      border: 1px solid rgba(79,70,229,0.35);
+      border-radius: 12px; padding: 12px 14px; margin-bottom: 12px;
+    }
 
-  @keyframes alert-pulse{
-    0%   { box-shadow: 0 0 0 0   rgba(239,68,68,0.55); }
-    70%  { box-shadow: 0 0 0 14px rgba(239,68,68,0.00); }
-    100% { box-shadow: 0 0 0 0   rgba(239,68,68,0.00); }
-  }
+    /* Список линий в модалках */
+    .b1-list{ display:grid; gap:12px; }
+    .b1-line .line-head{
+      display:flex; align-items:center; gap:10px; margin-bottom:6px;
+    }
+    .b1-line .line-title{ display:flex; gap:10px; align-items:baseline; }
+    .b1-line .line-date{ font-size:.85rem; opacity:.85 }
+    .b1-line .line-amt{ font-weight:700 }
+    .b1-line .bar.track{ height:8px; border-radius:999px; overflow:hidden; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12) }
+    .b1-line .fill.indigo{ background:#4f46e5; height:100% }
 
-  /* уважение к настройкам пользователя — отключаем анимации при reduced motion */
-  @media (prefers-reduced-motion: reduce){
-    .modal-funds .alert-cta{ animation: none; }
-  }
+    /* Раскрывающиеся заметки */
+    .b1-line .line-note{
+      margin-top:6px; font-size:.95rem; line-height:1.35;
+      border-left: 3px solid rgba(79,70,229,0.55);
+      padding: 6px 8px; background: rgba(79,70,229,0.08);
+      border-radius: 8px;
+      overflow:hidden; max-height:0; transition:max-height .25s ease;
+    }
+    .b1-line.active .line-note{ /* состояние управляется JS через style.maxHeight */ }
 
-  
-  
-  .modal-funds{ display:grid; gap:12px; }
-  /* шапка-монолит суммы: индиговый просвет + центрирование */
-  .modal-funds .sticky-summary{
-    position:sticky; top:0; z-index:1;
-    padding:12px; border-radius:12px;
-    background: rgba(79,70,229,.12);
-    border:1px solid rgba(79,70,229,.35);
-    text-align:center;
-  }
-  .modal-funds .sum-value{ font-weight:800; font-size:1.2rem; }
+    /* Кнопка «плюс» — явная и чёткая */
+    .icon-btn.expander{
+      margin-left:auto;
+      display:inline-flex; align-items:center; justify-content:center;
+      width:28px; height:28px; border-radius:8px;
+      background: rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.14);
+      color:#e7ecf3; cursor:pointer;
+      transition: background .15s ease, border-color .15s ease, transform .02s ease;
+    }
+    .icon-btn.expander:hover{ background: rgba(79,70,229,0.10); border-color: rgba(79,70,229,0.35); }
+    .icon-btn.expander:active{ transform: translateY(1px); }
+    .icon-btn.expander:focus-visible{
+      outline:none; box-shadow:0 0 0 2px rgba(79,70,229,0.35);
+      border-color: rgba(79,70,229,0.55);
+    }
+    .icon-btn.expander .i-plus{ transition: transform .18s ease; }
+    .icon-btn.expander.is-open .i-plus{ transform: rotate(45deg); } /* превращаем «+» в «×» */
 
-  .modal-funds .list{ display:grid; gap:10px; }
-  .modal-funds .row{ display:grid; gap:6px; }
-  .modal-funds .row-head{ display:flex; justify-content:space-between; gap:10px; align-items:center; }
-  .modal-funds .row-left{ display:flex; align-items:baseline; gap:8px; }
-  .modal-funds .row-date{ opacity:.9; font-size:.95rem; }
-  .modal-funds .row-amount{ font-weight:600; }
+    /* Available: сообщение при нулевом/отрицательном остатке */
+    .b1-available-msg.red{
+      margin-top:8px; padding:10px 12px;
+      background: rgba(239,68,68,0.16); border:1px solid rgba(239,68,68,0.35);
+      border-radius:10px; font-weight:600; text-align:center;
+    }
 
-  /* явная кнопка-тогглер для Spent */
-  .modal-funds .toggle-btn{
-    width:28px; height:28px; border-radius:8px;
-    border:1px solid rgba(79,70,229,.55);
-    background: transparent; color:inherit; cursor:pointer;
-    display:inline-grid; place-items:center;
-  }
-  .modal-funds .toggle-btn::after{
-    content:'+'; font-weight:800; line-height:1; font-size:16px;
-  }
-  .modal-funds .toggle-btn[aria-expanded="true"]::after{
-    content:'–';
-  }
-
-  /* горизонтальные линии (индиго) */
-  .modal-funds .bar{
-    height:8px; border-radius:999px; background:rgba(79,70,229,.18);
-    overflow:hidden;
-  }
-  .modal-funds .bar-fill{
-    height:100%; background:#4f46e5;
-  }
-
-  .modal-funds .note{ opacity:.92; }
-  .modal-funds .empty{ opacity:.8; }
-
-  /* gauge (available safety) */
-  .gauge{ display:grid; gap:8px; }
-  .gauge-track{
-    position:relative; height:10px; border-radius:999px; background:rgba(255,255,255,.12); overflow:hidden;
-  }
-  .gauge-fill{ height:100%; }
-  .gauge-label{ opacity:.9; }
-  .gauge-overflow{
-    width:8px; height:14px; border-radius:2px; background:#4f46e5;
-    margin-left:auto; transform:translateY(-2px);
-  }
+    .rep-b1 .muted, .rep-b1 .empty{ opacity:.75; font-size:.95rem; }
+    .rep-b1 .updated{ margin-top:8px; font-size:.85rem; opacity:.7; }
   `;
-  const style = document.createElement('style');
-  style.id = 'funds-b1-styles';
-  style.textContent = css;
-  document.head.appendChild(style);
+  const st = document.createElement('style');
+  st.id = 'rep-b1-styles';
+  st.textContent = css;
+  document.head.appendChild(st);
 }

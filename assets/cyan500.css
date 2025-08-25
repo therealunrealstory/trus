@@ -10,12 +10,12 @@
   --fuchsia-500:#d946ef;
 }
 
-/* Область страницы Support — привяжем к классу .page--support (добавим его на Шаге 2) */
+/* Область страницы Support — привязано к .page--support */
 .page--support{
   --support-accent: var(--cyan-500);
   --support-accent-weak: var(--cyan-400);
   --support-accent-strong: var(--cyan-600);
-/*  --heart-accent: var(--fuchsia-500);*/
+  /*  — сердца оставим индиго, как раньше */
   --heart-accent: #4f46e5; /* Indigo 600 */
 
   /* Переназначаем любые green-* токены внутри страницы */
@@ -24,6 +24,14 @@
   --green-500: var(--cyan-500);
   --green-600: var(--cyan-600);
   --green-700: var(--cyan-700);
+
+  /* «Ghost»-рецепт (как у Your engagement), но в циановом тоне */
+  --ghost-bg: rgba(6,182,212,0.16);
+  --ghost-bg-hover: rgba(6,182,212,0.26);
+  --ghost-bg-active: rgba(6,182,212,0.36);
+  --ghost-border: rgba(6,182,212,0.36);
+  --ghost-outline: rgba(6,182,212,0.65);
+  --ghost-text: #ecfeff;
 }
 
 /* Перекрываем утилиты Tailwind-подобных классов на странице Support */
@@ -46,17 +54,62 @@
   --tw-gradient-to: var(--support-accent-strong) !important;
 }
 
-/* Кнопка «Отправить сердечко» (и её возможные классы) */
-.page--support :is([data-action="send-heart"], .btn-send-heart){
-  background-color: var(--support-accent);
-  border-color: var(--support-accent);
-  color:#fff;
-  transition: filter .15s ease, transform .05s ease;
-}
-.page--support :is([data-action="send-heart"], .btn-send-heart):hover{ filter: brightness(1.08); }
-.page--support :is([data-action="send-heart"], .btn-send-heart):active{ transform: translateY(1px); }
+/* ——— Кнопки в стиле Your engagement (ghost) для нужных зон ——— */
+/* 1) Суммы в Support now (ищем типичные селекторы сумм)
+   2) Add на карте поддержки
+   3) Leave heart в Hearts of support
+*/
+.page--support :is(
+  /* суммы */
+  [data-amount],
+  .donate-amount,
+  .donate-tier,
+  /* add */
+  [data-action="add"],
+  [data-action="add-mark"],
+  .btn-add,
+  /* leave heart */
+  [data-action="send-heart"],
+  .btn-send-heart
+){
+  background: var(--ghost-bg) !important;
+  border: 1px solid var(--ghost-border) !important;
+  color: var(--ghost-text) !important;
 
-/* Сердца: SVG-маска (Fuchsia 500) */
+  /* приятное стекло + лёгкая тень, как у сабнава/engagement */
+  backdrop-filter: saturate(120%) blur(2px);
+  -webkit-backdrop-filter: saturate(120%) blur(2px);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.02) inset,
+    0 1px 2px rgba(0,0,0,0.35);
+
+  transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .02s ease;
+}
+.page--support :is(
+  [data-amount], .donate-amount, .donate-tier,
+  [data-action="add"], [data-action="add-mark"], .btn-add,
+  [data-action="send-heart"], .btn-send-heart
+):hover{
+  background: var(--ghost-bg-hover) !important;
+}
+.page--support :is(
+  [data-amount], .donate-amount, .donate-tier,
+  [data-action="add"], [data-action="add-mark"], .btn-add,
+  [data-action="send-heart"], .btn-send-heart
+):active{
+  background: var(--ghost-bg-active) !important;
+  transform: translateY(1px);
+}
+.page--support :is(
+  [data-amount], .donate-amount, .donate-tier,
+  [data-action="add"], [data-action="add-mark"], .btn-add,
+  [data-action="send-heart"], .btn-send-heart
+):focus-visible{
+  outline: 2px solid var(--ghost-outline);
+  outline-offset: 2px;
+}
+
+/* ——— Сердечки (SVG mask) ——— */
 .page--support .hearts .heart-icon{
   width: 1.15rem;
   height: 1.15rem;
@@ -66,11 +119,9 @@
   -webkit-mask: url("../images/heart.mask.svg") no-repeat center / contain;
   mask: url("../images/heart.mask.svg") no-repeat center / contain;
 }
-
 /* Если в разметке остались PNG, скрыть их */
 .page--support img.heart-icon[src$=".png"]{ display:none !important; }
-
-/* Фолбэк: если иконки нет как отдельный элемент, добавим через ::before на карточку */
+/* Фолбэк-иконка сердечка через ::before */
 .page--support .heart-card::before,
 .page--support .hearts .splide__slide::before{
   content:"";
