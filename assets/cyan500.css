@@ -1,3 +1,4 @@
+/* /assets/cyan500.css */
 /* === TRUS v230825 — Support page: Cyan-500 theme + SVG hearts (robust) === */
 
 /* Палитра */
@@ -15,7 +16,7 @@
   --support-accent: var(--cyan-500);
   --support-accent-weak: var(--cyan-400);
   --support-accent-strong: var(--cyan-600);
-  /*  — сердца оставим индиго, как раньше */
+  /* — сердца оставим индиго, как раньше */
   --heart-accent: #4f46e5; /* Indigo 600 */
 
   /* Переназначаем любые green-* токены внутри страницы */
@@ -55,34 +56,28 @@
 }
 
 /* ——— Кнопки в стиле Your engagement (ghost) для нужных зон ——— */
-/* 1) Суммы в Support now (ищем типичные селекторы сумм)
+/* 1) Суммы в Support now
    2) Add на карте поддержки
    3) Leave heart в Hearts of support
 */
 .page--support :is(
-  /* суммы */
   [data-amount],
   .donate-amount,
   .donate-tier,
-  /* add */
   [data-action="add"],
   [data-action="add-mark"],
   .btn-add,
-  /* leave heart */
   [data-action="send-heart"],
   .btn-send-heart
 ){
   background: var(--ghost-bg) !important;
   border: 1px solid var(--ghost-border) !important;
   color: var(--ghost-text) !important;
-
-  /* приятное стекло + лёгкая тень, как у сабнава/engagement */
   backdrop-filter: saturate(120%) blur(2px);
   -webkit-backdrop-filter: saturate(120%) blur(2px);
   box-shadow:
     0 0 0 1px rgba(255,255,255,0.02) inset,
     0 1px 2px rgba(0,0,0,0.35);
-
   transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .02s ease;
 }
 .page--support :is(
@@ -134,3 +129,19 @@
   -webkit-mask:url("../images/heart.mask.svg") no-repeat center / contain;
   mask:url("../images/heart.mask.svg") no-repeat center / contain;
 }
+
+/* Ghost buttons for Support page (match "Your engagement" look) */
+.page--support .btn-ghost{
+  background: rgba(6,182,212,0.16);
+  border: 1px solid rgba(6,182,212,0.36);
+  color: #ecfeff;
+  backdrop-filter: saturate(120%) blur(2px);
+  -webkit-backdrop-filter: saturate(120%) blur(2px);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.02) inset,
+    0 1px 2px rgba(0,0,0,0.35);
+  transition: background-color .2s, border-color .2s, box-shadow .2s, transform .02s;
+}
+.page--support .btn-ghost:hover{ background: rgba(6,182,212,0.26); }
+.page--support .btn-ghost:active{ background: rgba(6,182,212,0.36); transform: translateY(1px); }
+.page--support .btn-ghost:focus-visible{ outline: 2px solid rgba(6,182,212,0.65); outline-offset: 2px; }

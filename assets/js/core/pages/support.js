@@ -1,3 +1,4 @@
+// /assets/js/core/pages/support.js
 import { $, loadScript } from '../dom.js';
 import { t } from '../i18n.js';
 import { openModal } from '../modal.js';
@@ -65,7 +66,6 @@ async function loadAllMarksPaged() {
 
 function chunk(a,s){const out=[];for(let i=0;i<a.length;i+=s) out.push(a.slice(i,i+s));return out;}
 // Сердечко в карточке — теперь SVG через CSS-mask (класс .heart-icon)
-// (PNG не удаляем; просто здесь используем span для стилизации через CSS)
 function heartCard(n){
   return `
     <div class="p-4 rounded-2xl bg-gray-900/50 shadow-sm border border-gray-700 heart-card">
@@ -94,10 +94,8 @@ function initEngagement(root){
     const on=loadEng();
     root.querySelectorAll('.eng-btn').forEach((b,i)=>{
       const s=on.includes(i);
-      // было: bg-green-700 / border-green-400
       b.classList.toggle('bg-cyan-700', s);
       b.classList.toggle('border-cyan-400', s);
-      // на всякий случай уберём старые зелёные классы, если они были в верстке
       b.classList.toggle('bg-green-700', false);
       b.classList.toggle('border-green-400', false);
       b.setAttribute('aria-pressed', s?'true':'false');
@@ -138,10 +136,11 @@ function renderDonateButtons(root){
   const { base, amounts, wrap } = cfg;
   wrap.innerHTML = '';
 
-  // Кнопки фиксированных сумм — был bg-green-600 → делаем bg-cyan-500
+  // Фиксированные суммы — ghost-кнопки
   amounts.forEach((amt) => {
     const a = document.createElement('a');
-    a.className = 'px-3 py-2 rounded-xl bg-cyan-500 text-white text-sm';
+    a.className = 'btn-ghost px-3 py-2 rounded-xl text-sm donate-tier';
+    a.dataset.amount = String(amt);
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
     a.href = `${base}?amount=${encodeURIComponent(amt)}`;
@@ -149,9 +148,9 @@ function renderDonateButtons(root){
     wrap.appendChild(a);
   });
 
-  // Кнопка «без суммы» (Donate) — тоже cyan-500
+  // Кнопка «Donate» — тоже ghost
   const custom = document.createElement('a');
-  custom.className = 'px-3 py-2 rounded-xl bg-cyan-500 text-white text-sm';
+  custom.className = 'btn-ghost px-3 py-2 rounded-xl text-sm donate-tier';
   custom.target = '_blank';
   custom.rel = 'noopener noreferrer';
   custom.href = base;
@@ -171,7 +170,7 @@ export async function init(root){
   // Вовлеченность
   initEngagement(root);
 
-  // Донат‑кнопки
+  // Донат-кнопки
   renderDonateButtons(root);
 
   // Карта
@@ -259,13 +258,17 @@ export async function init(root){
       loadMoreHearts();
     });
 
-    // Подсветим кнопку «Отправить сердечко» cyan-500 (на случай, если в верстке остался зелёный)
-    const addHeartBtn = root.querySelector('#addHeart');
-    if (addHeartBtn) {
-      addHeartBtn.classList.remove('bg-green-600','bg-green-500');
-      addHeartBtn.classList.add('bg-cyan-500','text-white');
-    }
+    // (старую принудительную заливку cyan-500 убрали)
   }
+
+  // Унифицированный ghost-стиль для Add / Leave heart
+  ['#addHeart', '#addMark'].forEach(sel => {
+    const btn = root.querySelector(sel);
+    if (btn) {
+      btn.classList.remove('bg-green-600','bg-green-500','bg-cyan-500','text-white');
+      btn.classList.add('btn-ghost','px-3','py-2','rounded-xl','text-sm');
+    }
+  });
 
   // Modal: Practical help
   root.querySelector('#wantHelp')?.addEventListener('click', () => {
