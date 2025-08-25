@@ -5,6 +5,7 @@
 // В модалках: убран footer "Updated", шапка с суммой по центру на индиговом фоне.
 // В Spent: явная кнопка-тогглер для заметок. 
 
+
 import { t } from '../../i18n.js';
 import { openModal } from '../../modal.js';
 
