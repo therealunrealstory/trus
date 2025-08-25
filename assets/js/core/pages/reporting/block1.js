@@ -1,6 +1,6 @@
 // assets/js/core/pages/reporting/block1.js
-// Финансовые метрики: Collected / Spent / Planned / Available (+ over-norm прогресс)
-// Модалки: индиго-подложка под заголовком с ОДНОЙ суммой по центру; в Spent — явные SVG-кнопки «плюс».
+// Финансовые метрики: Collected / Spent / Planned / Available
+// Модалки: индиго-подложка, в шапке — одна сумма по центру; в Spent — явные SVG-кнопки «плюс».
 
 import { I18N } from '../../i18n.js';
 import { openModal } from '../../modal.js';
@@ -9,13 +9,13 @@ const t = (k, f='') => I18N[k] ?? f;
 
 let mounted = false;
 let lastLang = null;
-let cache = null; // последняя загруженная funds.json
+let cache = null; // funds.json
 
 export async function init(root){
   if (mounted) return; mounted = true;
 
   let section = root.querySelector('#rep-block1')
-          || root.querySelector('[data-i18n="reporting.block1.title"]')?.closest('section');
+        || root.querySelector('[data-i18n="reporting.block1.title"]')?.closest('section');
   if (!section) { console.warn('[rep-b1] section not found'); return; }
 
   let host = section.querySelector(':scope > div');
@@ -33,10 +33,10 @@ export async function init(root){
 
   renderTiles(host, cache);
 
-  // Делегированная обработка кликов для модальных «плюсов» (Spent/Planned)
+  // Делегирование кликов по кнопкам «+» (capture — надёжнее поверх вложенных слоёв модалки)
   if (!document.__repB1Delegated__) {
     document.__repB1Delegated__ = true;
-    document.addEventListener('click', onDelegatedClick, false);
+    document.addEventListener('click', onDelegatedClick, true);
   }
 
   lastLang = getLang();
@@ -79,7 +79,7 @@ function renderTiles(host, data){
   const totalPlanned   = sum(planned, 'amount');
   const available      = totalCollected - totalSpent - totalPlanned;
 
-  // пороги
+  // Пороги (из вашего ТЗ)
   const spentRatio   = totalCollected > 0 ? (totalSpent   / totalCollected) : (totalSpent   > 0 ? Infinity : 0);
   const plannedRatio = totalCollected > 0 ? (totalPlanned / totalCollected) : (totalPlanned > 0 ? Infinity : 0);
 
@@ -87,17 +87,20 @@ function renderTiles(host, data){
   const plannedTone = totalPlanned > totalCollected ? 'red'   : (plannedRatio >= 0.8 ? 'amber' : 'green');
 
   const safety = totalPlanned > 0 ? (available / totalPlanned) * 100 : 100;
-  const availTone = (available <= 0) ? 'red' : (safety <= 50 ? 'amber' : 'green');
+  const safetyPct = Math.max(0, Math.round(safety));
+  const availTone = (available <= 0) ? 'red' : (safetyPct <= 50 ? 'amber' : 'green');
 
+  // «Коллекшн» сверх норматива: пока не выводим отдельной плиткой (оставил расчёт на будущее)
   const normTarget = Number(norm?.target) || 0;
   const overNormAmount  = Math.max(0, totalCollected - normTarget);
   const overNormPercent = normTarget > 0 ? clamp((totalCollected / normTarget) * 100, 0, 999) : 0;
+  void overNormAmount; void overNormPercent;
 
   host.innerHTML = '';
   const grid = document.createElement('div');
   grid.className = 'rep-b1 grid';
 
-  // (1) Collected — фон как у активных «your engagement» (cyan500)
+  // (1) Collected — фон как на активных «ваша вовлечённость» (cyan500 + прозрачность)
   grid.appendChild(tile({
     kind: 'collected',
     label: t('reporting.block1.collected','Collected'),
@@ -124,9 +127,13 @@ function renderTiles(host, data){
     onClick: () => openPlannedModal(planned, currency)
   }));
 
-  // (4) Available (+ safety bar)
-  const safetyPct = Math.max(0, Math.round(safety));
-  const bar = progress(Math.min(safetyPct, 100), t('funds.available.safety','Safety margin: {percent}%').replace('{percent}', String(safetyPct)));
+  // (4) Available (+ safety bar в нужном тоне)
+  const bar = progress(
+    Math.min(safetyPct, 100),
+    t('funds.available.safety','Safety margin: {percent}%').replace('{percent}', String(safetyPct)),
+    (safetyPct <= 50 ? 'amber' : 'green')
+  );
+
   grid.appendChild(tile({
     kind: 'available',
     label: t('reporting.block1.available','Available'),
@@ -138,7 +145,7 @@ function renderTiles(host, data){
 
   host.appendChild(grid);
 
-  // подпись Updated — ТОЛЬКО под плитками (в модалках её нет по вашему требованию)
+  // «Updated» — только под плитками (в модалках не показываем)
   if (updated_at){
     const upd = document.createElement('div');
     upd.className = 'updated muted';
@@ -152,7 +159,7 @@ function openCollectedModal(collected = [], total, currency){
   const title = t('funds.modal.collected.title','Collected over time');
 
   const rows = (Array.isArray(collected) ? collected : []).slice().sort(byDateAsc)
-    .map((x, i) => {
+    .map(x => {
       const val = Number(x?.value ?? x?.amount) || 0;
       const pct = total > 0 ? (val / total) * 100 : 0;
       return `
@@ -195,7 +202,9 @@ function openSpentModal(spent = [], currency){
             <span class="line-amt">${fmtMoney(amt, currency)}</span>
           </div>
 
-          <button class="icon-btn expander" type="button" aria-expanded="false" aria-controls="${rowId}" title="${escapeHtml(t('reporting.block1.more','More'))}">
+          <button class="icon-btn expander" type="button"
+                  aria-expanded="false" aria-controls="${rowId}"
+                  title="${escapeHtml(t('reporting.block1.more','More'))}">
             ${svgPlus()}
           </button>
         </div>
@@ -236,7 +245,9 @@ function openPlannedModal(planned = [], currency){
             <span class="line-amt">${fmtMoney(amt, currency)}</span>
           </div>
 
-          <button class="icon-btn expander" type="button" aria-expanded="false" aria-controls="${rowId}" title="${escapeHtml(t('reporting.block1.more','More'))}">
+          <button class="icon-btn expander" type="button"
+                  aria-expanded="false" aria-controls="${rowId}"
+                  title="${escapeHtml(t('reporting.block1.more','More'))}">
             ${svgPlus()}
           </button>
         </div>
@@ -295,8 +306,8 @@ function onDelegatedClick(e){
   if (!btn) return;
 
   e.preventDefault();
-  const row = btn.closest('[data-row]');
-  const id  = btn.getAttribute('aria-controls');
+  const row  = btn.closest('[data-row]');
+  const id   = btn.getAttribute('aria-controls');
   const note = id ? document.getElementById(id) : null;
 
   const expanded = btn.getAttribute('aria-expanded') === 'true';
@@ -305,18 +316,13 @@ function onDelegatedClick(e){
 
   if (note) {
     if (expanded) {
-      // hide
       note.setAttribute('hidden','');
       note.style.maxHeight = '0px';
     } else {
-      // show
       note.removeAttribute('hidden');
-      // для анимации высоты
       note.style.maxHeight = note.scrollHeight + 'px';
     }
   }
-
-  // лёгкая пульсация активного ряда
   row?.classList.toggle('active', !expanded);
 }
 
@@ -332,7 +338,7 @@ async function loadFunds(url){
 }
 
 function normalize(data){
-  // collected может храниться с ключом value или amount; выравниваем, чтобы lastValue работал
+  // collected: value|amount → value
   if (Array.isArray(data?.collected)) {
     data.collected = data.collected.map(x => ({
       date: x.date,
@@ -364,11 +370,12 @@ function tile({ kind, label, value, sub='', subNode=null, tone='neutral', onClic
   return el;
 }
 
-function progress(pct, text){
+function progress(pct, text, tone=null){
   const box = document.createElement('div');
   box.className = 'b1-progress';
   const track = document.createElement('div'); track.className='track';
   const fill  = document.createElement('div'); fill.className='fill';
+  if (tone) fill.classList.add(tone);
   fill.style.width = `${pct}%`;
   const label = document.createElement('div'); label.className='ptext'; label.textContent = text;
   track.appendChild(fill);
@@ -378,14 +385,15 @@ function progress(pct, text){
 }
 
 function modalHead(bigText){
-  // Индиго-подложка, только одна сумма по центру
   return `<div class="b1-modal-head">${escapeHtml(bigText)}</div>`;
 }
 
 function svgPlus(){
-  // чистый, чёткий плюс (Lucide-like)
+  // геометрически точный плюс; хорошо рендерится на ретине
   return `
-  <svg class="i-plus" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+  <svg class="i-plus" viewBox="0 0 24 24" width="20" height="20"
+       fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+       shape-rendering="geometricPrecision" vector-effect="non-scaling-stroke" aria-hidden="true">
     <path d="M12 5v14M5 12h14"/>
   </svg>`;
 }
@@ -412,11 +420,11 @@ function escapeHtml(str){ return String(str).replace(/[&<>"']/g, m => ({'&':'&am
 function injectStyles(){
   if (document.getElementById('rep-b1-styles')) return;
   const css = `
-    /* Базовая сетка */
+    /* Сетка */
     .rep-b1.grid { display:grid; gap:12px; grid-template-columns: 1fr; }
     @media (min-width:680px){ .rep-b1.grid { grid-template-columns: 1fr 1fr; } }
 
-    /* Плитка */
+    /* Плитки */
     .b1-tile{
       border-radius:14px; padding:14px 14px 12px; position:relative;
       background:rgba(255,255,255,0.06);
@@ -432,38 +440,34 @@ function injectStyles(){
     .b1-tile .value{ font-size:1.4rem; font-weight:700; letter-spacing:.2px; }
     .b1-tile .sub{ margin-top:8px; }
 
-    /* ТОНА для плиток Spent/Planned/Available */
+    /* Тоны (Spent/Planned/Available) */
     .b1-tile.tone-red   { background: rgba(239, 68, 68, 0.16);  border-color: rgba(239, 68, 68, 0.35); }
     .b1-tile.tone-amber { background: rgba(245,158, 11, 0.16);  border-color: rgba(245,158, 11, 0.35); }
     .b1-tile.tone-green { background: rgba( 34,197, 94, 0.16);  border-color: rgba( 34,197, 94, 0.35); }
 
-    /* ТОН для Collected — как у активных «your engagement» (cyan500.css) */
+    /* Collected — как Cyan500 в поддержке (с прозрачностью) */
     .b1-tile--collected{
-      /* используем переменную, если она задана где-то глобально; иначе фолбэк к #06b6d4 */
-      --_c: var(--support-accent, #06b6d4);
-      background: var(--_c);
-      border-color: var(--_c);
-      color:#fff;
+      /* используем переменную из cyan500.css, если задана; иначе — явные RGBA для Cyan-500 */
+      background: rgba(6, 182, 212, 0.14);
+      border-color: rgba(6, 182, 212, 0.35);
+      color:#e7ecf3;
       text-shadow: 0 1px 0 rgba(0,0,0,.12);
     }
     .b1-tile--collected .label{ opacity:.95 }
     .b1-tile--collected:hover{ filter: brightness(1.03); }
 
-    /* Прогресс/полосы в блоке */
+    /* Прогресс-полосы в карточке/модалке */
     .b1-progress .track{
       height: 8px; border-radius:999px; overflow:hidden;
       background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.12);
     }
-    .b1-progress .fill{
-      height:100%; width:0%; transition: width .35s ease;
-      background: rgba(34,197, 94, 0.7);
-    }
+    .b1-progress .fill{ height:100%; width:0%; transition: width .35s ease; }
     .b1-progress .fill.amber{ background: rgba(245,158,11, .7); }
     .b1-progress .fill.green{ background: rgba( 34,197,94, .7); }
     .b1-progress .ptext{ margin-top:6px; font-size:.85rem; opacity:.85; }
 
-    /* Модальная шапка-подложка (индиго) — ТОЛЬКО сумма по центру */
+    /* Модальная шапка (индиго) — только сумма */
     .b1-modal-head{
       text-align:center; font-size:1.35rem; font-weight:800; letter-spacing:.2px;
       background: rgba(79,70,229,0.14); /* Indigo 600 */
@@ -473,9 +477,7 @@ function injectStyles(){
 
     /* Список линий в модалках */
     .b1-list{ display:grid; gap:12px; }
-    .b1-line .line-head{
-      display:flex; align-items:center; gap:10px; margin-bottom:6px;
-    }
+    .b1-line .line-head{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
     .b1-line .line-title{ display:flex; gap:10px; align-items:baseline; }
     .b1-line .line-date{ font-size:.85rem; opacity:.85 }
     .b1-line .line-amt{ font-weight:700 }
@@ -490,9 +492,8 @@ function injectStyles(){
       border-radius: 8px;
       overflow:hidden; max-height:0; transition:max-height .25s ease;
     }
-    .b1-line.active .line-note{ /* состояние управляется JS через style.maxHeight */ }
 
-    /* Кнопка «плюс» — явная и чёткая */
+    /* Кнопка «плюс» */
     .icon-btn.expander{
       margin-left:auto;
       display:inline-flex; align-items:center; justify-content:center;
@@ -509,7 +510,7 @@ function injectStyles(){
       border-color: rgba(79,70,229,0.55);
     }
     .icon-btn.expander .i-plus{ transition: transform .18s ease; }
-    .icon-btn.expander.is-open .i-plus{ transform: rotate(45deg); } /* превращаем «+» в «×» */
+    .icon-btn.expander.is-open .i-plus{ transform: rotate(45deg); } /* + → × */
 
     /* Available: сообщение при нулевом/отрицательном остатке */
     .b1-available-msg.red{
