@@ -17,7 +17,7 @@ export async function init(root){
     else {
       box.innerHTML=arr.map(p=>{
         const dt=p.date?new Date(p.date):null, time=dt?dt.toLocaleString():'';
-//        const link=p.link?`<a href="${p.link}" target="_blank" class="underline text-sky-400">${t('feed.openTelegram','Open in Telegram')}</a>`:'';
+        const link=p.link?`<a href="${p.link}" target="_blank" class="underline text-sky-400">${t('feed.openTelegram','Open in Telegram')}</a>`:'';
         const text=(p.text||'').replace(/\n/g,'<br>');
         const _img = (p.media_type==='photo' && p.media_path) ? `/.netlify/functions/tg-file?path=${encodeURIComponent(p.media_path)}` : null;
         const mediaHtml = _img
