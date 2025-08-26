@@ -116,5 +116,7 @@
 
   "alert.enterMessage": "Saisissez un message",
   "alert.clickMapFirst": "Cliquez d’abord sur la carte !",
-  "error.saveFailed": "Erreur d’enregistrement : "
+  "error.saveFailed": "Erreur d’enregistrement : ",
+  
+  "news.followHeartNowCTA": "Le cœur de l’histoire bat maintenant — à voir sur Telegram et X :"
 }

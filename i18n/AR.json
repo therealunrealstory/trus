@@ -116,5 +116,7 @@
 
   "alert.enterMessage": "أدخل رسالة",
   "alert.clickMapFirst": "انقر على الخريطة أولًا!",
-  "error.saveFailed": "فشل الحفظ: "
+  "error.saveFailed": "فشل الحفظ: ",
+  
+  "news.followHeartNowCTA": "قلب القصة ينبض الآن — شاهد على تيليغرام وX:"
 }

@@ -119,5 +119,7 @@
   "alert.clickMapFirst": "Сначала кликните по карте!",
   "error.saveFailed": "Ошибка сохранения: ",
   
-  "menu.reporting": "Отчётность"
+  "menu.reporting": "Отчётность",
+  
+  "news.followHeartNowCTA": "Сердце истории бьётся сейчас — смотрите в Telegram и X:"
 }

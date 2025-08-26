@@ -116,5 +116,7 @@
 
   "alert.enterMessage": "请输入留言",
   "alert.clickMapFirst": "请先点击地图！",
-  "error.saveFailed": "保存失败："
+  "error.saveFailed": "保存失败：",
+  
+  "news.followHeartNowCTA": "故事的心脏此刻跳动 —— 在 Telegram 与 X 查看："
 }
