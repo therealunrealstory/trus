@@ -1,139 +1,132 @@
-// /.netlify/functions/news2.js
+// netlify/functions/news2.js
 import { query, cors } from "./_db.js";
 
-/** Каналы: короткое имя → username в Telegram */
-const CH = {
-  now:  "TheRealUnrealStoryNow",
-  nico: "TheRealUnrealStoryNico",
-};
+const OPENAI_URL = "https://api.openai.com/v1/responses";
+const MODEL = "gpt-5-nano";
 
-/** Нормализуем код языка: EN/CN/AR и т.п. */
-function normLang(raw) {
-  const L = String(raw || "EN").trim().toUpperCase();
-  if (L === "CN") return "ZH";     // китайский
-  return L;
+function mapChannel(param) {
+  const p = (param || "now").toLowerCase();
+  if (p === "nico") return process.env.TG_NICO_CHANNEL || "TheRealUnrealStoryNico";
+  return process.env.TG_CHANNEL || "TheRealUnrealStoryNow";
 }
 
-/** Перевод через OpenAI Responses API (gpt-5-nano) */
-async function translateWithOpenAI(text, targetLang) {
-  const key = process.env.OPENAI_API_KEY;
-  if (!key || !text || targetLang === "EN") return null;
+async function translateOnce(text, lang) {
+  if (!text || !lang || lang === "en") return { out: text, provider: "none" };
 
-  try {
-    const r = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${key}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-5-nano",
-        // Никаких разметок и объяснений — только перевод
-        input:
-          `Translate from English to ${targetLang}. ` +
-          `Keep URLs, emoji and line breaks. Respond with translation text only.\n\n` +
-          text,
-      }),
-    });
-    const j = await r.json();
-    const out = (j && (j.output_text || "").trim()) || "";
-    if (!out) return null;
-    return { text: out, provider: "openai:gpt-5-nano" };
-  } catch (e) {
-    console.error("openai translate error:", e);
-    return null;
-  }
+  const payload = {
+    model: MODEL,
+    input: [
+      { role: "system",
+        content:
+          `You are a professional translator into ${lang}. ` +
+          `Translate from English to ${lang}. Preserve original line breaks, punctuation, emojis and URLs. ` +
+          `Return translation only.` },
+      { role: "user", content: text }
+    ],
+    temperature: 0
+  };
+
+  const r = await fetch(OPENAI_URL, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const j = await r.json();
+  const out = j.output_text || j.content?.[0]?.text || j.choices?.[0]?.message?.content || text;
+  return { out, provider: `openai:${MODEL}` };
 }
 
 export default async (req) => {
   try {
-    const url   = new URL(req.url);
-    const key   = String(url.searchParams.get("channel") || "now").toLowerCase();
-    const channel = CH[key] || key; // разрешаем и полное имя
-    const langU = normLang(url.searchParams.get("lang"));
-    const limit = Math.min(100, Math.max(1, Number(url.searchParams.get("limit") || 20)));
+    const url = new URL(req.url);
+    const lang   = (url.searchParams.get("lang") || "en").toLowerCase();
+    const limit  = Math.min(parseInt(url.searchParams.get("limit") || "20", 10), 50);
+    const before = url.searchParams.get("before") ? Number(url.searchParams.get("before")) : null;
+    const channelName = mapChannel(url.searchParams.get("channel")); // env-ник канала
 
-    // 1) Берём последние посты
+    // 1) Посты
     const posts = await query(
-      `select p.id, p.message_id, p.date, p.link, p.text_src, p.lang_src
-         from public.tg_posts p
-        where p.channel = $1 and coalesce(p.hidden,false) = false
-        order by p.date desc
-        limit $2`,
-      [channel, limit]
+      `
+      SELECT id, channel, message_id, date, link, text_src
+      FROM public.tg_posts
+      WHERE lower(channel) = lower($1) AND hidden = false
+        ${before ? "AND message_id < $3" : ""}
+      ORDER BY date DESC
+      LIMIT $2
+      `,
+      before ? [channelName, limit, before] : [channelName, limit]
     );
 
+    if (!posts.rows.length) {
+      return cors({ channel: channelName, lang, items: [] });
+    }
+
+    // 2) Медиа
+    const ids = posts.rows.map(r => r.id);
+    const media = await query(
+      `SELECT id, post_id FROM public.tg_media WHERE post_id = ANY($1::bigint[])`,
+      [ids]
+    );
+    const mediaByPost = new Map();
+    for (const m of media.rows) {
+      const arr = mediaByPost.get(m.post_id) || [];
+      arr.push({ id: m.id });
+      mediaByPost.set(m.post_id, arr);
+    }
+
+    // 3) Переводы (кэш)
     const items = [];
-    for (const row of posts.rows) {
-      const pid = row.id;
+    for (const p of posts.rows) {
+      let text_tr = p.text_src || "";
+      let provider = "none";
 
-      // 2) Медиа
-      const mm = await query(
-        `select kind, file_path_thumb, file_path_full
-           from public.tg_media
-          where post_id = $1
-          order by id asc`,
-        [pid]
-      );
-      const media = mm.rows
-        .map(m => ({
-          kind: m.kind,
-          thumb: m.file_path_thumb
-            ? `/.netlify/functions/tg-file?path=${encodeURIComponent(m.file_path_thumb)}&v=thumb`
-            : null,
-          full: m.file_path_full
-            ? `/.netlify/functions/tg-file?path=${encodeURIComponent(m.file_path_full)}`
-            : null,
-        }))
-        .filter(x => !!x.thumb);
-
-      // 3) Перевод (кэшируем в tg_translations)
-      let text_tr = row.text_src || "";
-      let provider = null;
-
-      if (langU !== "EN") {
-        const langDb = langU.toLowerCase();
-        const tr = await query(
-          `select text_tr, provider from public.tg_translations
-            where post_id = $1 and lang = $2
-            limit 1`,
-          [pid, langDb]
+      if (lang !== "en" && p.text_src) {
+        const got = await query(
+          `SELECT text_tr, provider FROM public.tg_translations WHERE post_id=$1 AND lang=$2`,
+          [p.id, lang]
         );
-        if (tr.rows.length) {
-          text_tr = tr.rows[0].text_tr || text_tr;
-          provider = tr.rows[0].provider || null;
+        if (got.rows.length) {
+          text_tr = got.rows[0].text_tr;
+          provider = got.rows[0].provider;
         } else {
-          const tt = await translateWithOpenAI(row.text_src || "", langU);
-          if (tt && tt.text) {
-            text_tr = tt.text;
-            provider = tt.provider;
-            await query(
-              `insert into public.tg_translations (post_id, lang, text_tr, provider)
-                   values ($1,$2,$3,$4)
-              on conflict (post_id, lang)
-              do update set text_tr = excluded.text_tr, provider = excluded.provider`,
-              [pid, langDb, text_tr, provider]
-            );
-          }
+          const tr = await translateOnce(p.text_src, lang); // в OpenAI уходит ТОЛЬКО текст
+          await query(
+            `INSERT INTO public.tg_translations (post_id, lang, text_tr, provider)
+             VALUES ($1,$2,$3,$4)
+             ON CONFLICT (post_id, lang) DO NOTHING`,
+            [p.id, lang, tr.out, tr.provider]
+          );
+          text_tr = tr.out;
+          provider = tr.provider;
         }
       }
 
+      const mediaArr = (mediaByPost.get(p.id) || []).map(m => ({
+        id: m.id,
+        thumbUrl: `/.netlify/functions/tg-file?id=${m.id}&v=thumb`,
+        fullUrl:  `/.netlify/functions/tg-file?id=${m.id}&v=full`
+      }));
+
       items.push({
-        id: String(pid),
-        message_id: String(row.message_id),
-        date: row.date,
-        link: row.link,
-        text: row.text_src || "",
+        id: p.id,
+        message_id: p.message_id,
+        date: p.date,
+        link: p.link,
+        text: p.text_src || "",
         text_tr,
-        lang_out: langU.toLowerCase(),
+        lang_out: lang,
         provider,
-        media,
+        media: mediaArr
       });
     }
 
-    return cors({ channel, lang: langU.toLowerCase(), items });
+    return cors({ channel: channelName, lang, items });
   } catch (e) {
     console.error("news2 error:", e);
-    return cors({ error: "server error" }, 500);
+    return cors({ error: "news_failed" }, 500);
   }
 };
