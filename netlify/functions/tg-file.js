@@ -1,27 +1,47 @@
-// Прокси к файлам Telegram по ранее полученному media_path
-exports.handler = async (event) => {
+// netlify/functions/tg-file.js
+import { query } from "./_db.js";
+
+function pickTokenByChannel(channel) {
+  const ch = (channel || '').toLowerCase();
+  if (ch === (process.env.TG_CHANNEL || '').toLowerCase())       return process.env.TG_BOT_TOKEN;
+  if (ch === (process.env.TG_NICO_CHANNEL || '').toLowerCase())  return process.env.TG_NICO_BOT_TOKEN;
+  return process.env.TG_BOT_TOKEN; // fallback
+}
+
+export default async (req) => {
   try {
-    const path = new URL(event.rawUrl).searchParams.get('path') || '';
-    if (!/^[\w\-/.]{5,200}$/.test(path)) return { statusCode: 400, body: 'Bad path' };
+    const url = new URL(req.url);
+    const id = Number(url.searchParams.get('id') || 0);
+    const variant = (url.searchParams.get('v') || url.searchParams.get('variant') || 'thumb').toLowerCase();
+    if (!id) return new Response('bad_request', { status: 400 });
 
-    const token = process.env.TELEGRAM_NOWADAYS_BOT_TOKEN;
-    if (!token) return { statusCode: 500, body: 'Missing token' };
+    const rows = await query(
+      `SELECT m.file_path_thumb, m.file_path_full, p.channel
+         FROM public.tg_media m
+         JOIN public.tg_posts p ON p.id = m.post_id
+        WHERE m.id = $1`,
+      [id]
+    );
+    if (!rows.length) return new Response('not_found', { status: 404 });
 
-    const url = `https://api.telegram.org/file/bot${token}/${path}`;
-    const r = await fetch(url);
-    if (!r.ok) return { statusCode: r.status, body: 'Not found' };
+    const row = rows[0];
+    const path = variant === 'full' ? row.file_path_full : row.file_path_thumb;
+    if (!path) return new Response('no_path', { status: 404 });
 
-    const buf = Buffer.from(await r.arrayBuffer());
-    // content-type может отсутствовать — отдадим как octet-stream
-    const ct = r.headers.get('content-type') || 'application/octet-stream';
-    return {
-      statusCode: 200,
-      headers: { 'content-type': ct, 'cache-control': 'public, max-age=31536000, immutable', 'access-control-allow-origin':'*' },
-      body: buf.toString('base64'),
-      isBase64Encoded: true
-    };
+    const token = pickTokenByChannel(row.channel);
+    const tgUrl = `https://api.telegram.org/file/bot${token}/${path}`;
+
+    const r = await fetch(tgUrl);
+    if (!r.ok) return new Response('tg_fetch_failed', { status: 502 });
+
+    const buf = await r.arrayBuffer();
+    const headers = new Headers({
+      'Content-Type': r.headers.get('content-type') || 'image/jpeg',
+      'Cache-Control': 'public, max-age=86400, immutable'
+    });
+    return new Response(Buffer.from(buf), { status: 200, headers });
   } catch (e) {
-    console.error(e);
-    return { statusCode: 500, body: 'Server error' };
+    console.error('tg-file error:', e);
+    return new Response('internal', { status: 500 });
   }
 };
