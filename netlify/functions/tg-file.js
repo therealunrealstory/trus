@@ -4,10 +4,21 @@
 import { query } from "./_db.js";
 
 function pickTokenByChannel(channel) {
-  const ch = (channel || '').toLowerCase();
-  if (ch === (process.env.TG_CHANNEL || '').toLowerCase())      return process.env.TG_BOT_TOKEN;
-  if (ch === (process.env.TG_NICO_CHANNEL || '').toLowerCase()) return process.env.TG_NICO_BOT_TOKEN;
-  return process.env.TG_BOT_TOKEN; // fallback
+  const ch = String(channel || '').toLowerCase();
+  const nowCh   = (process.env.TG_CHANNEL || '').toLowerCase();
+  const nicoCh  = (process.env.TG_NICO_CHANNEL || '').toLowerCase();
+  const repCh   = (process.env.TG_REPORTS_CHANNEL || '').toLowerCase();
+
+  if (ch && repCh && ch === repCh) return process.env.TG_REPORTS_BOT_TOKEN;
+  if (ch && nowCh && ch === nowCh) return process.env.TG_BOT_TOKEN;
+  if (ch && nicoCh && ch === nicoCh) return process.env.TG_NICO_BOT_TOKEN;
+
+  // Если канал приватный и хранится как числовой chat_id (начинается с -100...),
+  // скорее всего это и есть «reports» — используем REPORTS токен как fallback.
+  if (/^-?\d/.test(ch) && process.env.TG_REPORTS_BOT_TOKEN) return process.env.TG_REPORTS_BOT_TOKEN;
+
+  // общий fallback — токен NOW
+  return process.env.TG_BOT_TOKEN;
 }
 
 export default async (req) => {
