@@ -1,20 +1,27 @@
 // netlify/functions/db-migrate.js
+// Создаёт таблицы tg_posts, tg_media, tg_translations и индексы.
+// Запуск: POST с заголовком Authorization: Bearer <ADMIN_SECRET>
+// Опционально: ?drop=1 — предварительно удалит старые таблицы.
+
 import { query } from "./_db.js";
 
-// Набор idempotent-стейтментов — можно запускать повторно
-const SQL = [
-  // tg_posts: недостающие поля
-  `ALTER TABLE public.tg_posts ADD COLUMN IF NOT EXISTS lang_src   TEXT        DEFAULT 'en';`,
-  `ALTER TABLE public.tg_posts ADD COLUMN IF NOT EXISTS hidden     BOOLEAN     DEFAULT FALSE;`,
-  `ALTER TABLE public.tg_posts ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT now();`,
-  `ALTER TABLE public.tg_posts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();`,
-
-  // Уникальность (как уникальный индекс — безопаснее, чем CONSTRAINT IF NOT EXISTS)
+const CREATE_SQL = [
+  // tg_posts
+  `CREATE TABLE IF NOT EXISTS public.tg_posts (
+     id BIGSERIAL PRIMARY KEY,
+     channel TEXT NOT NULL,
+     message_id BIGINT NOT NULL,
+     date TIMESTAMPTZ NOT NULL,
+     link TEXT NOT NULL,
+     text_src TEXT,
+     lang_src TEXT DEFAULT 'en',
+     hidden BOOLEAN DEFAULT FALSE,
+     created_at TIMESTAMPTZ DEFAULT now(),
+     updated_at TIMESTAMPTZ DEFAULT now()
+   );`,
   `CREATE UNIQUE INDEX IF NOT EXISTS tg_posts_unique_msg_idx ON public.tg_posts (channel, message_id);`,
-
-  // Индексы
   `CREATE INDEX IF NOT EXISTS tg_posts_date_desc_idx ON public.tg_posts (date DESC);`,
-  `CREATE INDEX IF NOT EXISTS tg_posts_hidden_idx     ON public.tg_posts (hidden);`,
+  `CREATE INDEX IF NOT EXISTS tg_posts_hidden_idx ON public.tg_posts (hidden);`,
 
   // tg_media
   `CREATE TABLE IF NOT EXISTS public.tg_media (
@@ -43,27 +50,50 @@ const SQL = [
   `CREATE UNIQUE INDEX IF NOT EXISTS tg_tr_unique_idx ON public.tg_translations (post_id, lang);`
 ];
 
+const DROP_SQL = [
+  `DROP TABLE IF EXISTS public.tg_translations CASCADE;`,
+  `DROP TABLE IF EXISTS public.tg_media CASCADE;`,
+  `DROP TABLE IF EXISTS public.tg_posts CASCADE;`
+];
+
 export default async (req) => {
   try {
-    if (req.method !== "POST") return new Response("method_not_allowed", { status: 405 });
-
-    // защита: только с твоим ADMIN_SECRET
-    const auth = req.headers.get("authorization") || "";
-    const token = auth.toLowerCase().startsWith("bearer ") ? auth.slice(7).trim() : "";
-    if (!token || token !== process.env.ADMIN_SECRET) return new Response("forbidden", { status: 403 });
-
-    for (const sql of SQL) {
-      await query(sql);
+    if (req.method !== "POST") {
+      return new Response("method_not_allowed", { status: 405 });
     }
-    return new Response(JSON.stringify({ ok: true }), {
-      status: 200,
-      headers: { "content-type": "application/json" }
-    });
+    // защита
+    const auth = req.headers.get("authorization") || "";
+    const token = auth.toLowerCase().startsWith("bearer ")
+      ? auth.slice(7).trim()
+      : "";
+    if (!token || token !== process.env.ADMIN_SECRET) {
+      return new Response("forbidden", { status: 403 });
+    }
+
+    const url = new URL(req.url);
+    const drop = (url.searchParams.get("drop") || "").toLowerCase();
+    const ops = [];
+
+    if (drop === "1" || drop === "true") {
+      for (const sql of DROP_SQL) {
+        await query(sql);
+        ops.push(sql);
+      }
+    }
+    for (const sql of CREATE_SQL) {
+      await query(sql);
+      ops.push(sql);
+    }
+
+    return new Response(
+      JSON.stringify({ ok: true, statements: ops.length }),
+      { status: 200, headers: { "content-type": "application/json" } }
+    );
   } catch (e) {
     console.error("db-migrate error", e);
-    return new Response(JSON.stringify({ error: "db_migrate_failed", message: String(e.message || e) }), {
-      status: 500,
-      headers: { "content-type": "application/json" }
-    });
+    return new Response(
+      JSON.stringify({ error: "db_migrate_failed", message: String(e.message || e) }),
+      { status: 500, headers: { "content-type": "application/json" } }
+    );
   }
 };
