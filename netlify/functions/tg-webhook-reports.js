@@ -63,7 +63,7 @@ export default async (req) => {
     const text_src = post.text || post.caption || "";
 
     // приватный канал — ссылку не сохраняем
-    const link = null;
+    const link = '';
 
     // upsert поста
     const { rows } = await query(
