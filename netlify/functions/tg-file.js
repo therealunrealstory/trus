@@ -1,10 +1,12 @@
 // netlify/functions/tg-file.js
+// Прокси к файлам Telegram. Определяет токен по каналу поста.
+
 import { query } from "./_db.js";
 
 function pickTokenByChannel(channel) {
   const ch = (channel || '').toLowerCase();
-  if (ch === (process.env.TG_CHANNEL || '').toLowerCase())       return process.env.TG_BOT_TOKEN;
-  if (ch === (process.env.TG_NICO_CHANNEL || '').toLowerCase())  return process.env.TG_NICO_BOT_TOKEN;
+  if (ch === (process.env.TG_CHANNEL || '').toLowerCase())      return process.env.TG_BOT_TOKEN;
+  if (ch === (process.env.TG_NICO_CHANNEL || '').toLowerCase()) return process.env.TG_NICO_BOT_TOKEN;
   return process.env.TG_BOT_TOKEN; // fallback
 }
 
@@ -13,9 +15,12 @@ export default async (req) => {
     const url = new URL(req.url);
     const id = Number(url.searchParams.get('id') || 0);
     const variant = (url.searchParams.get('v') || url.searchParams.get('variant') || 'thumb').toLowerCase();
-    if (!id) return new Response('bad_request', { status: 400 });
 
-    const rows = await query(
+    if (!id) {
+      return new Response('bad_request', { status: 400, headers: { 'content-type': 'text/plain' } });
+    }
+
+    const { rows } = await query(
       `SELECT m.file_path_thumb, m.file_path_full, p.channel
          FROM public.tg_media m
          JOIN public.tg_posts p ON p.id = m.post_id
