@@ -8,9 +8,9 @@
         {
           "id": "gfm-2025-main",
           "title": "The Real Unreal — Main 2025",
-          "period": { "start": "2025-07-01", "end": null },
+          "period": { "start": "01-11-2025", "end": null },
           "status": "active",
-          "metrics": { "raised": 18000, "currency": "USD", "donors": 240 },
+          "metrics": { "raised": 0, "currency": "USD", "donors": 0 },
           "url": null
         }
       ]
@@ -18,18 +18,18 @@
     {
       "id": "self",
       "name": "Direct / Self-hosted",
-      "url": "https://therealunrealstory.com/support",
+      "url": "https://therealunrealstory.com/#support",
       "campaigns": [
         {
           "id": "self-2025",
           "title": "Direct Support 2025",
-          "period": { "start": "2025-06-10", "end": null },
+          "period": { "start": "30-12-2025", "end": null },
           "status": "active",
-          "metrics": { "raised": 9200, "currency": "USD", "donors": 110 },
-          "url": "https://therealunrealstory.com/support"
+          "metrics": { "raised": 0, "currency": "USD", "donors": 0 },
+          "url": "https://therealunrealstory.com/#support"
         }
       ]
     }
   ],
-  "updated_at": "2025-08-24T00:00:00Z"
+  "updated_at": "2025-08-28"
 }
