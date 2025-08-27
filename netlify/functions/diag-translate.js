@@ -15,7 +15,6 @@ export default async (req) => {
     if (req.method === "OPTIONS") return cors({}, 204);
     if (req.method !== "POST")   return cors({ error: "method_not_allowed" }, 405);
 
-    // защита — нужен ADMIN_SECRET
     const auth = req.headers.get("authorization") || "";
     const token = auth.toLowerCase().startsWith("bearer ") ? auth.slice(7).trim() : "";
     if (!token || token !== process.env.ADMIN_SECRET) return cors({ error: "forbidden" }, 403);
@@ -28,26 +27,24 @@ export default async (req) => {
     if (!process.env.OPENAI_API_KEY) return cors({ error: "no_openai_key" }, 500);
     if (!text) return cors({ error: "empty_text" }, 400);
 
-    // ВАЖНО: type = input_text
     const payload = {
       model: MODEL,
       input: [
         {
           role: "system",
           content: [
-            {
-              type: "input_text",
-              text:
+            { type: "input_text", text:
 `You are a professional translator.
 Translate strictly from English to ${target}.
 Output ONLY the translation in ${target} (no quotes, no explanations).
-Preserve line breaks, punctuation, emojis and URLs exactly.`
-            }
+Preserve line breaks, punctuation, emojis and URLs exactly.` }
           ]
         },
         { role: "user", content: [ { type: "input_text", text } ] }
       ],
-      temperature: 0
+      // ВАЖНО: без temperature — эта модель его не поддерживает
+      // Можно задать лимит токенов, если нужно:
+      // max_output_tokens: 2000
     };
 
     const r = await fetch(OPENAI_URL, {
@@ -61,7 +58,6 @@ Preserve line breaks, punctuation, emojis and URLs exactly.`
 
     const j = await r.json();
 
-    // Надёжный парсинг
     let out = "";
     if (typeof j.output_text === "string") out = j.output_text.trim();
     else if (Array.isArray(j.output)) {

@@ -16,7 +16,6 @@ const LANG_NAME = {
   cn:"Chinese (Simplified)", zh:"Chinese (Simplified)", ar:"Arabic",
 };
 const langName = (code) => LANG_NAME[String(code||"en").toLowerCase()] || code;
-
 const norm = (s) => String(s||"").trim().replace(/\s+/g," ").toLowerCase();
 
 async function translateOnce(text, langCode) {
@@ -27,7 +26,6 @@ async function translateOnce(text, langCode) {
 
   const target = langName(lc);
 
-  // ВАЖНО: type = input_text
   const payload = {
     model: MODEL,
     input: [
@@ -42,8 +40,8 @@ Preserve line breaks, punctuation, emojis and URLs exactly.`}
         ]
       },
       { role: "user", content: [ { type:"input_text", text } ] }
-    ],
-    temperature: 0
+    ]
+    // без temperature
   };
 
   try{
