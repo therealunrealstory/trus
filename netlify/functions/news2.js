@@ -4,75 +4,82 @@ import { query, cors } from "./_db.js";
 const OPENAI_URL = "https://api.openai.com/v1/responses";
 const MODEL = "gpt-5-nano";
 
-// Мэппинг кодов на названия языков — Responses лучше реагирует на full names
-const LANG_NAME = {
-  en: "English",
-  ru: "Russian",
-  es: "Spanish",
-  pt: "Portuguese",
-  fr: "French",
-  it: "Italian",
-  de: "German",
-  cn: "Chinese (Simplified)",
-  zh: "Chinese (Simplified)",
-  ar: "Arabic",
-};
-
+// короткое имя → username канала
 function mapChannel(param) {
   const p = (param || "now").toLowerCase();
   if (p === "nico") return process.env.TG_NICO_CHANNEL || "TheRealUnrealStoryNico";
   return process.env.TG_CHANNEL || "TheRealUnrealStoryNow";
 }
 
+// код → human-name (Responses на такое реагирует стабильнее)
+const LANG_NAME = {
+  en: "English", ru: "Russian", es: "Spanish", pt: "Portuguese",
+  fr: "French",  it: "Italian", de: "German",
+  cn: "Chinese (Simplified)", zh: "Chinese (Simplified)",
+  ar: "Arabic",
+};
 function langName(code) {
   const c = String(code || "en").toLowerCase();
   return LANG_NAME[c] || c;
 }
 
-// Нормализатор для грубого сравнения “тот же текст?”
 function normalize(s) {
-  return String(s || "")
-    .trim()
-    .replace(/\s+/g, " ")
-    .toLowerCase();
+  return String(s || "").trim().replace(/\s+/g, " ").toLowerCase();
 }
 
+// ——— Перевод через Responses API ———
 async function translateOnce(text, langCode) {
-  const target = langName(langCode);
-  if (!text || !langCode || String(langCode).toLowerCase() === "en") {
-    return null; // не переводим
-  }
-  if (!process.env.OPENAI_API_KEY) return null;
+  const targetName = langName(langCode);
+  const lc = String(langCode || "en").toLowerCase();
+  if (!text || lc === "en") return null;
+  const key = process.env.OPENAI_API_KEY;
+  if (!key) return null;
 
-  const prompt =
-    `Translate the following text from English to ${target}. ` +
-    `Keep original line breaks, punctuation, emojis and URLs. ` +
-    `Respond with the translation only, no comments.\n\n` +
-    text;
-
-  const r = await fetch(OPENAI_URL, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+  // строгая инструкция: только перевод, без комментариев/кавычек/английского
+  const messages = [
+    {
+      role: "system",
+      content:
+        `You are a professional literary translator. ` +
+        `Translate exactly from English into ${targetName}. ` +
+        `Output ONLY the translation text in ${targetName}. ` +
+        `Do not include explanations, quotes, notes, or the original text. ` +
+        `Preserve line breaks, punctuation, emojis and URLs exactly; keep numbers and hashtags.`
     },
-    body: JSON.stringify({
-      model: MODEL,
-      input: prompt,
-      temperature: 0,
-    }),
-  });
+    {
+      role: "user",
+      content: text
+    }
+  ];
 
-  const j = await r.json();
-  const out =
-    (j && (j.output_text || "").trim()) ||
-    (j?.content?.[0]?.text || "").trim() ||
-    (j?.choices?.[0]?.message?.content || "").trim();
+  let out = "";
+  try {
+    const r = await fetch(OPENAI_URL, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${key}` },
+      body: JSON.stringify({
+        model: MODEL,
+        input: messages,
+        temperature: 0,
+        max_output_tokens: Math.min(2000, Math.max(200, text.length * 2))
+      }),
+    });
+    const j = await r.json();
 
-  // если пусто или фактически тот же текст — считаем, что перевод не удался
-  if (!out || normalize(out) === normalize(text)) return null;
+    // Responses API: удобное поле output_text есть почти всегда, оставляем и резервные пути
+    out =
+      (j && (j.output_text || "").trim()) ||
+      (j?.content?.[0]?.text || "").trim() ||
+      (j?.choices?.[0]?.message?.content || "").trim() ||
+      "";
+    // если модель упрямо вернула исходник — считаем, что перевода нет
+    if (!out || normalize(out) === normalize(text)) return null;
 
-  return { out, provider: `openai:${MODEL}` };
+    return { out, provider: `openai:${MODEL}` };
+  } catch (e) {
+    console.error("openai translate error:", e);
+    return null;
+  }
 }
 
 export default async (req) => {
@@ -95,10 +102,9 @@ export default async (req) => {
       `,
       before ? [channelName, limit, before] : [channelName, limit]
     );
-
     if (!posts.rows.length) return cors({ channel: channelName, lang, items: [] });
 
-    // 2) Медиа
+    // 2) Медиа (id → потом /tg-file?id=..)
     const ids = posts.rows.map(r => r.id);
     const media = await query(
       `SELECT id, post_id FROM public.tg_media WHERE post_id = ANY($1::bigint[])`,
@@ -118,13 +124,13 @@ export default async (req) => {
       let provider = "none";
 
       if (lang !== "en" && p.text_src) {
-        const got = await query(
+        const cached = await query(
           `SELECT text_tr, provider FROM public.tg_translations WHERE post_id=$1 AND lang=$2`,
           [p.id, lang]
         );
-        if (got.rows.length) {
-          text_tr = got.rows[0].text_tr;
-          provider = got.rows[0].provider || "none";
+        if (cached.rows.length) {
+          text_tr = cached.rows[0].text_tr || text_tr;
+          provider = cached.rows[0].provider || "none";
         } else {
           const tr = await translateOnce(p.text_src, lang);
           if (tr && tr.out) {
@@ -144,7 +150,7 @@ export default async (req) => {
       const mediaArr = (mediaByPost.get(p.id) || []).map(m => ({
         id: m.id,
         thumbUrl: `/.netlify/functions/tg-file?id=${m.id}&v=thumb`,
-        fullUrl:  `/.netlify/functions/tg-file?id=${m.id}&v=full`
+        fullUrl:  `/.netlify/functions/tg-file?id=${m.id}&v=full`,
       }));
 
       items.push({
@@ -156,7 +162,7 @@ export default async (req) => {
         text_tr,
         lang_out: lang,
         provider,
-        media: mediaArr
+        media: mediaArr,
       });
     }
 
