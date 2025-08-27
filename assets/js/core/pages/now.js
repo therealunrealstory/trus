@@ -5,14 +5,17 @@ import { openModal } from '../modal.js';
 let unLocale = null;
 
 export async function init(root) {
-  const box = root.querySelector('#tgFeed');
-  if (!box) return;
-  await render(box);
+  const boxNow  = root.querySelector('#tgFeedNow');
+  const boxNico = root.querySelector('#tgFeedNico');
 
-  // Перерисовывать при смене языка
-  unLocale = onLocaleChanged(async () => { await render(box); });
+  await renderFeed(boxNow, 'now');
+  await renderFeed(boxNico, 'nico');
 
-  // Делегированный клик по превью — открываем full
+  unLocale = onLocaleChanged(async () => {
+    await renderFeed(boxNow, 'now');
+    await renderFeed(boxNico, 'nico');
+  });
+
   document.addEventListener('click', onThumbClick);
 }
 
@@ -28,12 +31,14 @@ function onThumbClick(e){
   openModal('', `<img src="${img.getAttribute('data-full')}" class="w-full h-auto rounded-xl">`);
 }
 
-async function render(box){
-  const lang = (getLangFromQuery() || 'EN').toLowerCase();
+async function renderFeed(box, channel){
+  if (!box) return;
+  const lang = (getLangFromQuery() || 'en').toLowerCase();
+
   box.innerHTML = `<div class="text-sm text-gray-300">${t('feed.loading','Loading news…')}</div>`;
 
   try{
-    const r = await fetch(`/.netlify/functions/news2?channel=now&lang=${encodeURIComponent(lang)}&limit=20`, { cache: 'no-store' });
+    const r = await fetch(`/.netlify/functions/news2?channel=${channel}&lang=${encodeURIComponent(lang)}&limit=20`, { cache: 'no-store' });
     if (!r.ok) throw new Error('news2 API ' + r.status);
     const data = await r.json();
     const items = Array.isArray(data.items) ? data.items : [];
@@ -55,15 +60,15 @@ function renderItem(p){
   const link = p.link ? `<a href="${p.link}" target="_blank" class="underline text-sky-400">${t('feed.openTelegram','Open in Telegram')}</a>` : '';
 
   const mediaHtml = (Array.isArray(p.media) ? p.media : []).map(m => {
-    const thumb = m.thumbUrl || m.thumb || m.thumb_url;
-    const full  = m.fullUrl  || m.full  || m.full_url || m.url;
+    const thumb = m.thumbUrl || m.thumb;
+    const full  = m.fullUrl  || m.full;
     if (!thumb) return '';
-    return `<img src="${thumb}" data-full="${full || ''}" alt="" class="mt-2 rounded-xl border border-gray-700 max-w-full max-h-52 sm:max-h-52 w-auto object-contain block cursor-zoom-in">`;
+    return `<img src="${thumb}" data-full="${full || ''}" alt="" class="mt-2 rounded-xl max-w-full max-h-52 w-auto object-contain block cursor-zoom-in">`;
   }).join('');
 
   return `
-    <article class="mb-4 p-3 rounded-2xl bg-gray-900/50 border border-gray-700">
-      <div class="text-xs text-gray-300 mb-2">
+    <article class="mb-6">
+      <div class="text-xs text-gray-400 mb-2">
         ${time}${hasTr ? ` • ${t('feed.auto','auto-translated')}` : ''}${link ? ` · ${link}` : ''}
       </div>
       ${ textHtml ? `<div class="text-sm leading-relaxed">${textHtml}</div>` : '' }
