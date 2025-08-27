@@ -1,31 +1,27 @@
 // /assets/js/core/pages/now.js
-// Now v2: два фида (NOW и NICO). Берём тек. язык сайта, тянем API news2,
-// рисуем миниатюры; клик по миниатюре — модалка с большим изображением.
+// Два фида (NOW и NICO). Берём язык сайта через getLangFromQuery,
+// тянем API news2, рисуем миниатюры; клик по миниатюре — модалка с большим фото.
 
-import { t, currentLocale } from '../i18n.js';
+import { t, getLangFromQuery } from '../i18n.js';
 import { openModal } from '../modal.js';
 
 let aborters = [];
 let onOpenImage = null;
 
 export async function init(root) {
-  // Контейнеры: основной фид (NOW) и фид Нико (NICO).
-  const boxNow  = root.querySelector('#tgFeedNow')  || root.querySelector('#tgFeed'); // на случай старого id
+  const boxNow  = root.querySelector('#tgFeedNow')  || root.querySelector('#tgFeed'); // совместимость со старым id
   const boxNico = root.querySelector('#tgFeedNico');
 
-  const lang = (currentLocale?.() || 'en').slice(0,2);
+  const lang = (getLangFromQuery()?.toLowerCase() || 'en').slice(0, 2);
 
-  // Чистый старт
   if (boxNow)  boxNow.innerHTML  = `<div class="text-sm text-gray-300">${t('feed.loading','Loading news…')}</div>`;
   if (boxNico) boxNico.innerHTML = `<div class="text-sm text-gray-300">${t('feed.loading','Loading news…')}</div>`;
 
-  // Рисуем каждый блок, если он есть
   const tasks = [];
   if (boxNow)  tasks.push(loadFeed(boxNow,  'now',  lang));
   if (boxNico) tasks.push(loadFeed(boxNico, 'nico', lang));
-  await Promise.all(tasks).catch(()=>{ /* ошибки уже обработаны внутри */ });
+  await Promise.all(tasks).catch(()=>{});
 
-  // Общий обработчик модалки
   onOpenImage = (e) => openModal('', `<img src="${e.detail}" class="w-full h-auto rounded-xl">`);
   document.addEventListener('openImage', onOpenImage);
 }
