@@ -4,39 +4,74 @@ import { query, cors } from "./_db.js";
 const OPENAI_URL = "https://api.openai.com/v1/responses";
 const MODEL = "gpt-5-nano";
 
+// Мэппинг кодов на названия языков — Responses лучше реагирует на full names
+const LANG_NAME = {
+  en: "English",
+  ru: "Russian",
+  es: "Spanish",
+  pt: "Portuguese",
+  fr: "French",
+  it: "Italian",
+  de: "German",
+  cn: "Chinese (Simplified)",
+  zh: "Chinese (Simplified)",
+  ar: "Arabic",
+};
+
 function mapChannel(param) {
   const p = (param || "now").toLowerCase();
   if (p === "nico") return process.env.TG_NICO_CHANNEL || "TheRealUnrealStoryNico";
   return process.env.TG_CHANNEL || "TheRealUnrealStoryNow";
 }
 
-async function translateOnce(text, lang) {
-  if (!text || !lang || lang === "en") return { out: text, provider: "none" };
+function langName(code) {
+  const c = String(code || "en").toLowerCase();
+  return LANG_NAME[c] || c;
+}
 
-  const payload = {
-    model: MODEL,
-    input: [
-      { role: "system",
-        content:
-          `You are a professional translator into ${lang}. ` +
-          `Translate from English to ${lang}. Preserve original line breaks, punctuation, emojis and URLs. ` +
-          `Return translation only.` },
-      { role: "user", content: text }
-    ],
-    temperature: 0
-  };
+// Нормализатор для грубого сравнения “тот же текст?”
+function normalize(s) {
+  return String(s || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+}
+
+async function translateOnce(text, langCode) {
+  const target = langName(langCode);
+  if (!text || !langCode || String(langCode).toLowerCase() === "en") {
+    return null; // не переводим
+  }
+  if (!process.env.OPENAI_API_KEY) return null;
+
+  const prompt =
+    `Translate the following text from English to ${target}. ` +
+    `Keep original line breaks, punctuation, emojis and URLs. ` +
+    `Respond with the translation only, no comments.\n\n` +
+    text;
 
   const r = await fetch(OPENAI_URL, {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      "authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+      authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
     },
-    body: JSON.stringify(payload)
+    body: JSON.stringify({
+      model: MODEL,
+      input: prompt,
+      temperature: 0,
+    }),
   });
 
   const j = await r.json();
-  const out = j.output_text || j.content?.[0]?.text || j.choices?.[0]?.message?.content || text;
+  const out =
+    (j && (j.output_text || "").trim()) ||
+    (j?.content?.[0]?.text || "").trim() ||
+    (j?.choices?.[0]?.message?.content || "").trim();
+
+  // если пусто или фактически тот же текст — считаем, что перевод не удался
+  if (!out || normalize(out) === normalize(text)) return null;
+
   return { out, provider: `openai:${MODEL}` };
 }
 
@@ -46,7 +81,7 @@ export default async (req) => {
     const lang   = (url.searchParams.get("lang") || "en").toLowerCase();
     const limit  = Math.min(parseInt(url.searchParams.get("limit") || "20", 10), 50);
     const before = url.searchParams.get("before") ? Number(url.searchParams.get("before")) : null;
-    const channelName = mapChannel(url.searchParams.get("channel")); // env-ник канала
+    const channelName = mapChannel(url.searchParams.get("channel"));
 
     // 1) Посты
     const posts = await query(
@@ -61,9 +96,7 @@ export default async (req) => {
       before ? [channelName, limit, before] : [channelName, limit]
     );
 
-    if (!posts.rows.length) {
-      return cors({ channel: channelName, lang, items: [] });
-    }
+    if (!posts.rows.length) return cors({ channel: channelName, lang, items: [] });
 
     // 2) Медиа
     const ids = posts.rows.map(r => r.id);
@@ -91,17 +124,20 @@ export default async (req) => {
         );
         if (got.rows.length) {
           text_tr = got.rows[0].text_tr;
-          provider = got.rows[0].provider;
+          provider = got.rows[0].provider || "none";
         } else {
-          const tr = await translateOnce(p.text_src, lang); // в OpenAI уходит ТОЛЬКО текст
-          await query(
-            `INSERT INTO public.tg_translations (post_id, lang, text_tr, provider)
-             VALUES ($1,$2,$3,$4)
-             ON CONFLICT (post_id, lang) DO NOTHING`,
-            [p.id, lang, tr.out, tr.provider]
-          );
-          text_tr = tr.out;
-          provider = tr.provider;
+          const tr = await translateOnce(p.text_src, lang);
+          if (tr && tr.out) {
+            text_tr = tr.out;
+            provider = tr.provider;
+            await query(
+              `INSERT INTO public.tg_translations (post_id, lang, text_tr, provider)
+               VALUES ($1,$2,$3,$4)
+               ON CONFLICT (post_id, lang)
+               DO UPDATE SET text_tr = EXCLUDED.text_tr, provider = EXCLUDED.provider`,
+              [p.id, lang, text_tr, provider]
+            );
+          }
         }
       }
 
@@ -112,8 +148,8 @@ export default async (req) => {
       }));
 
       items.push({
-        id: p.id,
-        message_id: p.message_id,
+        id: String(p.id),
+        message_id: String(p.message_id),
         date: p.date,
         link: p.link,
         text: p.text_src || "",
