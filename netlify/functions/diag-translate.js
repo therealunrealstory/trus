@@ -28,23 +28,24 @@ export default async (req) => {
     if (!process.env.OPENAI_API_KEY) return cors({ error: "no_openai_key" }, 500);
     if (!text) return cors({ error: "empty_text" }, 400);
 
+    // ВАЖНО: type = input_text
     const payload = {
       model: MODEL,
-      // ВАЖНО: строгое сообщение system + user, content со структурой [{type:'text',text:'...'}]
       input: [
         {
           role: "system",
           content: [
-            { type: "text",
+            {
+              type: "input_text",
               text:
 `You are a professional translator.
-Translate the user's message from English to ${target}.
-Output ONLY the translation in ${target}, no explanations or quotes.
+Translate strictly from English to ${target}.
+Output ONLY the translation in ${target} (no quotes, no explanations).
 Preserve line breaks, punctuation, emojis and URLs exactly.`
             }
           ]
         },
-        { role: "user", content: [ { type: "text", text } ] }
+        { role: "user", content: [ { type: "input_text", text } ] }
       ],
       temperature: 0
     };
@@ -60,7 +61,7 @@ Preserve line breaks, punctuation, emojis and URLs exactly.`
 
     const j = await r.json();
 
-    // Разбор результата максимально безопасно
+    // Надёжный парсинг
     let out = "";
     if (typeof j.output_text === "string") out = j.output_text.trim();
     else if (Array.isArray(j.output)) {
@@ -71,14 +72,7 @@ Preserve line breaks, punctuation, emojis and URLs exactly.`
       out = String(j.choices[0].message.content).trim();
     }
 
-    return cors({
-      ok: true,
-      status: r.status,
-      model: MODEL,
-      target,
-      output_text: out,
-      raw: j,              // <- во время отладки смотрим сырое тело
-    });
+    return cors({ ok: r.ok, status: r.status, model: MODEL, target, output_text: out, raw: j });
   } catch (e) {
     console.error("diag-translate error:", e);
     return cors({ ok:false, error: String(e?.message || e) }, 500);

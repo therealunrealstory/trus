@@ -27,20 +27,21 @@ async function translateOnce(text, langCode) {
 
   const target = langName(lc);
 
+  // ВАЖНО: type = input_text
   const payload = {
     model: MODEL,
     input: [
       {
         role: "system",
         content: [
-          { type:"text", text:
+          { type:"input_text", text:
 `You are a professional translator.
 Translate the user's message from English to ${target}.
-Output ONLY the translation in ${target}, with no extra words.
+Output ONLY the translation in ${target} (no extra words).
 Preserve line breaks, punctuation, emojis and URLs exactly.`}
         ]
       },
-      { role: "user", content: [ { type:"text", text } ] }
+      { role: "user", content: [ { type:"input_text", text } ] }
     ],
     temperature: 0
   };
