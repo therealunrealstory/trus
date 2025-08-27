@@ -1,11 +1,11 @@
-// netlify/functions/tg-webhook.js (NOW)
+// netlify/functions/tg-webhook-nico.js (NICO)
 import { query, cors } from "./_db.js";
 
-const CHANNEL = (process.env.TG_CHANNEL || "").toLowerCase();
+const CHANNEL = (process.env.TG_NICO_CHANNEL || "").toLowerCase();
 
 async function getFilePath(file_id) {
   try {
-    const token = process.env.TG_BOT_TOKEN;
+    const token = process.env.TG_NICO_BOT_TOKEN;
     if (!token) return null;
     const r = await fetch(`https://api.telegram.org/bot${token}/getFile`, {
       method: 'POST',
@@ -29,7 +29,7 @@ export default async (req) => {
     if (req.method !== "POST")   return cors({ ok: true });
 
     const secretHeader = req.headers.get("x-telegram-bot-api-secret-token");
-    if (!process.env.TG_WEBHOOK_SECRET || secretHeader !== process.env.TG_WEBHOOK_SECRET) {
+    if (!process.env.TG_NICO_WEBHOOK_SECRET || secretHeader !== process.env.TG_NICO_WEBHOOK_SECRET) {
       return cors({ error: "forbidden" }, 403);
     }
 
@@ -45,7 +45,6 @@ export default async (req) => {
     const text_src = post.text || post.caption || '';
     const link = `https://t.me/${post.chat.username}/${message_id}`;
 
-    // upsert поста
     const { rows } = await query(
       `INSERT INTO public.tg_posts (channel, message_id, date, link, text_src, updated_at)
        VALUES ($1,$2,$3,$4,$5,now())
@@ -56,14 +55,12 @@ export default async (req) => {
     );
     const post_id = rows[0].id;
 
-    // фото (thumb + full)
     if (Array.isArray(post.photo) && post.photo.length) {
       const { thumb, full } = pickPhotoSizes(post.photo);
       const [pth, pfull] = await Promise.all([
         getFilePath(thumb.file_id),
         getFilePath(full.file_id)
       ]);
-      // очистим старые медиа и вставим новые
       await query(`DELETE FROM public.tg_media WHERE post_id=$1`, [post_id]);
       await query(
         `INSERT INTO public.tg_media
@@ -75,7 +72,7 @@ export default async (req) => {
 
     return cors({ ok: true });
   } catch (e) {
-    console.error("tg-webhook(NOW) error:", e);
+    console.error("tg-webhook(NICO) error:", e);
     return cors({ error: "server error" }, 500);
   }
 };
