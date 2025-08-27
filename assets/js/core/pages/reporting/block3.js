@@ -1,109 +1,171 @@
 // assets/js/core/reporting/block3.js
-// Reports feed from a private Telegram channel: text auto-translate via OpenAI (gpt-5-nano), images via tg-file proxy.
-// No external links (private), no social buttons.
+// Block 3 — "Лента отчётности по расходам"
+// Берёт данные из /.netlify/functions/telegram_reporting?limit=20
 
 import { I18N } from '../../i18n.js';
-import { openModal } from '../../modal.js';
 
 let mounted = false;
-let unsubLocale = null;
+let lastLang = null;
 
-const t = (k, fb='') => I18N[k] ?? fb;
-const esc = s => String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const t = (k, f='') => I18N[k] ?? f;
 
 export async function init(root){
   if (mounted) return; mounted = true;
 
-  // Ищем секцию блока (по id или заголовку)
-  const section =
-    root.querySelector('#rep-block3')
-    || root.querySelector('[data-i18n="reporting.block3.title"]')?.closest('section');
-  if (!section) { console.warn('[reports:b3] section not found'); return; }
+  // 1) Находим секцию по id или по заголовку
+  let section = root.querySelector('#rep-block3');
+  if (!section){
+    const h = root.querySelector('[data-i18n="reporting.block3.title"]');
+    section = h ? h.closest('section') : null;
+  }
+  if (!section){ console.warn('[rep-b3] section not found'); return; }
+
+  // 2) Хост для списка (делаем его "подложкой" + правильная рамка)
+  let host = section.querySelector(':scope > div');
+  if (!host){ host = document.createElement('div'); section.appendChild(host); }
+  host.classList.remove('border','border-gray-700','rounded-2xl','p-4'); // вдруг остались старые классы
+  host.classList.add('b3-pane');
 
   injectStyles();
 
-  // Внутренний контейнер с тонкой рамкой и скроллом
-  let host = section.querySelector('.reports-host');
-  if (!host) {
-    host = document.createElement('div');
-    host.className = 'reports-host rounded-2xl border border-gray-700 p-4';
-    host.style.maxHeight = '560px';
-    host.style.overflowY = 'auto';
-    host.innerHTML = `<div class="text-sm text-gray-300">${t('feed.loading','Loading news…')}</div>`;
-    section.appendChild(host);
+  host.innerHTML = `<div class="rep-b3 muted">${t('reporting.block3.loading','Loading expense reports…')}</div>`;
+  const data = await loadFeed('/.netlify/functions/telegram_reporting?limit=20');
+
+  if (!Array.isArray(data) || data.length === 0){
+    host.innerHTML = `<div class="rep-b3 empty">${t('reporting.block3.empty','No expense reports yet.')}</div>`;
+    return;
   }
 
-  // Подписка на клики по превью
-  host.addEventListener('click', onThumbClick);
-
-  await reload(host);
-
-  // Реакция на смену языка
-  unsubLocale = (e) => reload(host);
-  document.addEventListener('locale-changed', unsubLocale);
+  host.innerHTML = '';
+  host.appendChild(renderFeed(data));
+  lastLang = getLang();
 }
 
-export function destroy(){
-  mounted = false;
-  document.removeEventListener('locale-changed', unsubLocale || (()=>{}));
+export function destroy(){ mounted = false; }
+
+export async function onLocaleChanged(){
+  if (!mounted) return;
+  const cur = getLang(); if (cur === lastLang) return;
+  lastLang = cur;
+
+  const section = document.querySelector('#rep-block3')
+    || document.querySelector('[data-i18n="reporting.block3.title"]')?.closest('section');
+  const host = section?.querySelector(':scope > div');
+  if (!host) return;
+
+  host.innerHTML = `<div class="rep-b3 muted">${t('reporting.block3.loading','Loading expense reports…')}</div>`;
+  const data = await loadFeed('/.netlify/functions/telegram_reporting?limit=20');
+  host.innerHTML = '';
+  host.appendChild(
+    Array.isArray(data) && data.length
+      ? renderFeed(data)
+      : (()=>{ const d=document.createElement('div'); d.className='rep-b3 empty'; d.textContent=t('reporting.block3.empty','No expense reports yet.'); return d; })()
+  );
 }
 
-async function reload(host){
+/* ---------- helpers ---------- */
+
+async function loadFeed(url){
   try{
-    const lang = (document.documentElement.getAttribute('lang')||'en').toLowerCase();
-    host.innerHTML = `<div class="text-sm text-gray-300">${t('feed.loading','Loading news…')}</div>`;
-    const r = await fetch(`/.netlify/functions/news2?channel=reports&lang=${encodeURIComponent(lang)}&limit=20`, { cache:'no-store' });
-    if (!r.ok) throw new Error('http '+r.status);
-    const { items=[] } = await r.json();
-    host.innerHTML = items.length ? items.map(renderItem).join('') :
-      `<div class="text-sm text-gray-300">${t('feed.empty','No posts yet.')}</div>`;
-  }catch(e){
-    console.error('[reports:b3] reload error', e);
-    host.innerHTML = `<div class="text-sm text-red-400">${t('feed.error','Failed to load news.')}</div>`;
+    const r = await fetch(url, { cache:'no-store' });
+    if (!r.ok) return [];
+    const json = await r.json();
+    return Array.isArray(json) ? json : [];
+  }catch{ return []; }
+}
+
+function renderFeed(items){
+  const wrap = document.createElement('div');
+  wrap.className = 'rep-b3 list';
+  for (const it of items) wrap.appendChild(renderItem(it));
+  return wrap;
+}
+
+function renderItem(x){
+  // ожидаемые поля: date, text, amount, currency, tags[], link
+  const card = document.createElement('article');
+  card.className = 'b3-card';
+
+  const top = document.createElement('div');
+  top.className = 'row top';
+
+  const time = document.createElement('div');
+  time.className = 'time';
+  time.textContent = safeTime(x?.date);
+
+  const amt = document.createElement('div');
+  amt.className = 'amt';
+  const hasAmt = Number.isFinite(Number(x?.amount));
+  amt.textContent = hasAmt ? `${Number(x.amount)} ${x?.currency || ''}`.trim() : t('reporting.block3.noamount','—');
+
+  const body = document.createElement('div');
+  body.className = 'body';
+  body.innerHTML = escapeHtml((x?.text || '').replace(/\n/g,'\n')).replace(/\n/g,'<br>');
+
+  const meta = document.createElement('div'); meta.className = 'meta';
+
+  if (Array.isArray(x?.tags) && x.tags.length){
+    const tg = document.createElement('div'); tg.className = 'tags';
+    tg.innerHTML = x.tags.map(s=>`<span class="chip">${escapeHtml(String(s))}</span>`).join('');
+    meta.appendChild(tg);
   }
+
+  if (x?.link){
+    const a = document.createElement('a');
+    a.href = x.link; a.target = '_blank'; a.rel = 'noopener';
+    a.className = 'open-link';
+    a.textContent = t('reporting.block3.open','Open source post');
+    meta.appendChild(a);
+  }
+
+  top.appendChild(time); top.appendChild(amt);
+  card.appendChild(top); card.appendChild(body);
+  if (meta.childNodes.length) card.appendChild(meta);
+
+  return card;
 }
 
-function renderItem(p){
-  const time   = p.date ? new Date(p.date).toLocaleString() : '';
-  const hasTr  = !!(p.provider && p.provider !== 'none');
-  const body   = hasTr && p.text_tr ? p.text_tr : (p.text || '');
-  const text   = esc(body).replace(/\n/g,'<br>');
-
-  const mediaHtml = (Array.isArray(p.media) ? p.media : []).map(m => {
-    const th = m.thumbUrl || m.thumb;
-    const fu = m.fullUrl  || m.full;
-    if (!th) return '';
-    return `<img src="${th}" data-full="${fu||''}" alt="" class="rep-thumb">`;
-  }).join('');
-
-  return `
-    <article class="rep-post">
-      <div class="rep-meta">${time}${hasTr ? ` • ${t('feed.auto','auto-translated')}` : ''}</div>
-      ${ text ? `<div class="rep-text">${text}</div>` : '' }
-      ${ mediaHtml }
-    </article>`;
-}
-
-function onThumbClick(e){
-  const img = e.target.closest('img[data-full]');
-  if (!img) return;
-  e.preventDefault();
-  openModal('', `<img src="${img.getAttribute('data-full')}" class="w-full h-auto rounded-xl">`);
-}
+function getLang(){ return (document.documentElement.getAttribute('lang')||'').toUpperCase(); }
+function safeTime(s){ const d = new Date(s||''); return Number.isFinite(d.getTime()) ? d.toLocaleString() : ''; }
+function escapeHtml(str){ return String(str).replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;' }[m])); }
 
 function injectStyles(){
-  if (document.getElementById('reports-b3-styles')) return;
-  const st = document.createElement('style');
-  st.id = 'reports-b3-styles';
-  st.textContent = `
-    .rep-post { margin-bottom: 1.25rem; }
-    .rep-meta { font-size: .75rem; color: rgba(255,255,255,.7); margin-bottom: .5rem; }
-    .rep-text { font-size: .95rem; line-height: 1.5; }
-    .rep-thumb {
-      margin-top: .5rem; border-radius: .75rem; display:block;
-      max-width: 100%; max-height: 13rem; object-fit: contain; cursor: zoom-in;
-      border: 1px solid rgba(255,255,255,0.08);
+  if (document.getElementById('rep-b3-styles')) return;
+  const css = `
+    /* Подложка списка (как у Legal Timeline .roadmap-body) */
+    .b3-pane{
+      background: rgba(0,0,0,0.20);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 10px;
     }
+
+    /* Сетка карточек */
+    .rep-b3.list{ display:grid; gap:10px; }
+
+    /* Карточка операции */
+    .b3-card{
+      border-radius:14px;
+      padding:12px;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.10);
+    }
+    .b3-card .row.top{ display:flex; align-items:center; gap:10px; }
+    .b3-card .time{ font-size:.85rem; opacity:.8 }
+    .b3-card .amt{ margin-left:auto; font-weight:600; }
+    .b3-card .body{ margin-top:6px; line-height:1.45; font-size:.95rem; }
+    .b3-card .meta{ margin-top:8px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .b3-card .chip{
+      font-size:.75rem; padding:2px 8px; border-radius:999px;
+      border:1px solid rgba(255,255,255,0.14);
+      color:rgba(231,236,243,0.9);
+      background:rgba(255,255,255,0.04);
+    }
+
+    .rep-b3 .open-link{ text-decoration:underline; }
+    .rep-b3 .muted, .rep-b3 .empty{ opacity:.75; font-size:.95rem; }
+    @media (min-width:700px){ .b3-card{ padding:14px 16px } }
   `;
+  const st = document.createElement('style'); st.id='rep-b3-styles'; st.textContent=css;
   document.head.appendChild(st);
 }
