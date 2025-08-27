@@ -121,5 +121,9 @@
   
   "menu.reporting": "Отчётность",
   
-  "news.followHeartNowCTA": "Сердце истории бьётся сейчас — смотрите в Telegram и X:"
+"news.titleNow": "История сейчас",
+"news.titleNico": "Заметки Нико",
+"news.followNowRich": "Сердце истории бьётся сейчас — смотрите в Telegram и X:",
+"news.followNicoRich": "Голос Нико в истории — следите в Telegram, X и Instagram:"
+
 }

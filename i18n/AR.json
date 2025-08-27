@@ -118,5 +118,8 @@
   "alert.clickMapFirst": "انقر على الخريطة أولًا!",
   "error.saveFailed": "فشل الحفظ: ",
   
-  "news.followHeartNowCTA": "قلب القصة ينبض الآن — شاهد على تيليغرام وX:"
+"news.titleNow": "القصة الآن",
+"news.titleNico": "ملاحظات نيكو",
+"news.followNowRich": "قلب القصة ينبض الآن — شاهد على تيليغرام و X:",
+"news.followNicoRich": "صوت نيكو في القصة — تابع على تيليغرام، X وإنستغرام:"
 }

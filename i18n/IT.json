@@ -118,5 +118,9 @@
   "alert.clickMapFirst": "Clicca prima sulla mappa!",
   "error.saveFailed": "Errore di salvataggio: ",
   
-  "news.followHeartNowCTA": "Il cuore della storia batte ora — guarda su Telegram e X:"
+"news.titleNow": "La storia ora",
+"news.titleNico": "Appunti di Nico",
+"news.followNowRich": "Il cuore della storia batte adesso — guarda su Telegram e X:",
+"news.followNicoRich": "La voce di Nico nella storia — segui su Telegram, X e Instagram:"
+
 }

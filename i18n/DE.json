@@ -118,5 +118,9 @@
   "alert.clickMapFirst": "Klicke zuerst auf die Karte!",
   "error.saveFailed": "Speicherfehler: ",
   
-  "news.followHeartNowCTA": "Das Herz der Geschichte schlägt jetzt – sieh es auf Telegram & X:"
+"news.titleNow": "Die Geschichte jetzt",
+"news.titleNico": "Notizen von Nico",
+"news.followNowRich": "Das Herz der Geschichte schlägt jetzt — siehe auf Telegram und X:",
+"news.followNicoRich": "Nicos Stimme in der Geschichte — folge auf Telegram, X und Instagram:"
+
 }
