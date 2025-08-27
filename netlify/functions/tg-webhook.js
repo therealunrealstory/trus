@@ -8,8 +8,8 @@ async function getFilePath(file_id) {
     const token = process.env.TG_BOT_TOKEN;
     if (!token) return null;
     const r = await fetch(`https://api.telegram.org/bot${token}/getFile`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      method: "POST",
+      headers: { "content-type": "application/json" },
       body: JSON.stringify({ file_id })
     });
     const j = await r.json();
@@ -42,7 +42,7 @@ export default async (req) => {
 
     const message_id = post.message_id;
     const date = new Date((post.date || 0) * 1000).toISOString();
-    const text_src = post.text || post.caption || '';
+    const text_src = post.text || post.caption || "";
     const link = `https://t.me/${post.chat.username}/${message_id}`;
 
     // upsert поста
@@ -56,14 +56,16 @@ export default async (req) => {
     );
     const post_id = rows[0].id;
 
-    // фото (thumb + full)
+    // --- МЕДИА ---
+    let inserted = false;
+
+    // 1) Фото (со сжатием)
     if (Array.isArray(post.photo) && post.photo.length) {
       const { thumb, full } = pickPhotoSizes(post.photo);
       const [pth, pfull] = await Promise.all([
         getFilePath(thumb.file_id),
         getFilePath(full.file_id)
       ]);
-      // очистим старые медиа и вставим новые
       await query(`DELETE FROM public.tg_media WHERE post_id=$1`, [post_id]);
       await query(
         `INSERT INTO public.tg_media
@@ -71,9 +73,30 @@ export default async (req) => {
          VALUES ($1,'photo',$2,$3,$4,$5,$6,$7)`,
         [post_id, thumb.file_id, full.file_id, pth, pfull, full.width, full.height]
       );
+      inserted = true;
     }
 
-    return cors({ ok: true });
+    // 2) Документ-изображение (без сжатия) — используем превью, если есть
+    if (!inserted && post.document && /^image\//i.test(post.document.mime_type || "")) {
+      const fidFull  = post.document.file_id;
+      const fidThumb = post.document.thumb?.file_id || fidFull;
+
+      const [pth, pfull] = await Promise.all([
+        getFilePath(fidThumb),
+        getFilePath(fidFull)
+      ]);
+
+      await query(`DELETE FROM public.tg_media WHERE post_id=$1`, [post_id]);
+      await query(
+        `INSERT INTO public.tg_media
+           (post_id, kind, file_id_thumb, file_id_full, file_path_thumb, file_path_full, width, height)
+         VALUES ($1,'photo',$2,$3,$4,$5,$6,$7)`,
+        [post_id, fidThumb, fidFull, pth, pfull, post.document.thumb?.width || null, post.document.thumb?.height || null]
+      );
+      inserted = true;
+    }
+
+    return cors({ ok: true, media: inserted ? 'saved' : 'none' });
   } catch (e) {
     console.error("tg-webhook(NOW) error:", e);
     return cors({ error: "server error" }, 500);

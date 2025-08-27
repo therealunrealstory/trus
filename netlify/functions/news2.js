@@ -53,7 +53,7 @@ export default async (req) => {
       `
       SELECT id, channel, message_id, date, link, text_src
       FROM public.tg_posts
-      WHERE channel = $1 AND hidden = false
+      WHERE lower(channel) = lower($1) AND hidden = false
         ${before ? "AND message_id < $3" : ""}
       ORDER BY date DESC
       LIMIT $2

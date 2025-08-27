@@ -8,8 +8,8 @@ async function getFilePath(file_id) {
     const token = process.env.TG_NICO_BOT_TOKEN;
     if (!token) return null;
     const r = await fetch(`https://api.telegram.org/bot${token}/getFile`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      method: "POST",
+      headers: { "content-type": "application/json" },
       body: JSON.stringify({ file_id })
     });
     const j = await r.json();
@@ -42,7 +42,7 @@ export default async (req) => {
 
     const message_id = post.message_id;
     const date = new Date((post.date || 0) * 1000).toISOString();
-    const text_src = post.text || post.caption || '';
+    const text_src = post.text || post.caption || "";
     const link = `https://t.me/${post.chat.username}/${message_id}`;
 
     const { rows } = await query(
@@ -54,6 +54,8 @@ export default async (req) => {
       [post.chat.username, message_id, date, link, text_src]
     );
     const post_id = rows[0].id;
+
+    let inserted = false;
 
     if (Array.isArray(post.photo) && post.photo.length) {
       const { thumb, full } = pickPhotoSizes(post.photo);
@@ -68,9 +70,29 @@ export default async (req) => {
          VALUES ($1,'photo',$2,$3,$4,$5,$6,$7)`,
         [post_id, thumb.file_id, full.file_id, pth, pfull, full.width, full.height]
       );
+      inserted = true;
     }
 
-    return cors({ ok: true });
+    if (!inserted && post.document && /^image\//i.test(post.document.mime_type || "")) {
+      const fidFull  = post.document.file_id;
+      const fidThumb = post.document.thumb?.file_id || fidFull;
+
+      const [pth, pfull] = await Promise.all([
+        getFilePath(fidThumb),
+        getFilePath(fidFull)
+      ]);
+
+      await query(`DELETE FROM public.tg_media WHERE post_id=$1`, [post_id]);
+      await query(
+        `INSERT INTO public.tg_media
+           (post_id, kind, file_id_thumb, file_id_full, file_path_thumb, file_path_full, width, height)
+         VALUES ($1,'photo',$2,$3,$4,$5,$6,$7)`,
+        [post_id, fidThumb, fidFull, pth, pfull, post.document.thumb?.width || null, post.document.thumb?.height || null]
+      );
+      inserted = true;
+    }
+
+    return cors({ ok: true, media: inserted ? 'saved' : 'none' });
   } catch (e) {
     console.error("tg-webhook(NICO) error:", e);
     return cors({ error: "server error" }, 500);
