@@ -6,7 +6,8 @@ const MODEL = "gpt-5-nano";
 
 function mapChannel(param) {
   const p = (param || "now").toLowerCase();
-  if (p === "nico") return process.env.TG_NICO_CHANNEL || "TheRealUnrealStoryNico";
+  if (p === "nico")    return process.env.TG_NICO_CHANNEL     || "TheRealUnrealStoryNico";
+  if (p === "reports") return process.env.TG_REPORTS_CHANNEL  || "Reports";
   return process.env.TG_CHANNEL || "TheRealUnrealStoryNow";
 }
 
