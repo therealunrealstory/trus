@@ -32,14 +32,21 @@ export async function init(root) {
   await applyI18nTo(pageRoot);
 
   // Динамически подключаем блоки (каждый — изолированный модуль)
-  const [b1, b2, b3, b4] = await Promise.all([
+  //Временно коментирую часть кода, чтобы скрыть block4
+//  const [b1, b2, b3, b4] = await Promise.all([
+//    import('./reporting/block1.js'),
+//    import('./reporting/block2.js'),
+//    import('./reporting/block3.js'),
+//    import('./reporting/block4.js'),
+//  ]);
+//  blocks = [b1, b2, b3, b4];
+  
+    const [b1, b2, b3] = await Promise.all([
     import('./reporting/block1.js'),
     import('./reporting/block2.js'),
     import('./reporting/block3.js'),
-    import('./reporting/block4.js'),
   ]);
-
-  blocks = [b1, b2, b3, b4];
+  blocks = [b1, b2, b3];
 
   // Инициализация каждого блока
   for (const b of blocks) {
