@@ -21,8 +21,8 @@
       "campaigns": [
         {
           "id": "self-2025",
-          "period": { "start": "xx-xx-2025", "end": null },
-          "status": "active",
+          "period": { "start": "xx-xx-2025", "end": "xx-xx-2025" },
+          "status": "finished",
           "metrics": { "raised": 0, "currency": "USD", "donors": 0 },
           "url": "https://therealunrealstory.com/#support"
         }
