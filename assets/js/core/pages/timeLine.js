@@ -5,18 +5,16 @@ import { I18N, applyI18nTo, onLocaleChanged as onI18NLocaleChanged, getLangFromQ
 let Roadmap = null;
 let cleanup = [];
 
+// держим ссылку на модуль документов, чтобы вызывать destroy/init повторно
+let B4 = null;
+
 /* ---------- robust partial loader ---------- */
 
 function stripCommentsAndCommas(raw) {
-  // убираем BOM
   let s = raw.replace(/^\uFEFF/, '');
-  // блок-комментарии /* ... */
   s = s.replace(/\/\*[\s\S]*?\*\//g, '');
-  // построчные // ... (вне строк)
   s = s.replace(/^[ \t]*\/\/.*$/gm, '');
-  // висящие запятые перед } или ]
   s = s.replace(/,(\s*[}\]])/g, '$1');
-  // .join("") → обратно в массив
   s = s.replace(/\]\s*\.join\(\s*(["'`])\1\s*\)/g, ']');
   return s;
 }
@@ -24,21 +22,16 @@ function stripCommentsAndCommas(raw) {
 async function loadPartial(name) {
   const res = await fetch(`partials/${name}.json`, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Failed to load partial: ${name}`);
-
-  // читаем как текст и чистим
   const raw = await res.text();
   const cleaned = stripCommentsAndCommas(raw);
 
-  // 1) обычный JSON.parse
   try {
     const json = JSON.parse(cleaned);
     let html = json.html ?? json.markup ?? json.content ?? json.innerHTML ?? '';
     if (Array.isArray(html)) html = html.join('');
     return String(html || '');
   } catch {
-    // 2) fallback: "html": ["…","…"]
-    const s = cleaned;
-    const key = '"html"';
+    const s = cleaned, key = '"html"';
     const idx = s.indexOf(key);
     if (idx !== -1) {
       let i = idx + key.length;
@@ -46,8 +39,7 @@ async function loadPartial(name) {
       if (s[i] === ':') i++;
       while (i < s.length && /\s/.test(s[i])) i++;
       if (s[i] === '[') {
-        let start = i;
-        let depth = 0, inStr = false, end = -1, esc = false;
+        let start = i, depth = 0, inStr = false, end = -1, esc = false;
         for (; i < s.length; i++) {
           const ch = s[i];
           if (inStr) {
@@ -68,31 +60,76 @@ async function loadPartial(name) {
         }
       }
     }
-    // 3) fallback: "html": "…"
     const m = s.match(/"html"\s*:\s*("(?:\\.|[^"\\])*")/);
     if (m && m[1]) return String(JSON.parse(m[1]));
     throw new Error(`Partial ${name}: cannot extract html`);
   }
 }
 
-/* ---------- i18n loader for reporting.* (нужен для Block4) ---------- */
+/* ---------- i18n loader for reporting.* (для Block4) ---------- */
 
 async function loadReportingLocale(lang){
   const L = (lang || 'EN').toUpperCase();
+
   async function fetchJson(url){
     try{
       const r = await fetch(url, { cache:'no-store' });
       if (!r.ok) return null;
-      const txt = await r.text();
-      const s = (txt || '').trim();
-      if (!s || (s[0] !== '{' && s[0] !== '[')) return null; // пусто/HTML → пропускаем
-      try { return JSON.parse(s); } catch { return null; }
+      const txt = (await r.text() || '').trim();
+      if (!txt || (txt[0] !== '{' && txt[0] !== '[')) return null;
+      try { return JSON.parse(txt); } catch { return null; }
     }catch{ return null; }
   }
+
   let data = await fetchJson(`/i18n/reporting/${L}.json`);
   if (!data && L !== 'EN') data = await fetchJson(`/i18n/reporting/EN.json`);
   if (!data) data = {};
-  for (const k in data) I18N[k] = data[k]; // мягкий merge только reporting.*
+
+  for (const k in data) I18N[k] = data[k];
+}
+
+/* ---------- документы: монтирование/демонтаж ---------- */
+
+function buildDocsSection(root){
+  // удалим старую секцию, если была (чтобы не мешала переинициализации)
+  const old = root.querySelector('#rep-block4');
+  if (old) old.remove();
+
+  const docsSection = document.createElement('section');
+  docsSection.id = 'rep-block4';
+
+  const h = document.createElement('h1');
+  h.className = 'roadmap-title';               // стиль как у Medical/Legal
+  h.setAttribute('data-i18n','reporting.block4.title');
+  h.textContent = 'Documents';                 // fallback
+  docsSection.appendChild(h);
+
+  const host = document.createElement('div');  // контейнер для контента блока
+  host.style.marginTop = '24px';               // увеличенный отступ
+  docsSection.appendChild(host);
+
+  root.appendChild(docsSection);
+  return docsSection;
+}
+
+async function mountDocs(root){
+  // 1) создать секцию
+  const docsSection = buildDocsSection(root);
+
+  // 2) подгрузить локаль reporting.* и применить i18n к секции
+  const startLang = (typeof getLangFromQuery === 'function') ? getLangFromQuery() : undefined;
+  await loadReportingLocale(startLang);
+  await applyI18nTo(docsSection);
+
+  // 3) импортировать модуль и инициализировать
+  if (!B4) B4 = await import('./reporting/block4.js');
+  try { B4.destroy?.(); } catch {}
+  await B4.init(root); // модуль сам найдёт #rep-block4
+}
+
+async function unmountDocs(){
+  try { B4?.destroy?.(); } catch {}
+  // саму секцию удаляет buildDocsSection при следующем mountDocs
 }
 
 /* ---------- page lifecycle ---------- */
@@ -130,45 +167,16 @@ export async function init(rootEl) {
 
   // 3) Documents (перенесённый Reporting → Block4)
   try{
-    // Секция, если ещё не создана
-    let docsSection = el.querySelector('#rep-block4');
-    if (!docsSection){
-      docsSection = document.createElement('section');
-      docsSection.id = 'rep-block4';
+    await mountDocs(el);
 
-      // Заголовок — как у Medical/Legal
-      const h = document.createElement('h1');
-      h.className = 'roadmap-title';
-      h.setAttribute('data-i18n','reporting.block4.title');
-      h.textContent = 'Documents'; // fallback
-      docsSection.appendChild(h);
-
-      // Host с дополнительным отступом
-      const host = document.createElement('div');
-      host.style.marginTop = '24px';
-      docsSection.appendChild(host);
-
-      el.appendChild(docsSection);
-    }
-
-    // Локаль reporting.* + применение i18n
-    const startLang = (typeof getLangFromQuery === 'function') ? getLangFromQuery() : undefined;
-    await loadReportingLocale(startLang);
-    await applyI18nTo(docsSection);
-
-    // Подключаем и инициализируем блок документов
-    const b4 = await import('./reporting/block4.js');
-    await b4.init(el); // block4 сам найдёт #rep-block4
-
-    // При смене языка — принудительно переинициализируем блок (destroy → init)
+    // при смене языка — аккуратный цикл: unmount → reload i18n → mount
     const un = onI18NLocaleChanged(async ({ lang }) => {
       try {
+        await unmountDocs();
         await loadReportingLocale(lang);
-        await applyI18nTo(docsSection);
-        if (typeof b4.destroy === 'function') { try { b4.destroy(); } catch {} }
-        await b4.init(el);
+        await mountDocs(el);
       } catch (err) {
-        console.warn('[timeline] block4 locale refresh failed:', err);
+        console.warn('[timeline] block4 locale cycle failed:', err);
       }
     });
     cleanup.push(un);
@@ -181,4 +189,6 @@ export function destroy() {
   try { unmountLegal(); } catch {}
   cleanup.forEach(fn => { try { fn(); } catch {} });
   cleanup = [];
+  // демонтируем документы
+  unmountDocs();
 }
