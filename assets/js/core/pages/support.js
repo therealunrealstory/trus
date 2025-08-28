@@ -256,7 +256,7 @@ export async function init(root){
     });
   }
 
-  // Единый SOLID-стайл (как у «Вовлечённости») для Add / Leave heart
+  // Единый SOLID-стайл (как у «Вовлечённости») для Add / Leave heart и Add mark
   ['#addHeart', '#addMark'].forEach(sel => {
     const btn = root.querySelector(sel);
     if (btn) {
@@ -264,6 +264,13 @@ export async function init(root){
       btn.classList.add('donate-tier','px-3','py-2','rounded-xl','text-sm');
     }
   });
+
+  // «I want to help» → такая же cyan-кнопка, как в Donate Funds
+  const wantHelp = root.querySelector('#wantHelp');
+  if (wantHelp) {
+    wantHelp.classList.remove('btn-ghost','bg-green-600','bg-green-500','bg-cyan-500','text-white');
+    wantHelp.classList.add('donate-tier','px-3','py-2','rounded-xl','text-sm');
+  }
 
   // Modal: Practical help
   root.querySelector('#wantHelp')?.addEventListener('click', () => {

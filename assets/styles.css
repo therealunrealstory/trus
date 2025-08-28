@@ -500,3 +500,42 @@ body.modal-open{ overflow:hidden; }
     overflow-wrap:anywhere; word-break:break-word;
   }
 }
+
+/* ========= Support page tweaks ========= */
+
+/* Мягкая рамка и фон для текстовых полей на странице Support
+   (форма карты: #name, #msg; Hearts: #heartName, и прочие похожие поля) */
+.page--support input[type="text"],
+.page--support input[type="search"],
+.page--support input[type="email"],
+.page--support textarea{
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #e7ecf3;
+  border-radius: 12px;
+  padding: 8px 10px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+.page--support textarea{ min-height: 96px; resize: vertical; }
+.page--support input[type="text"]::placeholder,
+.page--support input[type="search"]::placeholder,
+.page--support input[type="email"]::placeholder,
+.page--support textarea::placeholder{
+  color: rgba(231,236,243,0.6);
+}
+.page--support input[type="text"]:focus,
+.page--support input[type="search"]:focus,
+.page--support input[type="email"]:focus,
+.page--support textarea:focus{
+  border-color: rgba(6,182,212,0.45);           /* cyan-500 around */
+  box-shadow: 0 0 0 2px rgba(6,182,212,0.20);   /* мягкое свечение */
+  background: rgba(255,255,255,0.08);
+}
+
+/* Мягкая обводка и скругление у контейнера карты */
+.page--support #map{
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  overflow: hidden; /* чтобы плитка не выходила за скругления */
+}
