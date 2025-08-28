@@ -5,7 +5,7 @@ export const MUSIC_LINKS = {
   FR: 'https://ditto.com/trus-fr',
   IT: 'https://ditto.com/trus-it',
   DE: 'https://ditto.com/trus-de',
-  PT: 'https://ditto.com/trus-pt',
+  PT: 'https://ditto.fm/nossa-historia-real-e-irreal',
   RU: 'https://ditto.com/trus-ru',
   CN: 'https://ditto.com/trus-cn',
   AR: 'https://ditto.com/trus-ar',
