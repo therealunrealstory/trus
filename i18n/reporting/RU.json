@@ -27,6 +27,8 @@
 
   "reporting.block2.open": "Открыть кампанию",
   "reporting.block2.nolink": "Ссылка будет добавлена позже.",
+  "reporting.block2.status.active": "Активна",
+  "reporting.block2.status.finished": "Завершена",
   
   "reporting.block3.title": "Лента отчётности по расходам",
   "reporting.block3.note": "Здесь будут пояснения медицинских и организационных трат (на базе приватного Telegram‑канала).",

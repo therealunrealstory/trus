@@ -34,8 +34,6 @@ export async function init(root) {
     section.appendChild(host);
   }
 
-  console.debug('[rep-b2] mount on section:', section.id || '(no id)');
-
   injectStyles();
 
   host.innerHTML = `<div class="rep-b2 muted">${t('reporting.block2.loading', 'Loading fundraising history…')}</div>`;
@@ -52,26 +50,21 @@ export async function init(root) {
   lastLang = getLang();
 }
 
-
 export function destroy() {
   mounted = false;
 }
 
-// Для локализованного динамического контента перерисуем при смене языка
-export async function onLocaleChanged(/*lang, root*/) {
-  // Если язык сменился — перерисуем блок (данные не перезагружаем)
-const section = document.querySelector('#rep-block2') 
-  || document.querySelector('[data-i18n="reporting.block2.title"]')?.closest('section');
-const host = section?.querySelector(':scope > div');
-if (!host || !mounted) return;
+// Перерисовка при смене языка
+export async function onLocaleChanged() {
+  const section = document.querySelector('#rep-block2')
+    || document.querySelector('[data-i18n="reporting.block2.title"]')?.closest('section');
+  const host = section?.querySelector(':scope > div');
+  if (!host || !mounted) return;
 
   const curLang = getLang();
   if (curLang === lastLang) return;
   lastLang = curLang;
 
-  // Попробуем считать уже отрисованное и перегенерировать подписи,
-  // но проще (и стабильнее) — перерисовать по данным, если они ещё есть в DOM.
-  // Здесь поступим просто: покажем loading и перезагрузим файл (он небольшой).
   host.innerHTML = `<div class="rep-b2 muted">${t('reporting.block2.loading', 'Loading fundraising history…')}</div>`;
   const data = await loadData('/data/fundraising_history.json');
   if (!data || !Array.isArray(data.platforms) || data.platforms.length === 0) {
@@ -104,7 +97,7 @@ function renderPlatforms(platforms) {
 
     const platformTitle = document.createElement('div');
     platformTitle.className = 'platform-title';
-    platformTitle.textContent = p?.name || t('reporting.block2.platform.unknown', 'Platform');
+    platformTitle.textContent = localize(p?.name) || t('reporting.block2.platform.unknown', 'Platform');
     plat.appendChild(platformTitle);
 
     const list = document.createElement('div');
@@ -133,20 +126,34 @@ function renderCampaignCard(c, fallbackUrl) {
   const card = document.createElement('div');
   card.className = 'card';
 
-  // Row 1: title + status
+  // Row 1: только статус (title убран по требованию)
   const row1 = document.createElement('div');
   row1.className = 'row';
-  const title = document.createElement('div');
-  title.innerHTML = `<strong>${escapeHtml(c?.title || '-')}</strong>`;
-  const status = document.createElement('div');
-  status.className = 'muted';
-  status.textContent = c?.status ? `• ${c.status}` : '';
-  row1.appendChild(title);
-  row1.appendChild(status);
 
-  // Row 2: period + metrics
+  const statusEl = document.createElement('div');
+  const statusRaw = String(c?.status || '').toLowerCase();
+
+  // Ключи: reporting.block2.status.active / .finished (есть fallback на исходный статус)
+  const statusText = t(`reporting.block2.status.${statusRaw}`, c?.status || '');
+
+  if (statusRaw === 'active') {
+    statusEl.className = 'status active';
+    // текст + пульсирующая зелёная точка после него
+    statusEl.innerHTML = `${escapeHtml(statusText)} <span class="dot" aria-hidden="true"></span>`;
+  } else if (statusRaw === 'finished') {
+    statusEl.className = 'status finished';
+    statusEl.textContent = statusText;
+  } else {
+    statusEl.className = 'status';
+    statusEl.textContent = statusText;
+  }
+
+  row1.appendChild(statusEl);
+
+  // Row 2: период + метрики
   const row2 = document.createElement('div');
   row2.className = 'row';
+
   const period = document.createElement('div');
   const start = safeDate(c?.period?.start) || '';
   const endRaw = c?.period?.end;
@@ -167,7 +174,7 @@ function renderCampaignCard(c, fallbackUrl) {
   row2.appendChild(spacer);
   row2.appendChild(metrics);
 
-  // Row 3: link
+  // Row 3: кнопка/ссылка
   const row3 = document.createElement('div');
   row3.className = 'row';
   const url = c?.url || fallbackUrl || null;
@@ -176,7 +183,7 @@ function renderCampaignCard(c, fallbackUrl) {
     link.href = url;
     link.target = '_blank';
     link.rel = 'noopener';
-    link.className = 'open-link';
+    link.className = 'open-btn';
     link.textContent = t('reporting.block2.open', 'Open campaign');
     row3.appendChild(link);
   } else {
@@ -192,20 +199,75 @@ function renderCampaignCard(c, fallbackUrl) {
   return card;
 }
 
+/* ---------- styles ---------- */
+
 function injectStyles() {
   if (document.getElementById('rep-b2-styles')) return;
   const css = `
-    /*Тут будут стили для именно этого блока - такое правило, стили для блока храним в файлах блока*/
+    /* Локальные стили блока 2 */
     .rep-b2 { display: grid; gap: 12px; }
     .rep-b2 .platform-title { font-weight: 600; margin-bottom: 6px; }
     .rep-b2 .campaigns { display: grid; gap: 8px; }
-    .rep-b2 .card { border-radius: 14px; padding: 12px; background: rgba(0,0,0,0.18); }
+
+    /* Подложка карточки кампании: как в блоке 4 (тонкая окантовка) */
+    .rep-b2 .card {
+      border-radius: 14px;
+      padding: 12px;
+      background: rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+    }
+
     .rep-b2 .row { display:flex; flex-wrap:wrap; gap:10px; font-size: 0.95rem; }
     .rep-b2 .label { opacity: .75; }
     .rep-b2 .spacer { flex:1 1 auto; }
-    .rep-b2 .open-link { text-decoration: underline; }
     .rep-b2 .muted { opacity:.7; font-size:.95rem; }
     .rep-b2 .empty { opacity:.8; font-size:.95rem; }
+
+    /* Статус */
+    .rep-b2 .status { opacity:.9; }
+    .rep-b2 .status.finished { opacity:.85; } /* без спец-стайлинга */
+    .rep-b2 .status.active {
+      color: #22c55e;                /* green-500 */
+      display:inline-flex; align-items:center; gap:6px;
+      font-weight:600; opacity:1;
+    }
+    .rep-b2 .status.active .dot{
+      width: 8px; height: 8px; border-radius: 999px; background: #22c55e;
+      box-shadow: 0 0 0 0 rgba(34,197,94,0.65);
+      animation: repb2Pulse 1.8s infinite;
+      display:inline-block; vertical-align:middle;
+    }
+    @keyframes repb2Pulse{
+      0%   { box-shadow: 0 0 0 0   rgba(34,197,94,0.65); transform: scale(1); }
+      70%  { box-shadow: 0 0 0 12px rgba(34,197,94,0.00); transform: scale(1.05); }
+      100% { box-shadow: 0 0 0 0   rgba(34,197,94,0.00); transform: scale(1); }
+    }
+
+    /* Кнопка «Open campaign» — как open-btn из блока 4 */
+    .rep-b2 .open-btn{
+      width:fit-content;
+      margin-top:6px;
+      padding:8px 12px;
+      border-radius:10px;
+      font-size:.92rem;
+      background: rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.14);
+      color:rgba(231,236,243,.95);
+      text-decoration:none;
+      transition: background .18s ease, border-color .18s ease, transform .02s ease, color .18s ease;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+    }
+    .rep-b2 .card:hover .open-btn{
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.22);
+    }
+    .rep-b2 .open-btn:active{ transform: translateY(1px); }
+    .rep-b2 .open-btn:focus-visible{
+      outline:2px solid rgba(79,70,229,0.45);
+      outline-offset:2px;
+    }
+
     @media (min-width: 700px) {
       .rep-b2 { gap: 16px; }
       .rep-b2 .card { padding: 14px 16px; }
@@ -217,24 +279,27 @@ function injectStyles() {
   document.head.appendChild(style);
 }
 
-/* utils */
+/* ---------------- tiny utils ---------------- */
+
 function getLang() {
-  // Язык уже хранится в I18N под капотом, но для простоты вернём заглушку:
-  // если потребуется точный язык, можно пробросить его из onLocaleChanged.
-  // Здесь достаточно смены ссылочных текстов через I18N.
   return (document.documentElement.getAttribute('lang') || '').toUpperCase();
 }
-
 function numberOrZero(v) {
   const n = Number(v);
   return Number.isFinite(n) ? n : 0;
 }
-
-function safeDate(s) {
-  // возвращаем исходную строку (YYYY-MM-DD) — не форматируем, чтобы не спорить с локалью.
-  return typeof s === 'string' ? s : null;
-}
-
+function safeDate(s) { return typeof s === 'string' ? s : null; }
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+/** Универсальная локализация строкового/объектного поля
+ *  Пример: name = "GoFundMe" ИЛИ name = { EN:"GoFundMe", RU:"…" }
+ */
+function localize(val){
+  if (val && typeof val === 'object') {
+    const L = getLang();
+    return val[L] ?? val.EN ?? Object.values(val)[0] ?? '';
+  }
+  return typeof val === 'string' ? val : '';
 }

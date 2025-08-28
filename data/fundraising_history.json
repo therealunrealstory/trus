@@ -2,12 +2,11 @@
   "platforms": [
     {
       "id": "gofundme",
-      "name": "GoFundMe",
+      "name": { "EN": "GoFundMe", "RU": "GoFundMe" },
       "url": "https://example.com/gofundme",
       "campaigns": [
         {
           "id": "gfm-2025-main",
-          "title": "GoFundMe",
           "period": { "start": "xx-xx-2025", "end": null },
           "status": "active",
           "metrics": { "raised": 0, "currency": "USD", "donors": 0 },
@@ -17,12 +16,11 @@
     },
     {
       "id": "self",
-      "name": "Self-hosted",
+      "name": { "EN": "Self-hosted", "RU": "Самостоятельный сбор" },
       "url": "https://therealunrealstory.com/#support",
       "campaigns": [
         {
           "id": "self-2025",
-          "title": "Self-hosted",
           "period": { "start": "xx-xx-2025", "end": null },
           "status": "active",
           "metrics": { "raised": 0, "currency": "USD", "donors": 0 },
@@ -30,15 +28,14 @@
         }
       ]
     },
-	{
+    {
       "id": "direct",
-      "name": "Direct",
+      "name": { "EN": "Direct", "RU": "Прямые переводы" },
       "url": "https://www.instagram.com/TheRealUnrealStoryNico/",
       "campaigns": [
         {
           "id": "direct-2025",
-          "title": "Direct",
-          "period": { "start": "30-08-2025", "end": null },
+          "period": { "start": "xx-xx-2025", "end": null },
           "status": "active",
           "metrics": { "raised": 0, "currency": "USD", "donors": 0 },
           "url": "https://www.instagram.com/TheRealUnrealStoryNico/"
