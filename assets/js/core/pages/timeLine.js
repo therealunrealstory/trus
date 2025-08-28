@@ -5,8 +5,46 @@ import { I18N, applyI18nTo, onLocaleChanged as onI18NLocaleChanged, getLangFromQ
 let Roadmap = null;
 let cleanup = [];
 
-// держим ссылку на модуль документов, чтобы вызывать destroy/init повторно
+// Держим ссылку на модуль документов, чтобы вызывать destroy/init повторно
 let B4 = null;
+
+/* ---------- FEATURE FLAG для блока Documents (Block4) ---------- */
+/*
+  Режимы (приоритет: URL → localStorage → DEFAULT):
+    URL:
+      ?b4=1       → показать полностью
+      ?b4=title   → только заголовок
+      ?b4=0       → скрыть полностью
+      ?noB4       → синоним скрыть полностью (для совместимости)
+    LocalStorage (ключ TRUS_B4_MODE):
+      "full" | "title" | "off"
+    DEFAULT_B4_MODE ниже.
+*/
+const DEFAULT_B4_MODE = 'off';              // ← по умолчанию скрываем блок полностью
+const B4_LS_KEY = 'TRUS_B4_MODE';
+
+function getB4Mode() {
+  const qs = new URLSearchParams(location.search);
+  if (qs.has('noB4')) return 'off';
+  if (qs.has('b4')) {
+    const v = qs.get('b4')?.toLowerCase();
+    if (v === '1' || v === 'true' || v === 'on' || v === 'full') return 'full';
+    if (v === 'title') return 'title';
+    return 'off';
+  }
+  const ls = (localStorage.getItem(B4_LS_KEY) || '').toLowerCase();
+  if (ls === 'full' || ls === 'title' || ls === 'off') return ls;
+  return DEFAULT_B4_MODE;
+}
+
+// Удобные помощники для включения/выключения из консоли (и для вас/QA)
+if (typeof window !== 'undefined') {
+  window.TRUS_docsSet = (mode) => { localStorage.setItem(B4_LS_KEY, String(mode)); location.reload(); }; // mode: 'full' | 'title' | 'off'
+  window.TRUS_docsOn  = () => { localStorage.setItem(B4_LS_KEY, 'full');  location.reload(); };
+  window.TRUS_docsHdr = () => { localStorage.setItem(B4_LS_KEY, 'title'); location.reload(); };
+  window.TRUS_docsOff = () => { localStorage.setItem(B4_LS_KEY, 'off');   location.reload(); };
+  window.TRUS_docsClr = () => { localStorage.removeItem(B4_LS_KEY);       location.reload(); };
+}
 
 /* ---------- robust partial loader ---------- */
 
@@ -91,7 +129,7 @@ async function loadReportingLocale(lang){
 /* ---------- документы: монтирование/демонтаж ---------- */
 
 function buildDocsSection(root){
-  // удалим старую секцию, если была (чтобы не мешала переинициализации)
+  // удалим старую секцию, если была (чтобы не мешала переинициализации/режиму)
   const old = root.querySelector('#rep-block4');
   if (old) old.remove();
 
@@ -112,24 +150,27 @@ function buildDocsSection(root){
   return docsSection;
 }
 
-async function mountDocs(root){
+async function mountDocs(root, opts = { content: true }){
   // 1) создать секцию
   const docsSection = buildDocsSection(root);
 
-  // 2) подгрузить локаль reporting.* и применить i18n к секции
+  // 2) локаль reporting.* и i18n
   const startLang = (typeof getLangFromQuery === 'function') ? getLangFromQuery() : undefined;
   await loadReportingLocale(startLang);
   await applyI18nTo(docsSection);
 
-  // 3) импортировать модуль и инициализировать
-  if (!B4) B4 = await import('./reporting/block4.js');
-  try { B4.destroy?.(); } catch {}
-  await B4.init(root); // модуль сам найдёт #rep-block4
+  // 3) контент (опционально)
+  if (opts.content) {
+    if (!B4) B4 = await import('./reporting/block4.js');
+    try { B4.destroy?.(); } catch {}
+    await B4.init(root); // модуль сам найдёт #rep-block4
+  }
 }
 
 async function unmountDocs(){
   try { B4?.destroy?.(); } catch {}
-  // саму секцию удаляет buildDocsSection при следующем mountDocs
+  const s = document.querySelector('#rep-block4');
+  if (s) s.remove();
 }
 
 /* ---------- page lifecycle ---------- */
@@ -165,21 +206,27 @@ export async function init(rootEl) {
     }
   }
 
-  // 3) Documents (перенесённый Reporting → Block4)
+  // 3) Documents (перенесённый Reporting → Block4) с универсальным флагом
   try{
-    await mountDocs(el);
+    const mode = getB4Mode();         // 'full' | 'title' | 'off'
+    if (mode !== 'off') {
+      await mountDocs(el, { content: mode === 'full' });
 
-    // при смене языка — аккуратный цикл: unmount → reload i18n → mount
-    const un = onI18NLocaleChanged(async ({ lang }) => {
-      try {
-        await unmountDocs();
-        await loadReportingLocale(lang);
-        await mountDocs(el);
-      } catch (err) {
-        console.warn('[timeline] block4 locale cycle failed:', err);
-      }
-    });
-    cleanup.push(un);
+      // при смене языка — сохраним режим и переинициализируем в том же режиме
+      const un = onI18NLocaleChanged(async ({ lang }) => {
+        try {
+          await unmountDocs();
+          await loadReportingLocale(lang);
+          await mountDocs(el, { content: getB4Mode() === 'full' });
+        } catch (err) {
+          console.warn('[timeline] block4 locale cycle failed:', err);
+        }
+      });
+      cleanup.push(un);
+    } else {
+      // полностью скрыть: гарантированно удалим секцию, если она есть
+      await unmountDocs();
+    }
   } catch (e){
     console.error('[timeline] documents block failed:', e);
   }
@@ -189,6 +236,5 @@ export function destroy() {
   try { unmountLegal(); } catch {}
   cleanup.forEach(fn => { try { fn(); } catch {} });
   cleanup = [];
-  // демонтируем документы
   unmountDocs();
 }
