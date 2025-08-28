@@ -42,6 +42,21 @@
         }
       ]
     }
+	{
+      "id": "other",
+      "name": { "EN": "Other", "RU": "Иная" },
+      "url": "https://www.instagram.com/TheRealUnrealStory/",
+      "campaigns": [
+        {
+          "id": "other-2025",
+		  "hidden": true,
+          "period": { "start": "xx-xx-2025", "end": null },
+          "status": "active",
+          "metrics": { "raised": 0, "currency": "USD", "donors": 0 },
+          "url": "https://www.instagram.com/TheRealUnrealStory/"
+        }
+      ]
+    }
   ],
   "updated_at": "2025-08-30"
 }

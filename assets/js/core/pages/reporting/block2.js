@@ -103,7 +103,7 @@ function renderPlatforms(platforms) {
     const list = document.createElement('div');
     list.className = 'campaigns';
 
-    const campaigns = Array.isArray(p?.campaigns) ? p.campaigns : [];
+	const campaigns = (Array.isArray(p?.campaigns) ? p.campaigns : []).filter(c => !c?.hidden);
     if (campaigns.length === 0) {
       const empty = document.createElement('div');
       empty.className = 'muted';
