@@ -8,10 +8,15 @@ let cleanup = [];
 /* ---------- robust partial loader ---------- */
 
 function stripCommentsAndCommas(raw) {
+  // убираем BOM
   let s = raw.replace(/^\uFEFF/, '');
+  // блок-комментарии /* ... */
   s = s.replace(/\/\*[\s\S]*?\*\//g, '');
+  // построчные // ... (вне строк)
   s = s.replace(/^[ \t]*\/\/.*$/gm, '');
+  // висящие запятые перед } или ]
   s = s.replace(/,(\s*[}\]])/g, '$1');
+  // .join("") → обратно в массив
   s = s.replace(/\]\s*\.join\(\s*(["'`])\1\s*\)/g, ']');
   return s;
 }
@@ -19,15 +24,19 @@ function stripCommentsAndCommas(raw) {
 async function loadPartial(name) {
   const res = await fetch(`partials/${name}.json`, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Failed to load partial: ${name}`);
+
+  // читаем как текст и чистим
   const raw = await res.text();
   const cleaned = stripCommentsAndCommas(raw);
 
+  // 1) обычный JSON.parse
   try {
     const json = JSON.parse(cleaned);
     let html = json.html ?? json.markup ?? json.content ?? json.innerHTML ?? '';
     if (Array.isArray(html)) html = html.join('');
     return String(html || '');
   } catch {
+    // 2) fallback: "html": ["…","…"]
     const s = cleaned;
     const key = '"html"';
     const idx = s.indexOf(key);
@@ -37,7 +46,8 @@ async function loadPartial(name) {
       if (s[i] === ':') i++;
       while (i < s.length && /\s/.test(s[i])) i++;
       if (s[i] === '[') {
-        let start = i, depth = 0, inStr = false, end = -1, esc = false;
+        let start = i;
+        let depth = 0, inStr = false, end = -1, esc = false;
         for (; i < s.length; i++) {
           const ch = s[i];
           if (inStr) {
@@ -58,6 +68,7 @@ async function loadPartial(name) {
         }
       }
     }
+    // 3) fallback: "html": "…"
     const m = s.match(/"html"\s*:\s*("(?:\\.|[^"\\])*")/);
     if (m && m[1]) return String(JSON.parse(m[1]));
     throw new Error(`Partial ${name}: cannot extract html`);
@@ -68,22 +79,20 @@ async function loadPartial(name) {
 
 async function loadReportingLocale(lang){
   const L = (lang || 'EN').toUpperCase();
-
   async function fetchJson(url){
     try{
       const r = await fetch(url, { cache:'no-store' });
       if (!r.ok) return null;
-      const txt = (await r.text() || '').trim();
-      if (!txt || (txt[0] !== '{' && txt[0] !== '[')) return null;
-      try { return JSON.parse(txt); } catch { return null; }
+      const txt = await r.text();
+      const s = (txt || '').trim();
+      if (!s || (s[0] !== '{' && s[0] !== '[')) return null; // пусто/HTML → пропускаем
+      try { return JSON.parse(s); } catch { return null; }
     }catch{ return null; }
   }
-
   let data = await fetchJson(`/i18n/reporting/${L}.json`);
   if (!data && L !== 'EN') data = await fetchJson(`/i18n/reporting/EN.json`);
   if (!data) data = {};
-
-  for (const k in data) I18N[k] = data[k];
+  for (const k in data) I18N[k] = data[k]; // мягкий merge только reporting.*
 }
 
 /* ---------- page lifecycle ---------- */
@@ -121,24 +130,26 @@ export async function init(rootEl) {
 
   // 3) Documents (перенесённый Reporting → Block4)
   try{
-    // Секция, которую ищет block4.js
-    const docsSection = document.createElement('section');
-    docsSection.id = 'rep-block4';
+    // Секция, если ещё не создана
+    let docsSection = el.querySelector('#rep-block4');
+    if (!docsSection){
+      docsSection = document.createElement('section');
+      docsSection.id = 'rep-block4';
 
-    // Заголовок в стиле как у других блоков
-    const h = document.createElement('h2');
-    h.className = 'roadmap-title';         // стиль как у Medical/Legal
-    h.setAttribute('data-i18n','reporting.block4.title');
-    h.textContent = 'Documents';           // fallback
-    docsSection.appendChild(h);
+      // Заголовок — как у Medical/Legal
+      const h = document.createElement('h1');
+      h.className = 'roadmap-title';
+      h.setAttribute('data-i18n','reporting.block4.title');
+      h.textContent = 'Documents'; // fallback
+      docsSection.appendChild(h);
 
-    // Host для контента блока (увеличенный отступ сверху)
-    const host = document.createElement('div');
-    host.style.marginTop = '16px';
-    docsSection.appendChild(host);
+      // Host с дополнительным отступом
+      const host = document.createElement('div');
+      host.style.marginTop = '24px';
+      docsSection.appendChild(host);
 
-    // Добавляем секцию в конец страницы
-    el.appendChild(docsSection);
+      el.appendChild(docsSection);
+    }
 
     // Локаль reporting.* + применение i18n
     const startLang = (typeof getLangFromQuery === 'function') ? getLangFromQuery() : undefined;
@@ -149,25 +160,15 @@ export async function init(rootEl) {
     const b4 = await import('./reporting/block4.js');
     await b4.init(el); // block4 сам найдёт #rep-block4
 
-    // Надёжное обновление при смене языка
+    // При смене языка — принудительно переинициализируем блок (destroy → init)
     const un = onI18NLocaleChanged(async ({ lang }) => {
       try {
         await loadReportingLocale(lang);
         await applyI18nTo(docsSection);
-
-        if (typeof b4.onLocaleChanged === 'function') {
-          await b4.onLocaleChanged();      // пусть блок сам перерисуется
-        }
-
-        // Страховка: если по какой-то причине пусто — пересоздаём контент блока
-        const hostNow = docsSection.querySelector(':scope > div');
-        if (!hostNow || hostNow.children.length === 0) {
-          await b4.init(el);
-        }
+        if (typeof b4.destroy === 'function') { try { b4.destroy(); } catch {} }
+        await b4.init(el);
       } catch (err) {
         console.warn('[timeline] block4 locale refresh failed:', err);
-        // В крайнем случае пробуем ре-инициализацию
-        try { await b4.init(el); } catch {}
       }
     });
     cleanup.push(un);
