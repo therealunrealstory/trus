@@ -21,6 +21,15 @@ async function loadReportingLocale(lang) {
   for (const k in data) I18N[k] = data[k]; // мягкий merge только reporting.*
 }
 
+/* Удаляем секцию Block4 (Documents) из DOM — на всякий случай ищем по id и по data-i18n */
+function removeBlock4Section(root) {
+  const pageRoot = root || document;
+  const sec =
+    pageRoot.querySelector('#rep-block4') ||
+    pageRoot.querySelector('[data-i18n="reporting.block4.title"]')?.closest('section');
+  if (sec) sec.remove();
+}
+
 export async function init(root) {
   const pageRoot = root || document;
   const sub = document.getElementById('subpage');
@@ -31,17 +40,11 @@ export async function init(root) {
   await loadReportingLocale(startLang);
   await applyI18nTo(pageRoot);
 
-  // Динамически подключаем блоки (каждый — изолированный модуль)
-  //Временно коментирую часть кода, чтобы скрыть block4
-//  const [b1, b2, b3, b4] = await Promise.all([
-//    import('./reporting/block1.js'),
-//    import('./reporting/block2.js'),
-//    import('./reporting/block3.js'),
-//    import('./reporting/block4.js'),
-//  ]);
-//  blocks = [b1, b2, b3, b4];
-  
-    const [b1, b2, b3] = await Promise.all([
+  // Сразу уберём секцию документов, если она пришла из partial
+  removeBlock4Section(pageRoot);
+
+  // Динамически подключаем только блоки 1–3 (Block4 больше не импортируем)
+  const [b1, b2, b3] = await Promise.all([
     import('./reporting/block1.js'),
     import('./reporting/block2.js'),
     import('./reporting/block3.js'),
@@ -53,10 +56,11 @@ export async function init(root) {
     try { await b.init(pageRoot); } catch (e) { console.error('Reporting block init error:', e); }
   }
 
-  // На смену языка — применяем i18n; блоки могут переинициализироваться по необходимости
+  // На смену языка — обновляем локали/тексты; плюс ещё раз гарантированно удаляем Block4-секцию
   unLocale = onLocaleChanged(async ({ lang }) => {
     await loadReportingLocale(lang);
     await applyI18nTo(pageRoot);
+    removeBlock4Section(pageRoot);
     for (const b of blocks) {
       if (typeof b.onLocaleChanged === 'function') {
         try { await b.onLocaleChanged(lang, pageRoot); } catch {}
