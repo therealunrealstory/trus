@@ -8,7 +8,7 @@
   "collected": [
     { "date": "2025-xx-xx", "amount": 0 },
     { "date": "2025-xx-xx", "amount": 0 },
-    { "date": "2025-xx-xx", "amount": 0 },
+    { "date": "2025-xx-xx", "amount": 0 }
   ],
 
   "spent": [
@@ -36,7 +36,7 @@
       "date": "2025-08-01",
       "amount": 500,
       "note": { "EN": "Food", "RU": "Еда (месяц)" }
-    },
+    }
   ],
 
   "planned": [
