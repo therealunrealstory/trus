@@ -8,15 +8,10 @@ let cleanup = [];
 /* ---------- robust partial loader ---------- */
 
 function stripCommentsAndCommas(raw) {
-  // убираем BOM
   let s = raw.replace(/^\uFEFF/, '');
-  // блок-комментарии /* ... */
   s = s.replace(/\/\*[\s\S]*?\*\//g, '');
-  // построчные // ... (вне строк)
   s = s.replace(/^[ \t]*\/\/.*$/gm, '');
-  // висящие запятые перед } или ]
   s = s.replace(/,(\s*[}\]])/g, '$1');
-  // .join("") → превращаем обратно в массив
   s = s.replace(/\]\s*\.join\(\s*(["'`])\1\s*\)/g, ']');
   return s;
 }
@@ -24,37 +19,31 @@ function stripCommentsAndCommas(raw) {
 async function loadPartial(name) {
   const res = await fetch(`partials/${name}.json`, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Failed to load partial: ${name}`);
-
-  // читаем как текст и чистим
   const raw = await res.text();
   const cleaned = stripCommentsAndCommas(raw);
 
-  // 1) пробуем обычный JSON.parse
   try {
     const json = JSON.parse(cleaned);
     let html = json.html ?? json.markup ?? json.content ?? json.innerHTML ?? '';
     if (Array.isArray(html)) html = html.join('');
     return String(html || '');
   } catch {
-    // 2) fallback-парсер: вытаскиваем строку-массив под ключом "html": ["...","..."]
     const s = cleaned;
     const key = '"html"';
     const idx = s.indexOf(key);
     if (idx !== -1) {
       let i = idx + key.length;
-      // ищем двоеточие
       while (i < s.length && /\s/.test(s[i])) i++;
       if (s[i] === ':') i++;
       while (i < s.length && /\s/.test(s[i])) i++;
       if (s[i] === '[') {
-        let start = i;
-        let depth = 0; let inStr = false; let end = -1; let esc = false;
+        let start = i, depth = 0, inStr = false, end = -1, esc = false;
         for (; i < s.length; i++) {
           const ch = s[i];
           if (inStr) {
-            if (esc) { esc = false; }
-            else if (ch === '\\') { esc = true; }
-            else if (ch === '"') { inStr = false; }
+            if (esc) esc = false;
+            else if (ch === '\\') esc = true;
+            else if (ch === '"') inStr = false;
           } else {
             if (ch === '"') { inStr = true; continue; }
             if (ch === '[') depth++;
@@ -62,19 +51,15 @@ async function loadPartial(name) {
           }
         }
         if (end !== -1) {
-          const arrBody = s.slice(start, end + 1); // ["…","…"]
+          const arrBody = s.slice(start, end + 1);
           const strings = arrBody.match(/"(?:\\.|[^"\\])*"/g) || [];
           const parts = strings.map(strLit => JSON.parse(strLit));
           return parts.join('');
         }
       }
     }
-    // 3) запасной путь: "html": "....."
     const m = s.match(/"html"\s*:\s*("(?:\\.|[^"\\])*")/);
-    if (m && m[1]) {
-      const htmlStr = JSON.parse(m[1]);
-      return String(htmlStr);
-    }
+    if (m && m[1]) return String(JSON.parse(m[1]));
     throw new Error(`Partial ${name}: cannot extract html`);
   }
 }
@@ -84,18 +69,13 @@ async function loadPartial(name) {
 async function loadReportingLocale(lang){
   const L = (lang || 'EN').toUpperCase();
 
-  // надёжный загрузчик JSON: читаем как текст, проверяем и только потом парсим
   async function fetchJson(url){
     try{
       const r = await fetch(url, { cache:'no-store' });
       if (!r.ok) return null;
-      const txt = await r.text();
-      const s = (txt || '').trim();
-      if (!s) return null;                  // пусто → нет данных
-      if (s[0] !== '{' && s[0] !== '[') {   // явно не JSON (например, HTML)
-        return null;
-      }
-      try { return JSON.parse(s); } catch { return null; }
+      const txt = (await r.text() || '').trim();
+      if (!txt || (txt[0] !== '{' && txt[0] !== '[')) return null;
+      try { return JSON.parse(txt); } catch { return null; }
     }catch{ return null; }
   }
 
@@ -103,7 +83,6 @@ async function loadReportingLocale(lang){
   if (!data && L !== 'EN') data = await fetchJson(`/i18n/reporting/EN.json`);
   if (!data) data = {};
 
-  // мягкий merge только reporting.*
   for (const k in data) I18N[k] = data[k];
 }
 
@@ -113,7 +92,7 @@ export async function init(rootEl) {
   const el = rootEl || document.querySelector('#subpage');
   if (!el) return;
 
-  // 1) Юридическая лента (как было)
+  // 1) Legal Timeline
   const legalRoot = el.querySelector('#legal-timeline');
   if (legalRoot) {
     try {
@@ -124,7 +103,7 @@ export async function init(rootEl) {
     }
   }
 
-  // 2) Медицинская лента (как было): partial + roadmap.js
+  // 2) Medical Timeline
   const medRoot = el.querySelector('#medical-timeline');
   if (medRoot) {
     try {
@@ -140,45 +119,55 @@ export async function init(rootEl) {
     }
   }
 
-  // 3) Документы (перенесённый Reporting → Block4)
+  // 3) Documents (перенесённый Reporting → Block4)
   try{
-    // создаём контейнер, которого ждёт block4.js
+    // Секция, которую ищет block4.js
     const docsSection = document.createElement('section');
     docsSection.id = 'rep-block4';
 
-    // Заголовок (для консистентности), блок не зависит от него
+    // Заголовок в стиле как у других блоков
     const h = document.createElement('h2');
-    h.className = 'h2';
+    h.className = 'roadmap-title';         // стиль как у Medical/Legal
     h.setAttribute('data-i18n','reporting.block4.title');
-    h.textContent = 'Documents'; // fallback
+    h.textContent = 'Documents';           // fallback
     docsSection.appendChild(h);
 
-    // Внутренний host (block4.js рендерит внутрь первого div)
+    // Host для контента блока (увеличенный отступ сверху)
     const host = document.createElement('div');
+    host.style.marginTop = '16px';
     docsSection.appendChild(host);
 
     // Добавляем секцию в конец страницы
     el.appendChild(docsSection);
 
-    // Загрузим локаль reporting.* и применим i18n для заголовка
+    // Локаль reporting.* + применение i18n
     const startLang = (typeof getLangFromQuery === 'function') ? getLangFromQuery() : undefined;
     await loadReportingLocale(startLang);
     await applyI18nTo(docsSection);
 
-    // Импортируем и инициализируем блок документов
+    // Подключаем и инициализируем блок документов
     const b4 = await import('./reporting/block4.js');
     await b4.init(el); // block4 сам найдёт #rep-block4
 
-    // При смене языка — подгружаем локаль reporting.*, обновляем заголовок и сам блок
+    // Надёжное обновление при смене языка
     const un = onI18NLocaleChanged(async ({ lang }) => {
       try {
         await loadReportingLocale(lang);
         await applyI18nTo(docsSection);
+
         if (typeof b4.onLocaleChanged === 'function') {
-          await b4.onLocaleChanged(lang, el);
+          await b4.onLocaleChanged();      // пусть блок сам перерисуется
+        }
+
+        // Страховка: если по какой-то причине пусто — пересоздаём контент блока
+        const hostNow = docsSection.querySelector(':scope > div');
+        if (!hostNow || hostNow.children.length === 0) {
+          await b4.init(el);
         }
       } catch (err) {
         console.warn('[timeline] block4 locale refresh failed:', err);
+        // В крайнем случае пробуем ре-инициализацию
+        try { await b4.init(el); } catch {}
       }
     });
     cleanup.push(un);
