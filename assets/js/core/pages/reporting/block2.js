@@ -91,7 +91,17 @@ function renderPlatforms(platforms) {
   const wrap = document.createElement('div');
   wrap.className = 'rep-b2';
 
-  for (const p of platforms) {
+  const listOfPlatforms = Array.isArray(platforms) ? platforms : [];
+
+  for (const p of listOfPlatforms) {
+    if (p?.hidden) continue; // скрыть всю платформу
+
+    const campaignsRaw = Array.isArray(p?.campaigns) ? p.campaigns : [];
+    const campaigns = campaignsRaw.filter(c => c && !c.hidden); // скрыть кампании с hidden:true
+
+    // если после фильтра нет ни одной видимой кампании — не рендерим даже заголовок платформы
+    if (campaigns.length === 0) continue;
+
     const plat = document.createElement('div');
     plat.className = 'platform';
 
@@ -103,20 +113,20 @@ function renderPlatforms(platforms) {
     const list = document.createElement('div');
     list.className = 'campaigns';
 
-	const campaigns = (Array.isArray(p?.campaigns) ? p.campaigns : []).filter(c => !c?.hidden);
-    if (campaigns.length === 0) {
-      const empty = document.createElement('div');
-      empty.className = 'muted';
-      empty.textContent = t('reporting.block2.platform.empty', 'No campaigns on this platform yet.');
-      list.appendChild(empty);
-    } else {
-      for (const c of campaigns) {
-        list.appendChild(renderCampaignCard(c, p?.url || null));
-      }
+    for (const c of campaigns) {
+      list.appendChild(renderCampaignCard(c, p?.url || null));
     }
 
     plat.appendChild(list);
     wrap.appendChild(plat);
+  }
+
+  // если все скрыто, покажем общий пустой текст (иначе секция будет совсем пустой)
+  if (!wrap.children.length) {
+    const empty = document.createElement('div');
+    empty.className = 'empty';
+    empty.textContent = t('reporting.block2.empty', 'No campaigns published yet.');
+    wrap.appendChild(empty);
   }
 
   return wrap;
