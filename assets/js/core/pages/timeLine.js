@@ -83,14 +83,28 @@ async function loadPartial(name) {
 
 async function loadReportingLocale(lang){
   const L = (lang || 'EN').toUpperCase();
+
+  // надёжный загрузчик JSON: читаем как текст, проверяем и только потом парсим
   async function fetchJson(url){
-    try{ const r = await fetch(url, { cache:'no-store' }); return r.ok ? r.json() : null; }
-    catch{ return null; }
+    try{
+      const r = await fetch(url, { cache:'no-store' });
+      if (!r.ok) return null;
+      const txt = await r.text();
+      const s = (txt || '').trim();
+      if (!s) return null;                  // пусто → нет данных
+      if (s[0] !== '{' && s[0] !== '[') {   // явно не JSON (например, HTML)
+        return null;
+      }
+      try { return JSON.parse(s); } catch { return null; }
+    }catch{ return null; }
   }
+
   let data = await fetchJson(`/i18n/reporting/${L}.json`);
   if (!data && L !== 'EN') data = await fetchJson(`/i18n/reporting/EN.json`);
   if (!data) data = {};
-  for (const k in data) I18N[k] = data[k]; // мягкий merge только reporting.*
+
+  // мягкий merge только reporting.*
+  for (const k in data) I18N[k] = data[k];
 }
 
 /* ---------- page lifecycle ---------- */
@@ -126,7 +140,7 @@ export async function init(rootEl) {
     }
   }
 
-  // 3) Документы (перенесённый Reporting → Block4), аккуратно добавляем секцию снизу
+  // 3) Документы (перенесённый Reporting → Block4)
   try{
     // создаём контейнер, которого ждёт block4.js
     const docsSection = document.createElement('section');
@@ -136,7 +150,7 @@ export async function init(rootEl) {
     const h = document.createElement('h2');
     h.className = 'h2';
     h.setAttribute('data-i18n','reporting.block4.title');
-    h.textContent = 'Documents'; // fallback на случай отсутствия локали
+    h.textContent = 'Documents'; // fallback
     docsSection.appendChild(h);
 
     // Внутренний host (block4.js рендерит внутрь первого div)
@@ -151,9 +165,9 @@ export async function init(rootEl) {
     await loadReportingLocale(startLang);
     await applyI18nTo(docsSection);
 
-    // Импортируем и инициализируем сам блок документов
+    // Импортируем и инициализируем блок документов
     const b4 = await import('./reporting/block4.js');
-    await b4.init(el); // block4 сам найдёт #rep-block4 внутри root
+    await b4.init(el); // block4 сам найдёт #rep-block4
 
     // При смене языка — подгружаем локаль reporting.*, обновляем заголовок и сам блок
     const un = onI18NLocaleChanged(async ({ lang }) => {
