@@ -2,7 +2,17 @@
   "platforms": [
     {
       "id": "gofundme",
-      "name": { "EN": "GoFundMe", "RU": "GoFundMe" },
+      "name": {
+        "EN": "GoFundMe",
+        "RU": "GoFundMe",
+        "ES": "GoFundMe",
+        "FR": "GoFundMe",
+        "IT": "GoFundMe",
+        "DE": "GoFundMe",
+        "PT": "GoFundMe",
+        "CN": "GoFundMe",
+        "AR": "GoFundMe"
+      },
       "url": "https://example.com/gofundme",
       "campaigns": [
         {
@@ -16,7 +26,17 @@
     },
     {
       "id": "self",
-      "name": { "EN": "Self-hosted", "RU": "Самостоятельный сбор" },
+      "name": {
+        "EN": "Self-hosted",
+        "RU": "Самостоятельный сбор",
+        "ES": "Self-hosted",
+        "FR": "Self-hosted",
+        "IT": "Self-hosted",
+        "DE": "Self-hosted",
+        "PT": "Self-hosted",
+        "CN": "Self-hosted",
+        "AR": "Self-hosted"
+      },
       "url": "https://therealunrealstory.com/#support",
       "campaigns": [
         {
@@ -30,7 +50,17 @@
     },
     {
       "id": "direct",
-      "name": { "EN": "Direct", "RU": "Прямые переводы" },
+      "name": {
+        "EN": "Direct",
+        "RU": "Прямые переводы",
+        "ES": "Direct",
+        "FR": "Direct",
+        "IT": "Direct",
+        "DE": "Direct",
+        "PT": "Direct",
+        "CN": "Direct",
+        "AR": "Direct"
+      },
       "url": "https://www.instagram.com/TheRealUnrealStoryNico/",
       "campaigns": [
         {
@@ -42,14 +72,24 @@
         }
       ]
     },
-	{
+    {
       "id": "other",
-      "name": { "EN": "Other", "RU": "Иная" },
+      "name": {
+        "EN": "Other",
+        "RU": "Иная",
+        "ES": "Other",
+        "FR": "Other",
+        "IT": "Other",
+        "DE": "Other",
+        "PT": "Other",
+        "CN": "Other",
+        "AR": "Other"
+      },
       "url": "https://www.instagram.com/TheRealUnrealStory/",
       "campaigns": [
         {
           "id": "other-2025",
-		  "hidden": true,
+          "hidden": true,
           "period": { "start": "2025-xx-xx", "end": null },
           "status": "active",
           "metrics": { "raised": 0, "currency": "USD", "donors": 0 },

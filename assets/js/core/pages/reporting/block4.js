@@ -1,6 +1,7 @@
 // assets/js/core/pages/reporting/block4.js
 // Block 4 — "Документы (медицинские и юридические)"
 // Загружает /data/documents_index.json и отрисовывает карточки документов по группам.
+// Теперь поддерживает локализованные title/summary (строка ИЛИ объект {EN, RU, ...}).
 
 import { I18N } from '../../i18n.js';
 
@@ -106,6 +107,7 @@ function renderGroup(kind, arr){
 }
 
 function renderDocCard(d){
+  // Поддерживаем: title/summary как строка ИЛИ как объект { EN, RU, ... }
   // Ожидается: { id, title, date, kind, url, thumb?, ext?, size?, summary? }
   const a = document.createElement('a');
   a.className='doc-card';
@@ -117,7 +119,7 @@ function renderDocCard(d){
 
   if (d?.thumb){
     const img = document.createElement('img');
-    img.src = d.thumb; img.alt = d.title || '';
+    img.src = d.thumb; img.alt = resolveLocalized(d?.title, getLang()) || '';
     img.className='thumb';
     thumbBox.appendChild(img);
   } else {
@@ -132,7 +134,7 @@ function renderDocCard(d){
 
   const h4 = document.createElement('div');
   h4.className='doc-title';
-  h4.textContent = d?.title || t('reporting.block4.untitled','Untitled');
+  h4.textContent = resolveLocalized(d?.title, getLang()) || t('reporting.block4.untitled','Untitled');
   meta.appendChild(h4);
 
   const sub = document.createElement('div');
@@ -143,14 +145,15 @@ function renderDocCard(d){
   sub.textContent = `${date}${ext?` • ${ext}`:''}${size}`;
   meta.appendChild(sub);
 
-  if (d?.summary){
+  const summaryText = resolveLocalized(d?.summary, getLang());
+  if (summaryText){
     const sm = document.createElement('div');
     sm.className='doc-summary';
-    sm.textContent = d.summary;
+    sm.textContent = summaryText;
     meta.appendChild(sm);
   }
 
-  // Кнопка «Open document» теперь под текстом
+  // Кнопка «Open document» под текстом (ghost-стиль)
   const btn = document.createElement('div');
   btn.className='open-btn';
   btn.textContent = t('reporting.block4.open','Open document');
@@ -175,8 +178,8 @@ function injectStyles(){
 
     .doc-card{
       display:grid;
-      grid-template-columns: 88px 1fr;     /* thumb | content */
-      grid-auto-rows: auto;                /* кнопка уходит на следующую строку */
+      grid-template-columns: 88px 1fr;
+      grid-auto-rows: auto;
       gap:12px;
       align-items:start;
       border-radius:14px; padding:12px;
@@ -203,7 +206,7 @@ function injectStyles(){
 
     /* Лёгкая "ghost"-кнопка — под текстом, выравнена по колонке контента */
     .open-btn{
-      grid-column:2;                       /* под текстом, в правой колонке */
+      grid-column:2;
       width:fit-content;
       margin-top:6px;
       padding:8px 12px;
@@ -242,4 +245,17 @@ function formatSize(n){
   if (b < 1024) return `${b} B`;
   const kb = b/1024; if (kb < 1024) return `${Math.round(kb)} KB`;
   const mb = kb/1024; return `${mb.toFixed(mb<10?1:0)} MB`;
+}
+function resolveLocalized(val, lang){
+  if (val == null) return '';
+  if (typeof val === 'string') return val;
+  if (typeof val === 'object'){
+    // ожидаем ключи вида EN/RU/DE… (в верхнем регистре); подстрахуемся и понизим
+    const L = (lang || 'EN').toUpperCase();
+    const byUpper = val[L] ?? val.EN;
+    if (typeof byUpper === 'string' && byUpper) return byUpper;
+    // fallback: первая строка из объекта
+    for (const k in val){ if (typeof val[k] === 'string' && val[k]) return val[k]; }
+  }
+  return '';
 }

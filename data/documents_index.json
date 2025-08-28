@@ -2,39 +2,99 @@
   "medical": [
     {
       "id": "med-001",
-      "title": "Hospitalization summary — July 2025",
+      "title": {
+        "EN": "Hospitalization summary — July 2025",
+        "RU": "Hospitalization summary — July 2025",
+        "ES": "Hospitalization summary — July 2025",
+        "FR": "Hospitalization summary — July 2025",
+        "IT": "Hospitalization summary — July 2025",
+        "DE": "Hospitalization summary — July 2025",
+        "PT": "Hospitalization summary — July 2025",
+        "CN": "Hospitalization summary — July 2025",
+        "AR": "Hospitalization summary — July 2025"
+      },
       "date": "2025-07-12",
       "kind": "medical",
       "url": "/docs/medical/hospitalization_jul2025.pdf",
       "thumb": "/docs/medical/thumbs/hospitalization_jul2025.jpg",
       "ext": "pdf",
       "size": 3145728,
-      "summary": "Summary of inpatient treatment, tests and discharge notes."
+      "summary": {
+        "EN": "Summary of inpatient treatment, tests and discharge notes.",
+        "RU": "Summary of inpatient treatment, tests and discharge notes.",
+        "ES": "Summary of inpatient treatment, tests and discharge notes.",
+        "FR": "Summary of inpatient treatment, tests and discharge notes.",
+        "IT": "Summary of inpatient treatment, tests and discharge notes.",
+        "DE": "Summary of inpatient treatment, tests and discharge notes.",
+        "PT": "Summary of inpatient treatment, tests and discharge notes.",
+        "CN": "Summary of inpatient treatment, tests and discharge notes.",
+        "AR": "Summary of inpatient treatment, tests and discharge notes."
+      }
     },
-	{
+    {
       "id": "med-002",
-      "title": "Hospitalization summary — August 2025",
+      "title": {
+        "EN": "Hospitalization summary — August 2025",
+        "RU": "Hospitalization summary — August 2025",
+        "ES": "Hospitalization summary — August 2025",
+        "FR": "Hospitalization summary — August 2025",
+        "IT": "Hospitalization summary — August 2025",
+        "DE": "Hospitalization summary — August 2025",
+        "PT": "Hospitalization summary — August 2025",
+        "CN": "Hospitalization summary — August 2025",
+        "AR": "Hospitalization summary — August 2025"
+      },
       "date": "2025-08-18",
       "kind": "medical",
       "url": "/docs/medical/med180825.pdf",
       "thumb": "/docs/medical/thumbs/med180825.png",
       "ext": "pdf",
       "size": 5728,
-      "summary": "Unexpected procedures."
+      "summary": {
+        "EN": "Unexpected procedures.",
+        "RU": "Unexpected procedures.",
+        "ES": "Unexpected procedures.",
+        "FR": "Unexpected procedures.",
+        "IT": "Unexpected procedures.",
+        "DE": "Unexpected procedures.",
+        "PT": "Unexpected procedures.",
+        "CN": "Unexpected procedures.",
+        "AR": "Unexpected procedures."
+      }
     }
   ],
   "legal": [
     {
       "id": "leg-001",
-      "title": "Court filing (excerpt)",
+      "title": {
+        "EN": "Court filing (excerpt)",
+        "RU": "Court filing (excerpt)",
+        "ES": "Court filing (excerpt)",
+        "FR": "Court filing (excerpt)",
+        "IT": "Court filing (excerpt)",
+        "DE": "Court filing (excerpt)",
+        "PT": "Court filing (excerpt)",
+        "CN": "Court filing (excerpt)",
+        "AR": "Court filing (excerpt)"
+      },
       "date": "2025-06-03",
       "kind": "legal",
       "url": "/docs/legal/filing_excerpt.pdf",
       "thumb": "/docs/legal/thumbs/filing_excerpt.jpg",
       "ext": "pdf",
       "size": 1048576,
-      "summary": "Excerpt of the filing related to the case."
+      "summary": {
+        "EN": "Excerpt of the filing related to the case.",
+        "RU": "Excerpt of the filing related to the case.",
+        "ES": "Excerpt of the filing related to the case.",
+        "FR": "Excerpt of the filing related to the case.",
+        "IT": "Excerpt of the filing related to the case.",
+        "DE": "Excerpt of the filing related to the case.",
+        "PT": "Excerpt of the filing related to the case.",
+        "CN": "Excerpt of the filing related to the case.",
+        "AR": "Excerpt of the filing related to the case."
+      }
     }
   ],
-  "updated_at": "2025-08-24T00:10:00Z"
+  "updated_at": "2025-08-28"
 }
