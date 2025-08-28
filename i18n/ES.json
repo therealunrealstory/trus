@@ -85,7 +85,6 @@
   "map.locate": "Mostrar mi ubicación",
   "map.noGeo": "La geolocalización no es compatible en este dispositivo.",
 
-
   "hearts.title": "Corazones de apoyo",
   "hearts.empty": "Aún no hay corazones.",
 
@@ -122,5 +121,7 @@
 "news.titleNico": "Notas de Nico",
 "news.followNowRich": "El corazón de la historia late ahora — mira en Telegram y X:",
 "news.followNicoRich": "La voz de Nico en la historia — sigue en Telegram, X e Instagram:",
-"feed.auto": "traducción automática"
+"feed.auto": "traducción automática",
+
+"menu.reporting": "Informes"
 }
