@@ -8,7 +8,7 @@
         {
           "id": "gfm-2025-main",
           "title": "",
-          "period": { "start": "01-11-2025", "end": null },
+          "period": { "start": "xx-xx-2025", "end": null },
           "status": "active",
           "metrics": { "raised": 0, "currency": "USD", "donors": 0 },
           "url": null
@@ -17,19 +17,34 @@
     },
     {
       "id": "self",
-      "name": "Direct / Self-hosted",
+      "name": "Self-hosted",
       "url": "https://therealunrealstory.com/#support",
       "campaigns": [
         {
           "id": "self-2025",
           "title": "",
-          "period": { "start": "30-12-2025", "end": null },
+          "period": { "start": "xx-xx-2025", "end": null },
           "status": "active",
           "metrics": { "raised": 0, "currency": "USD", "donors": 0 },
           "url": "https://therealunrealstory.com/#support"
         }
       ]
     }
+	{
+      "id": "direct",
+      "name": "Direct",
+      "url": "https://www.instagram.com/TheRealUnrealStoryNico/",
+      "campaigns": [
+        {
+          "id": "direct-2025",
+          "title": "",
+          "period": { "start": "30-08-2025", "end": null },
+          "status": "active",
+          "metrics": { "raised": 0, "currency": "USD", "donors": 0 },
+          "url": "https://www.instagram.com/TheRealUnrealStoryNico/"
+        }
+      ]
+    }
   ],
-  "updated_at": "2025-08-28"
+  "updated_at": "2025-08-30"
 }
