@@ -1,7 +1,7 @@
 // assets/js/core/reporting/block3.js
 // Reports feed from a private Telegram channel via news2 (channel=reports).
 // Text is auto-translated (cached), images via tg-file proxy.
-// No "Open in Telegram" link, no social buttons. No per-post card background/border.
+// No "Open in Telegram" link, no social buttons. No per-post card background/border. No image borders.
 
 import { I18N } from '../../i18n.js';
 import { openModal } from '../../modal.js';
@@ -86,7 +86,6 @@ function renderItem(p){
     return `<img src="${th}" data-full="${fu||''}" alt="" class="rep-thumb">`;
   }).join('');
 
-  // ВНИМАНИЕ: без подложки/обводки на каждом посте — только общий контейнер b3-pane.
   return `
     <article class="rep-post">
       <div class="rep-meta">${time}${hasTr ? ` • ${t('feed.auto','auto-translated')}` : ''}</div>
@@ -110,11 +109,11 @@ function injectStyles(){
     .rep-meta { font-size: .80rem; color: rgba(231,236,243,.8); margin-bottom: 6px; }
     .rep-text { font-size: .95rem; line-height: 1.5; }
 
-    /* Превью изображений — оставляем тонкую рамку для читабельности */
+    /* Превью изображений — без обводки/подложки */
     .rep-thumb {
       margin-top: .5rem; border-radius: .75rem; display:block;
       max-width: 100%; max-height: 13rem; object-fit: contain; cursor: zoom-in;
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 0 !important; outline: 0 !important; box-shadow: none !important; background: transparent !important;
     }
 
     .rep-b3.muted, .rep-b3.empty, .rep-b3.error { opacity:.75; font-size:.95rem; }
@@ -125,6 +124,5 @@ function injectStyles(){
     st.id = 'reports-b3-styles';
     document.head.appendChild(st);
   }
-  // Перезаписываем содержимое стиля, чтобы перебить старые правила
-  st.textContent = css;
+  st.textContent = css; // перезапись, чтобы перебить старые правила
 }
