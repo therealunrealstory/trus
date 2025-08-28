@@ -1,52 +1,6 @@
 {
   "reporting.block1.title": "Актуальные данные поддержки",
-  "reporting.block1.note": "Здесь будут живые метрики: Собрано / Потрачено / Запланировано и процент Over‑norm.",
-
-  "reporting.block2.title": "История кампаний по сбору средств",
-  "reporting.block2.note": "Здесь покажем кампании на GoFundMe, самостоятельные и другие платформы.",
-
-  "reporting.block3.title": "Лента отчётности по расходам",
-  "reporting.block3.note": "Здесь будут пояснения медицинских и организационных трат (на базе нашего приватного Telegram‑канала).",
-
-  "reporting.block4.title": "Документы: медицинские и юридические",
-  "reporting.block4.note": "Здесь появятся проверенные документы (сканы и PDF), сгруппированные по медицине и праву.",
-  
-  "reporting.block2.title": "История кампаний по сбору средств",
-  "reporting.block2.note": "Здесь покажем кампании на GoFundMe, самостоятельные и другие платформы.",
-
-  "reporting.block2.loading": "Загружаем историю кампаний…",
-  "reporting.block2.empty": "Кампании ещё не опубликованы.",
-
-  "reporting.block2.platform.unknown": "Платформа",
-  "reporting.block2.platform.empty": "На этой платформе пока нет кампаний.",
-
-  "reporting.block2.period": "Период",
-  "reporting.block2.period.now": "по наст. время",
-
-  "reporting.block2.metrics": "Собрано/Доноры",
-
-  "reporting.block2.open": "Открыть кампанию",
-  "reporting.block2.nolink": "Ссылка будет добавлена позже.",
-  "reporting.block2.status.active": "Активна",
-  "reporting.block2.status.finished": "Завершена",
-  
-  "reporting.block3.title": "Лента отчётности по расходам",
-  "reporting.block3.note": "Здесь будут пояснения медицинских и организационных трат (на базе приватного Telegram‑канала).",
-  "reporting.block3.loading": "Загружаем ленту расходов…",
-  "reporting.block3.empty": "Пока нет опубликованных пояснений по расходам.",
-  "reporting.block3.open": "Открыть исходный пост",
-  "reporting.block3.noamount": "—",
-  
-  "reporting.block4.title": "Документы: медицинские и юридические",
-  "reporting.block4.note": "Здесь появятся проверенные документы (сканы и PDF), сгруппированные по медицине и праву.",
-  "reporting.block4.loading": "Загружаем список документов…",
-  "reporting.block4.empty": "Документы пока не опубликованы.",
-  "reporting.block4.group.medical": "Медицинские документы",
-  "reporting.block4.group.legal": "Юридические документы",
-  "reporting.block4.open": "Открыть документ",
-  "reporting.block4.untitled": "Без названия",
-  
-  "reporting.block1.title": "Актуальные данные поддержки",
+  "reporting.block1.note": "Живые метрики: Собрано / Потрачено / Запланировано и процент Over-norm.",
   "reporting.block1.loading": "Загружаем финансовые метрики…",
   "reporting.block1.empty": "Пока нет данных для расчёта.",
   "reporting.block1.collected": "Собрано",
@@ -55,6 +9,36 @@
   "reporting.block1.available": "Доступно",
   "reporting.block1.updated": "Обновлено",
   "reporting.block1.more": "Подробнее",
+
+  "reporting.block2.title": "История кампаний по сбору средств",
+  "reporting.block2.note": "Покажем кампании на GoFundMe, самостоятельные и на других платформах.",
+  "reporting.block2.loading": "Загружаем историю кампаний…",
+  "reporting.block2.empty": "Кампании ещё не опубликованы.",
+  "reporting.block2.platform.unknown": "Платформа",
+  "reporting.block2.platform.empty": "На этой платформе пока нет кампаний.",
+  "reporting.block2.period": "Период",
+  "reporting.block2.period.now": "по наст. время",
+  "reporting.block2.metrics": "Собрано/Доноры",
+  "reporting.block2.open": "Открыть кампанию",
+  "reporting.block2.nolink": "Ссылка будет добавлена позже.",
+  "reporting.block2.status.active": "Активна",
+  "reporting.block2.status.finished": "Завершена",
+
+  "reporting.block3.title": "Лента отчётности по расходам",
+  "reporting.block3.note": "Пояснения медицинских и организационных трат (на базе приватного Telegram-канала).",
+  "reporting.block3.loading": "Загружаем ленту расходов…",
+  "reporting.block3.empty": "Пока нет опубликованных пояснений по расходам.",
+  "reporting.block3.open": "Открыть исходный пост",
+  "reporting.block3.noamount": "—",
+
+  "reporting.block4.title": "Документы: медицинские и юридические",
+  "reporting.block4.note": "Проверенные документы (сканы и PDF), сгруппированные по медицине и праву.",
+  "reporting.block4.loading": "Загружаем список документов…",
+  "reporting.block4.empty": "Документы пока не опубликованы.",
+  "reporting.block4.group.medical": "Медицинские документы",
+  "reporting.block4.group.legal": "Юридические документы",
+  "reporting.block4.open": "Открыть документ",
+  "reporting.block4.untitled": "Без названия",
 
   "funds.modal.collected.title": "Динамика сбора",
   "funds.modal.spent.title": "Подтверждённые расходы",
@@ -66,6 +50,5 @@
   "funds.reserve.ok": "Резерв достаточен для будущих затрат.",
   "funds.available.none": "Резерва пока нет — нужна дополнительная поддержка.",
   "funds.empty": "Пока нет записей.",
-  
   "funds.covered": "Покрыто: {percent}%"
 }
