@@ -59,12 +59,12 @@
 
   "engage.title": "Votre participation",
   "engage.desc": "Cochez ce que vous avez déjà fait — c’est aussi un soutien",
-  "engage.b1": "Lu/écouté la version courte",
-  "engage.b2": "Lu/écouté l’histoire complète",
-  "engage.b3": "Écouté des morceaux sur notre histoire",
-  "engage.b4": "Abonné au canal Telegram",
-  "engage.b5": "Abonné à Instagram",
-  "engage.b6": "Partagé l’histoire",
+  "engage.b1": "Soutien financier apporté",
+  "engage.b2": "Version courte lue/écoutée",
+  "engage.b3": "Histoire complète lue/écoutée",
+  "engage.b4": "Morceaux musicaux écoutés",
+  "engage.b5": "Abonné à TG/IG/X/TT/YT",
+  "engage.b6": "Histoire partagée",
   "engage.note": "Vos choix sont enregistrés dans votre navigateur.",
 
   "feed.loading": "Chargement des actus…",
