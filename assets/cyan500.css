@@ -84,3 +84,55 @@
   -webkit-mask:url("../images/heart.mask.svg") no-repeat center / contain;
   mask:url("../images/heart.mask.svg") no-repeat center / contain;
 }
+
+/* ====== NEW: «I want to help» как cyan-кнопка (без подчёркивания) ====== */
+.page--support #wantHelp{
+  text-decoration: none !important;
+  display: inline-block; /* чтобы выглядело как кнопка */
+  background-color: var(--support-accent-strong);
+  border: 1px solid var(--support-accent-weak);
+  color: #ecfeff !important;
+  border-radius: 0.75rem; /* rounded-xl */
+  padding: 0.5rem 0.75rem; /* px-3 py-2 */
+  font-size: 0.875rem; /* text-sm */
+  line-height: 1.25rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.35);
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color .15s ease, border-color .15s ease, transform .02s ease;
+}
+.page--support #wantHelp:hover{
+  background-color: var(--cyan-600);
+  border-color: var(--cyan-500);
+}
+.page--support #wantHelp:active{ transform: translateY(1px); }
+.page--support #wantHelp:focus-visible{
+  outline: 2px solid rgba(34,211,238,0.65);
+  outline-offset: 2px;
+}
+
+/* ====== NEW: мягкие рамки для инпутов на странице Support ======
+   (форма карты: #name, #msg; Hearts: #heartName) */
+.page--support :is(#name, #msg, #heartName){
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  color: #e7ecf3 !important;
+  border-radius: 12px !important;
+  padding: 8px 10px !important;
+  outline: none !important;
+  transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease !important;
+}
+.page--support :is(#name, #msg, #heartName)::placeholder{
+  color: rgba(231,236,243,0.6) !important;
+}
+.page--support :is(#name, #msg, #heartName):focus{
+  border-color: rgba(6,182,212,0.45) !important;     /* cyan-500 around */
+  box-shadow: 0 0 0 2px rgba(6,182,212,0.20) !important;
+  background: rgba(255,255,255,0.08) !important;
+}
+
+/* ====== NEW: мягкая обводка и скругление у контейнера карты ====== */
+.page--support #map{
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  overflow: hidden; /* чтобы плитка не выходила за скругления */
+}
