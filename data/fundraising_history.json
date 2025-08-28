@@ -7,7 +7,7 @@
       "campaigns": [
         {
           "id": "gfm-2025-main",
-          "title": "The Real Unreal — Main 2025",
+          "title": "",
           "period": { "start": "01-11-2025", "end": null },
           "status": "active",
           "metrics": { "raised": 0, "currency": "USD", "donors": 0 },
@@ -22,7 +22,7 @@
       "campaigns": [
         {
           "id": "self-2025",
-          "title": "Direct Support 2025",
+          "title": "",
           "period": { "start": "30-12-2025", "end": null },
           "status": "active",
           "metrics": { "raised": 0, "currency": "USD", "donors": 0 },
