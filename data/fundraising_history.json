@@ -7,7 +7,7 @@
       "campaigns": [
         {
           "id": "gfm-2025-main",
-          "title": "",
+          "title": "GoFundMe",
           "period": { "start": "xx-xx-2025", "end": null },
           "status": "active",
           "metrics": { "raised": 0, "currency": "USD", "donors": 0 },
@@ -22,7 +22,7 @@
       "campaigns": [
         {
           "id": "self-2025",
-          "title": "",
+          "title": "Self-hosted",
           "period": { "start": "xx-xx-2025", "end": null },
           "status": "active",
           "metrics": { "raised": 0, "currency": "USD", "donors": 0 },
@@ -37,7 +37,7 @@
       "campaigns": [
         {
           "id": "direct-2025",
-          "title": "",
+          "title": "Direct",
           "period": { "start": "30-08-2025", "end": null },
           "status": "active",
           "metrics": { "raised": 0, "currency": "USD", "donors": 0 },
