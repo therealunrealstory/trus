@@ -1,117 +1,177 @@
 // assets/js/core/pages/timeline.js
 import { mount as mountLegal, unmount as unmountLegal } from '../../features/legalTimeline.js';
+import { I18N, applyI18nTo, onLocaleChanged as onI18NLocaleChanged, getLangFromQuery } from '../i18n.js';
 
 let Roadmap = null;
 let cleanup = [];
 
+// Держим ссылку на модуль документов, чтобы вызывать destroy/init повторно
+let B4 = null;
+
+/* ---------- FEATURE FLAG для блока Documents (Block4) ---------- */
+/*
+  Режимы (приоритет: URL → localStorage → DEFAULT):
+    URL:
+      ?b4=1       → показать полностью
+      ?b4=title   → только заголовок
+      ?b4=0       → скрыть полностью
+      ?noB4       → синоним скрыть полностью (для совместимости)
+    LocalStorage (ключ TRUS_B4_MODE):
+      "full" | "title" | "off"
+    DEFAULT_B4_MODE ниже.
+*/
+const DEFAULT_B4_MODE = 'off';              // ← по умолчанию скрываем блок полностью
+const B4_LS_KEY = 'TRUS_B4_MODE';
+
+function getB4Mode() {
+  const qs = new URLSearchParams(location.search);
+  if (qs.has('noB4')) return 'off';
+  if (qs.has('b4')) {
+    const v = qs.get('b4')?.toLowerCase();
+    if (v === '1' || v === 'true' || v === 'on' || v === 'full') return 'full';
+    if (v === 'title') return 'title';
+    return 'off';
+  }
+  const ls = (localStorage.getItem(B4_LS_KEY) || '').toLowerCase();
+  if (ls === 'full' || ls === 'title' || ls === 'off') return ls;
+  return DEFAULT_B4_MODE;
+}
+
+// Удобные помощники для включения/выключения из консоли (и для вас/QA)
+if (typeof window !== 'undefined') {
+  window.TRUS_docsSet = (mode) => { localStorage.setItem(B4_LS_KEY, String(mode)); location.reload(); }; // mode: 'full' | 'title' | 'off'
+  window.TRUS_docsOn  = () => { localStorage.setItem(B4_LS_KEY, 'full');  location.reload(); };
+  window.TRUS_docsHdr = () => { localStorage.setItem(B4_LS_KEY, 'title'); location.reload(); };
+  window.TRUS_docsOff = () => { localStorage.setItem(B4_LS_KEY, 'off');   location.reload(); };
+  window.TRUS_docsClr = () => { localStorage.removeItem(B4_LS_KEY);       location.reload(); };
+}
+
 /* ---------- robust partial loader ---------- */
 
 function stripCommentsAndCommas(raw) {
-  // убираем BOM
   let s = raw.replace(/^\uFEFF/, '');
-  // блок-комментарии /* ... */
   s = s.replace(/\/\*[\s\S]*?\*\//g, '');
-  // построчные // ...
-  s = s.replace(/(^|[^:])\/\/.*$/gm, '$1');
-  // убираем висящие запятые перед } или ]
+  s = s.replace(/^[ \t]*\/\/.*$/gm, '');
   s = s.replace(/,(\s*[}\]])/g, '$1');
-  // если встретится "].join("")" — удаляем хвост, оставляем чистый JSON-массив
-  s = s.replace(/\]\.join\(\s*["']{0,1}["']{0,1}\s*\)/g, ']');
-  return s.trim();
-}
-
-function sliceFirstJsonObject(cleaned) {
-  // Находим первый полноценный JSON-объект или массив в тексте и возвращаем его срез
-  const startIdxObj = cleaned.indexOf('{');
-  const startIdxArr = cleaned.indexOf('[');
-  let start = -1, opener = '', closer = '';
-  if (startIdxObj !== -1 && (startIdxArr === -1 || startIdxObj < startIdxArr)) {
-    start = startIdxObj; opener = '{'; closer = '}';
-  } else if (startIdxArr !== -1) {
-    start = startIdxArr; opener = '['; closer = ']';
-  }
-  if (start === -1) return null;
-
-  let depth = 0, inStr = false, esc = false;
-  for (let i = start; i < cleaned.length; i++) {
-    const ch = cleaned[i];
-    if (inStr) {
-      if (esc) { esc = false; continue; }
-      if (ch === '\\') { esc = true; continue; }
-      if (ch === '"') { inStr = false; continue; }
-      continue;
-    } else {
-      if (ch === '"') { inStr = true; continue; }
-      if (ch === opener) { depth++; }
-      else if (ch === closer) { depth--; if (depth === 0) return cleaned.slice(start, i + 1); }
-    }
-  }
-  return null;
+  s = s.replace(/\]\s*\.join\(\s*(["'`])\1\s*\)/g, ']');
+  return s;
 }
 
 async function loadPartial(name) {
   const res = await fetch(`partials/${name}.json`, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Failed to load partial: ${name}`);
-
-  // 1) читаем как текст
   const raw = await res.text();
+  const cleaned = stripCommentsAndCommas(raw);
 
-  // 2) убираем BOM и комментарии (вне строк)
-  let s = raw.replace(/^\uFEFF/, '');
-  // блок-комментарии /* ... */
-  s = s.replace(/\/\*[\s\S]*?\*\//g, '');
-  // построчные // ... (не трогаем те, что внутри строк — проще: удаляем только если начинаются с начала строки/после пробелов)
-  s = s.replace(/^[ \t]*\/\/.*$/gm, '');
-  // висящие запятые перед } или ]
-  s = s.replace(/,(\s*[}\]])/g, '$1');
-  // .join("") → превращаем в просто массив
-  s = s.replace(/\]\s*\.join\(\s*(["'`])\1\s*\)/g, ']');
-
-  // 3) пробуем обычный JSON.parse
   try {
-    const json = JSON.parse(s);
+    const json = JSON.parse(cleaned);
     let html = json.html ?? json.markup ?? json.content ?? json.innerHTML ?? '';
     if (Array.isArray(html)) html = html.join('');
-    return String(html);
-  } catch (_) {
-    // 4) ФОЛЛБЭК: вытащим только поле "html" без полного парсинга
-    // 4.1) Попробуем найти массив под "html": [ ... ]
-    const htmlArrStart = s.search(/"html"\s*:\s*\[/);
-    if (htmlArrStart !== -1) {
-      // вырежем подстроку от первой "[" после "html": до соответствующей "]"
-      const start = s.indexOf('[', htmlArrStart);
-      let depth = 0, inStr = false, esc = false, end = -1;
-      for (let i = start; i < s.length; i++) {
-        const ch = s[i];
-        if (inStr) {
-          if (esc) { esc = false; continue; }
-          if (ch === '\\') { esc = true; continue; }
-          if (ch === '"') { inStr = false; continue; }
-          continue;
-        } else {
-          if (ch === '"') { inStr = true; continue; }
-          if (ch === '[') depth++;
-          else if (ch === ']') { depth--; if (depth === 0) { end = i; break; } }
+    return String(html || '');
+  } catch {
+    const s = cleaned, key = '"html"';
+    const idx = s.indexOf(key);
+    if (idx !== -1) {
+      let i = idx + key.length;
+      while (i < s.length && /\s/.test(s[i])) i++;
+      if (s[i] === ':') i++;
+      while (i < s.length && /\s/.test(s[i])) i++;
+      if (s[i] === '[') {
+        let start = i, depth = 0, inStr = false, end = -1, esc = false;
+        for (; i < s.length; i++) {
+          const ch = s[i];
+          if (inStr) {
+            if (esc) esc = false;
+            else if (ch === '\\') esc = true;
+            else if (ch === '"') inStr = false;
+          } else {
+            if (ch === '"') { inStr = true; continue; }
+            if (ch === '[') depth++;
+            else if (ch === ']') { depth--; if (depth === 0) { end = i; break; } }
+          }
+        }
+        if (end !== -1) {
+          const arrBody = s.slice(start, end + 1);
+          const strings = arrBody.match(/"(?:\\.|[^"\\])*"/g) || [];
+          const parts = strings.map(strLit => JSON.parse(strLit));
+          return parts.join('');
         }
       }
-      if (end !== -1) {
-        const arrBody = s.slice(start, end + 1); // строка вида ["…","…", …]
-        // вытащим все строковые литералы и распарсим их по отдельности
-        const strings = arrBody.match(/"(?:\\.|[^"\\])*"/g) || [];
-        const parts = strings.map(strLit => JSON.parse(strLit)); // корректно снимает экранирование
-        return parts.join('');
-      }
     }
-    // 4.2) Попробуем найти строку под "html": "...."
     const m = s.match(/"html"\s*:\s*("(?:\\.|[^"\\])*")/);
-    if (m && m[1]) {
-      const htmlStr = JSON.parse(m[1]); // корректно разэкранируем
-      return String(htmlStr);
-    }
+    if (m && m[1]) return String(JSON.parse(m[1]));
     throw new Error(`Partial ${name}: cannot extract html`);
   }
 }
 
+/* ---------- i18n loader for reporting.* (для Block4) ---------- */
+
+async function loadReportingLocale(lang){
+  const L = (lang || 'EN').toUpperCase();
+
+  async function fetchJson(url){
+    try{
+      const r = await fetch(url, { cache:'no-store' });
+      if (!r.ok) return null;
+      const txt = (await r.text() || '').trim();
+      if (!txt || (txt[0] !== '{' && txt[0] !== '[')) return null;
+      try { return JSON.parse(txt); } catch { return null; }
+    }catch{ return null; }
+  }
+
+  let data = await fetchJson(`/i18n/reporting/${L}.json`);
+  if (!data && L !== 'EN') data = await fetchJson(`/i18n/reporting/EN.json`);
+  if (!data) data = {};
+
+  for (const k in data) I18N[k] = data[k];
+}
+
+/* ---------- документы: монтирование/демонтаж ---------- */
+
+function buildDocsSection(root){
+  // удалим старую секцию, если была (чтобы не мешала переинициализации/режиму)
+  const old = root.querySelector('#rep-block4');
+  if (old) old.remove();
+
+  const docsSection = document.createElement('section');
+  docsSection.id = 'rep-block4';
+
+  const h = document.createElement('h1');
+  h.className = 'roadmap-title';               // стиль как у Medical/Legal
+  h.setAttribute('data-i18n','reporting.block4.title');
+  h.textContent = 'Documents';                 // fallback
+  docsSection.appendChild(h);
+
+  const host = document.createElement('div');  // контейнер для контента блока
+  host.style.marginTop = '24px';               // увеличенный отступ
+  docsSection.appendChild(host);
+
+  root.appendChild(docsSection);
+  return docsSection;
+}
+
+async function mountDocs(root, opts = { content: true }){
+  // 1) создать секцию
+  const docsSection = buildDocsSection(root);
+
+  // 2) локаль reporting.* и i18n
+  const startLang = (typeof getLangFromQuery === 'function') ? getLangFromQuery() : undefined;
+  await loadReportingLocale(startLang);
+  await applyI18nTo(docsSection);
+
+  // 3) контент (опционально)
+  if (opts.content) {
+    if (!B4) B4 = await import('./reporting/block4.js');
+    try { B4.destroy?.(); } catch {}
+    await B4.init(root); // модуль сам найдёт #rep-block4
+  }
+}
+
+async function unmountDocs(){
+  try { B4?.destroy?.(); } catch {}
+  const s = document.querySelector('#rep-block4');
+  if (s) s.remove();
+}
 
 /* ---------- page lifecycle ---------- */
 
@@ -119,15 +179,19 @@ export async function init(rootEl) {
   const el = rootEl || document.querySelector('#subpage');
   if (!el) return;
 
+  // 1) Legal Timeline
   const legalRoot = el.querySelector('#legal-timeline');
-  const medRoot   = el.querySelector('#medical-timeline');
-
-  // 1) Юридическая
   if (legalRoot) {
-    try { mountLegal(legalRoot); } catch (e) { console.error('[timeline] mount legal failed:', e); }
+    try {
+      mountLegal(legalRoot);
+      cleanup.push(() => { try { unmountLegal(); } catch {} });
+    } catch (e) {
+      console.error('[timeline] mount legal failed:', e);
+    }
   }
 
-  // 2) Медицинская — сначала подгружаем её partial, затем инициализируем модуль
+  // 2) Medical Timeline
+  const medRoot = el.querySelector('#medical-timeline');
   if (medRoot) {
     try {
       const roadmapHtml = await loadPartial('roadmap');
@@ -141,10 +205,36 @@ export async function init(rootEl) {
       console.error('[timeline] medical block failed:', e);
     }
   }
+
+  // 3) Documents (перенесённый Reporting → Block4) с универсальным флагом
+  try{
+    const mode = getB4Mode();         // 'full' | 'title' | 'off'
+    if (mode !== 'off') {
+      await mountDocs(el, { content: mode === 'full' });
+
+      // при смене языка — сохраним режим и переинициализируем в том же режиме
+      const un = onI18NLocaleChanged(async ({ lang }) => {
+        try {
+          await unmountDocs();
+          await loadReportingLocale(lang);
+          await mountDocs(el, { content: getB4Mode() === 'full' });
+        } catch (err) {
+          console.warn('[timeline] block4 locale cycle failed:', err);
+        }
+      });
+      cleanup.push(un);
+    } else {
+      // полностью скрыть: гарантированно удалим секцию, если она есть
+      await unmountDocs();
+    }
+  } catch (e){
+    console.error('[timeline] documents block failed:', e);
+  }
 }
 
 export function destroy() {
   try { unmountLegal(); } catch {}
   cleanup.forEach(fn => { try { fn(); } catch {} });
   cleanup = [];
+  unmountDocs();
 }

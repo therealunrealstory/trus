@@ -15,7 +15,8 @@ const ROUTES = {
   support:  { partial: 'support',  module: () => import('./pages/support.js')  },
   now:      { partial: 'now',      module: () => import('./pages/now.js')      },
   roadmap:  { partial: null,       module: () => import('./pages/roadmap.js')  }, // оставим как было
-  timeline: { partial: 'timeline', module: () => import('./pages/timeline.js') } // НОВОЕ
+  timeline: { partial: 'timeline', module: () => import('./pages/timeline.js') }, // НОВОЕ
+  reporting:{ partial: 'reporting',module: () => import('./pages/reporting.js') }  // ← ДОБАВЛЕНО
 };
 
 function parseRoute() {

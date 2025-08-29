@@ -59,12 +59,12 @@
 
   "engage.title": "La tua partecipazione",
   "engage.desc": "Segna ciò che hai già fatto — è anche questo un sostegno",
-  "engage.b1": "Letta/ascoltata la versione breve",
-  "engage.b2": "Letta/ascoltata la storia completa",
-  "engage.b3": "Ascoltate le tracce sulla nostra storia",
-  "engage.b4": "Iscritto al canale Telegram",
-  "engage.b5": "Seguito Instagram",
-  "engage.b6": "Condivisa la storia",
+  "engage.b1": "Ho sostenuto economicamente",
+  "engage.b2": "Ho letto/ascoltato la versione breve",
+  "engage.b3": "Ho letto/ascoltato la storia completa",
+  "engage.b4": "Ho ascoltato le tracce musicali",
+  "engage.b5": "Mi sono iscritto a TG/IG/X/TT/YT",
+  "engage.b6": "Ho condiviso la storia",
   "engage.note": "Le tue selezioni sono salvate nel browser.",
 
   "feed.loading": "Caricamento notizie…",
@@ -116,5 +116,13 @@
 
   "alert.enterMessage": "Inserisci un messaggio",
   "alert.clickMapFirst": "Clicca prima sulla mappa!",
-  "error.saveFailed": "Errore di salvataggio: "
+  "error.saveFailed": "Errore di salvataggio: ",
+  
+"news.titleNow": "La storia continua ora",
+"news.titleNico": "Appunti di Nico",
+"news.followNowRich": "Il cuore della storia batte adesso — guarda su Telegram e X:",
+"news.followNicoRich": "La voce di Nico nella storia — segui su Telegram, X e Instagram:",
+"feed.auto": "traduzione automatica",
+
+"menu.reporting": "Rendiconti"
 }

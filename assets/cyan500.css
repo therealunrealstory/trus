@@ -1,0 +1,138 @@
+/* === TRUS v230825 — Support page: Cyan-500 theme + SVG hearts === */
+
+:root{
+  --cyan-300:#67e8f9;
+  --cyan-400:#22d3ee;
+  --cyan-500:#06b6d4;
+  --cyan-600:#0891b2;
+  --cyan-700:#0e7490;
+}
+
+/* применяется только на странице Support */
+.page--support{
+  --support-accent-weak: var(--cyan-400);
+  --support-accent-strong: var(--cyan-700); /* базовый фон, как у активной ENG-кнопки */
+}
+
+/* ====== ЕДИНЫЙ SOLID-СТАЙЛ (как активная «Вовлечённость») ====== */
+/* Используем класс .donate-tier для ВСЕХ нужных кнопок:
+   суммы, "Своя сумма", #addMark, #addHeart */
+.page--support .donate-tier{
+  background-color: var(--support-accent-strong);
+  border: 1px solid var(--support-accent-weak);
+  color: #ecfeff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.35);
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color .15s ease, border-color .15s ease, transform .02s ease;
+}
+.page--support .donate-tier:hover{
+  background-color: var(--cyan-600);
+  border-color: var(--cyan-500);
+}
+.page--support .donate-tier:active{ transform: translateY(1px); }
+.page--support .donate-tier:focus-visible{
+  outline: 2px solid rgba(34,211,238,0.65); /* cyan-400 */
+  outline-offset: 2px;
+}
+
+/* ====== (опционально) Ghost для других мест — НЕ применяется если есть .donate-tier ====== */
+.page--support .btn-ghost{
+  background: rgba(6,182,212,0.16);
+  border: 1px solid rgba(6,182,212,0.36);
+  color: #ecfeff;
+  backdrop-filter: saturate(120%) blur(2px);
+  -webkit-backdrop-filter: saturate(120%) blur(2px);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.02) inset, 0 1px 2px rgba(0,0,0,0.35);
+  transition: background-color .2s, border-color .2s, box-shadow .2s, transform .02s;
+}
+.page--support :is([data-action="add"],[data-action="add-mark"],.btn-add,[data-action="send-heart"],.btn-send-heart):not(.donate-tier){
+  background: rgba(6,182,212,0.16);
+  border: 1px solid rgba(6,182,212,0.36);
+  color: #ecfeff;
+  backdrop-filter: saturate(120%) blur(2px);
+  -webkit-backdrop-filter: saturate(120%) blur(2px);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.02) inset, 0 1px 2px rgba(0,0,0,0.35);
+  transition: background-color .2s, border-color .2s, box-shadow .2s, transform .02s;
+}
+.page--support .btn-ghost:hover,
+.page--support :is([data-action="add"],[data-action="add-mark"],.btn-add,[data-action="send-heart"],.btn-send-heart):not(.donate-tier):hover{
+  background: rgba(6,182,212,0.26);
+}
+.page--support .btn-ghost:active,
+.page--support :is([data-action="add"],[data-action="add-mark"],.btn-add,[data-action="send-heart"],.btn-send-heart):not(.donate-tier):active{
+  background: rgba(6,182,212,0.36);
+  transform: translateY(1px);
+}
+.page--support .btn-ghost:focus-visible,
+.page--support :is([data-action="add"],[data-action="add-mark"],.btn-add,[data-action="send-heart"],.btn-send-heart):not(.donate-tier):focus-visible{
+  outline: 2px solid rgba(6,182,212,0.65);
+  outline-offset: 2px;
+}
+
+/* ====== Иконка сердца (CSS mask) ====== */
+.page--support .hearts .heart-icon{
+  width:1.15rem;height:1.15rem;display:inline-block;vertical-align:-0.15em;
+  background-color:#4f46e5; /* indigo-600 */
+  -webkit-mask:url("../images/heart.mask.svg") no-repeat center / contain;
+  mask:url("../images/heart.mask.svg") no-repeat center / contain;
+}
+.page--support img.heart-icon[src$=".png"]{ display:none !important; }
+.page--support .heart-card::before,
+.page--support .hearts .splide__slide::before{
+  content:"";width:1.15rem;height:1.15rem;margin-right:.35rem;display:inline-block;vertical-align:-0.15em;
+  background-color:#4f46e5;
+  -webkit-mask:url("../images/heart.mask.svg") no-repeat center / contain;
+  mask:url("../images/heart.mask.svg") no-repeat center / contain;
+}
+
+/* ====== NEW: «I want to help» как cyan-кнопка (без подчёркивания) ====== */
+.page--support #wantHelp{
+  text-decoration: none !important;
+  display: inline-block; /* чтобы выглядело как кнопка */
+  background-color: var(--support-accent-strong);
+  border: 1px solid var(--support-accent-weak);
+  color: #ecfeff !important;
+  border-radius: 0.75rem; /* rounded-xl */
+  padding: 0.5rem 0.75rem; /* px-3 py-2 */
+  font-size: 0.875rem; /* text-sm */
+  line-height: 1.25rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.35);
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color .15s ease, border-color .15s ease, transform .02s ease;
+}
+.page--support #wantHelp:hover{
+  background-color: var(--cyan-600);
+  border-color: var(--cyan-500);
+}
+.page--support #wantHelp:active{ transform: translateY(1px); }
+.page--support #wantHelp:focus-visible{
+  outline: 2px solid rgba(34,211,238,0.65);
+  outline-offset: 2px;
+}
+
+/* ====== NEW: мягкие рамки для инпутов на странице Support ======
+   (форма карты: #name, #msg; Hearts: #heartName) */
+.page--support :is(#name, #msg, #heartName){
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  color: #e7ecf3 !important;
+  border-radius: 12px !important;
+  padding: 8px 10px !important;
+  outline: none !important;
+  transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease !important;
+}
+.page--support :is(#name, #msg, #heartName)::placeholder{
+  color: rgba(231,236,243,0.6) !important;
+}
+.page--support :is(#name, #msg, #heartName):focus{
+  border-color: rgba(6,182,212,0.45) !important;     /* cyan-500 around */
+  box-shadow: 0 0 0 2px rgba(6,182,212,0.20) !important;
+  background: rgba(255,255,255,0.08) !important;
+}
+
+/* ====== NEW: мягкая обводка и скругление у контейнера карты ====== */
+.page--support #map{
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  overflow: hidden; /* чтобы плитка не выходила за скругления */
+}

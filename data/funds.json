@@ -1,0 +1,374 @@
+{
+  "meta": {
+    "currency": "USD",
+    "lang_default": "EN",
+    "updated_at": "2025-08-28"
+  },
+
+  "collected": [
+    { "date": "2025-xx-xx", "amount": 0 },
+    { "date": "2025-xx-xx", "amount": 0 },
+    { "date": "2025-xx-xx", "amount": 0 }
+  ],
+
+  "spent": [
+    {
+      "date": "2025-07-01",
+      "amount": 1500,
+      "note": {
+        "EN": "Initial labs",
+        "RU": "Начальные анализы",
+        "ES": "Initial labs",
+        "FR": "Initial labs",
+        "IT": "Initial labs",
+        "DE": "Erste Laborwerte",
+        "PT": "Initial labs",
+        "CN": "Initial labs",
+        "AR": "Initial labs"
+      }
+    },
+    {
+      "date": "2025-07-01",
+      "amount": 500,
+      "note": {
+        "EN": "Food",
+        "RU": "Еда (месяц)",
+        "ES": "Food",
+        "FR": "Food",
+        "IT": "Food",
+        "DE": "Food",
+        "PT": "Food",
+        "CN": "Food",
+        "AR": "Food"
+      }
+    },
+    {
+      "date": "2025-07-25",
+      "amount": 1000,
+      "note": {
+        "EN": "Medication (2 weeks)",
+        "RU": "Лекарства (2 недели)",
+        "ES": "Medication (2 weeks)",
+        "FR": "Medication (2 weeks)",
+        "IT": "Medication (2 weeks)",
+        "DE": "Medication (2 weeks)",
+        "PT": "Medication (2 weeks)",
+        "CN": "Medication (2 weeks)",
+        "AR": "Medication (2 weeks)"
+      }
+    },
+    {
+      "date": "2025-08-08",
+      "amount": 1000,
+      "note": {
+        "EN": "Medication (2 weeks)",
+        "RU": "Лекарства (2 недели)",
+        "ES": "Medication (2 weeks)",
+        "FR": "Medication (2 weeks)",
+        "IT": "Medication (2 weeks)",
+        "DE": "Medication (2 weeks)",
+        "PT": "Medication (2 weeks)",
+        "CN": "Medication (2 weeks)",
+        "AR": "Medication (2 weeks)"
+      }
+    },
+    {
+      "date": "2025-08-01",
+      "amount": 500,
+      "note": {
+        "EN": "Food",
+        "RU": "Еда (месяц)",
+        "ES": "Food",
+        "FR": "Food",
+        "IT": "Food",
+        "DE": "Food",
+        "PT": "Food",
+        "CN": "Food",
+        "AR": "Food"
+      }
+    }
+  ],
+
+  "planned": [
+    {
+      "amount": 1200,
+      "note": {
+        "EN": "Next diagnostics",
+        "RU": "Следующая диагностика",
+        "ES": "Next diagnostics",
+        "FR": "Next diagnostics",
+        "IT": "Next diagnostics",
+        "DE": "Nächste Diagnostik",
+        "PT": "Next diagnostics",
+        "CN": "Next diagnostics",
+        "AR": "Next diagnostics"
+      }
+    },
+    {
+      "amount": 800,
+      "note": {
+        "EN": "Medication (month)",
+        "RU": "Medication (month)",
+        "ES": "Medicamentos (mes)",
+        "FR": "Medication (month)",
+        "IT": "Medication (month)",
+        "DE": "Medication (month)",
+        "PT": "Medication (month)",
+        "CN": "Medication (month)",
+        "AR": "Medication (month)"
+      }
+    },
+    {
+      "amount": 1500,
+      "note": {
+        "EN": "Specialist consultation",
+        "RU": "Specialist consultation",
+        "ES": "Specialist consultation",
+        "FR": "Consultation spécialiste",
+        "IT": "Specialist consultation",
+        "DE": "Specialist consultation",
+        "PT": "Specialist consultation",
+        "CN": "Specialist consultation",
+        "AR": "Specialist consultation"
+      }
+    },
+    {
+      "amount": 900,
+      "note": {
+        "EN": "Transport (city)",
+        "RU": "Транспорт по городу",
+        "ES": "Transport (city)",
+        "FR": "Transport (city)",
+        "IT": "Transport (city)",
+        "DE": "Transport (city)",
+        "PT": "Transport (city)",
+        "CN": "Transport (city)",
+        "AR": "Transport (city)"
+      }
+    },
+    {
+      "amount": 1100,
+      "note": {
+        "EN": "Lab panels",
+        "RU": "Lab panels",
+        "ES": "Lab panels",
+        "FR": "Lab panels",
+        "IT": "Lab panels",
+        "DE": "Labordiagnostik",
+        "PT": "Lab panels",
+        "CN": "Lab panels",
+        "AR": "Lab panels"
+      }
+    },
+    {
+      "amount": 1300,
+      "note": {
+        "EN": "Day clinic procedures",
+        "RU": "Day clinic procedures",
+        "ES": "Procedimientos en clínica de día",
+        "FR": "Day clinic procedures",
+        "IT": "Day clinic procedures",
+        "DE": "Day clinic procedures",
+        "PT": "Day clinic procedures",
+        "CN": "Day clinic procedures",
+        "AR": "Day clinic procedures"
+      }
+    },
+    {
+      "amount": 750,
+      "note": {
+        "EN": "Supplies restock",
+        "RU": "Пополнение расходников",
+        "ES": "Supplies restock",
+        "FR": "Supplies restock",
+        "IT": "Supplies restock",
+        "DE": "Supplies restock",
+        "PT": "Supplies restock",
+        "CN": "Supplies restock",
+        "AR": "Supplies restock"
+      }
+    },
+    {
+      "amount": 1600,
+      "note": {
+        "EN": "Rehabilitation block",
+        "RU": "Rehabilitation block",
+        "ES": "Rehabilitation block",
+        "FR": "Bloc de rééducation",
+        "IT": "Rehabilitation block",
+        "DE": "Rehabilitation block",
+        "PT": "Rehabilitation block",
+        "CN": "Rehabilitation block",
+        "AR": "Rehabilitation block"
+      }
+    },
+    {
+      "amount": 1400,
+      "note": {
+        "EN": "Housing (short-term)",
+        "RU": "Housing (short-term)",
+        "ES": "Housing (short-term)",
+        "FR": "Housing (short-term)",
+        "IT": "Housing (short-term)",
+        "DE": "Kurzzeitunterkunft",
+        "PT": "Housing (short-term)",
+        "CN": "Housing (short-term)",
+        "AR": "Housing (short-term)"
+      }
+    },
+    {
+      "amount": 950,
+      "note": {
+        "EN": "Dental check",
+        "RU": "Dental check",
+        "ES": "Revisión dental",
+        "FR": "Dental check",
+        "IT": "Dental check",
+        "DE": "Dental check",
+        "PT": "Dental check",
+        "CN": "Dental check",
+        "AR": "Dental check"
+      }
+    },
+    {
+      "amount": 1250,
+      "note": {
+        "EN": "Cardiology consult",
+        "RU": "Консультация кардиолога",
+        "ES": "Cardiology consult",
+        "FR": "Cardiology consult",
+        "IT": "Cardiology consult",
+        "DE": "Cardiology consult",
+        "PT": "Cardiology consult",
+        "CN": "Cardiology consult",
+        "AR": "Cardiology consult"
+      }
+    },
+    {
+      "amount": 1200,
+      "note": {
+        "EN": "Therapy session set",
+        "RU": "Therapy session set",
+        "ES": "Therapy session set",
+        "FR": "Séances de thérapie",
+        "IT": "Therapy session set",
+        "DE": "Therapy session set",
+        "PT": "Therapy session set",
+        "CN": "Therapy session set",
+        "AR": "Therapy session set"
+      }
+    },
+    {
+      "amount": 900,
+      "note": {
+        "EN": "Emergency reserve",
+        "RU": "Emergency reserve",
+        "ES": "Emergency reserve",
+        "FR": "Emergency reserve",
+        "IT": "Emergency reserve",
+        "DE": "Notfallreserve",
+        "PT": "Emergency reserve",
+        "CN": "Emergency reserve",
+        "AR": "Emergency reserve"
+      }
+    },
+    {
+      "amount": 1000,
+      "note": {
+        "EN": "Nutrition support",
+        "RU": "Nutrition support",
+        "ES": "Apoyo nutricional",
+        "FR": "Nutrition support",
+        "IT": "Nutrition support",
+        "DE": "Nutrition support",
+        "PT": "Nutrition support",
+        "CN": "Nutrition support",
+        "AR": "Nutrition support"
+      }
+    },
+    {
+      "amount": 1200,
+      "note": {
+        "EN": "Chemotherapy co-pay",
+        "RU": "Доплата за химиотерапию",
+        "ES": "Chemotherapy co-pay",
+        "FR": "Chemotherapy co-pay",
+        "IT": "Chemotherapy co-pay",
+        "DE": "Chemotherapy co-pay",
+        "PT": "Chemotherapy co-pay",
+        "CN": "Chemotherapy co-pay",
+        "AR": "Chemotherapy co-pay"
+      }
+    },
+    {
+      "amount": 1200,
+      "note": {
+        "EN": "Home care shifts",
+        "RU": "Home care shifts",
+        "ES": "Home care shifts",
+        "FR": "Soins à domicile",
+        "IT": "Home care shifts",
+        "DE": "Home care shifts",
+        "PT": "Home care shifts",
+        "CN": "Home care shifts",
+        "AR": "Home care shifts"
+      }
+    },
+    {
+      "amount": 700,
+      "note": {
+        "EN": "Transport (intercity)",
+        "RU": "Transport (intercity)",
+        "ES": "Transport (intercity)",
+        "FR": "Transport (intercity)",
+        "IT": "Transport (intercity)",
+        "DE": "Überlandtransport",
+        "PT": "Transport (intercity)",
+        "CN": "Transport (intercity)",
+        "AR": "Transport (intercity)"
+      }
+    },
+    {
+      "amount": 1200,
+      "note": {
+        "EN": "Imaging (MRI)",
+        "RU": "МРТ",
+        "ES": "Imaging (MRI)",
+        "FR": "Imaging (MRI)",
+        "IT": "Imaging (MRI)",
+        "DE": "Imaging (MRI)",
+        "PT": "Imaging (MRI)",
+        "CN": "Imaging (MRI)",
+        "AR": "Imaging (MRI)"
+      }
+    },
+    {
+      "amount": 800,
+      "note": {
+        "EN": "Legal paperwork",
+        "RU": "Legal paperwork",
+        "ES": "Trámites legales",
+        "FR": "Legal paperwork",
+        "IT": "Legal paperwork",
+        "DE": "Legal paperwork",
+        "PT": "Legal paperwork",
+        "CN": "Legal paperwork",
+        "AR": "Legal paperwork"
+      }
+    },
+    {
+      "amount": 900,
+      "note": {
+        "EN": "Psychological support",
+        "RU": "Psychological support",
+        "ES": "Psychological support",
+        "FR": "Soutien psychologique",
+        "IT": "Psychological support",
+        "DE": "Psychological support",
+        "PT": "Psychological support",
+        "CN": "Psychological support",
+        "AR": "Psychological support"
+      }
+    }
+  ]
+}

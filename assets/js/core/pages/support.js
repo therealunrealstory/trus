@@ -1,3 +1,4 @@
+// /assets/js/core/pages/support.js
 import { $, loadScript } from '../dom.js';
 import { t } from '../i18n.js';
 import { openModal } from '../modal.js';
@@ -40,7 +41,7 @@ function drawMarksBatch(points, batch=300) {
       const m = points[i];
       const lat = Number(m.lat), lon = Number(m.lon);
       if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
-      L.circleMarker([lat, lon], { radius:4, color:'lime' })
+      L.circleMarker([lat, lon], { radius:4, color:'#06b6d4' })
         .bindPopup(`<b>${m.name||'Anon'}</b><br>${m.message||''}`)
         .addTo(layer);
     }
@@ -63,7 +64,15 @@ async function loadAllMarksPaged() {
 }
 
 function chunk(a,s){const out=[];for(let i=0;i<a.length;i+=s) out.push(a.slice(i,i+s));return out;}
-function heartCard(n){return `<div class="p-4 rounded-2xl bg-gray-900/50 shadow-sm border border-gray-700"><div class="flex items-center gap-2"><span class="text-xl">❤️</span><div class="text-sm text-gray-200">${n||'Anon'}</div></div></div>`;}
+function heartCard(n){
+  return `
+    <div class="p-4 rounded-2xl bg-gray-900/50 shadow-sm border border-gray-700 heart-card">
+      <div class="flex items-center gap-2">
+        <span class="heart-icon" aria-hidden="true"></span>
+        <div class="text-sm text-gray-200">${n||'Anon'}</div>
+      </div>
+    </div>`;
+}
 function renderHeartsSlides(arr){
   const pages=chunk(arr,12);
   const ul = $('#heartsSlides');
@@ -79,8 +88,20 @@ function initEngagement(root){
   const ENG_KEY='engagement_v1';
   const loadEng=()=>{ try{return JSON.parse(localStorage.getItem(ENG_KEY)||'[]');}catch{return []} };
   const saveEng=a=>{ try{localStorage.setItem(ENG_KEY,JSON.stringify(a));}catch{} };
-  function applyEng(){ const on=loadEng(); root.querySelectorAll('.eng-btn').forEach((b,i)=>{const s=on.includes(i); b.classList.toggle('bg-green-700',s); b.classList.toggle('border-green-400',s); b.setAttribute('aria-pressed', s?'true':'false');}); }
-  root.querySelectorAll('.eng-btn').forEach((b,i)=>b.addEventListener('click',()=>{const on=loadEng(); const p=on.indexOf(i); if(p>=0) on.splice(p,1); else on.push(i); saveEng(on); applyEng();}));
+  function applyEng(){
+    const on=loadEng();
+    root.querySelectorAll('.eng-btn').forEach((b,i)=>{
+      const s=on.includes(i);
+      b.classList.toggle('bg-cyan-700', s);
+      b.classList.toggle('border-cyan-400', s);
+      b.classList.toggle('bg-green-700', false);
+      b.classList.toggle('border-green-400', false);
+      b.setAttribute('aria-pressed', s?'true':'false');
+    });
+  }
+  root.querySelectorAll('.eng-btn').forEach((b,i)=>b.addEventListener('click',()=>{
+    const on=loadEng(); const p=on.indexOf(i); if(p>=0) on.splice(p,1); else on.push(i); saveEng(on); applyEng();
+  }));
   applyEng();
 }
 
@@ -113,10 +134,11 @@ function renderDonateButtons(root){
   const { base, amounts, wrap } = cfg;
   wrap.innerHTML = '';
 
-  // Кнопки фиксированных сумм (как раньше)
+  // Фиксированные суммы — SOLID как активная кнопка «Вовлечённости»
   amounts.forEach((amt) => {
     const a = document.createElement('a');
-    a.className = 'px-3 py-2 rounded-xl bg-green-600 text-white text-sm';
+    a.className = 'donate-tier px-3 py-2 rounded-xl text-sm';
+    a.dataset.amount = String(amt);
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
     a.href = `${base}?amount=${encodeURIComponent(amt)}`;
@@ -124,9 +146,9 @@ function renderDonateButtons(root){
     wrap.appendChild(a);
   });
 
-  // Кнопка «без суммы» ПОСЛЕ $500 — ключ btn.donate
+  // Кнопка «Donate» — тот же стиль
   const custom = document.createElement('a');
-  custom.className = 'px-3 py-2 rounded-xl bg-green-600 text-white text-sm';
+  custom.className = 'donate-tier px-3 py-2 rounded-xl text-sm';
   custom.target = '_blank';
   custom.rel = 'noopener noreferrer';
   custom.href = base;
@@ -134,15 +156,18 @@ function renderDonateButtons(root){
   custom.textContent = t('btn.donate','Donate');
   wrap.appendChild(custom);
 
-  // Применить переводы, если i18n ещё не прошёл
   document.dispatchEvent(new CustomEvent('locale-apply-request'));
 }
 
 export async function init(root){
+  // Маркер страницы для тематического CSS
+  const subpageEl = document.getElementById('subpage');
+  if (subpageEl) subpageEl.classList.add('page--support');
+
   // Вовлеченность
   initEngagement(root);
 
-  // Донат‑кнопки
+  // Донат-кнопки
   renderDonateButtons(root);
 
   // Карта
@@ -231,11 +256,27 @@ export async function init(root){
     });
   }
 
+  // Единый SOLID-стайл (как у «Вовлечённости») для Add / Leave heart и Add mark
+  ['#addHeart', '#addMark'].forEach(sel => {
+    const btn = root.querySelector(sel);
+    if (btn) {
+      btn.classList.remove('bg-green-600','bg-green-500','bg-cyan-500','text-white','btn-ghost');
+      btn.classList.add('donate-tier','px-3','py-2','rounded-xl','text-sm');
+    }
+  });
+
+  // «I want to help» → такая же cyan-кнопка, как в Donate Funds
+  const wantHelp = root.querySelector('#wantHelp');
+  if (wantHelp) {
+    wantHelp.classList.remove('btn-ghost','bg-green-600','bg-green-500','bg-cyan-500','text-white');
+    wantHelp.classList.add('donate-tier','px-3','py-2','rounded-xl','text-sm');
+  }
+
   // Modal: Practical help
   root.querySelector('#wantHelp')?.addEventListener('click', () => {
     openModal(
       t('modal.help.title', t('support.physical','Practical help')),
-      t('modal.help.body', 'If you are ready to help — whether legal, medical, or practical support (nurses, caregivers), or if you want to arrange a personal meeting — please write to: <a href=\"mailto:theRealUnrealStory@gmail.com\" class=\"underline\">theRealUnrealStory@gmail.com</a>.<br><br>We are sincerely grateful to everyone who responds.')
+      t('modal.help.body', 'If you are ready to help — whether legal, medical, or practical support (nurses, caregivers), or if you want to arrange a personal meeting — please write to: <a href="mailto:theRealUnrealStory@gmail.com" class="underline">theRealUnrealStory@gmail.com</a>.<br><br>We are sincerely grateful to everyone who responds.')
     );
   });
 }
@@ -249,7 +290,9 @@ export function destroy(){
   try { if (splide) splide.destroy(true); } catch {}
   splide = null;
   allHearts = [];
+
+  const subpageEl = document.getElementById('subpage');
+  if (subpageEl) subpageEl.classList.remove('page--support');
 }
 
-// На случай, если роутер ждёт default-экспорт
 export default { init, destroy };

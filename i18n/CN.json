@@ -59,11 +59,11 @@
 
   "engage.title": "你的参与",
   "engage.desc": "勾选你已做过的事——这也是一种支持",
-  "engage.b1": "已阅读/收听简版",
-  "engage.b2": "已阅读/收听完整版",
-  "engage.b3": "已收听与故事相关的曲目",
-  "engage.b4": "已关注 Telegram 频道",
-  "engage.b5": "已关注 Instagram",
+  "engage.b1": "提供了资金支持",
+  "engage.b2": "已阅读/收听短版",
+  "engage.b3": "已阅读/收听完整版",
+  "engage.b4": "已收听音乐曲目",
+  "engage.b5": "订阅了 TG/IG/X/TT/YT",
   "engage.b6": "已分享故事",
   "engage.note": "你的选择会保存在浏览器中。",
 
@@ -116,5 +116,13 @@
 
   "alert.enterMessage": "请输入留言",
   "alert.clickMapFirst": "请先点击地图！",
-  "error.saveFailed": "保存失败："
+  "error.saveFailed": "保存失败：",
+  
+"news.titleNow": "故事现在继续",
+"news.titleNico": "Nico的笔记",
+"news.followNowRich": "故事的心脏此刻跳动 — 请见于 Telegram 和 X:",
+"news.followNicoRich": "Nico 在故事中的声音 — 请关注 Telegram、X 和 Instagram:",
+"feed.auto": "自动翻译",
+
+"menu.reporting": "报告"
 }
