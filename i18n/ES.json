@@ -1,0 +1,120 @@
+{
+  "meta.titleRest": "apoyo para Adam",
+  "meta.description": "La verdadera historia de un cirujano que salvó a otros toda su vida y ahora lucha por la suya.",
+
+  "hero.titleRest": "apoyo para Adam",
+  "hero.lead1": "La verdadera historia de un cirujano que dedicó su vida a salvar a otros y ahora lucha por la suya.",
+  "hero.note": "* “Adam” es un seudónimo de una persona real. El nombre se ha cambiado para proteger su privacidad.",
+
+  "audio.play": "Historia en música",
+  "audio.pause": "‖ Pausa",
+  
+  "story.full.title": "Versión completa de nuestra historia",
+"full.play": "▶︎ Reproducir",
+"full.pause": "‖ Pausa",
+"full.note": "Relato completo narrado",
+  
+  "menu.story": "La Historia",
+  "menu.support": "Apoyo",
+  "menu.storyNow": "La Historia Ahora",
+  
+  "page.loading": "Cargando página...",
+  "page.error": "No se pudo cargar la página",
+
+  "btn.install": "Instalar app",
+  "pwa.installedTitle": "Instalada",
+  "pwa.installedBody": "La aplicación se ha añadido a tu pantalla de inicio / lista de apps.",
+  "pwa.installTitle": "Instalar esta app",
+  "pwa.installBody": "Puedes añadir The Real Unreal Story a tu pantalla de inicio para una experiencia más rápida, como una app.",
+  "map.geoError": "No se pudo obtener tu ubicación. Inténtalo de nuevo.",
+
+  "announce.title": "Anuncio de nuestra historia",
+  "announce.short": "Anuncio de audio corto",
+  "announce.play": "▶︎ Reproducir",
+  "announce.pause": "‖ Pausa",
+  "announce.langLabel": "Idioma: ",
+  
+  "nav.roadmap": "Cronología",
+
+  "video.title": "Avance en video",
+
+  "short.title": "Versión corta de nuestra historia",
+  "short.note": "Sobre los acontecimientos desde inicios de 2019 hasta mediados de 2025.",
+  "short.play": "▶︎ Reproducir",
+  "short.pause": "‖ Pausa",
+  "short.langLabel": "Idioma: ",
+  
+  "status.playing": "Reproduciendo…",
+  "status.paused": "En pausa",
+
+  "support.title": "Apoya ahora",
+  "support.money": "Donar fondos",
+  "support.physical": "Ayuda práctica",
+  
+  "modal.help.title": "Ayuda práctica y profesional",
+  "modal.help.body": "Si estás listo para ayudar — ya sea con apoyo legal, médico o práctico (enfermeros, cuidadores), o si quieres concertar una reunión personal — escríbenos a: <a href=\"mailto:theRealUnrealStory@gmail.com\" class=\"underline\">theRealUnrealStory@gmail.com</a>.<br><br>Estamos sinceramente agradecidos con todos los que respondan.",
+
+  "news.title": "La historia continúa ahora",
+  "news.follow": "Sigue nuestra historia en Telegram",
+
+  "engage.title": "Tu participación",
+  "engage.desc": "Marca lo que ya has hecho — eso también es apoyo",
+  "engage.b1": "Leí/escuché la versión corta",
+  "engage.b2": "Leí/escuché la historia completa",
+  "engage.b3": "Escuché pistas sobre nuestra historia",
+  "engage.b4": "Me suscribí al canal de Telegram",
+  "engage.b5": "Me suscribí a Instagram",
+  "engage.b6": "Compartí la historia",
+  "engage.note": "Tus selecciones se guardan en tu navegador.",
+
+  "feed.loading": "Cargando noticias…",
+  "feed.empty": "Aún no hay publicaciones.",
+  "feed.error": "No se pudieron cargar las noticias.",
+  "feed.openTelegram": "Abrir en Telegram",
+
+  "map.title": "Mapa de apoyo",
+  "map.tip": "Asegúrate de hacer clic en el mapa para indicar el lugar exacto de tu apoyo.",
+  "map.locateMe": "Mostrar mi ubicación",
+  "map.locating": "Localizando…",
+  "map.geoUnsupported": "La geolocalización no es compatible en este dispositivo/navegador.",
+  "map.geoDenied": "Permiso de geolocalización denegado o no disponible.",
+  "map.dataNote": "Los datos se almacenan en la base de datos",
+  "map.totalLabel": "Marcas totales:",
+  "map.youAreHere": "Estás aquí",
+  "map.selectedPoint": "Punto seleccionado (puedes arrastrar)",
+  "map.locate": "Mostrar mi ubicación",
+  "map.noGeo": "La geolocalización no es compatible en este dispositivo.",
+
+
+  "hearts.title": "Corazones de apoyo",
+  "hearts.empty": "Aún no hay corazones.",
+
+  "placeholder.name": "Nombre",
+  "placeholder.msg": "Mensaje (hasta 140 caracteres)",
+
+  "footer.note": "Gracias por cualquier apoyo — incluso un repost puede cambiar una vida.",
+
+  "share.copied": "Enlace copiado",
+
+  "btn.donate": "Ingresa monto",
+  "btn.share": "Compartir",
+  "btn.wantHelp": "Quiero ayudar",
+  "btn.addMark": "Añadir",
+  "btn.addHeart": "Dejar un corazón",
+  "btn.loadMoreHearts": "Cargar más corazones",
+
+  "hashtag.title": "#TheRealUnrealStory",
+  "hashtag.body": "Gracias por usar <b>#TheRealUnrealStory</b> cuando publiques o compartas nuestra historia. Ayuda a que la gente encuentre y siga el hilo.<br><br>Úsalo en Instagram (publicaciones/reels/historias), Telegram, YouTube (títulos/descripciones/comentarios), TikTok, X/Twitter, Facebook, blogs y Medium, foros y Reddit, LinkedIn — ¡cada mención cuenta!",
+
+  "tiles.me": "Soy Nico",
+  "tiles.about": "Sobre Adam",
+  "tiles.others": "Otras personas en la historia",
+
+  "modal.tile1.body": "Me llamo Nico y soy amigo de Adam. Me convertí en un participante involuntario de esta historia “real-irreal”. He pedido apoyo a una audiencia amplia — ya no puedo con esto solo. Por eso contamos nuestra historia sin adornos y lanzamos en paralelo una recaudación en GoFundMe.",
+  "modal.tile2.body": "Adam es una gran persona y un cirujano con técnicas únicas, un filántropo. Desde 2019, se ha enfrentado varias veces a la oncología de la sangre. En julio de 2025 — un nuevo giro grave: otra forma de leucemia. Al mismo tiempo — conmociones y pérdidas personales.",
+  "modal.tile3.body": "La historia de Adam está llena de sorpresas reales. Hubo ayudantes increíbles — sin ellos no habría sobrevivido hasta hoy. También hubo quienes causaron daño deliberadamente. Y hubo personas que el destino pareció poner en el momento justo.",
+
+  "alert.enterMessage": "Escribe un mensaje",
+  "alert.clickMapFirst": "¡Primero haz clic en el mapa!",
+  "error.saveFailed": "Error al guardar: "
+}

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Real Unreal Story — support for Adam</title>
+  <meta name="description" content="The Real Unreal Story — the true story of a surgeon who saved others all his life and is now fighting for his own." />
+
+  <!-- Hreflang -->
+  <link rel="alternate" hreflang="x-default" href="?lang=EN">
+  <link rel="alternate" hreflang="en" href="?lang=EN">
+  <link rel="alternate" hreflang="es" href="?lang=ES">
+  <link rel="alternate" hreflang="fr" href="?lang=FR">
+  <link rel="alternate" hreflang="it" href="?lang=IT">
+  <link rel="alternate" hreflang="de" href="?lang=DE">
+  <link rel="alternate" hreflang="pt" href="?lang=PT">
+  <link rel="alternate" hreflang="ru" href="?lang=RU">
+  <link rel="alternate" hreflang="zh" href="?lang=CN">
+  <link rel="alternate" hreflang="ar" href="?lang=AR">
+
+  <!-- PWA / Icons -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" sizes="32x32" href="favicon-32x32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="theme-color" content="#0b0b0b">
+
+  <!-- iOS A2HS -->
+  <meta name="apple-mobile-web-app-title" content="The Real Unreal Story">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lib CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+
+  <!-- Our CSS -->
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="text-white">
+
+  <!-- HEADER -->
+  <header class="max-w-5xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between gap-3">
+      <div id="hashtagBtn" class="font-mono text-xs sm:text-sm text-white/90 cursor-pointer select-none flex items-center" title="#TheRealUnrealStory" aria-label="#TheRealUnrealStory">
+        <span id="hashtagType">#TheRealUnrealStory</span><span class="hashtag-caret ml-0.5">|</span>
+      </div>
+      <div class="flex gap-2 items-end sm:items-center sm:flex-row flex-col">
+        <button id="installBtn" class="px-4 py-2 rounded-xl border border-indigo-500 text-indigo-300 hover:bg-indigo-600/10 text-sm hidden" data-i18n="btn.install">Install app</button>
+        <button id="audioBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse" data-i18n="audio.play">Story in music</button>
+        <select id="lang" class="px-3 py-2 rounded bg-gray-800 text-white text-sm">
+          <optgroup label="Languages">
+            <option value="EN" selected>EN</option><option value="ES">ES</option><option value="FR">FR</option>
+            <option value="PT">PT</option><option value="DE">DE</option><option value="IT">IT</option>
+            <option value="RU">RU</option><option value="CN">CN</option><option value="AR">AR</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- Соцсети -->
+  <nav aria-label="Social links">
+  <section class="max-w-5xl mx-auto px-4">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 flex-wrap grow">
+			
+
+			<!-- Telegram -->
+			<a class="icon-btn social-btn" aria-label="Telegram"
+			   href="https://t.me/theRealUnrealStory" target="_blank" rel="noopener noreferrer">
+			  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+				<path d="M9.96 15.47l-.4 5.63c.57 0 .81-.24 1.1-.53l2.64-2.53 5.47 4c1.01.56 1.73.27 2-.93l3.62-16.97c.32-1.5-.54-2.08-1.52-1.72L1.2 9.65c-1.46.57-1.44 1.39-.25 1.76l5.54 1.73 12.85-8.11c.6-.39 1.15-.17.7.22"/>
+			  </svg>
+			</a>
+			
+			<!-- X (Twitter) -->
+			<a class="icon-btn social-btn" aria-label="X"
+			   href="https://x.com/RealUnrealStory" target="_blank" rel="noopener noreferrer">
+			  <svg xmlns="http://www.w3.org/2000/svg" 
+				   viewBox="0 0 24 24" 
+				   fill="none" 
+				   stroke="currentColor" 
+				   stroke-width="1.6" 
+				   stroke-linecap="round" 
+				   stroke-linejoin="round" 
+				   class="w-5 h-5">
+				<path d="M4 4l16 16M20 4L4 20"/>
+			  </svg>
+			</a>
+			
+			<!-- Instagram -->
+			<a class="icon-btn social-btn" aria-label="Instagram"
+			   href="https://instagram.com/theRealUnrealStory" target="_blank" rel="noopener noreferrer">
+			  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+				<path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2.2A2.8 2.8 0 1 0 12 15.8 2.8 2.8 0 0 0 12 9.2zm4.8-2.5a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2z"/>
+			  </svg>
+			</a>
+
+
+			<!-- YouTube -->
+			<a class="icon-btn social-btn" aria-label="YouTube"
+			   href="https://www.youtube.com/@theRealUnrealStory" target="_blank" rel="noopener noreferrer">
+			  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+				<path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .6 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.3.6 9.3.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.6-5.8zM9.6 15.5v-7l6.2 3.5-6.2 3.5z"/>
+			  </svg>
+			</a>
+			
+			<!-- Spotify -->
+			<a class="icon-btn social-btn" aria-label="Spotify"
+			   href="https://open.spotify.com" target="_blank" rel="noopener noreferrer">
+			  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+				<path d="M12 1.5a10.5 10.5 0 1 0 0 21 10.5 10.5 0 0 0 0-21zm4.84 15.2c-.19.3-.6.39-.9.2-2.44-1.5-5.52-1.84-9.13-1-.35.08-.7-.14-.78-.5-.08-.35.14-.7.5-.78 3.93-.9 7.34-.51 10.02 1.15.3.18.4.6.2.92zm1.28-2.88c-.24.38-.75.5-1.13.26-2.8-1.72-7.08-2.23-10.4-1.2-.43.13-.88-.11-1-.54-.13-.43.1-.88.54-1 3.76-1.12 8.45-.54 11.67 1.4.4.24.52.76.3 1.08zm.1-3.1c-3.23-1.92-8.6-2.1-11.69-1.14-.5.15-1.04-.14-1.2-.66-.15-.5.14-1.04.66-1.2 3.57-1.1 9.46-.86 13.2 1.37.47.28.63.9.35 1.36-.28.48-.9.63-1.32.27z"/>
+			  </svg>
+			</a>
+
+			<!-- Music (smart link) -->
+			<a class="icon-btn social-btn" aria-label="Music"
+			   id="musicLink"
+			   href="https://ditto.com" target="_blank" rel="noopener noreferrer">
+			  <svg xmlns="http://www.w3.org/2000/svg" 
+				   viewBox="0 0 24 24" 
+				   fill="none" 
+				   stroke="currentColor" 
+				   stroke-width="1.6" 
+				   stroke-linecap="round" 
+				   stroke-linejoin="round" 
+				   class="w-5 h-5">
+				<path d="M9 18V5l12-2v13"/>
+				<circle cx="6" cy="18" r="3"/>
+				<circle cx="18" cy="16" r="3"/>
+			  </svg>
+			</a>
+      </div>
+    </div>
+  </section>
+  </nav>
+
+
+  <!-- SUBNAV -->
+  <div class="max-w-5xl mx-auto px-4">
+    <nav class="subnav-wrap" aria-label="Subpage switch">
+      <button class="subnav-btn" data-route="#/story"   data-i18n="menu.story">The Story</button>
+      <button class="subnav-btn" data-route="#/timeline" data-i18n="nav.roadmap">Timeline</button>
+      <button class="subnav-btn" data-route="#/now"     data-i18n="menu.storyNow">The Story Now</button>
+      <button class="subnav-btn" data-route="#/support" data-i18n="menu.support">Support</button>
+    </nav>
+  </div>
+  <!-- /SUBNAV -->
+
+  <!-- SUBPAGE-MOUNT: main -->
+  <main id="subpage" class="max-w-5xl mx-auto px-4"></main>
+
+  <footer class="max-w-5xl mx-auto px-4 text-center text-sm text-gray-300" data-i18n="footer.note">
+    Thank you for any support—even a repost can change a life.
+  </footer>
+
+  <!-- Аудио (глобальный плеер) -->
+  <audio id="bgAudio" preload="none"></audio>
+
+  <!-- Модалка: фон и центрирование теперь берутся из styles.css -->
+  <div id="modalBackdrop" class="modal-backdrop">
+    <div class="min-h-full flex items-center justify-center p-4">
+      <div class="bg-gray-900 text-white rounded-2xl shadow-xl border border-gray-700 max-w-xl w-full p-6 relative modal-dialog">
+        <button id="modalClose" class="absolute right-3 top-3 text-gray-400 hover:text-white" aria-label="Close">✕</button>
+        <h3 id="modalTitle" class="text-lg font-semibold mb-3"></h3>
+        <div id="modalBody" class="text-sm text-gray-200 leading-relaxed"></div>
+        <div class="mt-5 text-right"><button id="modalOk" class="btn">OK</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Один вход — app.js (внутри импортирует boot.js → modal.js) -->
+  <script type="module" src="assets/app.js"></script>
+
+  <script>
+    // Service Worker (версия синхронизирована с sw.js)
+    if ('serviceWorker' in navigator) {
+      (async () => {
+        try { await navigator.serviceWorker.register('/sw.js?ver=v1.3.4'); } catch {}
+      })();
+    }
+  </script>
+</body>
+</html>

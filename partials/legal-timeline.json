@@ -1,0 +1,216 @@
+{
+  "meta": {
+    "updated_at": "2025-08-22T00:00:00Z",
+    "updated_by": "Nico",
+    "version": "legal.v1.3",
+    "lang_default": "en"
+  },
+	"legend": {
+	  "roles": {
+		"plaintiff": "Relatives’ actions (plaintiffs)",
+		"defendant": "Adam’s actions (defendant)",
+		"court": "Court",
+		"admin": "Measures / restrictions"
+	  },
+	  "status": {
+		"done": "completed",
+		"current": "current",
+		"planned": "planned",
+		"tentative": "tentative"
+	  }
+	},
+  "items": [
+    {
+      "id": "2020-09-will-mother",
+      "role": "court",
+      "type": "will",
+      "status": "done",
+      "date_start": "2020-09",
+      "date_end": null,
+      "when_label": "September 2020",
+      "title": "Mother’s will in favor of Adam",
+      "summary": "Mother died; will in Adam’s favor.",
+      "details": "In September 2020, Adam’s mother died, leaving a will in his favor. In the following months he did not use the inherited property. The relatives raised no claims while his father was alive."
+    },
+    {
+      "id": "2021-04-father-dx-will",
+      "role": "court",
+      "type": "will",
+      "status": "done",
+      "date_start": "2021-04",
+      "date_end": null,
+      "when_label": "April 2021",
+      "title": "Father’s diagnosis; will in favor of Adam",
+      "summary": "Father diagnosed with cancer; will already executed.",
+      "details": "In April 2021, Adam’s father was diagnosed with late‑stage cancer. By that time he had already made a will in Adam’s favor."
+    },
+    {
+      "id": "2021-07-father-death-claims",
+      "role": "plaintiff",
+      "type": "claim",
+      "status": "done",
+      "date_start": "2021-07",
+      "date_end": null,
+      "when_label": "July 2021",
+      "title": "Father’s death; international lawsuits filed",
+      "summary": "Relatives filed lawsuits; lengthy claims (~100 pages).",
+      "details": "In July 2021, Adam’s father died. Almost simultaneously, relatives filed international lawsuits contesting the parents’ wills. The claims ran dozens of pages (about 100) and were aimed at keeping Adam’s rights and assets blocked for as long as possible. Some claims were filed while the father was still alive but already incapacitated. On legal advice, Adam suspended transactions on his personal accounts."
+    },
+    {
+      "id": "2021-07-asset-freeze",
+      "role": "admin",
+      "type": "freeze",
+      "status": "current",
+      "date_start": "2021-07",
+      "date_end": null,
+      "when_label": "From July 2021",
+      "title": "Full asset freeze and restrictions",
+      "summary": "Asset and movement restrictions in force.",
+      "details": "Full asset freeze and movement restrictions were imposed, covering accounts and real estate. The freeze remains in effect."
+    },
+    {
+      "id": "2021-09-apartment-dispute",
+      "role": "defendant",
+      "type": "other",
+      "status": "done",
+      "date_start": "2021-09",
+      "date_end": null,
+      "when_label": "September 2021",
+      "title": "Dispute over Adam’s apartment",
+      "summary": "Sister refused temporary stay; dispute over eviction.",
+      "details": "While in the United States for CAR‑T diagnostics, Adam contacted his sister, who was living in his apartment, asking to stay there temporarily. She refused, citing “discomfort.” Adam then stated that he no longer wished her to live there for free and asked her to move out. She refused, claiming that under the freeze Adam had no right to evict her."
+    },
+    {
+      "id": "2021-11-prelim-scheduled",
+      "role": "court",
+      "type": "order",
+      "status": "done",
+      "date_start": "2021-11",
+      "date_end": null,
+      "when_label": "November 2021",
+      "title": "Preliminary hearing scheduled",
+      "summary": "Preliminary hearing set for July 2024.",
+      "details": "The court scheduled a preliminary hearing on the inheritance case for July 2024."
+    },
+    {
+      "id": "2022-03-hearing-travel",
+      "role": "court",
+      "type": "hearing",
+      "status": "done",
+      "date_start": "2022-03-05",
+      "date_end": null,
+      "when_label": "March 2022 (beginning)",
+      "title": "Hearing on the right to travel for treatment",
+      "summary": "Consideration of permission to travel to the US; relatives objected.",
+      "details": "The court considered granting Adam permission to travel for CAR‑T treatment in the United States. The relatives objected. A forensic medical examination was conducted."
+    },
+    {
+      "id": "2022-03-permission-travel",
+      "role": "court",
+      "type": "order",
+      "status": "done",
+      "date_start": "2022-03-25",
+      "date_end": null,
+      "when_label": "March 2022 (end)",
+      "title": "Permission to travel for treatment granted",
+      "summary": "Court authorized travel to the US for therapy.",
+      "details": "The court granted Adam’s request and allowed him to travel to the United States for therapy."
+    },
+    {
+      "id": "2022-05-visit-med-exam",
+      "role": "admin",
+      "type": "order",
+      "status": "done",
+      "date_start": "2022-05",
+      "date_end": null,
+      "when_label": "May 2022",
+      "title": "Relatives’ visit; demand for medical examination",
+      "summary": "Police intervened; restrictions imposed on the relatives.",
+      "details": "Relatives came to Adam’s home insisting on taking him for a medical examination, citing a possible guardianship order. Adam objected, and the medical staff did not grant them access to him. Police intervened. The court held that such demands were unlawful without Adam’s consent and, as a sanction, imposed one month of custody on the relatives and a six‑month ban on entering the country for attempting to forcibly remove him from his home to an undisclosed location."
+    },
+    {
+      "id": "2024-06-eviction-start",
+      "role": "defendant",
+      "type": "motion",
+      "status": "done",
+      "date_start": "2024-06-25",
+      "date_end": null,
+      "when_label": "June 2024 (end)",
+      "title": "Eviction procedure against sister initiated",
+      "summary": "Process started to evict her from Adam’s apartment.",
+      "details": "In late June 2024, Adam initiated eviction proceedings against his sister after learning that she was the main initiator of the lawsuit. Earlier (in September 2021) she had refused him a temporary stay. Later she claimed in court that the eviction was unlawful, but the court found no violations."
+    },
+    {
+      "id": "2024-07-docs-fee",
+      "role": "defendant",
+      "type": "other",
+      "status": "done",
+      "date_start": "2024-07-05",
+      "date_end": null,
+      "when_label": "July 2024 (beginning)",
+      "title": "Submission of documents; court fee paid",
+      "summary": "Financial and medical documents submitted; $5,350 fee paid.",
+      "details": "Before the preliminary hearing, Adam submitted financial documents on his accounts and medical materials, and paid a court fee of $5,350."
+    },
+    {
+      "id": "2024-07-prelim-hearing",
+      "role": "court",
+      "type": "hearing",
+      "status": "done",
+      "date_start": "2024-07-15",
+      "date_end": null,
+      "when_label": "July 2024 (middle)",
+      "title": "Preliminary hearing; two possible outcomes",
+      "summary": "Court outlined two outcomes; settlement refused.",
+      "details": "The court outlined two scenarios: (1) confirm the wills and secure the inheritance for Adam; (2) divide the inheritance among all children if pressure on the parents is proven. The relatives refused a settlement."
+    },
+    {
+      "id": "2024-07-motion-freeze-relatives",
+      "role": "defendant",
+      "type": "motion",
+      "status": "done",
+      "date_start": "2024-07-15",
+      "date_end": null,
+      "when_label": "July 2024 (middle)",
+      "title": "Motion to freeze relatives’ accounts",
+      "summary": "Freeze and financial review requested.",
+      "details": "At the same hearing, Adam filed a motion to freeze his relatives’ accounts and review their financial transactions."
+    },
+    {
+      "id": "2024-08-relatives-freeze",
+      "role": "admin",
+      "type": "freeze",
+      "status": "done",
+      "date_start": "2024-08",
+      "date_end": null,
+      "when_label": "August 2024",
+      "title": "Relatives’ accounts frozen",
+      "summary": "Court granted the freeze motion.",
+      "details": "The court granted Adam’s motion to freeze the relatives’ accounts to review their financial transactions."
+    },
+    {
+      "id": "2025-07-unfreeze-motion",
+      "role": "defendant",
+      "type": "motion",
+      "status": "done",
+      "date_start": "2025-07",
+      "date_end": null,
+      "when_label": "July 2025",
+      "title": "Motion to unfreeze assets",
+      "summary": "Full or partial unfreeze requested.",
+      "details": "Due to his health and a newly diagnosed form of leukemia, Adam moved for a full or partial unfreeze of assets, despite his lawyer’s opposition on the ground that such filings would only prolong the proceedings. Adam had no other option: he urgently needed funds because of the new form of leukemia and the uncertain scenario of upcoming treatment and maintenance of remission."
+    },
+    {
+      "id": "2026-11-hearing-scheduled",
+      "role": "court",
+      "type": "hearing",
+      "status": "planned",
+      "date_start": "2026-11",
+      "date_end": null,
+      "when_label": "November 2026",
+      "title": "Hearing on the motion scheduled",
+      "summary": "Court scheduled a hearing for November 2026.",
+      "details": "In August 2025, the court accepted Adam’s motion for consideration and scheduled a hearing for November 2026."
+    }
+  ]
+}

@@ -1,0 +1,173 @@
+{
+  "labels": {
+    "done": "Terminé",
+    "current": "Maintenant",
+    "planned": "Planifié",
+    "tentative": "Provisoire",
+
+    "diagnosis": "Diagnostic",
+    "chemotherapy": "Chimiothérapie",
+    "radiotherapy": "Radiothérapie",
+    "transplant": "Greffe",
+    "rehab": "Rééducation",
+    "event": "Événement",
+    "surgery": "Chirurgie",
+    "other": "Autre"
+  },
+  "ui": {
+    "page_title": "Chronologie médicale",
+    "meta_updated": "Mis à jour",
+    "legend_done": "Terminé — étapes/événements achevés",
+    "legend_now": "Maintenant — étape actuelle",
+    "legend_planned": "Planifié — prévu/attendu",
+    "legend_tentative": "Provisoire — possible, non confirmé",
+    "section_completed": "Terminé",
+    "section_now": "Maintenant",
+    "section_plans": "Plans",
+    "no_entries": "Aucune entrée pour le moment.",
+    "btn_details": "Détails",
+    "btn_hide": "Masquer",
+    "confidence": "confiance",
+    "notice_tbd": "« TBD » = « to be determined » (dates/détails non encore définis). Cette carte est informative et ne constitue pas un avis médical."
+  },
+  "items": {
+    "2019-01-dx-staging": {
+      "when_label": "janvier–mars 2019",
+      "title": "Diagnostic primaire — lymphome T-lymphoblastique ; stadification",
+      "summary": "L’évaluation initiale a confirmé un lymphome T-lymphoblastique ; tests de base et stadification complétés.",
+      "details": "Consultation d’hématologie, imagerie et biopsies ont établi le diagnostic et le stade. Évaluations cardiaques et biologiques de base avant traitement."
+    },
+    "2019-03-first-chemo-rt": {
+      "when_label": "mars–août 2019",
+      "title": "Chimiothérapie contre le lymphome (T-lymphoblastique)",
+      "summary": "Chimiothérapie systémique avec support ; radiothérapie adjuvante.",
+      "details": "Cycles planifiés avec contrôles intermédiaires et évaluation de fin de traitement. Radiothérapie de consolidation : ~30 séances."
+    },
+    "2020-04-relapse-dx": {
+      "when_label": "avril 2020",
+      "title": "Rechute — lymphome T-lymphoblastique (diagnostic)",
+      "summary": "Rechute confirmée ; plan thérapeutique renouvelé.",
+      "details": "Réévaluation diagnostique reconfirmant le lymphome T-lymphoblastique ; reprise de la thérapie systémique indiquée."
+    },
+    "2020-04-11-chemo-rt-mi": {
+      "when_label": "avril–novembre 2020",
+      "title": "Chimiothérapie avec radiothérapie adjointe ×30 ; hémorragie digestive massive avec infarctus",
+      "summary": "La chimio a repris avec radiothérapie ; l’ulcère digestif a entraîné un infarctus ; traitement poursuivi après stabilisation.",
+      "details": "Anémie sévère et tachyarythmie prises en charge par transfusions et soins intensifs. Radiothérapie en parallèle de la chimio : ~30 séances."
+    },
+    "2021-05-aggressive-leukocytosis-dx": {
+      "when_label": "mai 2021",
+      "title": "Leucémie agressive avec hyperleucocytose extrême — diagnostic",
+      "summary": "Leucocytes >300 000 ; diagnostic posé ; plan de cytoréduction initié.",
+      "details": "Processus leucémique rapide (caractéristiques Ph+ ultérieures) ; cytoréduction urgente et support transfusionnel nécessaires."
+    },
+    "2021-05-2023-09-chemo-aggr-leukemia": {
+      "when_label": "mai 2021–septembre 2023",
+      "title": "Chimiothérapie contre la leucémie agressive",
+      "summary": "Chimiothérapie systémique prolongée pour atteindre l’éligibilité CAR-T et le contrôle de la maladie.",
+      "details": "Schémas intensifiés/ajustés pour abaisser les leucocytes sous le seuil CAR-T ; infections gérées en cours de route."
+    },
+    "2022-03-26-neuro-shock": {
+      "when_label": "mars–avril 2022",
+      "title": "Choc systémique avec paralysie et amnésie",
+      "summary": "Réanimé ; déficits neurologiques prolongés avec récupération graduelle.",
+      "details": "Effondrement aigu nécessitant réanimation. Ensuite : paralysie, amnésie et ralentissement cognitif ; récupération progressive sous suivi neurologique."
+    },
+    "2022-10-invasive-fungal-sepsis": {
+      "when_label": "octobre 2022",
+      "title": "Infection fongique invasive avec sepsis",
+      "summary": "Foyer oropharyngé sévère avec atteinte systémique ; traité avec succès.",
+      "details": "Prise en charge hospitalière par antimicrobiens ; arythmies concomitantes et antécédent de micro-AVC en 2022."
+    },
+    "2022-12-covid-icu-gi-bleed": {
+      "when_label": "décembre 2022–janvier 2023",
+      "title": "Pneumonie COVID-19 (réanimation, intubation) et hémorragie digestive ; récupération",
+      "summary": "COVID-19 critique avec intubation ; hémorragie digestive ; coma ; récupération inopinée.",
+      "details": "Progression rapide de la pneumonie sous immunosuppression ; récupération post-réanimation suivie d’une stabilisation."
+    },
+    "2023-06-respiratory-arrest-sepsis": {
+      "when_label": "juin–septembre 2023",
+      "title": "Arrêt respiratoire (réanimé) et bactériémie ; chimio à forte dose",
+      "summary": "Événement cardiorespiratoire inversé ; bactériémie d’origine cardiaque traitée ; intensification de la chimio pour les critères CAR-T.",
+      "details": "Thérapie intensifiée pour réduire les leucocytes sous le seuil CAR-T ; infections gérées."
+    },
+    "2023-10-car-t": {
+      "when_label": "octobre–novembre 2023",
+      "title": "Thérapie cellulaire CAR-T",
+      "summary": "CAR-T administrée ; toxicité sévère gérée (fièvre, événements neurologiques et cardiaques).",
+      "details": "Forte fièvre, vomissements, paralysie transitoire d’une jambe, événement cardiaque et amnésie profonde ; récupération graduelle."
+    },
+    "2024-01-allo-sct-brother-bradonor": {
+      "when_label": "janvier 2024",
+      "title": "Greffe allogénique de cellules souches — donneur frère",
+      "summary": "Cellules souches allogéniques en consolidation après CAR-T.",
+      "details": "Phase de prise de greffe sous strict contrôle infectieux ; récupération ensuite en ambulatoire."
+    },
+    "2024-07-abdominal-mass-hl": {
+      "when_label": "juillet 2024",
+      "title": "Volumineuse masse abdominale ; lymphome de Hodgkin agressif",
+      "summary": "Nouveau LH diagnostiqué, distinct de la maladie antérieure ; plan thérapeutique ajusté.",
+      "details": "Possiblement lié au contexte thérapeutique antérieur ; l’oncologie a proposé une nouvelle stratégie de chimiothérapie."
+    },
+    "2024-08-2025-06-chemo-rt": {
+      "when_label": "août 2024–juin 2025",
+      "title": "Chimio intensifiée → complication septique → passage à un schéma efficace ; radiothérapie ×30",
+      "summary": "La dose initiale élevée a provoqué une septicémie ; passage à un schéma mieux toléré ; radiothérapie adjuvante (30 séances).",
+      "details": "Après l’épisode septique, le schéma a été ajusté ; les cycles suivants ont montré un effet. Radiothérapie de consolidation (30 séances quotidiennes)."
+    },
+    "2024-10-nasal-fracture-rhinoplasty": {
+      "when_label": "octobre–novembre 2024",
+      "title": "Grave fracture nasale ; rhinoplastie chirurgicale",
+      "summary": "Chute avec fracture nasale comminutive → épistaxis persistante et obstruction respiratoire ; chirurgie définitive en novembre.",
+      "details": "Fin octobre 2024, une chute traumatique a causé une fracture nasale multifragmentaire. L’épistaxis continue et l’obstruction des voies aériennes rendaient impossible une guérison spontanée ; en novembre, une rhinoplastie reconstructrice a été réalisée pour repositionner les os et réparer les tissus mous. Les symptômes compliquaient aussi la tolérance à la chimio intensive jusqu’à ce que la chirurgie lève l’obstruction."
+    },
+    "2025-06-relapse-Ph-pos": {
+      "when_label": "fin juin 2025",
+      "title": "Augmentation des leucocytes ; cellules lymphoïdes Ph+ détectées",
+      "summary": "Leucocytes passés d’environ 35 k à ~67 k en quelques jours ; lignée lymphoïde Ph+ identifiée.",
+      "details": "Oncologie a proposé une chimiothérapie orale suivie d’un ITK (ponatinib) après stabilisation."
+    },
+    "2025-07-oral-chemo-14": {
+      "when_label": "juillet 2025 – maintenant",
+      "title": "Chimiothérapie orale multi-agent (14 doses)",
+      "summary": "Schéma oral structuré à domicile, total de 14 doses.",
+      "details": "Association orale complexe avec bilans intermédiaires et suivi de tolérance ; points de décision à la fin."
+    },
+    "plan-2025-support-recovery": {
+      "when_label": "Après la chimio (TBD)",
+      "title": "Soutien et récupération fonctionnelle",
+      "summary": "Soins de support et rééducation structurés après le traitement actuel.",
+      "details": "Portée et calendrier ajustés au statut post-chimio et à la dynamique des examens."
+    },
+    "plan-2025-tki-lifelong": {
+      "when_label": "Après stabilisation (TBD)",
+      "title": "Inhibiteur de tyrosine kinase (ponatinib) — long terme",
+      "summary": "Démarrer un entretien par ITK après cytoréduction ; probablement au long cours.",
+      "details": "Démarrage après contrôle hématologique acceptable ; suivi de la réponse et des effets indésirables ; optimisation posologique attendue."
+    },
+    "plan-2025-re-irradiation": {
+      "when_label": "Si indiqué (TBD)",
+      "title": "Ré-irradiation potentielle",
+      "summary": "À envisager si nécessaire pour le contrôle de la maladie.",
+      "details": "À discuter en réunion de concertation pluridisciplinaire ; dépend de l’imagerie et des doses antérieures."
+    },
+    "plan-2025-chemo-switch": {
+      "when_label": "Si le schéma actuel est insuffisant (TBD)",
+      "title": "Changement possible du protocole de chimiothérapie actuel",
+      "summary": "Un changement peut être requis selon la réponse ou la toxicité.",
+      "details": "Décision après réévaluation des bilans, de l’imagerie et de la tolérance ; protocole alternatif choisi si indiqué."
+    },
+    "plan-2025-next-line-chemo": {
+      "when_label": "Si nécessaire (TBD)",
+      "title": "Ligne supplémentaire de chimiothérapie possible",
+      "summary": "Une autre ligne peut être nécessaire selon la dynamique de la maladie.",
+      "details": "À définir en réunion de concertation après évaluation du traitement en cours."
+    },
+    "plan-2026-repeat-allo-sct": {
+      "when_label": "2026 (possible)",
+      "title": "Nouvelle greffe allogénique de cellules souches possible",
+      "summary": "Option si l’évolution nécessite une consolidation définitive.",
+      "details": "Tributaire de la réponse au TKI et à la chimio ; évaluation du donneur/centre et analyse bénéfice-risque requises."
+    }
+  }
+}

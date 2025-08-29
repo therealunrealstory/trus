@@ -1,0 +1,120 @@
+{
+  "meta.titleRest": "支持 Adam",
+  "meta.description": "一位外科医生一生拯救他人，如今却为自己的生命而战的真实故事。",
+
+  "hero.titleRest": "支持 Adam",
+  "hero.lead1": "一位终身救人的外科医生，如今正在为自己的生命而战的真实故事。",
+  "hero.note": "* “Adam” 为化名。为保护隐私，姓名已作更改。",
+
+  "audio.play": "音乐中的故事",
+  "audio.pause": "‖ 暂停",
+  
+  "story.full.title": "我们的故事完整版",
+"full.play": "▶︎ 播放",
+"full.pause": "‖ 暂停",
+"full.note": "完整解说版故事",
+  
+  "menu.story": "故事",
+  "menu.support": "支持",
+  "menu.storyNow": "现在的故事",
+  
+  "page.loading": "正在加载页面...",
+  "page.error": "无法加载页面",
+
+  "btn.install": "安装应用",
+  "pwa.installedTitle": "已安装",
+  "pwa.installedBody": "应用已添加到主屏 / 应用列表。",
+  "pwa.installTitle": "安装此应用",
+  "pwa.installBody": "你可以将 The Real Unreal Story 添加到主屏幕，获得更快、近似原生应用的体验。",
+  "map.geoError": "无法获取你的位置。请重试。",
+
+  "announce.title": "我们的故事预告",
+  "announce.short": "简短音频预告",
+  "announce.play": "▶︎ 播放",
+  "announce.pause": "‖ 暂停",
+  "announce.langLabel": "语言：",
+  
+  "nav.roadmap": "时间线",
+
+  "video.title": "视频预告",
+
+  "short.title": "我们的故事（简版）",
+  "short.note": "涵盖 2019 年初至 2025 年中期的事件。",
+  "short.play": "▶︎ 播放",
+  "short.pause": "‖ 暂停",
+  "short.langLabel": "语言：",
+  
+  "status.playing": "播放中…",
+  "status.paused": "已暂停",
+
+  "support.title": "立即支持",
+  "support.money": "捐款",
+  "support.physical": "实际帮助",
+
+  "modal.help.title": "实际和专业的帮助",
+  "modal.help.body": "如果您愿意提供帮助——无论是法律、医疗还是实际协助（护士、护工），或者想安排见面，请写信至：<a href=\"mailto:theRealUnrealStory@gmail.com\" class=\"underline\">theRealUnrealStory@gmail.com</a>。<br><br>衷心感谢每一位伸出援手的人。",
+
+  "news.title": "故事现在继续",
+  "news.follow": "在 Telegram 关注我们的故事",
+
+  "engage.title": "你的参与",
+  "engage.desc": "勾选你已做过的事——这也是一种支持",
+  "engage.b1": "已阅读/收听简版",
+  "engage.b2": "已阅读/收听完整版",
+  "engage.b3": "已收听与故事相关的曲目",
+  "engage.b4": "已关注 Telegram 频道",
+  "engage.b5": "已关注 Instagram",
+  "engage.b6": "已分享故事",
+  "engage.note": "你的选择会保存在浏览器中。",
+
+  "feed.loading": "正在加载新闻…",
+  "feed.empty": "暂时没有帖子。",
+  "feed.error": "新闻加载失败。",
+  "feed.openTelegram": "在 Telegram 打开",
+
+  "map.title": "支持地图",
+  "map.tip": "请点击地图，标注你支持的准确地点。",
+  "map.locateMe": "显示我的位置",
+  "map.locating": "正在定位…",
+  "map.geoUnsupported": "此设备/浏览器不支持地理定位。",
+  "map.geoDenied": "地理定位权限被拒绝或不可用。",
+  "map.dataNote": "数据存储在数据库中",
+  "map.totalLabel": "总标记数：",
+  "map.youAreHere": "你在这里",
+  "map.selectedPoint": "已选位置（可拖动）",
+  "map.locate": "显示我的位置",
+  "map.noGeo": "此设备不支持定位功能。",
+
+
+  "hearts.title": "支持之心",
+  "hearts.empty": "还没有心形标记。",
+
+  "placeholder.name": "姓名",
+  "placeholder.msg": "留言（最多 140 字）",
+
+  "footer.note": "感谢任何形式的支持——哪怕一次转发也能改变人生。",
+
+  "share.copied": "链接已复制",
+
+  "btn.donate": "输入金额",
+  "btn.share": "分享",
+  "btn.wantHelp": "我愿提供帮助",
+  "btn.addMark": "添加",
+  "btn.addHeart": "留下一颗心",
+  "btn.loadMoreHearts": "加载更多",
+
+  "hashtag.title": "#TheRealUnrealStory",
+  "hashtag.body": "感谢在发布或分享我们的故事时使用 <b>#TheRealUnrealStory</b>。这有助于更多人找到并追踪这条线索。<br><br>请在 Instagram（帖子/Reels/故事）、Telegram、YouTube（标题/简介/评论）、TikTok、X/Twitter、Facebook、博客与 Medium、论坛与 Reddit、LinkedIn 中使用——每一次提及都很重要！",
+
+  "tiles.me": "我是 Nico",
+  "tiles.about": "关于 Adam",
+  "tiles.others": "故事中的其他人物",
+
+  "modal.tile1.body": "我叫 Nico，是 Adam 的朋友。我成了这段“真实-不真实”故事的不情愿参与者。我已向更多人寻求支持——我已无法独自应对。因此我们不加修饰地讲述这段经历，并同时在 GoFundMe 发起募捐。",
+  "modal.tile2.body": "Adam 为人善良，是一位拥有独特技术的外科医生，也是一位慈善家。自 2019 年以来，他多次与血液肿瘤抗争。2025 年 7 月——形势再次严峻：另一种白血病。同时伴随个人层面的打击与失去。",
+  "modal.tile3.body": "Adam 的故事充满了真实的意外与惊喜。有人给予了不可思议的帮助——没有他们，他不可能活到今天。也有蓄意伤害的人。还有一些人，仿佛被命运在恰当的时刻带到了我们身边。",
+
+  "alert.enterMessage": "请输入留言",
+  "alert.clickMapFirst": "请先点击地图！",
+  "error.saveFailed": "保存失败："
+}

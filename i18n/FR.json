@@ -1,0 +1,120 @@
+{
+  "meta.titleRest": "soutien pour Adam",
+  "meta.description": "La véritable histoire d’un chirurgien qui a sauvé des vies toute sa vie et qui se bat aujourd’hui pour la sienne.",
+
+  "hero.titleRest": "soutien pour Adam",
+  "hero.lead1": "La véritable histoire d’un chirurgien qui a consacré sa vie à sauver les autres et qui se bat maintenant pour sa propre vie.",
+  "hero.note": "* « Adam » est un pseudonyme d’une personne réelle. Le nom a été modifié pour protéger sa vie privée.",
+
+  "audio.play": "Histoire en musique",
+  "audio.pause": "‖ Pause",
+  
+  "story.full.title": "Version complète de notre histoire",
+"full.play": "▶︎ Lecture",
+"full.pause": "‖ Pause",
+"full.note": "Récit intégral narré",
+  
+  "menu.story": "L’histoire",
+  "menu.support": "Soutien",
+  "menu.storyNow": "L’histoire maintenant",
+  
+  "page.loading": "Chargement de la page...",
+  "page.error": "Échec du chargement de la page",
+
+  "btn.install": "Installer l’app",
+  "pwa.installedTitle": "Installée",
+  "pwa.installedBody": "L’application a été ajoutée à votre écran d’accueil / liste d’apps.",
+  "pwa.installTitle": "Installer cette application",
+  "pwa.installBody": "Vous pouvez ajouter The Real Unreal Story à votre écran d’accueil pour une expérience plus rapide, semblable à une application.",
+  "map.geoError": "Impossible d’obtenir votre position. Veuillez réessayer.",
+
+  "announce.title": "Annonce de notre histoire",
+  "announce.short": "Annonce audio courte",
+  "announce.play": "▶︎ Lire",
+  "announce.pause": "‖ Pause",
+  "announce.langLabel": "Langue : ",
+  
+  "nav.roadmap": "Chronologie",
+
+  "video.title": "Bande-annonce vidéo",
+
+  "short.title": "Version courte de notre histoire",
+  "short.note": "À propos des événements du début 2019 à la mi-2025.",
+  "short.play": "▶︎ Lire",
+  "short.pause": "‖ Pause",
+  "short.langLabel": "Langue : ",
+  
+  "status.playing": "Lecture…",
+  "status.paused": "En pause",
+
+  "support.title": "Soutenir maintenant",
+  "support.money": "Faire un don",
+  "support.physical": "Aide pratique",
+
+  "modal.help.title": "Aide pratique et professionnelle",
+  "modal.help.body": "Si vous êtes prêt à aider — soutien juridique, médical ou pratique (infirmiers, aidants), ou si vous souhaitez organiser une rencontre — écrivez-nous à : <a href=\"mailto:theRealUnrealStory@gmail.com\" class=\"underline\">theRealUnrealStory@gmail.com</a>.<br><br>Nous remercions sincèrement toutes les personnes qui répondront.",
+
+  "news.title": "L’histoire continue maintenant",
+  "news.follow": "Suivez notre histoire sur Telegram",
+
+  "engage.title": "Votre participation",
+  "engage.desc": "Cochez ce que vous avez déjà fait — c’est aussi un soutien",
+  "engage.b1": "Lu/écouté la version courte",
+  "engage.b2": "Lu/écouté l’histoire complète",
+  "engage.b3": "Écouté des morceaux sur notre histoire",
+  "engage.b4": "Abonné au canal Telegram",
+  "engage.b5": "Abonné à Instagram",
+  "engage.b6": "Partagé l’histoire",
+  "engage.note": "Vos choix sont enregistrés dans votre navigateur.",
+
+  "feed.loading": "Chargement des actus…",
+  "feed.empty": "Aucune publication pour le moment.",
+  "feed.error": "Échec du chargement des actus.",
+  "feed.openTelegram": "Ouvrir dans Telegram",
+
+  "map.title": "Carte de soutien",
+  "map.tip": "Cliquez sur la carte pour indiquer précisément le lieu de votre soutien.",
+  "map.locateMe": "Afficher ma position",
+  "map.locating": "Localisation…",
+  "map.geoUnsupported": "La géolocalisation n’est pas prise en charge sur cet appareil/navigateur.",
+  "map.geoDenied": "Permission de géolocalisation refusée ou indisponible.",
+  "map.dataNote": "Les données sont stockées dans la base de données",
+  "map.totalLabel": "Marqueurs au total :",
+  "map.youAreHere": "Vous êtes ici",
+  "map.selectedPoint": "Point sélectionné (vous pouvez déplacer)",
+  "map.locate": "Afficher ma position",
+  "map.noGeo": "La géolocalisation n’est pas prise en charge sur cet appareil.",
+
+
+  "hearts.title": "Cœurs de soutien",
+  "hearts.empty": "Pas encore de cœurs.",
+
+  "placeholder.name": "Nom",
+  "placeholder.msg": "Message (jusqu’à 140 caractères)",
+
+  "footer.note": "Merci pour tout soutien — même un repost peut changer une vie.",
+
+  "share.copied": "Lien copié",
+
+  "btn.donate": "Saisir montant",
+  "btn.share": "Partager",
+  "btn.wantHelp": "Je veux aider",
+  "btn.addMark": "Ajouter",
+  "btn.addHeart": "Laisser un cœur",
+  "btn.loadMoreHearts": "Charger plus de cœurs",
+
+  "hashtag.title": "#TheRealUnrealStory",
+  "hashtag.body": "Merci d’utiliser <b>#TheRealUnrealStory</b> lorsque vous publiez ou partagez notre histoire. Cela aide les gens à la trouver et à la suivre.<br><br>Utilisez-le sur Instagram (posts/reels/stories), Telegram, YouTube (titres/descriptions/commentaires), TikTok, X/Twitter, Facebook, blogs & Medium, forums & Reddit, LinkedIn — chaque mention compte !",
+
+  "tiles.me": "Je suis Nico",
+  "tiles.about": "À propos d’Adam",
+  "tiles.others": "D’autres personnes dans l’histoire",
+
+  "modal.tile1.body": "Je m’appelle Nico et je suis l’ami d’Adam. Je suis devenu un participant involontaire de cette histoire « réelle-irréelle ». J’ai fait appel à un large public pour obtenir du soutien — je ne peux plus y faire face seul. C’est pourquoi nous racontons notre histoire sans fard et lançons en parallèle une collecte sur GoFundMe.",
+  "modal.tile2.body": "Adam est une personne formidable et un chirurgien aux techniques uniques, un philanthrope. Depuis 2019, il a fait face à plusieurs reprises à des cancers du sang. En juillet 2025 — un nouveau tournant grave : une autre forme de leucémie. En même temps — des chocs et des pertes personnels.",
+  "modal.tile3.body": "L’histoire d’Adam est pleine de vraies surprises. Il y a eu des aides incroyables — sans eux il ne serait pas en vie aujourd’hui. Il y a aussi eu des personnes qui ont délibérément nui. Et des personnes que le destin a semblé mettre au bon moment.",
+
+  "alert.enterMessage": "Saisissez un message",
+  "alert.clickMapFirst": "Cliquez d’abord sur la carte !",
+  "error.saveFailed": "Erreur d’enregistrement : "
+}
