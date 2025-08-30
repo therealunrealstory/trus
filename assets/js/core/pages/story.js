@@ -3,6 +3,7 @@ import { $, $$ } from '../dom.js';
 import { t, I18N, DEFAULT_I18N, onLocaleChanged } from '../i18n.js';
 import { openModal } from '../modal.js';
 import { initSounds, getSoundUrl, onSoundsReady } from '../soundRouter.js';
+import { attachStoryReaders } from '../reader.js';
 
 let announceAudio, shortAudio, fullAudio;
 let announceBtn, shortBtn, fullBtn;
