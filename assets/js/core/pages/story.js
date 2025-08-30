@@ -481,6 +481,7 @@ function readerCalloutHTML(kind){
 }
 
 export function init(root){
+attachStoryReaders(root);
   initSounds();
 
   // DOM
