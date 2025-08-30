@@ -1,4 +1,4 @@
-// assets/js/core/reader.js — place reader ABOVE players
+// assets/js/core/reader.js — afterseek.v2
 import { $, $$ } from './dom.js';
 import { t, onLocaleChanged } from './i18n.js';
 import { openModal } from './modal.js';
@@ -142,79 +142,109 @@ function svgTriangle(){
   return `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>`;
 }
 
-function makeButton(){
+function makeButtonLike(sample){
+  // Create a fresh button that copies classes, but NOT data-i18n or text
   const b = document.createElement('button');
-  b.className = 'px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse';
+  const cls = (sample && sample.className) ? sample.className : 'px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm';
+  b.className = cls;
+  b.classList.add('pulse');
+  b.removeAttribute('data-i18n');
   b.setAttribute('aria-label', t('reader.open','Read'));
+  // include small triangle for parity
   b.innerHTML = `${svgTriangle()} <span>${t('reader.open','Read')}</span>`;
   return b;
 }
 
-function makeReaderCard(version, referenceCard, referenceRow){
-  const card = document.createElement('div');
-  // Copy the same classes as the audio "card"
-  card.className = referenceCard ? referenceCard.className : 'rounded-xl border border-white/10 bg-white/10 p-3';
-  card.style.marginBottom = '12px'; // spacing from the player below
+function makeCta(version, sampleBtn, playerRow){
+  const btn = makeButtonLike(sampleBtn);
+  btn.id = version === 'short' ? 'shortReadBtn' : 'fullReadBtn';
+  btn.addEventListener('click', (e)=>{ e.preventDefault(); openReader(version); });
 
+  const note = document.createElement('div');
+  note.className = playerRow ? playerRow.className : 'text-sm text-gray-200';
+  note.style.margin = '0';
+  note.style.flex = '1 1 auto';
+  // NOTE TEXTS — EN fallbacks (site base language)
+  if (version === 'short'){
+    note.textContent = t('reader.short.note','Some details are omitted. The text focuses on the chronology of events and the overall arc.');
+  } else {
+    note.textContent = t('reader.full.note','Richer descriptive detail and emotional context, with character interactions and a deeper sense of their personalities.');
+  }
+
+  // Reader card container — clone look from player container
+  const wrap = document.createElement('div');
+  const card = document.createElement('div');
+
+  // Try to mimic the same "card" container used for the mini-player row above
+  // Find a sibling card: the playerRow's parent likely is that card
+  const cardLike = playerRow && playerRow.parentElement ? playerRow.parentElement : null;
+  if (cardLike) {
+    card.className = cardLike.className;
+  } else {
+    // fallback: gentle substrate with border
+    card.className = 'rounded-xl border border-white/10 bg-white/10 p-3';
+  }
+
+  // Inner layout: text LEFT, button RIGHT to avoid merging visually with the player
   const row = document.createElement('div');
   row.style.display = 'flex';
   row.style.alignItems = 'center';
   row.style.gap = '10px';
-  if (referenceRow && referenceRow.className) row.className = referenceRow.className; // same font/size
 
-  const note = document.createElement('div');
-  note.style.flex = '1 1 auto';
-  // base language EN
-  note.textContent = version === 'short'
-    ? t('reader.short.note','Some details are omitted. The text focuses on the chronology of events and the overall arc.')
-    : t('reader.full.note','Richer descriptive detail and emotional context, with character interactions and a deeper sense of their personalities.');
+  // Keep same font as player text — reuse the same row classes if present
+  if (playerRow && playerRow.className) row.className = playerRow.className;
 
-  const btn = makeButton();
-  btn.id = version === 'short' ? 'shortReadBtn' : 'fullReadBtn';
-  btn.addEventListener('click', (e)=>{ e.preventDefault(); openReader(version); });
-
-  // Layout: text LEFT, button RIGHT (requested)
   row.appendChild(note);
   row.appendChild(btn);
+
+  card.innerHTML = ''; // clean
   card.appendChild(row);
-  return card;
+
+  wrap.className = '';
+  wrap.appendChild(card);
+  return wrap;
 }
 
-function findPlayerParts(root, version){
+function findPlayerSeekAndRow(root, version){
   const seek = root.querySelector(version==='short' ? '#shortSeek, .mini-player-seek[data-kind="short"]' : '#fullSeek, .mini-player-seek[data-kind="full"]');
-  const row  = seek ? seek.previousElementSibling : null;
-  const card = row ? row.parentElement : (seek ? seek.parentElement : null);
-  return { seek, row, card };
+  if (!seek) return { seek:null, row:null, playBtn:null };
+  // heuristics: the "row" above seek is a sibling with the Play button and text
+  let row = seek.previousElementSibling;
+  if (!row || !(row.querySelector('#shortBtn') || row.querySelector('#fullBtn'))) {
+    // fallback: try to find closest '.mini-player-row' above
+    row = seek.parentElement ? seek.parentElement.querySelector('.mini-player-row') : null;
+  }
+  const playBtn = row ? (row.querySelector('#shortBtn, #fullBtn') || null) : null;
+  return { seek, row, playBtn };
 }
 
 export function attachStoryReaders(root=document){
-  // FULL — insert ABOVE player card
+  // FULL
   {
-    const { seek, row, card } = findPlayerParts(root, 'full');
-    if (card && !root.querySelector('#fullReadBtn')){
-      const readerCard = makeReaderCard('full', card, row);
-      card.parentElement.insertBefore(readerCard, card); // place above player
+    const { seek, row, playBtn } = findPlayerSeekAndRow(root, 'full');
+    if (seek && !root.querySelector('#fullReadBtn')){
+      const cta = makeCta('full', playBtn, row);
+      seek.parentElement.insertBefore(cta, seek.nextSibling);
     }
   }
 
-  // SHORT — insert ABOVE player card
+  // SHORT
   {
-    const { seek, row, card } = findPlayerParts(root, 'short');
-    if (card && !root.querySelector('#shortReadBtn')){
-      const readerCard = makeReaderCard('short', card, row);
-      card.parentElement.insertBefore(readerCard, card); // place above player
+    const { seek, row, playBtn } = findPlayerSeekAndRow(root, 'short');
+    if (seek && !root.querySelector('#shortReadBtn')){
+      const cta = makeCta('short', playBtn, row);
+      seek.parentElement.insertBefore(cta, seek.nextSibling);
     }
   }
 
-  // Update texts on locale change
+  // Update notes when locale changes (do not recreate DOM)
   onLocaleChanged(()=>{
-    const sBtn = root.querySelector('#shortReadBtn');
-    const fBtn = root.querySelector('#fullReadBtn');
-    if (sBtn) sBtn.innerHTML = `${svgTriangle()} <span>${t('reader.open','Read')}</span>`;
-    if (fBtn) fBtn.innerHTML = `${svgTriangle()} <span>${t('reader.open','Read')}</span>`;
-    const sNote = sBtn ? sBtn.parentElement.querySelector('div') : null;
-    const fNote = fBtn ? fBtn.parentElement.querySelector('div') : null;
+    const sNote = root.querySelector('#shortReadBtn')?.parentElement?.querySelector('div');
     if (sNote) sNote.textContent = t('reader.short.note','Some details are omitted. The text focuses on the chronology of events and the overall arc.');
+    const fNote = root.querySelector('#fullReadBtn')?.parentElement?.querySelector('div');
     if (fNote) fNote.textContent = t('reader.full.note','Richer descriptive detail and emotional context, with character interactions and a deeper sense of their personalities.');
+    // Update button label too
+    const sBtn = root.querySelector('#shortReadBtn'); if (sBtn) sBtn.innerHTML = `${svgTriangle()} <span>${t('reader.open','Read')}</span>`;
+    const fBtn = root.querySelector('#fullReadBtn');  if (fBtn) fBtn.innerHTML = `${svgTriangle()} <span>${t('reader.open','Read')}</span>`;
   });
 }

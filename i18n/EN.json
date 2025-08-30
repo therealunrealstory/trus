@@ -125,5 +125,16 @@
 "news.titleNico": "Nico’s notes",
 "news.followNowRich": "The heart of the story beats now — see on Telegram & X:",
 "news.followNicoRich": "Niko’s voice in the story — follow on Telegram, X & Instagram:",
-"feed.auto": "auto-translated"
+"feed.auto": "auto-translated",
+
+  "reader.open": "Read",
+  "reader.short.note": "Some details are omitted. The text focuses on the chronology of events and the overall arc.",
+  "reader.full.note": "Richer descriptive detail and emotional context, with character interactions and a deeper sense of their personalities.",
+  "reader.prev": "Previous",
+  "reader.next": "Next",
+  "reader.toc": "Table of contents",
+  "reader.chapter": "Chapter",
+  "reader.of": "of",
+  "reader.hint": "Use ←/→ to navigate, Esc to close",
+  "reader.error": "Failed to load the book. Please try again later."
 }
