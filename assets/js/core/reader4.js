@@ -1,4 +1,4 @@
-// assets/js/core/reader.js — place reader directly under each block heading
+// assets/js/core/reader.js — place reader ABOVE players
 import { $, $$ } from './dom.js';
 import { t, onLocaleChanged } from './i18n.js';
 import { openModal } from './modal.js';
@@ -141,6 +141,7 @@ export async function openReader(version='full'){
 function svgTriangle(){
   return `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>`;
 }
+
 function makeButton(){
   const b = document.createElement('button');
   b.className = 'px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse';
@@ -151,19 +152,19 @@ function makeButton(){
 
 function makeReaderCard(version, referenceCard, referenceRow){
   const card = document.createElement('div');
+  // Copy the same classes as the audio "card"
   card.className = referenceCard ? referenceCard.className : 'rounded-xl border border-white/10 bg-white/10 p-3';
-  // a bit more gap under heading
-  card.style.marginTop = '8px';
-  card.style.marginBottom = '12px';
+  card.style.marginBottom = '12px'; // spacing from the player below
 
   const row = document.createElement('div');
   row.style.display = 'flex';
   row.style.alignItems = 'center';
   row.style.gap = '10px';
-  if (referenceRow && referenceRow.className) row.className = referenceRow.className; // font consistency
+  if (referenceRow && referenceRow.className) row.className = referenceRow.className; // same font/size
 
   const note = document.createElement('div');
   note.style.flex = '1 1 auto';
+  // base language EN
   note.textContent = version === 'short'
     ? t('reader.short.note','Some details are omitted. The text focuses on the chronology of events and the overall arc.')
     : t('reader.full.note','Richer descriptive detail and emotional context, with character interactions and a deeper sense of their personalities.');
@@ -172,30 +173,14 @@ function makeReaderCard(version, referenceCard, referenceRow){
   btn.id = version === 'short' ? 'shortReadBtn' : 'fullReadBtn';
   btn.addEventListener('click', (e)=>{ e.preventDefault(); openReader(version); });
 
+  // Layout: text LEFT, button RIGHT (requested)
   row.appendChild(note);
   row.appendChild(btn);
   card.appendChild(row);
   return card;
 }
 
-// find the heading node above each player card and insert right after it
-function findHeadingAnchor(card){
-  if (!card) return null;
-  let parent = card.parentElement;
-  if (!parent) return null;
-  // scan previous siblings until we hit a heading element (h1..h4) or node with role=heading
-  let prev = card.previousElementSibling;
-  while (prev){
-    const tag = (prev.tagName || '').toUpperCase();
-    const isHeading = tag === 'H1' || tag === 'H2' || tag === 'H3' || tag === 'H4' || prev.getAttribute('role') === 'heading';
-    if (isHeading) return prev;
-    prev = prev.previousElementSibling;
-  }
-  return null;
-}
-
 function findPlayerParts(root, version){
-  // card = the outer card container of the mini player
   const seek = root.querySelector(version==='short' ? '#shortSeek, .mini-player-seek[data-kind="short"]' : '#fullSeek, .mini-player-seek[data-kind="full"]');
   const row  = seek ? seek.previousElementSibling : null;
   const card = row ? row.parentElement : (seek ? seek.parentElement : null);
@@ -203,31 +188,21 @@ function findPlayerParts(root, version){
 }
 
 export function attachStoryReaders(root=document){
-  // FULL — insert after heading of this block
+  // FULL — insert ABOVE player card
   {
     const { seek, row, card } = findPlayerParts(root, 'full');
     if (card && !root.querySelector('#fullReadBtn')){
-      const heading = findHeadingAnchor(card);
       const readerCard = makeReaderCard('full', card, row);
-      if (heading && heading.parentElement){
-        heading.parentElement.insertBefore(readerCard, heading.nextSibling);
-      } else {
-        // fallback: above player card
-        card.parentElement.insertBefore(readerCard, card);
-      }
+      card.parentElement.insertBefore(readerCard, card); // place above player
     }
   }
-  // SHORT — insert after heading of this block
+
+  // SHORT — insert ABOVE player card
   {
     const { seek, row, card } = findPlayerParts(root, 'short');
     if (card && !root.querySelector('#shortReadBtn')){
-      const heading = findHeadingAnchor(card);
       const readerCard = makeReaderCard('short', card, row);
-      if (heading && heading.parentElement){
-        heading.parentElement.insertBefore(readerCard, heading.nextSibling);
-      } else {
-        card.parentElement.insertBefore(readerCard, card);
-      }
+      card.parentElement.insertBefore(readerCard, card); // place above player
     }
   }
 
