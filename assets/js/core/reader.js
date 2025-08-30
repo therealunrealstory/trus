@@ -1,5 +1,4 @@
-
-// assets/js/core/reader.js — place CTA under seek bar, with own card
+// assets/js/core/reader.js — afterseek.v2
 import { $, $$ } from './dom.js';
 import { t, onLocaleChanged } from './i18n.js';
 import { openModal } from './modal.js';
@@ -29,7 +28,7 @@ async function fetchBook(version, lang){
   const res = await fetch(url, {cache: 'no-store'});
   if (!res.ok) throw new Error(`Failed to load ${url}`);
   const data = await res.json();
-  if (!Array.isArray(data && data.chapters) || !data.chapters.length) throw new Error('Empty chapters');
+  if (!Array.isArray(data?.chapters) || !data.chapters.length) throw new Error('Empty chapters');
   return data;
 }
 
@@ -37,20 +36,20 @@ function buildReaderMarkup(){
   return `
     <div id="trusReader" class="reader-wrap">
       <div class="reader-nav" style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem">
-        <button id="readerPrev" class="btn">${t('reader.prev','Предыдущая')}</button>
-        <button id="readerNext" class="btn">${t('reader.next','Следующая')}</button>
-        <button id="readerToc"  class="btn" title="${t('reader.toc','Оглавление')}">${t('reader.toc','Оглавление')}</button>
-        <div id="readerCounter" class="muted" style="margin-left:auto"></div>
+        <button id="readerPrev" class="btn">${t('reader.prev','Previous')}</button>
+        <button id="readerNext" class="btn">${t('reader.next','Next')}</button>
+        <button id="readerToc"  class="btn" title="${t('reader.toc','Table of contents')}">${t('reader.toc','Table of contents')}</button>
+        <div id="readerCounter" class="opacity-80 text-sm" style="margin-left:auto"></div>
       </div>
       <div id="readerContent">
-        <h3 id="readerTitle" class="text-xl"></h3>
+        <h3 id="readerTitle" class="text-xl font-semibold mb-1"></h3>
         <div id="readerHtml" class="prose" style="line-height:1.6"></div>
       </div>
       <div id="readerTocPanel" style="display:none;margin-top:1rem">
-        <div class="muted" style="margin-bottom:.5rem">${t('reader.toc','Оглавление')}</div>
+        <div class="opacity-80 text-sm mb-2">${t('reader.toc','Table of contents')}</div>
         <div id="readerTocList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.5rem"></div>
       </div>
-      <div class="muted" style="margin-top:.75rem">${t('reader.hint','Стрелки ←/→ — перелистывание, Esc — закрыть')}</div>
+      <div class="opacity-80 text-sm mt-3">${t('reader.hint','Use ←/→ to navigate, Esc to close')}</div>
     </div>
   `;
 }
@@ -61,9 +60,13 @@ function renderChapter(state){
   state.idx = cap(idx);
 
   const ch = book.chapters[state.idx];
-  const titleEl = $('#readerTitle');       if (titleEl) titleEl.textContent = (ch && ch.title) || `${t('reader.chapter','Глава')} ${state.idx+1}`;
-  const htmlEl  = $('#readerHtml');        if (htmlEl)  htmlEl.innerHTML     = (ch && ch.html)  || '';
-  const counter = $('#readerCounter');     if (counter) counter.textContent  = `${t('reader.chapter','Глава')} ${state.idx+1} ${t('reader.of','из')} ${book.chapters.length}`;
+  const titleEl = $('#readerTitle');
+  if (titleEl) titleEl.textContent = (ch && ch.title) || `${t('reader.chapter','Chapter')} ${state.idx+1}`;
+  const htmlEl = $('#readerHtml');
+  if (htmlEl) htmlEl.innerHTML = (ch && ch.html) || '';
+
+  const counterEl = $('#readerCounter');
+  if (counterEl) counterEl.textContent = `${t('reader.chapter','Chapter')} ${state.idx+1} ${t('reader.of','of')} ${book.chapters.length}`;
   writePos(version, lang, state.idx);
 
   try{ const nxt = $('#readerNext'); nxt && nxt.focus(); }catch{}
@@ -71,15 +74,17 @@ function renderChapter(state){
 
 function buildToc(state){
   const { book } = state;
-  const wrap = $('#readerTocList'); if (!wrap) return;
+  const wrap = $('#readerTocList');
+  if (!wrap) return;
   wrap.innerHTML = '';
   book.chapters.forEach((ch,i)=>{
     const btn = document.createElement('button');
     btn.className = 'btn';
-    btn.textContent = (ch && ch.title) || `${t('reader.chapter','Глава')} ${i+1}`;
+    btn.textContent = (ch && ch.title) || `${t('reader.chapter','Chapter')} ${i+1}`;
     btn.addEventListener('click', ()=>{
       state.idx = i;
-      const p = $('#readerTocPanel'); if (p) p.style.display = 'none';
+      const p = $('#readerTocPanel');
+      if (p) p.style.display = 'none';
       renderChapter(state);
     });
     wrap.appendChild(btn);
@@ -103,7 +108,7 @@ export async function openReader(version='full'){
     book = await fetchBook(version, lang);
   }catch(e){
     const errEl = $('#readerHtml');
-    if (errEl) errEl.innerHTML = `<div class="error">${t('reader.error','Не удалось загрузить книгу. Попробуйте позже.')}</div>`;
+    if (errEl) errEl.innerHTML = `<div class="error">${t('reader.error','Failed to load the book. Please try again later.')}</div>`;
     console.error(e);
     return;
   }
@@ -131,107 +136,115 @@ export async function openReader(version='full'){
   renderChapter(state);
 }
 
-// ---- CTA placement under seek bar ----
-function lowestCommonAncestor(a, b){
-  if (!a || !b) return null;
-  const set = new Set();
-  let n=a; while(n){ set.add(n); n=n.parentElement; }
-  n=b; while(n){ if (set.has(n)) return n; n=n.parentElement; }
-  return null;
-}
-function after(node, newNode){
-  if (!node || !node.parentNode) return;
-  if (node.nextSibling) node.parentNode.insertBefore(newNode, node.nextSibling);
-  else node.parentNode.appendChild(newNode);
+/* ---------------- CTA rendering ---------------- */
+
+function svgTriangle(){
+  return `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>`;
 }
 
-function makeCardLike(container){
-  const wrap = document.createElement('div');
-  // Try to mirror container's classes for look & feel
-  if (container && container.className) {
-    wrap.className = container.className;
+function makeButtonLike(sample){
+  // Create a fresh button that copies classes, but NOT data-i18n or text
+  const b = document.createElement('button');
+  const cls = (sample && sample.className) ? sample.className : 'px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm';
+  b.className = cls;
+  b.classList.add('pulse');
+  b.removeAttribute('data-i18n');
+  b.setAttribute('aria-label', t('reader.open','Read'));
+  // include small triangle for parity
+  b.innerHTML = `${svgTriangle()} <span>${t('reader.open','Read')}</span>`;
+  return b;
+}
+
+function makeCta(version, sampleBtn, playerRow){
+  const btn = makeButtonLike(sampleBtn);
+  btn.id = version === 'short' ? 'shortReadBtn' : 'fullReadBtn';
+  btn.addEventListener('click', (e)=>{ e.preventDefault(); openReader(version); });
+
+  const note = document.createElement('div');
+  note.className = playerRow ? playerRow.className : 'text-sm text-gray-200';
+  note.style.margin = '0';
+  note.style.flex = '1 1 auto';
+  // NOTE TEXTS — EN fallbacks (site base language)
+  if (version === 'short'){
+    note.textContent = t('reader.short.note','Some details are omitted. The text focuses on the chronology of events and the overall arc.');
   } else {
-    // Fallback subtle card
-    wrap.style.background = 'rgba(255,255,255,0.05)';
-    wrap.style.border = '1px solid rgba(255,255,255,0.12)';
-    wrap.style.borderRadius = '12px';
-    wrap.style.padding = '10px 12px';
-    wrap.style.marginTop = '10px';
+    note.textContent = t('reader.full.note','Richer descriptive detail and emotional context, with character interactions and a deeper sense of their personalities.');
   }
-  return wrap;
-}
 
-function makeRow(){
+  // Reader card container — clone look from player container
+  const wrap = document.createElement('div');
+  const card = document.createElement('div');
+
+  // Try to mimic the same "card" container used for the mini-player row above
+  // Find a sibling card: the playerRow's parent likely is that card
+  const cardLike = playerRow && playerRow.parentElement ? playerRow.parentElement : null;
+  if (cardLike) {
+    card.className = cardLike.className;
+  } else {
+    // fallback: gentle substrate with border
+    card.className = 'rounded-xl border border-white/10 bg-white/10 p-3';
+  }
+
+  // Inner layout: text LEFT, button RIGHT to avoid merging visually with the player
   const row = document.createElement('div');
   row.style.display = 'flex';
   row.style.alignItems = 'center';
-  row.style.gap = '12px';
-  return row;
-}
+  row.style.gap = '10px';
 
-function makeCtaButton(version, sampleBtn){
-  const btn = sampleBtn ? sampleBtn.cloneNode(true) : document.createElement('button');
-  // ensure unique id and proper label
-  btn.id = version === 'short' ? 'shortReadBtn' : 'fullReadBtn';
-  btn.textContent = t('reader.open','Читать');
-  // make sure pulse effect stays
-  try{ btn.classList.add('pulse'); }catch{}
-  btn.addEventListener('click', (e)=>{ e.preventDefault(); openReader(version); });
-  return btn;
-}
+  // Keep same font as player text — reuse the same row classes if present
+  if (playerRow && playerRow.className) row.className = playerRow.className;
 
-function makeNote(version){
-  const note = document.createElement('div');
-  note.className = 'muted';
-  note.style.marginTop = '0';
-  note.textContent = version === 'short'
-    ? t('short.read.note','Краткая версия истории. Упущены некоторые детали; акцент на хронологии событий.')
-    : t('full.read.note','Полная версия истории. Больше деталей и эмоциональных переживаний, взаимодействия с персонажами и понимания их личностей.');
-  return note;
-}
-
-function insertReaderCta(root, version, btnSel, audioSel, seekSel){
-  const btnEl   = root.querySelector(btnSel);
-  const audioEl = root.querySelector(audioSel);
-  const seekEl  = root.querySelector(seekSel);
-  const seekRow = seekEl ? (seekEl.closest('.mini-player-seek') || seekEl) : null;
-
-  if (!btnEl && !audioEl) return;
-
-  // find common mini-player container (the one that visually looks like a card)
-  const container = lowestCommonAncestor(btnEl || audioEl, seekEl || (btnEl || audioEl));
-  if (!container) return;
-
-  // Avoid duplicates
-  const readId = version==='short' ? '#shortReadBtn' : '#fullReadBtn';
-  if (root.querySelector(readId)) return;
-
-  // Build card
-  const card = makeCardLike(container);
-  const row = makeRow();
-  const ctaBtn = makeCtaButton(version, btnEl);
-  const note = makeNote(version);
-  row.appendChild(ctaBtn);
   row.appendChild(note);
+  row.appendChild(btn);
+
+  card.innerHTML = ''; // clean
   card.appendChild(row);
 
-  if (seekRow) {
-    after(seekRow, card);
-  } else {
-    // fallback: append at end of container
-    container.appendChild(card);
+  wrap.className = '';
+  wrap.appendChild(card);
+  return wrap;
+}
+
+function findPlayerSeekAndRow(root, version){
+  const seek = root.querySelector(version==='short' ? '#shortSeek, .mini-player-seek[data-kind="short"]' : '#fullSeek, .mini-player-seek[data-kind="full"]');
+  if (!seek) return { seek:null, row:null, playBtn:null };
+  // heuristics: the "row" above seek is a sibling with the Play button and text
+  let row = seek.previousElementSibling;
+  if (!row || !(row.querySelector('#shortBtn') || row.querySelector('#fullBtn'))) {
+    // fallback: try to find closest '.mini-player-row' above
+    row = seek.parentElement ? seek.parentElement.querySelector('.mini-player-row') : null;
   }
+  const playBtn = row ? (row.querySelector('#shortBtn, #fullBtn') || null) : null;
+  return { seek, row, playBtn };
 }
 
 export function attachStoryReaders(root=document){
-  insertReaderCta(root, 'full',  '#fullBtn',  '#fullAudio',  '#fullSeek');
-  insertReaderCta(root, 'short', '#shortBtn', '#shortAudio', '#shortSeek');
+  // FULL
+  {
+    const { seek, row, playBtn } = findPlayerSeekAndRow(root, 'full');
+    if (seek && !root.querySelector('#fullReadBtn')){
+      const cta = makeCta('full', playBtn, row);
+      seek.parentElement.insertBefore(cta, seek.nextSibling);
+    }
+  }
 
+  // SHORT
+  {
+    const { seek, row, playBtn } = findPlayerSeekAndRow(root, 'short');
+    if (seek && !root.querySelector('#shortReadBtn')){
+      const cta = makeCta('short', playBtn, row);
+      seek.parentElement.insertBefore(cta, seek.nextSibling);
+    }
+  }
+
+  // Update notes when locale changes (do not recreate DOM)
   onLocaleChanged(()=>{
-    // Only update hint texts if buttons already exist
-    const sNote = root.querySelector('#shortReadBtn')?.nextElementSibling;
-    if (sNote) sNote.textContent = t('short.read.note','Краткая версия истории. Упущены некоторые детали; акцент на хронологии событий.');
-    const fNote = root.querySelector('#fullReadBtn')?.nextElementSibling;
-    if (fNote) fNote.textContent = t('full.read.note','Полная версия истории. Больше деталей и эмоциональных переживаний, взаимодействия с персонажами и понимания их личностей.');
+    const sNote = root.querySelector('#shortReadBtn')?.parentElement?.querySelector('div');
+    if (sNote) sNote.textContent = t('reader.short.note','Some details are omitted. The text focuses on the chronology of events and the overall arc.');
+    const fNote = root.querySelector('#fullReadBtn')?.parentElement?.querySelector('div');
+    if (fNote) fNote.textContent = t('reader.full.note','Richer descriptive detail and emotional context, with character interactions and a deeper sense of their personalities.');
+    // Update button label too
+    const sBtn = root.querySelector('#shortReadBtn'); if (sBtn) sBtn.innerHTML = `${svgTriangle()} <span>${t('reader.open','Read')}</span>`;
+    const fBtn = root.querySelector('#fullReadBtn');  if (fBtn) fBtn.innerHTML = `${svgTriangle()} <span>${t('reader.open','Read')}</span>`;
   });
 }
