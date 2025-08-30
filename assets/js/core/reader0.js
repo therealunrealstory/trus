@@ -1,5 +1,4 @@
-
-// assets/js/core/reader.js (fixed, pure JS)
+// assets/js/core/reader.js
 // Lightweight modal reader for TRUS Story page
 import { $, $$ } from './dom.js';
 import { t, onLocaleChanged } from './i18n.js';
@@ -9,6 +8,7 @@ const TITLE_STATIC = 'The Real Unreal Story'; // per your preference — not loc
 
 function currentLang(){
   const L = (document.documentElement.getAttribute('lang') || 'en').toLowerCase();
+  // normalize custom aliases if needed (cn->zh, etc.) — leave as-is for your structure
   return L;
 }
 function capLang(L){ return (L||'en').toLowerCase(); }
@@ -33,6 +33,10 @@ async function fetchBook(version, lang){
   const data = await res.json();
   if (!Array.isArray(data?.chapters) || !data.chapters.length) throw new Error('Empty chapters');
   return data;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch]));
 }
 
 // Build reader modal content
@@ -65,17 +69,14 @@ function renderChapter(state){
   state.idx = cap(idx);
 
   const ch = book.chapters[state.idx];
-  const titleEl = $('#readerTitle');
-  if (titleEl) titleEl.textContent = (ch && ch.title) || `${t('reader.chapter','Глава')} ${state.idx+1}`;
-  const htmlEl = $('#readerHtml');
-  if (htmlEl) htmlEl.innerHTML = (ch && ch.html) || '';
+  $('#readerTitle')!.textContent = ch?.title || `${t('reader.chapter','Глава')} ${state.idx+1}`;
+  $('#readerHtml')!.innerHTML    = ch?.html || '';
 
-  const counterEl = $('#readerCounter');
-  if (counterEl) counterEl.textContent = `${t('reader.chapter','Глава')} ${state.idx+1} ${t('reader.of','из')} ${book.chapters.length}`;
+  $('#readerCounter')!.textContent = `${t('reader.chapter','Глава')} ${state.idx+1} ${t('reader.of','из')} ${book.chapters.length}`;
   writePos(version, lang, state.idx);
 
   // focus mgmt (optional)
-  try{ const nxt = $('#readerNext'); nxt && nxt.focus(); }catch{}
+  try{ $('#readerNext')?.focus(); }catch{}
 }
 
 function buildToc(state){
@@ -86,11 +87,10 @@ function buildToc(state){
   book.chapters.forEach((ch,i)=>{
     const btn = document.createElement('button');
     btn.className = 'btn';
-    btn.textContent = (ch && ch.title) || `${t('reader.chapter','Глава')} ${i+1}`;
+    btn.textContent = ch?.title || `${t('reader.chapter','Глава')} ${i+1}`;
     btn.addEventListener('click', ()=>{
       state.idx = i;
-      const p = $('#readerTocPanel');
-      if (p) p.style.display = 'none';
+      $('#readerTocPanel')!.style.display = 'none';
       renderChapter(state);
     });
     wrap.appendChild(btn);
@@ -116,8 +116,7 @@ export async function openReader(version='full'){
   try{
     book = await fetchBook(version, lang);
   }catch(e){
-    const errEl = $('#readerHtml');
-    if (errEl) errEl.innerHTML = `<div class="error">${t('reader.error','Не удалось загрузить книгу. Попробуйте позже.')}</div>`;
+    $('#readerHtml')!.innerHTML = `<div class="error">${t('reader.error','Не удалось загрузить книгу. Попробуйте позже.')}</div>`;
     console.error(e);
     return;
   }
@@ -125,12 +124,9 @@ export async function openReader(version='full'){
   const state = { version, lang, book, idx: readPos(version, lang) };
 
   // Handlers
-  const prev = $('#readerPrev');
-  const next = $('#readerNext');
-  const tocBtn = $('#readerToc');
-  if (prev) prev.addEventListener('click', ()=>{ state.idx = Math.max(0, state.idx-1); renderChapter(state); });
-  if (next) next.addEventListener('click', ()=>{ state.idx = Math.min(book.chapters.length-1, state.idx+1); renderChapter(state); });
-  if (tocBtn) tocBtn.addEventListener('click', ()=>{
+  $('#readerPrev')!.addEventListener('click', ()=>{ state.idx = Math.max(0, state.idx-1); renderChapter(state); });
+  $('#readerNext')!.addEventListener('click', ()=>{ state.idx = Math.min(book.chapters.length-1, state.idx+1); renderChapter(state); });
+  $('#readerToc')! .addEventListener('click', ()=>{
     const p = $('#readerTocPanel');
     if (p) p.style.display = (p.style.display==='none' ? 'block' : 'none');
   });
@@ -186,8 +182,8 @@ export function attachStoryReaders(root=document){
   const fullBtn = root.querySelector('#fullBtn');
   const fullAudio = root.querySelector('#fullAudio') || root.querySelector('[data-audio="full"]');
   if (fullBtn || fullAudio){
-    const target = (fullBtn && fullBtn.parentElement) || (fullAudio && fullAudio.parentElement) || root;
-    if (target && !root.querySelector('#fullReadBtn')){
+    const target = fullBtn?.parentElement || fullAudio?.parentElement || root;
+    if (!root.querySelector('#fullReadBtn')){
       target.appendChild(makeCta('full', fullBtn));
     }
   }
@@ -196,21 +192,18 @@ export function attachStoryReaders(root=document){
   const shortBtn = root.querySelector('#shortBtn');
   const shortAudio = root.querySelector('#shortAudio') || root.querySelector('[data-audio="short"]');
   if (shortBtn || shortAudio){
-    const target = (shortBtn && shortBtn.parentElement) || (shortAudio && shortAudio.parentElement) || root;
-    if (target && !root.querySelector('#shortReadBtn')){
+    const target = shortBtn?.parentElement || shortAudio?.parentElement || root;
+    if (!root.querySelector('#shortReadBtn')){
       target.appendChild(makeCta('short', shortBtn));
     }
   }
 
-  // Update notes when locale changes
+  // Re-attach if locale changes (to ensure texts update)
   onLocaleChanged(()=>{
-    const shortBtnEl = root.querySelector('#shortReadBtn');
-    if (shortBtnEl && shortBtnEl.nextElementSibling) {
-      shortBtnEl.nextElementSibling.textContent = t('short.read.note','Краткая версия истории. Упущены некоторые детали; акцент на хронологии событий.');
-    }
-    const fullBtnEl = root.querySelector('#fullReadBtn');
-    if (fullBtnEl && fullBtnEl.nextElementSibling) {
-      fullBtnEl.nextElementSibling.textContent = t('full.read.note','Полная версия истории. Больше деталей и эмоциональных переживаний, взаимодействия с персонажами и понимания их личностей.');
-    }
+    // Replace notes text on-the-fly
+    const sNote = root.querySelector('.reader-cta #shortReadBtn')?.nextElementSibling;
+    if (sNote) sNote.textContent = t('short.read.note','Краткая версия истории. Упущены некоторые детали; акцент на хронологии событий.');
+    const fNote = root.querySelector('.reader-cta #fullReadBtn')?.nextElementSibling;
+    if (fNote) fNote.textContent = t('full.read.note','Полная версия истории. Больше деталей и эмоциональных переживаний, взаимодействия с персонажами и понимания их личностей.');
   });
 }
