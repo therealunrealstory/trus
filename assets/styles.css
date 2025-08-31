@@ -539,3 +539,30 @@ body.modal-open{ overflow:hidden; }
   border-radius: 12px;
   overflow: hidden; /* чтобы плитка не выходила за скругления */
 }
+/* === Mobile tweaks for Story page === */
+@media (max-width: 640px) {
+
+  /* 2.1. Мини-плееры: текст под кнопкой по центру + без лишнего нижнего отступа */
+  #announceBtn + *, #shortBtn + *, #fullBtn + * {
+    text-align: center;
+    margin-bottom: 0;        /* прибираем некрасивый зазор снизу */
+    width: 100%;             /* чтобы строка текста занимала всю ширину карточки */
+  }
+
+  /* 2.2. Ридеры: кнопка не на всю ширину, всё по центру в колонку */
+  .reader-card .reader-row {
+    display: flex;
+    flex-direction: column;  /* кнопка сверху, текст ниже */
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+  #shortReadBtn, #fullReadBtn {
+    display: inline-flex;
+    width: auto;             /* переопределяем возможное width:100% у универсальных .btn */
+    max-width: 90%;
+    justify-content: center;
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}

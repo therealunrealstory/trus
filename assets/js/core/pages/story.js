@@ -196,6 +196,7 @@ function setupMiniPlayer({ key, audioEl, btnEl, statusEl, seekEl, timeCurEl, tim
 function readerCalloutNode(kind, playCard){
   const wrap = document.createElement('div');
   wrap.className = playCard ? playCard.className : 'rounded-2xl border border-gray-700 p-4';
+  wrap.classList.add('reader-card');  
   wrap.style.background = 'rgba(0,0,0,0.35)';
   wrap.style.marginTop = '8px';
   wrap.style.marginBottom = '12px';
@@ -204,6 +205,7 @@ function readerCalloutNode(kind, playCard){
   row.className = 'flex items-center gap-3 trus-reader-row';
   row.style.justifyContent = 'flex-start';
   row.style.flexWrap = 'nowrap'; // по умолчанию (десктоп) — одна строка
+  row.classList.add('reader-row'); 
 
   const btn = document.createElement('button');
   btn.id = (kind==='short') ? 'shortReadBtn' : 'fullReadBtn';
