@@ -1,4 +1,4 @@
-// assets/js/core/pages/story.js — FINAL (readers + tiles working, calls openReader)
+// assets/js/core/pages/story.js — readers + tiles + responsive
 import { $ } from '../dom.js';
 import { t, I18N, DEFAULT_I18N, onLocaleChanged } from '../i18n.js';
 import { openModal } from '../modal.js';
@@ -11,6 +11,7 @@ let announceStatus, shortStatus, fullStatus;
 let announceSeek, shortSeek, fullSeek;
 let announceTimeCur, announceTimeDur, shortTimeCur, shortTimeDur, fullTimeCur, fullTimeDur;
 let onPauseOthers, unLocale;
+let respCleanup = null; // для снятия responsive-слушателей
 
 /* ====== Resume settings ====== */
 const RESUME_ENABLED = true;
@@ -23,8 +24,7 @@ function fmtTime(sec){
   if (!Number.isFinite(sec) || sec < 0) return '--:--';
   sec = Math.floor(sec);
   const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = sec%60;
-  return h>0 ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
-             : `${m}:${String(s).padStart(2,'0')}`;
+  return h>0 ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}` : `${m}:${String(s).padStart(2,'0')}`;
 }
 function resumeKey(trackKey, lang){ return `seek:${trackKey}:${(lang||'EN').toUpperCase()}`; }
 function readResume(trackKey, lang){
@@ -201,19 +201,23 @@ function readerCalloutNode(kind, playCard){
   wrap.style.marginBottom = '12px';
 
   const row = document.createElement('div');
-  row.className = 'flex items-center gap-3';
+  row.className = 'flex items-center gap-3 trus-reader-row';
   row.style.justifyContent = 'flex-start';
-  row.style.flexWrap = 'wrap';
+  row.style.flexWrap = 'nowrap'; // по умолчанию (десктоп) — одна строка
 
   const btn = document.createElement('button');
   btn.id = (kind==='short') ? 'shortReadBtn' : 'fullReadBtn';
   btn.className = 'px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm pulse';
   btn.textContent = t('reader.open','Read');
+  btn.style.whiteSpace = 'nowrap';
+  btn.style.display = 'inline-flex';
+  btn.style.alignItems = 'center';
   btn.addEventListener('click', ()=> openReader(kind));
 
   const note = document.createElement('div');
   note.className = 'text-sm text-gray-200';
   note.style.flex = '1 1 auto';
+  note.style.minWidth = '0';
   note.textContent = (kind==='short')
     ? t('reader.short.note','Some details are omitted. The text focuses on the chronology of events and the overall arc.')
     : t('reader.full.note','Richer descriptive detail and emotional context, with character interactions and a deeper sense of their personalities.');
@@ -248,6 +252,59 @@ function insertReaders(root){
     }
   }
 }
+
+/* ---------- Responsive layout for reader & players ---------- */
+function applyResponsiveLayout(root){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+  // РИДЕРЫ
+  root.querySelectorAll('.trus-reader-row').forEach(row=>{
+    const btn  = row.querySelector('button');
+    const note = row.querySelector('.text-sm');
+    if (btn) { btn.style.whiteSpace = 'nowrap'; btn.style.display = 'inline-flex'; btn.style.alignItems = 'center'; }
+    if (isMobile){
+      row.style.flexDirection = 'column';
+      row.style.flexWrap = 'nowrap';
+      if (note){ note.style.width = '100%'; note.style.marginTop = '8px'; }
+    } else {
+      row.style.flexDirection = 'row';
+      row.style.flexWrap = 'nowrap';
+      if (note){ note.style.flex = '1 1 auto'; note.style.marginTop = '0'; }
+    }
+  });
+
+  // АУДИОПЛЕЕРЫ: подпись под кнопкой на мобилке, в линию — на десктопе
+  const sets = [
+    { btn: announceBtn, status: announceStatus },
+    { btn: shortBtn,    status: shortStatus    },
+    { btn: fullBtn,     status: fullStatus     },
+  ];
+  sets.forEach(({btn, status})=>{
+    if (!btn) return;
+    const row = btn.parentElement; // контейнер кнопки и подписи
+    if (!row) return;
+
+    row.style.display = 'flex';
+    row.style.alignItems = 'center';
+    row.style.gap = '12px';
+
+    // фикс «двух строк» на кнопке (▶︎ и текст вместе)
+    btn.style.whiteSpace = 'nowrap';
+    btn.style.display = 'inline-flex';
+    btn.style.alignItems = 'center';
+
+    if (isMobile){
+      row.style.flexDirection = 'column';
+      row.style.flexWrap = 'nowrap';
+      if (status){ status.style.width = '100%'; status.style.marginTop = '8px'; status.style.flex = '0 0 auto'; }
+    } else {
+      row.style.flexDirection = 'row';
+      row.style.flexWrap = 'nowrap';
+      if (status){ status.style.flex = '1 1 auto'; status.style.marginTop = '0'; status.style.minWidth = '0'; }
+    }
+  });
+}
+/* ---------------------------------------------------------------- */
 
 export function init(root){
   initSounds();
@@ -286,6 +343,19 @@ export function init(root){
 
   // Reader cards under headings
   insertReaders(root);
+
+  // Responsive: применяем и подписываемся
+  applyResponsiveLayout(root);
+  const mql = window.matchMedia('(max-width: 768px)');
+  const onResp = ()=> applyResponsiveLayout(root);
+  if (mql.addEventListener) mql.addEventListener('change', onResp);
+  else mql.addListener(onResp);
+  window.addEventListener('resize', onResp);
+  respCleanup = ()=> {
+    if (mql.removeEventListener) mql.removeEventListener('change', onResp);
+    else mql.removeListener(onResp);
+    window.removeEventListener('resize', onResp);
+  };
 
   // Locale change
   unLocale = onLocaleChanged(({ detail })=>{
@@ -331,8 +401,10 @@ export function destroy(){
   try { announceAudio?.pause(); } catch {}
   try { shortAudio?.pause(); } catch {}
   try { fullAudio?.pause(); } catch {}
+
   document.removeEventListener('pause-others', onPauseOthers);
   if (typeof unLocale === 'function') unLocale();
+  if (typeof respCleanup === 'function') { try { respCleanup(); } catch {} respCleanup = null; }
 
   announceAudio = shortAudio = fullAudio = null;
   announceBtn = shortBtn = fullBtn = announceStatus = shortStatus = fullStatus = null;
