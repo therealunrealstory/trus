@@ -334,6 +334,14 @@ export function init(root){
   fullSeek       = root.querySelector('#fullSeek');
   fullTimeCur    = root.querySelector('#fullTimeCur');
   fullTimeDur    = root.querySelector('#fullTimeDur');
+  
+  // помечаем карточки аудиоплееров для мобильной подстройки
+[announceBtn, shortBtn, fullBtn].forEach(btn => {
+  if (!btn) return;
+  const card = btn.closest('div');        // ближайшая «подложка» с обводкой
+  if (card) card.classList.add('audio-card');
+});
+
 
   const langSel  = $('#lang');
   const currentLang = () => (langSel?.value || 'EN').toUpperCase();
