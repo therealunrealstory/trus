@@ -1,4 +1,4 @@
-// assets/js/core/reader.js — v5: place BEFORE player card (under heading), full-width, no triangle
+// assets/js/core/reader.js — place reader directly under each block heading
 import { $, $$ } from './dom.js';
 import { t, onLocaleChanged } from './i18n.js';
 import { openModal } from './modal.js';
@@ -138,29 +138,29 @@ export async function openReader(version='full'){
 
 /* ---------------- CTA rendering ---------------- */
 
+function svgTriangle(){
+  return `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>`;
+}
 function makeButton(){
   const b = document.createElement('button');
-  // keep visual parity with play button colors, but label is "Read"
   b.className = 'px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse';
   b.setAttribute('aria-label', t('reader.open','Read'));
-  b.textContent = t('reader.open','Read'); // NO triangle icon
+  b.innerHTML = `${svgTriangle()} <span>${t('reader.open','Read')}</span>`;
   return b;
 }
 
 function makeReaderCard(version, referenceCard, referenceRow){
   const card = document.createElement('div');
   card.className = referenceCard ? referenceCard.className : 'rounded-xl border border-white/10 bg-white/10 p-3';
-  card.style.width = '100%';
+  // a bit more gap under heading
   card.style.marginTop = '8px';
   card.style.marginBottom = '12px';
 
   const row = document.createElement('div');
   row.style.display = 'flex';
   row.style.alignItems = 'center';
-  row.style.justifyContent = 'space-between';
   row.style.gap = '10px';
-  // copy text row classes for font parity
-  if (referenceRow && referenceRow.className) row.className = referenceRow.className;
+  if (referenceRow && referenceRow.className) row.className = referenceRow.className; // font consistency
 
   const note = document.createElement('div');
   note.style.flex = '1 1 auto';
@@ -178,7 +178,24 @@ function makeReaderCard(version, referenceCard, referenceRow){
   return card;
 }
 
+// find the heading node above each player card and insert right after it
+function findHeadingAnchor(card){
+  if (!card) return null;
+  let parent = card.parentElement;
+  if (!parent) return null;
+  // scan previous siblings until we hit a heading element (h1..h4) or node with role=heading
+  let prev = card.previousElementSibling;
+  while (prev){
+    const tag = (prev.tagName || '').toUpperCase();
+    const isHeading = tag === 'H1' || tag === 'H2' || tag === 'H3' || tag === 'H4' || prev.getAttribute('role') === 'heading';
+    if (isHeading) return prev;
+    prev = prev.previousElementSibling;
+  }
+  return null;
+}
+
 function findPlayerParts(root, version){
+  // card = the outer card container of the mini player
   const seek = root.querySelector(version==='short' ? '#shortSeek, .mini-player-seek[data-kind="short"]' : '#fullSeek, .mini-player-seek[data-kind="full"]');
   const row  = seek ? seek.previousElementSibling : null;
   const card = row ? row.parentElement : (seek ? seek.parentElement : null);
@@ -186,21 +203,31 @@ function findPlayerParts(root, version){
 }
 
 export function attachStoryReaders(root=document){
-  // FULL — insert BEFORE player card (same container), which puts it right under the section heading
+  // FULL — insert after heading of this block
   {
-    const { row, card } = findPlayerParts(root, 'full');
-    if (card && card.parentElement && !root.querySelector('#fullReadBtn')){
+    const { seek, row, card } = findPlayerParts(root, 'full');
+    if (card && !root.querySelector('#fullReadBtn')){
+      const heading = findHeadingAnchor(card);
       const readerCard = makeReaderCard('full', card, row);
-      card.parentElement.insertBefore(readerCard, card);
+      if (heading && heading.parentElement){
+        heading.parentElement.insertBefore(readerCard, heading.nextSibling);
+      } else {
+        // fallback: above player card
+        card.parentElement.insertBefore(readerCard, card);
+      }
     }
   }
-
-  // SHORT — insert BEFORE player card
+  // SHORT — insert after heading of this block
   {
-    const { row, card } = findPlayerParts(root, 'short');
-    if (card && card.parentElement && !root.querySelector('#shortReadBtn')){
+    const { seek, row, card } = findPlayerParts(root, 'short');
+    if (card && !root.querySelector('#shortReadBtn')){
+      const heading = findHeadingAnchor(card);
       const readerCard = makeReaderCard('short', card, row);
-      card.parentElement.insertBefore(readerCard, card);
+      if (heading && heading.parentElement){
+        heading.parentElement.insertBefore(readerCard, heading.nextSibling);
+      } else {
+        card.parentElement.insertBefore(readerCard, card);
+      }
     }
   }
 
@@ -208,8 +235,8 @@ export function attachStoryReaders(root=document){
   onLocaleChanged(()=>{
     const sBtn = root.querySelector('#shortReadBtn');
     const fBtn = root.querySelector('#fullReadBtn');
-    if (sBtn) sBtn.textContent = t('reader.open','Read');
-    if (fBtn) fBtn.textContent = t('reader.open','Read');
+    if (sBtn) sBtn.innerHTML = `${svgTriangle()} <span>${t('reader.open','Read')}</span>`;
+    if (fBtn) fBtn.innerHTML = `${svgTriangle()} <span>${t('reader.open','Read')}</span>`;
     const sNote = sBtn ? sBtn.parentElement.querySelector('div') : null;
     const fNote = fBtn ? fBtn.parentElement.querySelector('div') : null;
     if (sNote) sNote.textContent = t('reader.short.note','Some details are omitted. The text focuses on the chronology of events and the overall arc.');
