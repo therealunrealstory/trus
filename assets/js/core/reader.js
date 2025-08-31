@@ -1,102 +1,70 @@
-// assets/js/core/reader.js — v5: place BEFORE player card (under heading), full-width, no triangle
+// assets/js/core/reader.js — v6 (reader card under heading, full-width, no play icon)
 import { $, $$ } from './dom.js';
 import { t, onLocaleChanged } from './i18n.js';
 import { openModal } from './modal.js';
 
 const TITLE_STATIC = 'The Real Unreal Story';
 
-function currentLang(){
-  const L = (document.documentElement.getAttribute('lang') || 'en').toLowerCase();
-  return L;
-}
-function capLang(L){ return (L||'en').toLowerCase(); }
-
-function readPos(version, lang){
-  try{
-    const v = localStorage.getItem(`reader:last:${version}:${lang}`);
-    const n = v==null ? 0 : Math.max(0, parseInt(v,10)||0);
-    return n;
-  }catch{ return 0; }
-}
-function writePos(version, lang, idx){
-  try{ localStorage.setItem(`reader:last:${version}:${lang}`, String(Math.max(0, idx|0))); }catch{}
-}
+function currentLang(){ return (document.documentElement.getAttribute('lang') || 'en').toLowerCase(); }
+function cap(L){ return (L||'en').toLowerCase(); }
+function readPos(ver, lang){ try{const v=localStorage.getItem(`reader:last:${ver}:${lang}`); return v==null?0:Math.max(0,parseInt(v,10)||0);}catch{ return 0; } }
+function writePos(ver, lang, i){ try{localStorage.setItem(`reader:last:${ver}:${lang}`, String(Math.max(0,i|0)));}catch{} }
 
 async function fetchBook(version, lang){
-  const L = capLang(lang);
-  const url = `/books/${version}/${L}/book.json`;
-  const res = await fetch(url, {cache: 'no-store'});
-  if (!res.ok) throw new Error(`Failed to load ${url}`);
+  const url = `/books/${version}/${cap(lang)}/book.json`;
+  const res = await fetch(url, { cache: 'no-store' });
+  if(!res.ok) throw new Error(`Failed to load ${url}`);
   const data = await res.json();
-  if (!Array.isArray(data?.chapters) || !data.chapters.length) throw new Error('Empty chapters');
+  if(!Array.isArray(data?.chapters) || !data.chapters.length) throw new Error('Empty chapters');
   return data;
 }
 
 function buildReaderMarkup(){
   return `
-    <div id="trusReader" class="reader-wrap">
-      <div class="reader-nav" style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem">
-        <button id="readerPrev" class="btn">${t('reader.prev','Previous')}</button>
-        <button id="readerNext" class="btn">${t('reader.next','Next')}</button>
-        <button id="readerToc"  class="btn" title="${t('reader.toc','Table of contents')}">${t('reader.toc','Table of contents')}</button>
-        <div id="readerCounter" class="opacity-80 text-sm" style="margin-left:auto"></div>
-      </div>
-      <div id="readerContent">
-        <h3 id="readerTitle" class="text-xl font-semibold mb-1"></h3>
-        <div id="readerHtml" class="prose" style="line-height:1.6"></div>
-      </div>
-      <div id="readerTocPanel" style="display:none;margin-top:1rem">
-        <div class="opacity-80 text-sm mb-2">${t('reader.toc','Table of contents')}</div>
-        <div id="readerTocList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.5rem"></div>
-      </div>
-      <div class="opacity-80 text-sm mt-3">${t('reader.hint','Use ←/→ to navigate, Esc to close')}</div>
+  <div id="trusReader" class="reader-wrap">
+    <div class="reader-nav" style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem">
+      <button id="readerPrev" class="btn">${t('reader.prev','Previous')}</button>
+      <button id="readerNext" class="btn">${t('reader.next','Next')}</button>
+      <button id="readerToc" class="btn" title="${t('reader.toc','Table of contents')}">${t('reader.toc','Table of contents')}</button>
+      <div id="readerCounter" class="opacity-80 text-sm" style="margin-left:auto"></div>
     </div>
-  `;
+    <div id="readerContent">
+      <h3 id="readerTitle" class="text-xl font-semibold mb-1"></h3>
+      <div id="readerHtml" class="prose" style="line-height:1.6"></div>
+    </div>
+    <div id="readerTocPanel" style="display:none;margin-top:1rem">
+      <div class="opacity-80 text-sm mb-2">${t('reader.toc','Table of contents')}</div>
+      <div id="readerTocList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.5rem"></div>
+    </div>
+    <div class="opacity-80 text-sm mt-3">${t('reader.hint','Use ←/→ to navigate, Esc to close')}</div>
+  </div>`;
 }
 
 function renderChapter(state){
-  const { book, idx, version, lang } = state;
-  const cap = (i)=> Math.min(Math.max(i,0), book.chapters.length-1);
-  state.idx = cap(idx);
-
+  const { book } = state;
+  const capIdx = (i)=> Math.min(Math.max(i,0), book.chapters.length-1);
+  state.idx = capIdx(state.idx);
   const ch = book.chapters[state.idx];
-  const titleEl = $('#readerTitle');
-  if (titleEl) titleEl.textContent = (ch && ch.title) || `${t('reader.chapter','Chapter')} ${state.idx+1}`;
-  const htmlEl = $('#readerHtml');
-  if (htmlEl) htmlEl.innerHTML = (ch && ch.html) || '';
 
-  const counterEl = $('#readerCounter');
-  if (counterEl) counterEl.textContent = `${t('reader.chapter','Chapter')} ${state.idx+1} ${t('reader.of','of')} ${book.chapters.length}`;
-  writePos(version, lang, state.idx);
-
-  try{ const nxt = $('#readerNext'); nxt && nxt.focus(); }catch{}
+  const titleEl = $('#readerTitle'); if (titleEl) titleEl.textContent = ch?.title || `${t('reader.chapter','Chapter')} ${state.idx+1}`;
+  const htmlEl  = $('#readerHtml');  if (htmlEl)  htmlEl.innerHTML = ch?.html  || '';
+  const cntEl   = $('#readerCounter'); if (cntEl) cntEl.textContent = `${t('reader.chapter','Chapter')} ${state.idx+1} ${t('reader.of','of')} ${book.chapters.length}`;
+  writePos(state.version, state.lang, state.idx);
 }
 
 function buildToc(state){
-  const { book } = state;
-  const wrap = $('#readerTocList');
-  if (!wrap) return;
+  const wrap = $('#readerTocList'); if (!wrap) return;
   wrap.innerHTML = '';
-  book.chapters.forEach((ch,i)=>{
-    const btn = document.createElement('button');
-    btn.className = 'btn';
-    btn.textContent = (ch && ch.title) || `${t('reader.chapter','Chapter')} ${i+1}`;
-    btn.addEventListener('click', ()=>{
-      state.idx = i;
-      const p = $('#readerTocPanel');
-      if (p) p.style.display = 'none';
-      renderChapter(state);
-    });
-    wrap.appendChild(btn);
+  state.book.chapters.forEach((ch,i)=>{
+    const b = document.createElement('button');
+    b.className = 'btn';
+    b.textContent = ch?.title || `${t('reader.chapter','Chapter')} ${i+1}`;
+    b.addEventListener('click', ()=>{ state.idx = i; $('#readerTocPanel').style.display='none'; renderChapter(state); });
+    wrap.appendChild(b);
   });
 }
 
-function pauseAllAudio(){
-  ['#announceAudio','#shortAudio','#fullAudio'].forEach(sel=>{
-    const a = document.querySelector(sel);
-    try{ a && a.pause && a.pause(); }catch{}
-  });
-}
+function pauseAllAudio(){ ['#announceAudio','#shortAudio','#fullAudio'].forEach(sel=>{ const a=document.querySelector(sel); try{a&&a.pause&&a.pause();}catch{} }); }
 
 export async function openReader(version='full'){
   pauseAllAudio();
@@ -104,72 +72,81 @@ export async function openReader(version='full'){
 
   const lang = currentLang();
   let book;
-  try{
-    book = await fetchBook(version, lang);
-  }catch(e){
-    const errEl = $('#readerHtml');
-    if (errEl) errEl.innerHTML = `<div class="error">${t('reader.error','Failed to load the book. Please try again later.')}</div>`;
-    console.error(e);
-    return;
-  }
+  try { book = await fetchBook(version, lang); }
+  catch(e){ const el=$('#readerHtml'); if(el) el.innerHTML = `<div class="error">${t('reader.error','Failed to load the book. Please try again later.')}</div>`; console.error(e); return; }
 
   const state = { version, lang, book, idx: readPos(version, lang) };
 
-  const prev = $('#readerPrev');
-  const next = $('#readerNext');
-  const tocBtn = $('#readerToc');
-  if (prev) prev.addEventListener('click', ()=>{ state.idx = Math.max(0, state.idx-1); renderChapter(state); });
-  if (next) next.addEventListener('click', ()=>{ state.idx = Math.min(book.chapters.length-1, state.idx+1); renderChapter(state); });
-  if (tocBtn) tocBtn.addEventListener('click', ()=>{
-    const p = $('#readerTocPanel');
-    if (p) p.style.display = (p.style.display==='none' ? 'block' : 'none');
-  });
+  const prev=$('#readerPrev'), next=$('#readerNext'), toc=$('#readerToc');
+  prev && prev.addEventListener('click', ()=>{ state.idx--; renderChapter(state); });
+  next && next.addEventListener('click', ()=>{ state.idx++; renderChapter(state); });
+  toc  && toc .addEventListener('click', ()=>{ const p=$('#readerTocPanel'); if(p) p.style.display = (p.style.display==='none'?'block':'none'); });
 
-  const onKey = (e)=>{
+  document.addEventListener('keydown', function onKey(e){
     if (!$('#trusReader')) { document.removeEventListener('keydown', onKey); return; }
-    if (e.key === 'ArrowLeft')  { state.idx = Math.max(0, state.idx-1); renderChapter(state); }
-    if (e.key === 'ArrowRight') { state.idx = Math.min(book.chapters.length-1, state.idx+1); renderChapter(state); }
-  };
-  document.addEventListener('keydown', onKey);
+    if (e.key==='ArrowLeft'){ state.idx--; renderChapter(state); }
+    if (e.key==='ArrowRight'){ state.idx++; renderChapter(state); }
+  });
 
   buildToc(state);
   renderChapter(state);
 }
 
-/* ---------------- CTA rendering ---------------- */
+/* ---------- CTA rendering (cards under headings) ---------- */
 
-function makeButton(){
-  const b = document.createElement('button');
-  // keep visual parity with play button colors, but label is "Read"
-  b.className = 'px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse';
-  b.setAttribute('aria-label', t('reader.open','Read'));
-  b.textContent = t('reader.open','Read'); // NO triangle icon
-  return b;
+// Find the **audio card**: the smallest ancestor that contains BOTH the play button and the seek of given kind
+function findAudioCard(root, kind){
+  const seek = root.querySelector(kind==='short' ? '#shortSeek, .mini-player-seek[data-kind="short"]'
+                                                 : '#fullSeek, .mini-player-seek[data-kind="full"]');
+  const btn  = root.querySelector(kind==='short' ? '#shortBtn' : '#fullBtn');
+  if (!seek || !btn) return null;
+
+  let node = seek;
+  let card = null;
+  while (node && node !== root){
+    if (node.contains(btn)) { card = node; node = node.parentElement; }
+    else break;
+  }
+  // card is the smallest ancestor containing both
+  return card;
 }
 
-function makeReaderCard(version, referenceCard, referenceRow){
+// Find heading above this audio card (H1–H4 or [role=heading])
+function findHeadingAbove(card){
+  if (!card || !card.parentElement) return null;
+  let prev = card.previousElementSibling;
+  while (prev){
+    const tag = (prev.tagName||'').toUpperCase();
+    if (tag==='H1' || tag==='H2' || tag==='H3' || tag==='H4' || prev.getAttribute('role')==='heading') return prev;
+    prev = prev.previousElementSibling;
+  }
+  return null;
+}
+
+function makeReaderCard(version, referenceCard){
   const card = document.createElement('div');
   card.className = referenceCard ? referenceCard.className : 'rounded-xl border border-white/10 bg-white/10 p-3';
-  card.style.width = '100%';
   card.style.marginTop = '8px';
   card.style.marginBottom = '12px';
+  card.style.gridColumn = '1 / -1'; // span full grid width if parent is grid
 
   const row = document.createElement('div');
   row.style.display = 'flex';
   row.style.alignItems = 'center';
   row.style.justifyContent = 'space-between';
   row.style.gap = '10px';
-  // copy text row classes for font parity
-  if (referenceRow && referenceRow.className) row.className = referenceRow.className;
 
   const note = document.createElement('div');
   note.style.flex = '1 1 auto';
-  note.textContent = version === 'short'
+  note.textContent = version==='short'
     ? t('reader.short.note','Some details are omitted. The text focuses on the chronology of events and the overall arc.')
     : t('reader.full.note','Richer descriptive detail and emotional context, with character interactions and a deeper sense of their personalities.');
 
-  const btn = makeButton();
-  btn.id = version === 'short' ? 'shortReadBtn' : 'fullReadBtn';
+  const btn = document.createElement('button');
+  btn.className = 'px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm pulse';
+  btn.setAttribute('aria-label', t('reader.open','Read'));
+  btn.textContent = t('reader.open','Read'); // no play symbol
+  btn.id = version==='short' ? 'shortReadBtn' : 'fullReadBtn';
   btn.addEventListener('click', (e)=>{ e.preventDefault(); openReader(version); });
 
   row.appendChild(note);
@@ -178,33 +155,25 @@ function makeReaderCard(version, referenceCard, referenceRow){
   return card;
 }
 
-function findPlayerParts(root, version){
-  const seek = root.querySelector(version==='short' ? '#shortSeek, .mini-player-seek[data-kind="short"]' : '#fullSeek, .mini-player-seek[data-kind="full"]');
-  const row  = seek ? seek.previousElementSibling : null;
-  const card = row ? row.parentElement : (seek ? seek.parentElement : null);
-  return { seek, row, card };
-}
-
 export function attachStoryReaders(root=document){
-  // FULL — insert BEFORE player card (same container), which puts it right under the section heading
+  // FULL
   {
-    const { row, card } = findPlayerParts(root, 'full');
-    if (card && card.parentElement && !root.querySelector('#fullReadBtn')){
-      const readerCard = makeReaderCard('full', card, row);
-      card.parentElement.insertBefore(readerCard, card);
+    const audioCard = findAudioCard(root, 'full');
+    if (audioCard && audioCard.parentElement && !root.querySelector('#fullReadBtn')){
+      const readerCard = makeReaderCard('full', audioCard);
+      // place **before** audio card -> right under the section heading
+      audioCard.parentElement.insertBefore(readerCard, audioCard);
+    }
+  }
+  // SHORT
+  {
+    const audioCard = findAudioCard(root, 'short');
+    if (audioCard && audioCard.parentElement && !root.querySelector('#shortReadBtn')){
+      const readerCard = makeReaderCard('short', audioCard);
+      audioCard.parentElement.insertBefore(readerCard, audioCard);
     }
   }
 
-  // SHORT — insert BEFORE player card
-  {
-    const { row, card } = findPlayerParts(root, 'short');
-    if (card && card.parentElement && !root.querySelector('#shortReadBtn')){
-      const readerCard = makeReaderCard('short', card, row);
-      card.parentElement.insertBefore(readerCard, card);
-    }
-  }
-
-  // Update texts on locale change
   onLocaleChanged(()=>{
     const sBtn = root.querySelector('#shortReadBtn');
     const fBtn = root.querySelector('#fullReadBtn');
