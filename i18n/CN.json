@@ -124,5 +124,16 @@
 "news.followNicoRich": "Nico 在故事中的声音 — 请关注 Telegram、X 和 Instagram:",
 "feed.auto": "自动翻译",
 
-"menu.reporting": "报告"
+"menu.reporting": "报告",
+
+  "reader.open": "阅读",
+  "reader.short.note": "部分细节已省略，文本更侧重于事件时间线和整体叙事框架。",
+  "reader.full.note": "提供更丰富的描述细节与情感背景，包含人物互动，并更深入地展现其性格。",
+  "reader.prev": "上一章",
+  "reader.next": "下一章",
+  "reader.toc": "目录",
+  "reader.chapter": "章节",
+  "reader.of": "共",
+  "reader.hint": "使用 ←/→ 导航，按 Esc 关闭",
+  "reader.error": "无法加载书籍。请稍后重试。"
 }
