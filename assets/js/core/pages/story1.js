@@ -3,6 +3,7 @@ import { $, $$ } from '../dom.js';
 import { t, I18N, DEFAULT_I18N, onLocaleChanged } from '../i18n.js';
 import { openModal } from '../modal.js';
 import { initSounds, getSoundUrl, onSoundsReady } from '../soundRouter.js';
+import { attachStoryReaders } from '../reader.js';
 
 let announceAudio, shortAudio, fullAudio;
 let announceBtn, shortBtn, fullBtn;
@@ -347,15 +348,15 @@ function renderReaderModal(version, lang, startIndex=0){
       <div class="flex items-center justify-between gap-3 mb-3">
         <div class="text-xs text-gray-300" id="readerMeta"></div>
         <div class="flex gap-2">
-          <button class="px-3 py-1 rounded-xl border border-gray-700 bg-gray-900/40 text-white text-xs" data-act="toc">${t('reader.toc','Table of contents')}</button>
-          <button class="px-3 py-1 rounded-xl border border-gray-700 bg-gray-900/40 text-white text-xs" data-act="prev">‹ ${t('reader.prev','Previous')}</button>
-          <button class="px-3 py-1 rounded-xl border border-gray-700 bg-gray-900/40 text-white text-xs" data-act="next">${t('reader.next','Next')} ›</button>
+          <button class="px-3 py-1 rounded-xl border border-gray-700 bg-gray-900/40 text-white text-xs" data-act="toc">${t('reader.toc','Оглавление')}</button>
+          <button class="px-3 py-1 rounded-xl border border-gray-700 bg-gray-900/40 text-white text-xs" data-act="prev">‹ ${t('reader.prev','Предыдущая')}</button>
+          <button class="px-3 py-1 rounded-xl border border-gray-700 bg-gray-900/40 text-white text-xs" data-act="next">${t('reader.next','Следующая')} ›</button>
         </div>
       </div>
       <h4 id="readerTitle" class="text-base font-semibold mb-2"></h4>
       <div id="readerBody" class="text-sm leading-relaxed space-y-3"></div>
       <div id="readerToc" class="mt-4 hidden"></div>
-      <div class="mt-4 text-right text-[11px] text-gray-400">${t('reader.hint','Use ←/→ to navigate, Esc to close')}</div>
+      <div class="mt-4 text-right text-[11px] text-gray-400">${t('reader.hint','Стрелки ←/→ — перелистывание, Esc — закрыть')}</div>
     </div>
   `);
 
@@ -376,7 +377,7 @@ function renderReaderModal(version, lang, startIndex=0){
   const savePos = ()=>{
     try { localStorage.setItem(readerStorageKey(version, L), String(current)); } catch {}
   };
-  const readPos2 = ()=>{
+  const readPos = ()=>{
     try {
       const v = localStorage.getItem(readerStorageKey(version, L));
       const n = v == null ? NaN : Number(v);
@@ -395,7 +396,7 @@ function renderReaderModal(version, lang, startIndex=0){
     const items = [];
     for (let i=0;i<total;i++){
       const ch = book.chapters[i];
-      items.push(`<button data-idx="${i}" class="block w-full text-left px-3 py-2 rounded hover:bg-white/5 text-sm">${htmlEscape(ch.title || (t('reader.chapter','Chapter')+' '+(i+1)))}</button>`);
+      items.push(`<button data-idx="${i}" class="block w-full text-left px-3 py-2 rounded hover:bg-white/5 text-sm">${htmlEscape(ch.title || (t('reader.chapter','Глава')+' '+(i+1)))}</button>`);
     }
     toc.innerHTML = `
       <div class="rounded-2xl border border-gray-700 p-2" style="background:rgba(0,0,0,0.25)">
@@ -420,9 +421,9 @@ function renderReaderModal(version, lang, startIndex=0){
     const total = book.chapters.length;
     const ch = book.chapters[current];
     // header meta
-    meta.textContent = `${t('reader.chapter','Chapter')} ${current+1} ${t('reader.of','of')} ${total}`;
+    meta.textContent = `${t('reader.chapter','Глава')} ${current+1} ${t('reader.of','из')} ${total}`;
     // title
-    title.textContent = ch.title || `${t('reader.chapter','Chapter')} ${current+1}`;
+    title.textContent = ch.title || `${t('reader.chapter','Глава')} ${current+1}`;
     // content
     body.innerHTML = ch.html || '';
     updateButtons(total);
@@ -448,11 +449,11 @@ function renderReaderModal(version, lang, startIndex=0){
   // load book
   loadBook(version, L).then(b=>{
     book = b;
-    if (!Number.isFinite(startIndex)) current = readPos2();
+    if (!Number.isFinite(startIndex)) current = readPos();
     renderToc(book.chapters.length);
     openIdx(current);
   }).catch(()=>{
-    body.innerHTML = `<div class="text-red-300">${t('reader.error','Failed to load the book. Please try again later.')}</div>`;
+    body.innerHTML = `<div class="text-red-300">${t('reader.error','Не удалось загрузить книгу. Попробуйте позже.')}</div>`;
   }).finally(()=>{
     // cleanup on modal close
     const modal = document.getElementById('modalBackdrop');
@@ -466,81 +467,21 @@ function renderReaderModal(version, lang, startIndex=0){
   });
 }
 
-/* =======================
-   Reader callouts UNDER HEADINGS
-   ======================= */
-
-function findPlayCard(section, kind){
-  // card with play button inside
-  const btn = section.querySelector(kind==='short' ? '#shortBtn' : '#fullBtn');
-  return btn ? btn.closest('div') : null;
-}
-
-function readerCalloutNode(kind, playCard){
-  const wrap = document.createElement('div');
-  // copy card classes from player card to keep same substrate/border/width
-  wrap.className = playCard ? playCard.className : 'rounded-2xl border border-gray-700 p-4';
-  wrap.style.background = 'rgba(0,0,0,0.35)';
-  wrap.style.marginTop = '8px';
-  wrap.style.marginBottom = '12px';
-
-  const row = document.createElement('div');
-  row.className = 'flex items-center justify-between gap-3';
-
-  const note = document.createElement('div');
-  note.className = 'text-sm text-gray-200';
-  note.textContent = (kind==='short')
-    ? t('reader.short.note','Some details are omitted. The text focuses on the chronology of events and the overall arc.')
-    : t('reader.full.note','Richer descriptive detail and emotional context, with character interactions and a deeper sense of their personalities.');
-
-  const btn = document.createElement('button');
-  btn.id = (kind==='short') ? 'shortReadBtn' : 'fullReadBtn';
-  btn.className = 'px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm pulse';
-  btn.textContent = t('reader.open','Read');
-  btn.addEventListener('click', ()=>{
-    const langSel  = $('#lang');
-    const L = (langSel?.value || 'EN').toUpperCase();
-    renderReaderModal(kind, L, NaN);
-  });
-
-  row.appendChild(note);
-  row.appendChild(btn);
-  wrap.appendChild(row);
-  return wrap;
-}
-
-function insertReaders(root){
-  // SHORT
-  {
-    const section = root.querySelector('#shortBtn')?.closest('section') || root.querySelector('#shortSeek')?.closest('section');
-    if (section && !section.querySelector('#shortReadBtn')){
-      const heading = section.querySelector('h2,[role="heading"]');
-      const playerCard = findPlayCard(section, 'short');
-      const node = readerCalloutNode('short', playerCard);
-      if (heading && heading.parentNode){
-        heading.parentNode.insertBefore(node, heading.nextSibling);
-      } else {
-        section.insertBefore(node, section.firstChild);
-      }
-    }
-  }
-  // FULL
-  {
-    const section = root.querySelector('#fullBtn')?.closest('section') || root.querySelector('#fullSeek')?.closest('section');
-    if (section && !section.querySelector('#fullReadBtn')){
-      const heading = section.querySelector('h2,[role="heading"]');
-      const playerCard = findPlayCard(section, 'full');
-      const node = readerCalloutNode('full', playerCard);
-      if (heading && heading.parentNode){
-        heading.parentNode.insertBefore(node, heading.nextSibling);
-      } else {
-        section.insertBefore(node, section.firstChild);
-      }
-    }
-  }
+function readerCalloutHTML(kind){
+  const note = kind === 'short'
+    ? t('short.read.note','Краткая версия истории. Упущены некоторые детали; акцент на хронологии событий.')
+    : t('full.read.note','Полная версия истории. Больше деталей и эмоциональных переживаний, взаимодействия с персонажами и понимания их личностей.');
+  const btnId = kind === 'short' ? 'shortReadBtn' : 'fullReadBtn';
+  return `
+    <div class="mt-3 rounded-2xl border border-gray-700 p-4 flex items-center gap-3" style="background:rgba(0,0,0,0.35)">
+      <button id="${btnId}" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm pulse">📖 ${t('reader.open','Читать')}</button>
+      <div class="text-sm text-gray-200">${note}</div>
+    </div>
+  `;
 }
 
 export function init(root){
+attachStoryReaders(root);
   initSounds();
 
   // DOM
@@ -571,7 +512,7 @@ export function init(root){
   const langSel  = $('#lang');
   const currentLang = () => (langSel?.value || 'EN').toUpperCase();
 
-  // Инициализируем три мини‑плеера
+  // Инициализируем три мини‑плеера единообразно
   const p1 = setupMiniPlayer({
     key:'announcement',
     audioEl:announceAudio, btnEl:announceBtn, statusEl:announceStatus,
@@ -591,28 +532,40 @@ export function init(root){
     getLang: currentLang
   });
 
-  // ВСТАВЛЯЕМ РИДЕРЫ ПОД ЗАГОЛОВКАМИ
-  insertReaders(root);
-
-  // Реакция на смену языка: обновляем плееры
+  // Реакция на смену языка
   unLocale = onLocaleChanged(({ detail })=>{
     const l = (detail?.lang || langSel?.value || 'EN').toUpperCase();
     p1?.onLocaleChange(l);
     p2?.onLocaleChange(l);
     p3?.onLocaleChange(l);
+    
+  // === Reader: insert callouts under Short & Full mini-players ===
+  try {
+    const L = currentLang();
+    const shortSection = root.querySelector('#shortAudio')?.closest('section');
+    const fullSection  = root.querySelector('#fullAudio')?.closest('section');
 
-    // Обновим подписи кнопок ридера (карточки уже на месте)
-    const sBtn = root.querySelector('#shortReadBtn');
-    const fBtn = root.querySelector('#fullReadBtn');
-    if (sBtn) sBtn.textContent = t('reader.open','Read');
-    if (fBtn) fBtn.textContent = t('reader.open','Read');
+    if (shortSection && !shortSection.querySelector('#shortReadBtn')) {
+      const seek = shortSection.querySelector('.mini-player-seek');
+      const holder = document.createElement('div');
+      holder.innerHTML = readerCalloutHTML('short');
+      (seek?.parentNode || shortSection).appendChild(holder.firstElementChild);
+      shortSection.querySelector('#shortReadBtn')?.addEventListener('click', ()=>{
+        renderReaderModal('short', currentLang(), NaN /* continue from saved */);
+      });
+    }
+    if (fullSection && !fullSection.querySelector('#fullReadBtn')) {
+      const seek = fullSection.querySelector('.mini-player-seek');
+      const holder = document.createElement('div');
+      holder.innerHTML = readerCalloutHTML('full');
+      (seek?.parentNode || fullSection).appendChild(holder.firstElementChild);
+      fullSection.querySelector('#fullReadBtn')?.addEventListener('click', ()=>{
+        renderReaderModal('full', currentLang(), NaN /* continue from saved */);
+      });
+    }
+  } catch {}
 
-    const sNote = sBtn ? sBtn.parentElement.querySelector('.text-sm') : null;
-    const fNote = fBtn ? fBtn.parentElement.querySelector('.text-sm') : null;
-    if (sNote) sNote.textContent = t('reader.short.note','Some details are omitted. The text focuses on the chronology of events and the overall arc.');
-    if (fNote) fNote.textContent = t('reader.full.note','Richer descriptive detail and emotional context, with character interactions and a deeper sense of their personalities.');
-
-    updateMiniLabels();
+  updateMiniLabels();
   });
 
   // Когда другие плееры стартуют — останавливаемся
@@ -623,7 +576,7 @@ export function init(root){
   };
   document.addEventListener('pause-others', onPauseOthers);
 
-  // Тайлы/модалки — примеры
+  // Тайлы/модалки — оставлено как у вас (пример):
   root.querySelector('#tile1')?.addEventListener('click', ()=> openModal(t('tiles.me','I’m Nico'), t('modal.tile1.body','…')));
   root.querySelector('#tile2')?.addEventListener('click', ()=> openModal(t('tiles.about','About Adam'), t('modal.tile2.body','…')));
   root.querySelector('#tile3')?.addEventListener('click', ()=> openModal(t('tiles.others','Other people in the story'), t('modal.tile3.body','…')));
