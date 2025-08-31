@@ -599,3 +599,45 @@ body.modal-open{ overflow:hidden; }
     align-self: center;
   }
 }
+/* ===== Mobile polish for audio + reader cards ===== */
+@media (max-width: 640px) {
+  /* Аудио-карточки: уменьшаем нижний внутренний отступ */
+  .rounded-2xl:has(#announceBtn),
+  .rounded-2xl:has(#shortBtn),
+  .rounded-2xl:has(#fullBtn) {
+    padding-bottom: 12px !important;   /* при желании 10–14 */
+  }
+
+  /* Текст под кнопкой по центру и без "хвоста" */
+  #announceBtn ~ *, #shortBtn ~ *, #fullBtn ~ * {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 0 !important;       /* внешний отступ */
+  }
+  .rounded-2xl:has(#announceBtn) > :last-child,
+  .rounded-2xl:has(#shortBtn)    > :last-child,
+  .rounded-2xl:has(#fullBtn)     > :last-child,
+  .rounded-2xl:has(#announceBtn) p:last-child,
+  .rounded-2xl:has(#shortBtn)    p:last-child,
+  .rounded-2xl:has(#fullBtn)     p:last-child {
+    margin-bottom: 0 !important;       /* отступ у последнего параграфа */
+  }
+
+  /* Ридеры: кнопка не тянется на всю ширину, всё по центру */
+  .reader-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+  #shortReadBtn, #fullReadBtn {
+    width: auto !important;            /* не растягивать */
+    max-width: 90%;
+    flex: none !important;
+    justify-content: center;
+    padding-left: 18px;
+    padding-right: 18px;
+    align-self: center;
+  }
+}
