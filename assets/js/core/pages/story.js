@@ -478,33 +478,38 @@ function findPlayCard(section, kind){
 
 function readerCalloutNode(kind, playCard){
   const wrap = document.createElement('div');
-  // copy card classes from player card to keep same substrate/border/width
+  // подложка/рамка/ширина как у карточки плеера
   wrap.className = playCard ? playCard.className : 'rounded-2xl border border-gray-700 p-4';
   wrap.style.background = 'rgba(0,0,0,0.35)';
   wrap.style.marginTop = '8px';
   wrap.style.marginBottom = '12px';
 
   const row = document.createElement('div');
-  row.className = 'flex items-center justify-between gap-3';
+  row.className = 'flex items-center gap-3';
+  row.style.justifyContent = 'flex-start';
+  row.style.flexWrap = 'wrap'; // на узких экранах текст может уйти под кнопку
 
-  const note = document.createElement('div');
-  note.className = 'text-sm text-gray-200';
-  note.textContent = (kind==='short')
-    ? t('reader.short.note','Some details are omitted. The text focuses on the chronology of events and the overall arc.')
-    : t('reader.full.note','Richer descriptive detail and emotional context, with character interactions and a deeper sense of their personalities.');
-
+  // КНОПКА слева
   const btn = document.createElement('button');
   btn.id = (kind==='short') ? 'shortReadBtn' : 'fullReadBtn';
   btn.className = 'px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm pulse';
   btn.textContent = t('reader.open','Read');
   btn.addEventListener('click', ()=>{
-    const langSel  = $('#lang');
+    const langSel = $('#lang');
     const L = (langSel?.value || 'EN').toUpperCase();
     renderReaderModal(kind, L, NaN);
   });
 
-  row.appendChild(note);
+  // ТЕКСТ справа, занимает всё оставшееся место
+  const note = document.createElement('div');
+  note.className = 'text-sm text-gray-200';
+  note.style.flex = '1 1 auto';
+  note.textContent = (kind==='short')
+    ? t('reader.short.note','Some details are omitted. The text focuses on the chronology of events and the overall arc.')
+    : t('reader.full.note','Richer descriptive detail and emotional context, with character interactions and a deeper sense of their personalities.');
+
   row.appendChild(btn);
+  row.appendChild(note);
   wrap.appendChild(row);
   return wrap;
 }
