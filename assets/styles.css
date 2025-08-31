@@ -599,38 +599,3 @@ body.modal-open{ overflow:hidden; }
     align-self: center;
   }
 }
-/* ===== Mobile polish for audio + reader cards ===== */
-@media (max-width: 640px) {
-
-  /* Аудио-карточки (только те, что пометили в JS): меньше нижний padding */
-  .audio-card {
-    padding-bottom: 12px !important;    /* при желании 10–14 */
-  }
-
-  /* Описание под кнопкой — по центру и без «хвоста» */
-  .audio-card * {
-    text-align: center;
-  }
-  .audio-card p:last-child,
-  .audio-card > :last-child {
-    margin-bottom: 0 !important;
-  }
-
-  /* Ридеры: кнопка не тянется на всю ширину, всё по центру */
-  .reader-row {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 12px;
-  }
-  #shortReadBtn, #fullReadBtn {
-    width: auto !important;             /* не растягивать на 100% */
-    max-width: 90%;
-    flex: none !important;
-    justify-content: center;
-    padding-left: 18px;
-    padding-right: 18px;
-    align-self: center;
-  }
-}

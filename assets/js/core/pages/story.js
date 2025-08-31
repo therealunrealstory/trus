@@ -255,6 +255,23 @@ function insertReaders(root){
   }
 }
 
+// пометить именно ВНЕШНЮЮ карточку плеера (rounded-2xl)
+function markAudioCards(root){
+  ['announce','short','full'].forEach(id=>{
+    const btn = root.querySelector(`#${id}Btn`);
+    if (!btn) return;
+    // поднимаемся по DOM до контейнера с рамкой
+    let box = btn;
+    while (box && box !== root && !box.classList?.contains('rounded-2xl')) {
+      box = box.parentElement;
+    }
+    if (box && box.classList.contains('rounded-2xl')) {
+      box.classList.add('audio-card');
+    }
+  });
+}
+
+
 /* ---------- Responsive layout for reader & players ---------- */
 function applyResponsiveLayout(root){
   const isMobile = window.matchMedia('(max-width: 768px)').matches;
@@ -335,13 +352,6 @@ export function init(root){
   fullTimeCur    = root.querySelector('#fullTimeCur');
   fullTimeDur    = root.querySelector('#fullTimeDur');
   
-  // помечаем карточки аудиоплееров для мобильной подстройки
-[announceBtn, shortBtn, fullBtn].forEach(btn => {
-  if (!btn) return;
-  const card = btn.closest('div');        // ближайшая «подложка» с обводкой
-  if (card) card.classList.add('audio-card');
-});
-
 
   const langSel  = $('#lang');
   const currentLang = () => (langSel?.value || 'EN').toUpperCase();
@@ -353,6 +363,8 @@ export function init(root){
 
   // Reader cards under headings
   insertReaders(root);
+  
+  markAudioCards(root);
 
   // Responsive: применяем и подписываемся
   applyResponsiveLayout(root);
