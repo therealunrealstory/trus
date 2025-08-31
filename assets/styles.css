@@ -566,3 +566,36 @@ body.modal-open{ overflow:hidden; }
     padding-right: 18px;
   }
 }
+/* === Mobile tweaks for Story page === */
+@media (max-width: 640px) {
+
+  /* Аудио-карточки: описание под кнопкой по центру и без лишнего зазора снизу */
+  #announceBtn ~ *, #shortBtn ~ *, #fullBtn ~ * {
+    text-align: center;
+    margin-bottom: 0 !important;       /* снимаем внешний отступ блока */
+  }
+  #announceBtn ~ * p:last-child,
+  #shortBtn  ~ * p:last-child,
+  #fullBtn   ~ * p:last-child {
+    margin-bottom: 0 !important;       /* снимаем отступ у последнего параграфа */
+  }
+
+  /* Ридеры: кнопка не растягивается, всё выровнено по центру */
+  .reader-row {
+    display: flex;
+    flex-direction: column;             /* кнопка сверху, текст ниже */
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+  #shortReadBtn, #fullReadBtn {
+    display: inline-flex;
+    width: auto !important;             /* переопределяем возможное width:100% */
+    max-width: 90%;
+    flex: none !important;              /* чтобы flex не растягивал */
+    justify-content: center;
+    padding-left: 18px;
+    padding-right: 18px;
+    align-self: center;
+  }
+}
