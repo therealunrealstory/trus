@@ -1,33 +1,28 @@
-// assets/js/core/reader.js — CLEAN v2 (normalize lang like "ru-RU" -> "ru")
+// assets/js/core/reader.js — CLEAN (single responsibility: modal reader)
 import { t } from './i18n.js';
 import { openModal } from './modal.js';
 
-const TITLE_STATIC = 'The Real Unreal Story';
+const TITLE_STATIC = 'The Real Unreal Story'; // keep original title across languages
 const _bookCache = new Map(); // key = `${version}:${langLower}`
 
-function normalizeLang(input){
-  const raw = (input || 'en').toString().trim();
-  const short = raw.split(/[-_]/)[0].toLowerCase(); // "ru-RU" -> "ru"
-  return { upper: short.toUpperCase(), lower: short };
-}
 function getCurrentLang(){
   const sel = document.querySelector('#lang');
-  const raw = (sel && sel.value) || document.documentElement.getAttribute('lang') || 'en';
-  return normalizeLang(raw).upper; // return "RU"
+  const v = (sel && sel.value) || document.documentElement.getAttribute('lang') || 'EN';
+  return String(v).toUpperCase();
 }
-function storageKey(version, langUpper){ return `reader:last:${version}:${langUpper}`; }
+function langFolder(lang){ return String(lang||'EN').toLowerCase(); }
+function storageKey(version, lang){ return `reader:last:${version}:${String(lang||'EN').toUpperCase()}`; }
 
 async function loadBook(version, langUpper){
-  const { lower } = normalizeLang(langUpper);
-  const cacheKey = `${version}:${lower}`;
-  if (_bookCache.has(cacheKey)) return _bookCache.get(cacheKey);
+  const key = `${version}:${langFolder(langUpper)}`;
+  if (_bookCache.has(key)) return _bookCache.get(key);
 
-  const url = `/books/${version}/${lower}/book.json?ts=${Date.now()}`;
+  const url = `/books/${version}/${langFolder(langUpper)}/book.json?ts=${Date.now()}`;
   const res = await fetch(url, { cache: 'no-store' });
-  if (!res.ok) throw new Error(`reader.load.failed: ${url}`);
+  if (!res.ok) throw new Error('reader.load.failed');
   const data = await res.json();
   if (!data || !Array.isArray(data.chapters) || !data.chapters.length) throw new Error('reader.empty');
-  _bookCache.set(cacheKey, data);
+  _bookCache.set(key, data);
   return data;
 }
 
@@ -36,8 +31,10 @@ function htmlEscape(s){
 }
 
 export async function openReader(version='full', startIndex=NaN){
+  // Pause any audio (the Story page listens for this event)
   document.dispatchEvent(new CustomEvent('pause-others', { detail: 'reader' }));
 
+  // Modal skeleton
   openModal(TITLE_STATIC, `
     <div id="readerWrap">
       <div class="flex items-center justify-between gap-3 mb-3">
@@ -64,20 +61,22 @@ export async function openReader(version='full', startIndex=NaN){
   const btnNext = wrap.querySelector('[data-act="next"]');
   const btnToc  = wrap.querySelector('[data-act="toc"]');
 
-  const L = getCurrentLang(); // e.g. "RU"
+  const L = getCurrentLang();
   let book;
   try {
     book = await loadBook(version, L);
   } catch (e) {
-    console.error(e);
     if (body) body.innerHTML = `<div class="text-red-300">${t('reader.error','Failed to load the book. Please try again later.')}</div>`;
+    console.error(e);
     return;
   }
 
   let current = Number.isFinite(startIndex) ? Math.max(0, startIndex|0) : (Number(localStorage.getItem(storageKey(version, L)))||0);
   current = Math.min(Math.max(0,current), book.chapters.length-1);
 
-  function savePos(){ try { localStorage.setItem(storageKey(version, L), String(current)); } catch {} }
+  function savePos(){
+    try { localStorage.setItem(storageKey(version, L), String(current)); } catch {}
+  }
   function updateButtons(){
     const total = book.chapters.length;
     btnPrev.disabled = current <= 0;
@@ -105,10 +104,12 @@ export async function openReader(version='full', startIndex=NaN){
     });
   }
 
+  // controls
   btnPrev.addEventListener('click', ()=> openIdx(current-1));
   btnNext.addEventListener('click', ()=> openIdx(current+1));
   btnToc .addEventListener('click', ()=> toc.classList.toggle('hidden'));
 
+  // keyboard
   const onKey = (e)=>{
     if (!document.getElementById('modalBody')) return;
     if (e.key === 'ArrowLeft')  { e.preventDefault(); openIdx(current-1); }
@@ -116,9 +117,11 @@ export async function openReader(version='full', startIndex=NaN){
   };
   document.addEventListener('keydown', onKey);
 
+  // build and open
   renderToc();
   openIdx(current);
 
+  // cleanup on modal close
   const modal = document.getElementById('modalBackdrop');
   const obs = new MutationObserver(()=>{
     if (!modal.classList.contains('show')){
