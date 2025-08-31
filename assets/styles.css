@@ -607,7 +607,7 @@ body.modal-open{ overflow:hidden; }
   #fullStatus {
     display: block;
     text-align: center;
-    margin-bottom: -10px !important;  /* съедаем внутренний паддинг карточки */
+    margin-bottom: -14px !important;  /* съедаем внутренний паддинг карточки */
   }
 
   /* если подпись завершается параграфом — уберём и его хвост */
