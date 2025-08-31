@@ -255,15 +255,6 @@ function insertReaders(root){
   }
 }
 
-// пометить карточки аудиоплееров
-function markAudioCards(root){
-  ['announce','short','full'].forEach(id=>{
-    const btn = root.querySelector(`#${id}Btn`);
-    const card = btn ? btn.closest('div') : null;   // ближайшая "карточка"
-    if (card) card.classList.add('mini-player-card');
-  });
-}
-
 /* ---------- Responsive layout for reader & players ---------- */
 function applyResponsiveLayout(root){
   const isMobile = window.matchMedia('(max-width: 768px)').matches;
@@ -354,11 +345,6 @@ export function init(root){
 
   // Reader cards under headings
   insertReaders(root);
-  
-  // Reader cards under headings
-insertReaders(root);
-// помечаем аудио-карточки для мобильной подстройки
-markAudioCards(root);
 
   // Responsive: применяем и подписываемся
   applyResponsiveLayout(root);
