@@ -135,5 +135,7 @@
   "reader.chapter": "Kapitel",
   "reader.of": "von",
   "reader.hint": "Mit ←/→ navigieren, mit Esc schließen",
-  "reader.error": "Das Buch konnte nicht geladen werden. Bitte versuchen Sie es später erneut."
+  "reader.error": "Das Buch konnte nicht geladen werden. Bitte versuchen Sie es später erneut.",
+  
+  "video.disclaimer": "Alles Filmmaterial in diesem Video zeigt reale Ereignisse und echte Menschen. Die volle Bedeutung dieser Szenen wird nach dem Lesen unserer Geschichte deutlich."
 }

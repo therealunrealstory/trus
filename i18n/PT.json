@@ -135,5 +135,7 @@
   "reader.chapter": "Capítulo",
   "reader.of": "de",
   "reader.hint": "Use ←/→ para navegar e Esc para fechar",
-  "reader.error": "Não foi possível carregar o livro. Tente novamente mais tarde."
+  "reader.error": "Não foi possível carregar o livro. Tente novamente mais tarde.",
+  
+  "video.disclaimer": "Todas as imagens deste vídeo retratam acontecimentos reais e pessoas reais. O significado completo destas cenas torna-se claro depois de ler a nossa história."
 }

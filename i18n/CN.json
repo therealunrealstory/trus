@@ -135,5 +135,7 @@
   "reader.chapter": "章节",
   "reader.of": "共",
   "reader.hint": "使用 ←/→ 导航，按 Esc 关闭",
-  "reader.error": "无法加载书籍。请稍后重试。"
+  "reader.error": "无法加载书籍。请稍后重试。",
+ 
+  "video.disclaimer": "本视频中的所有画面均源于真实事件与真人。通读我们的故事后，这些片段的意义将更为清晰。"
 }
