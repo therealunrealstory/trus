@@ -54,10 +54,23 @@ section, footer{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem
 
 /* ---------- Tiles with overlay ---------- */
 .tile{
-  position:relative; overflow:hidden; border-radius:1rem;
-  height:180px; background-size:cover; background-position:center;
-  cursor:pointer; border:1px solid rgba(255,255,255,.08)
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+
+  /* было: height:180px; */
+  aspect-ratio: 4 / 3;   /* фиксируем 4:3 */
+  height: auto;
+
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.08);
 }
+@supports not (aspect-ratio: 4 / 3){
+  .tile::before{ content:""; display:block; padding-top:75%; } /* 4:3 */
+}
+
 .tile::after{
   content:""; position:absolute; inset:0;
   background:linear-gradient(180deg,transparent,rgba(0,0,0,.6));
@@ -538,4 +551,82 @@ body.modal-open{ overflow:hidden; }
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 12px;
   overflow: hidden; /* чтобы плитка не выходила за скругления */
+}
+/* === Mobile tweaks for Story page === */
+@media (max-width: 640px) {
+
+  /* 2.1. Мини-плееры: текст под кнопкой по центру + без лишнего нижнего отступа */
+  #announceBtn + *, #shortBtn + *, #fullBtn + * {
+    text-align: center;
+    margin-bottom: 0;        /* прибираем некрасивый зазор снизу */
+    width: 100%;             /* чтобы строка текста занимала всю ширину карточки */
+  }
+
+  /* 2.2. Ридеры: кнопка не на всю ширину, всё по центру в колонку */
+  .reader-card .reader-row {
+    display: flex;
+    flex-direction: column;  /* кнопка сверху, текст ниже */
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+  #shortReadBtn, #fullReadBtn {
+    display: inline-flex;
+    width: auto;             /* переопределяем возможное width:100% у универсальных .btn */
+    max-width: 90%;
+    justify-content: center;
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}
+/* === Mobile tweaks for Story page === */
+@media (max-width: 640px) {
+
+  /* Аудио-карточки: описание под кнопкой по центру и без лишнего зазора снизу */
+  #announceBtn ~ *, #shortBtn ~ *, #fullBtn ~ * {
+    text-align: center;
+    margin-bottom: 0 !important;       /* снимаем внешний отступ блока */
+  }
+  #announceBtn ~ * p:last-child,
+  #shortBtn  ~ * p:last-child,
+  #fullBtn   ~ * p:last-child {
+    margin-bottom: 0 !important;       /* снимаем отступ у последнего параграфа */
+  }
+
+  /* Ридеры: кнопка не растягивается, всё выровнено по центру */
+  .reader-row {
+    display: flex;
+    flex-direction: column;             /* кнопка сверху, текст ниже */
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+  #shortReadBtn, #fullReadBtn {
+    display: inline-flex;
+    width: auto !important;             /* переопределяем возможное width:100% */
+    max-width: 90%;
+    flex: none !important;              /* чтобы flex не растягивал */
+    justify-content: center;
+    padding-left: 18px;
+    padding-right: 18px;
+    align-self: center;
+  }
+}
+/* ===== Mobile: tighten space under audio-card description ===== */
+@media (max-width: 640px) {
+  /* текстовая подпись под кнопкой — по центру и без нижнего «воздуха» */
+  #announceStatus,
+  #shortStatus,
+  #fullStatus {
+    display: block;
+    text-align: center;
+    margin-bottom: -14px !important;  /* съедаем внутренний паддинг карточки */
+  }
+
+  /* если подпись завершается параграфом — уберём и его хвост */
+  #announceStatus p:last-child,
+  #shortStatus p:last-child,
+  #fullStatus p:last-child {
+    margin-bottom: 0 !important;
+  }
 }

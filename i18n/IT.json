@@ -124,5 +124,16 @@
 "news.followNicoRich": "La voce di Nico nella storia — segui su Telegram, X e Instagram:",
 "feed.auto": "traduzione automatica",
 
-"menu.reporting": "Rendiconti"
+"menu.reporting": "Rendiconti",
+
+  "reader.open": "Leggi",
+  "reader.short.note": "Alcuni dettagli sono omessi. Il testo si concentra sulla cronologia degli eventi e sull’arco narrativo generale.",
+  "reader.full.note": "Più dettagli descrittivi e contesto emotivo, con interazioni tra i personaggi e una comprensione più profonda delle loro personalità.",
+  "reader.prev": "Precedente",
+  "reader.next": "Successivo",
+  "reader.toc": "Indice",
+  "reader.chapter": "Capitolo",
+  "reader.of": "di",
+  "reader.hint": "Usa ←/→ per navigare ed Esc per chiudere",
+  "reader.error": "Impossibile caricare il libro. Riprova più tardi."
 }
