@@ -1,6 +1,6 @@
 {
   "meta": {
-    "updated_at": "2025-09-15",
+    "updated_at": "2025-08-22T18:03:54Z",
     "updated_by": "Nico",
     "version": "v1.9",
     "lang_default": "en"
@@ -27,8 +27,8 @@
       "date_end": "2019-08-20",
       "when_label": "March–August 2019",
       "title": "Chemotherapy against lymphoma (T-lymphoblastic)",
-      "summary": "Systemic chemotherapy with supportive care; adjuvant radiotherapy.",
-      "details": "Planned cycles with interim response checks and end-of-treatment assessment. Radiotherapy delivered for consolidation."
+      "summary": "Systemic chemotherapy with supportive care; adjuvant radiation therapy.",
+      "details": "Planned cycles with interim response checks and end-of-treatment assessment. Radiotherapy delivered for consolidation: ~30 sessions."
     },
     {
       "id": "2020-04-relapse-dx",
@@ -50,9 +50,9 @@
       "date_start": "2020-04-15",
       "date_end": "2020-11-30",
       "when_label": "April–November 2020",
-      "title": "Chemotherapy with adjunct radiotherapy; GI bleed with MI",
-      "summary": "Chemo resumed with radiotherapy; GI ulcer bleed was complicated by a myocardial infarction; therapy continued after stabilization.",
-      "details": "significant anemia and tachyarrhythmia managed with transfusions and critical care. Radiotherapy delivered alongside chemotherapy."
+      "title": "Chemotherapy with adjunct radiotherapy ×30; massive GI bleed with MI",
+      "summary": "Chemo resumed with radiotherapy; GI ulcer bleed led to myocardial infarction; therapy continued after stabilization.",
+      "details": "Severe anemia and tachyarrhythmia managed with transfusions and critical care. Radiotherapy delivered alongside chemotherapy: ~30 sessions."
     },
     {
       "id": "2021-05-aggressive-leukocytosis-dx",
@@ -63,7 +63,7 @@
       "date_end": "2021-05-31",
       "when_label": "May 2021",
       "title": "Aggressive leukemia with extreme leukocytosis — diagnosis",
-      "summary": "Extremely high leukocyte count; diagnosis established; cytoreductive plan initiated.",
+      "summary": "Leukocytes >300k; diagnosis established; cytoreductive plan initiated.",
       "details": "Rapid leukemic process (Ph+ features later); urgent cytoreduction and transfusion support were indicated."
     },
     {
@@ -99,7 +99,7 @@
       "date_end": "2022-10-31",
       "when_label": "October 2022",
       "title": "Invasive fungal infection with sepsis",
-      "summary": "significant oropharyngeal focus with systemic involvement; treated successfully.",
+      "summary": "Severe oropharyngeal focus with systemic involvement; treated successfully.",
       "details": "Managed in hospital with antimicrobials; concurrent arrhythmias and prior micro-stroke noted during 2022."
     },
     {
@@ -111,7 +111,7 @@
       "date_end": "2023-01-15",
       "when_label": "December 2022–January 2023",
       "title": "COVID-19 pneumonia (ICU, intubation) and GI bleed; recovery",
-      "summary": "Critical COVID-19 with intubation; GI bleeding; coma; recovery.",
+      "summary": "Critical COVID-19 with intubation; GI bleeding; coma; unexpected recovery.",
       "details": "Rapid pneumonia progression on immunosuppression; post-ICU recovery followed by stabilization."
     },
     {
@@ -122,8 +122,8 @@
       "date_start": "2023-06-01",
       "date_end": "2023-09-30",
       "when_label": "June–September 2023",
-      "title": "Respiratory arrest (resuscitated) and bacteremia; intensified chemo",
-      "summary": "Cardiorespiratory event reversed; bacteremia treated; intensified chemo to reach CAR-T criteria.",
+      "title": "Respiratory arrest (revived) and bacteremia; high-dose chemo",
+      "summary": "Cardiorespiratory event reversed; rare cardiac-source bacteremia treated; intensified chemo to reach CAR-T criteria.",
       "details": "Therapy escalated to reduce leukocytes below CAR-T threshold; infections managed."
     },
     {
@@ -135,8 +135,8 @@
       "date_end": "2023-11-30",
       "when_label": "October–November 2023",
       "title": "CAR-T cell therapy",
-      "summary": "CAR-T administered; significant toxicity managed (fever, neurologic and cardiac events).",
-      "details": "High fever, vomiting, transient leg paralysis, cardiac event and significant memory loss consistent with neurotoxicity; gradual recovery thereafter."
+      "summary": "CAR-T administered; severe toxicity managed (fever, neurologic and cardiac events).",
+      "details": "High fever, vomiting, transient leg paralysis, cardiac event and profound memory loss consistent with neurotoxicity; gradual recovery thereafter."
     },
     {
       "id": "2024-01-allo-sct-brother-bradonor",
@@ -146,7 +146,7 @@
       "date_start": "2024-01-01",
       "date_end": "2024-02-01",
       "when_label": "January 2024",
-      "title": "Allogeneic stem-cell infusion — matched donor",
+      "title": "Allogeneic stem-cell infusion — brother donor",
       "summary": "Allogeneic stem cells infused as consolidation after CAR-T.",
       "details": "Engraftment phase under strict infection control; outpatient recovery thereafter."
     },
@@ -160,7 +160,7 @@
       "when_label": "July 2024",
       "title": "Large abdominal mass; aggressive Hodgkin lymphoma",
       "summary": "New HL diagnosed, distinct from earlier disease; therapy plan adjusted.",
-      "details": "Oncology proposed a new chemotherapy strategy; plan adjusted."
+      "details": "Considered possibly related to prior immunotherapy background; oncology proposed a new chemotherapy strategy."
     },
     {
       "id": "2024-08-2025-06-chemo-rt",
@@ -170,9 +170,9 @@
       "date_start": "2024-08-01",
       "date_end": "2025-06-30",
       "when_label": "August 2024–June 2025",
-      "title": "Escalated chemotherapy with septic complication; regimen adjusted; consolidation radiotherapy",
-      "summary": "Septic complication during initial cycle; regimen adjusted; consolidation radiotherapy completed.",
-      "details": "After a septic episode during the initial cycle, the regimen was adjusted; response improved thereafter. Radiotherapy added for consolidation."
+      "title": "Escalated chemo → septic complication → switch to effective regimen; radiotherapy ×30",
+      "summary": "Initial heavy dose caused sepsis; switched to better-tolerated regimen; adjuvant radiotherapy (30 sessions).",
+      "details": "After septic episode, regimen adjusted; subsequent cycles showed effect. Radiotherapy added for consolidation (30 daily sessions)."
     },
     {
       "id": "2024-10-nasal-fracture-rhinoplasty",
@@ -182,9 +182,9 @@
       "date_start": "2024-10-25",
       "date_end": "2024-11-20",
       "when_label": "October–November 2024",
-      "title": "significant nasal fracture; functional nasal surgery",
-      "summary": "Fall with comminuted nasal fracture → persistent bleeding and obstructed breathing; definitive functional nasal surgery in November.",
-      "details": "Traumatic fall in late October 2024 caused a multi-fragment nasal fracture. Ongoing epistaxis and airway obstruction made self-recovery impossible; a functional nasal surgery was performed in November to reposition bones and repair soft tissues. Symptoms had also complicated tolerance of high-intensity chemotherapy until surgery relieved obstruction."
+      "title": "Severe nasal fracture; surgical rhinoplasty",
+      "summary": "Fall with comminuted nasal fracture → persistent bleeding and obstructed breathing; definitive surgery in November.",
+      "details": "Traumatic fall in late October 2024 caused a multi-fragment nasal fracture. Ongoing epistaxis and airway obstruction made self-recovery impossible; a costly rhinoplasty was performed in November to reposition bones and repair soft tissues. Symptoms had also complicated tolerance of high-intensity chemotherapy until surgery relieved obstruction."
     },
     {
       "id": "2025-06-relapse-Ph-pos",
@@ -195,8 +195,8 @@
       "date_end": "2025-06-30",
       "when_label": "Late June 2025",
       "title": "Rising leukocytes; Ph+ lymphoid cells detected",
-      "summary": "Leukocytes increased rapidly within days; Ph+ lymphoid lineage identified.",
-      "details": "Oncology proposed oral chemotherapy followed by TKI once stabilized."
+      "summary": "Leukocytes increased from ~35k to ~67k within days; Ph+ lymphoid lineage identified.",
+      "details": "Oncology proposed oral chemotherapy followed by TKI (ponatinib) once stabilized."
     },
     {
       "id": "2025-07-oral-chemo-14",
@@ -206,8 +206,8 @@
       "date_start": "2025-07-15",
       "date_end": null,
       "when_label": "July 2025 - Now",
-      "title": "Oral multi-agent chemotherapy — short course",
-      "summary": "Structured per-oral regimen at home, total of course.",
+      "title": "Oral multi-agent chemotherapy (14 doses)",
+      "summary": "Structured per-oral regimen at home, total of 14 doses.",
       "details": "Complex oral combination with interim labs and tolerance monitoring; decision points defined after completion."
     },
     {
@@ -232,9 +232,9 @@
       "date_start": null,
       "date_end": null,
       "when_label": "After stabilization (TBD)",
-      "title": "Tyrosine-kinase inhibitor (TKI) maintenance — long-term (as indicated)",
-      "summary": "Initiate TKI maintenance after cytoreduction; long-term (as indicated).",
-      "details": "Start after acceptable hematologic control; monitor response and adverse events; regimen optimization expected."
+      "title": "Tyrosine-kinase inhibitor (ponatinib) — long-term",
+      "summary": "Initiate TKI maintenance after cytoreduction; likely long-term or lifelong.",
+      "details": "Start after acceptable hematologic control; monitor response and adverse events; dose optimization expected."
     },
     {
       "id": "plan-2025-re-irradiation",
@@ -247,7 +247,7 @@
       "when_label": "If indicated (TBD)",
       "title": "Potential repeat radiotherapy",
       "summary": "Consider re-irradiation if disease control requires it.",
-      "details": "To be discussed by tumor board; depends on imaging and prior constraints."
+      "details": "To be discussed by tumor board; depends on imaging and prior dose constraints."
     },
     {
       "id": "plan-2025-chemo-switch",
@@ -292,11 +292,11 @@
   "changelog": [
     {
       "date": "2025-08-21",
-      "note": "Split 2020 into two blocks: Apr 2020 relapse diagnosis; Apr–Nov 2020 chemo + radiotherapy course with GI bleed/MI. Added persistent header highlight for opened sections (UI change in HTML)."
+      "note": "Split 2020 into two blocks: Apr 2020 relapse diagnosis; Apr–Nov 2020 chemo + radiotherapy ×30 with GI bleed/MI. Added persistent header highlight for opened sections (UI change in HTML)."
     },
     {
       "date": "2025-08-22",
-      "note": "Added October–November 2024 nasal fracture with functional nasal surgery (completed). Standardized month names in when_label to full forms."
+      "note": "Added October–November 2024 nasal fracture with surgical rhinoplasty (completed). Standardized month names in when_label to full forms."
     }
   ]
 }
