@@ -3,135 +3,145 @@
     "title": "Cronologia legale",
     "loading": "Caricamento…",
     "errorLoadGeneric": "Impossibile caricare i dati",
-    "errorLoadJson": "Impossibile caricare legal-timeline.json"
+    "errorLoadJson": "Impossibile caricare il JSON"
   },
   "meta": {
     "updated": "Aggiornato: {date} • {user} • versione: {version}",
-	"updated_short": "Aggiornato: {date} • {user}"
+    "updated_short": "Aggiornato: {date} • {user}"
   },
   "legend": {
-    "pre": "Contesto (prima della causa)",
-    "base": "Periodo dei procedimenti giudiziari",
-    "freeze": "Periodo di blocco",
-    "future": "Prospettive legali (futuro)",
+    "pre": "Presupposti (prima della causa)",
+    "base": "Periodo del contenzioso",
+    "freeze": "Periodo di congelamento dei beni",
+    "future": "Prospettive legali (in avanti)",
     "event": "Evento",
     "eventHint": "(cliccabile)",
     "eventClickable": "Evento (cliccabile)",
-    "now": "Momento attuale"
+    "now": "Ora attuale"
   },
   "tooltip": {
-    "dot": "Evento — clicca per maggiori dettagli"
+    "dot": "Evento — clic per dettagli"
   },
   "a11y": {
-    "dotButton": "Evento — clicca per maggiori dettagli"
+    "dotButton": "Evento — clic per dettagli"
   },
   "modal": {
     "close": "Chiudi",
-    "more": "Dettagli",
-    "less": "Riduci",
+    "more": "Maggiori dettagli",
+    "less": "Comprimi",
     "clusterTitle": "Eventi ({count})",
     "singleTitle": "{when} — {title}"
   },
   "monthShort": [
-    "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
-    "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
+    "Gennaio",
+    "Febbraio",
+    "Marzo",
+    "Aprile",
+    "Maggio",
+    "Giugno",
+    "Luglio",
+    "Agosto",
+    "Settembre",
+    "Ottobre",
+    "Novembre",
+    "Dicembre"
   ],
   "items": {
     "2020-09-will-mother": {
-      "when_label": "Settembre 2020",
-      "title": "Testamento della madre a favore di Adam",
-      "summary": "La madre è morta; testamento a favore di Adam.",
-      "details": "Nel settembre 2020, la madre di Adam è morta, lasciando un testamento a suo favore. Nei mesi successivi, Adam non ha utilizzato i beni ereditati. I parenti non hanno fatto rivendicazioni finché il padre è rimasto in vita."
+      "when_label": "September 2020",
+      "title": "Testamento della madre che nomina Adam",
+      "summary": "Morte della madre; testamento che nomina Adam.",
+      "details": "Secondo i documenti disponibili, la madre di Adam è deceduta nel settembre 2020 e ha lasciato un testamento che lo nomina. In quel momento non risultavano controversie in tribunale."
     },
     "2021-04-father-dx-will": {
-      "when_label": "Aprile 2021",
-      "title": "Diagnosi del padre; testamento a favore di Adam",
-      "summary": "Il padre è stato diagnosticato con il cancro; testamento già fatto.",
-      "details": "Nell’aprile 2021, al padre di Adam è stato diagnosticato un cancro in fase terminale. A quel punto, aveva già redatto un testamento a favore di Adam."
+      "when_label": "April 2021",
+      "title": "Testamento del padre confermato",
+      "summary": "Testamento a favore di Adam confermato prima della morte del padre.",
+      "details": "Ad aprile 2021 il padre di Adam aveva già disposto un testamento a favore di Adam. I dettagli medici di terzi sono omessi nella versione pubblica."
     },
     "2021-07-father-death-claims": {
-      "when_label": "Luglio 2021",
-      "title": "Morte del padre; apertura di cause internazionali",
-      "summary": "I parenti hanno intentato cause; petizioni voluminose (≈100 pagine).",
-      "details": "Nel luglio 2021, il padre di Adam è morto. Quasi contemporaneamente, i parenti hanno intentato cause internazionali contestando i testamenti dei genitori. Le petizioni includevano decine di pagine (circa 100) e miravano a bloccare i beni e i diritti di Adam per il periodo più lungo possibile. Alcune petizioni erano state presentate quando il padre era ancora in vita ma già praticamente incapace. Su consiglio del suo avvocato, Adam ha sospeso le operazioni sui conti personali."
+      "when_label": "July 2021",
+      "title": "Morte del padre; presentati ricorsi per impugnare i testamenti",
+      "summary": "I familiari hanno presentato ricorsi per impugnare i testamenti dei genitori.",
+      "details": "Nel luglio 2021, a seguito della morte del padre, sono stati presentati ricorsi per impugnare i testamenti dei genitori. Nel procedimento sono state applicate misure provvisorie in attesa della valutazione."
     },
     "2021-07-asset-freeze": {
-      "when_label": "Da luglio 2021",
-      "title": "Blocco totale degli attivi e restrizioni",
-      "summary": "Misure di blocco e restrizioni di movimento in vigore.",
-      "details": "Sono state introdotte misure di blocco totale degli attivi e restrizioni di movimento. Il blocco copre conti e proprietà ed è tuttora in vigore."
+      "when_label": "Since July 2021",
+      "title": "Congelamento dei beni disposto dal tribunale e restrizioni",
+      "summary": "Il congelamento di conti e immobili rimane in vigore.",
+      "details": "Con ordinanza del tribunale è stato disposto il congelamento dei beni e restrizioni correlate su conti e immobili. Il congelamento resta in vigore."
     },
     "2021-09-apartment-dispute": {
-      "when_label": "Settembre 2021",
-      "title": "Disputa sull’appartamento di Adam",
-      "summary": "La sorella ha rifiutato ospitalità temporanea; disputa sull’uscita.",
-      "details": "Durante un viaggio negli USA per diagnosi CAR-T, Adam ha chiesto alla sorella, che abitava nel suo appartamento, di poter soggiornare temporaneamente. Lei ha rifiutato, sostenendo 'disagio'. Adam ha dichiarato che non desiderava che continuasse a vivere lì gratuitamente e le ha chiesto di andarsene. Lei si è rifiutata, sostenendo che con il blocco in vigore Adam non aveva diritto a sfrattarla."
+      "when_label": "September 2021",
+      "title": "Controversia sull’uso dell’appartamento di Adam",
+      "summary": "Controversia sull’uso durante il congelamento dei beni.",
+      "details": "Durante un viaggio per una valutazione medica è sorta una controversia sull’uso dell’appartamento di Adam. Le questioni di residenza e utilizzo sono state ricondotte al congelamento in corso e ai successivi atti processuali."
     },
     "2021-11-prelim-scheduled": {
-      "when_label": "Novembre 2021",
-      "title": "Udienza preliminare fissata",
+      "when_label": "November 2021",
+      "title": "Udienza preliminare programmata",
       "summary": "Udienza preliminare fissata per luglio 2024.",
-      "details": "Il tribunale ha fissato un’udienza preliminare per la questione dell’eredità a luglio 2024."
+      "details": "Il tribunale ha programmato un’udienza preliminare nella causa successoria per luglio 2024."
     },
     "2022-03-hearing-travel": {
-      "when_label": "Marzo 2022 (inizio)",
-      "title": "Udienza sul diritto a viaggiare per cure mediche",
-      "summary": "Analisi del diritto a viaggiare negli USA; obiezioni dei parenti.",
-      "details": "Il tribunale ha esaminato la richiesta di Adam di poter viaggiare negli USA per sottoporsi a trattamento CAR-T. I parenti si sono opposti. È stata eseguita una perizia medica giudiziaria."
+      "when_label": "March 2022 (beginning)",
+      "title": "Udienza sull’autorizzazione a viaggiare per cure",
+      "summary": "Il tribunale ha esaminato l’autorizzazione a viaggiare all’estero per cure.",
+      "details": "Il tribunale ha valutato la concessione ad Adam dell’autorizzazione a recarsi all’estero per ricevere cure. I ricorrenti hanno presentato obiezioni; è stata svolta una valutazione medico-legale disposta dal tribunale."
     },
     "2022-03-permission-travel": {
-      "when_label": "Marzo 2022 (fine)",
-      "title": "Autorizzazione a viaggiare per cure",
-      "summary": "Il tribunale ha autorizzato il viaggio negli USA per terapia.",
-      "details": "Il tribunale ha accolto la richiesta di Adam e gli ha concesso l’autorizzazione a viaggiare negli USA per sottoporsi alla terapia."
+      "when_label": "March 2022 (end)",
+      "title": "Autorizzazione a viaggiare per cure concessa",
+      "summary": "Il tribunale ha autorizzato il viaggio all’estero per la terapia.",
+      "details": "Il tribunale ha accolto la richiesta di Adam e ha autorizzato il viaggio all’estero per la terapia."
     },
     "2022-05-visit-med-exam": {
-      "when_label": "Maggio 2022",
-      "title": "Visita dei parenti; richiesta di esame medico",
-      "summary": "È intervenuta la polizia; imposte restrizioni ai parenti.",
-      "details": "I parenti si sono recati a casa di Adam insistendo affinché si sottoponesse a un esame medico, invocando una possibile decisione di tutela da parte del tribunale. Adam si è opposto e il personale medico non ha dato loro accesso. La polizia è intervenuta. Il tribunale ha stabilito che tali richieste non erano ammissibili senza il consenso di Adam e ha punito i parenti con un mese di carcere e con il divieto di ingresso nel paese per sei mesi per aver tentato di portarlo via con la forza verso una destinazione ignota."
+      "when_label": "May 2022",
+      "title": "Incidente presso l’abitazione; chiarimenti del tribunale sugli esami",
+      "summary": "Il tribunale ha confermato: gli esami richiedono consenso o base legale.",
+      "details": "Un incidente presso l’abitazione di Adam ha comportato l’intervento della polizia. Il tribunale ha chiarito che gli esami medici obbligatori richiedono il consenso o una valida base legale. In relazione all’incidente sono state applicate misure restrittive sull’accesso."
     },
     "2024-06-eviction-start": {
-      "when_label": "Giugno 2024 (fine)",
-      "title": "Avviata la procedura di sfratto della sorella",
-      "summary": "Avviato il processo di sfratto dall’appartamento di Adam.",
-      "details": "Alla fine di giugno 2024, Adam ha avviato il processo di sfratto della sorella dal suo appartamento, dopo aver scoperto che era la principale promotrice della causa. In precedenza (nel 2021-09) lei aveva rifiutato di ospitarlo temporaneamente. Successivamente, ha dichiarato in tribunale che lo sfratto era illegale, ma il tribunale non ha rilevato irregolarità."
+      "when_label": "June 2024 (end)",
+      "title": "Avvio di procedura di sfratto nei confronti di un parente",
+      "summary": "Avviato il procedimento di sfratto; successivamente esaminato dal tribunale.",
+      "details": "Alla fine di giugno 2024 è stata avviata una procedura di sfratto relativa a un parente che occupava l’appartamento di Adam. Successivamente il tribunale non ha riscontrato violazioni procedurali nel deposito."
     },
     "2024-07-docs-fee": {
-      "when_label": "Luglio 2024 (inizio)",
-      "title": "Presentazione dei documenti; pagamento della tassa",
-      "summary": "Documenti presentati prima dell’udienza; tassa di $5.350 pagata.",
-      "details": "Prima dell’udienza preliminare, Adam ha presentato documenti finanziari sui suoi conti e referti medici, oltre a pagare una tassa giudiziaria di $5.350."
+      "when_label": "July 2024 (beginning)",
+      "title": "Presentazione di documenti; tassa giudiziaria versata",
+      "summary": "Presentati documenti processuali; versata la tassa richiesta.",
+      "details": "Prima dell’udienza preliminare sono stati presentati documenti processuali. È stata versata la tassa giudiziaria richiesta (l’importo è omesso nella versione pubblica)."
     },
     "2024-07-prelim-hearing": {
-      "when_label": "Luglio 2024 (metà)",
-      "title": "Udienza preliminare; due possibili esiti",
-      "summary": "Il tribunale ha indicato 2 esiti; rifiuto di accordo.",
-      "details": "Il tribunale ha indicato due possibilità: (1) convalidare i testamenti e attribuire l’eredità ad Adam; (2) dividere l’eredità tra tutti i figli se fosse provata la pressione sui genitori al momento della stesura dei testamenti. I parenti hanno rifiutato un accordo."
+      "when_label": "July 2024 (middle)",
+      "title": "Udienza preliminare; scenari delineati",
+      "summary": "Il tribunale ha delineato possibili esiti; menzionate trattative di accordo.",
+      "details": "Durante l’udienza preliminare il tribunale ha delineato i possibili esiti della controversia successoria. Le trattative per un accordo non hanno portato a un’intesa."
     },
     "2024-07-motion-freeze-relatives": {
-      "when_label": "Luglio 2024 (metà)",
-      "title": "Istanza di blocco dei conti dei parenti",
-      "summary": "Richiesta di blocco e verifica delle operazioni.",
-      "details": "Nella stessa udienza, Adam ha presentato un’istanza per bloccare i conti dei parenti e verificare le loro operazioni finanziarie."
+      "when_label": "July 2024 (middle)",
+      "title": "Istanza relativa ai conti dei familiari",
+      "summary": "Presentata richiesta di congelamento e verifica delle operazioni.",
+      "details": "È stata presentata un’istanza per richiedere il congelamento dei conti dei familiari e la verifica delle operazioni. Il tribunale ha preso l’istanza in esame."
     },
     "2024-08-relatives-freeze": {
-      "when_label": "Agosto 2024",
-      "title": "Blocco dei conti dei parenti",
-      "summary": "Il tribunale ha accolto la richiesta di blocco.",
-      "details": "Il tribunale ha accolto la richiesta di Adam di bloccare i conti dei parenti per verificarne le operazioni finanziarie."
+      "when_label": "August 2024",
+      "title": "Ordinanza del tribunale sui conti dei familiari",
+      "summary": "Congelamento concesso ai fini della verifica.",
+      "details": "Il tribunale ha concesso il congelamento dei conti dei familiari ai fini della verifica nell’ambito del procedimento."
     },
     "2025-07-unfreeze-motion": {
-      "when_label": "Luglio 2025",
-      "title": "Istanza di sblocco degli attivi",
-      "summary": "Richiesto lo sblocco totale o parziale.",
-      "details": "A causa delle sue condizioni di salute e di una nuova forma di leucemia diagnosticata, Adam ha presentato un’istanza di sblocco totale o parziale degli attivi, nonostante il suo avvocato fosse contrario, sostenendo che ciò avrebbe solo ritardato ulteriormente il processo. Tuttavia, Adam non aveva altre opzioni: aveva urgente bisogno di fondi a causa della nuova forma di leucemia e dell’incertezza relativa al trattamento e al mantenimento della remissione."
+      "when_label": "July 2025",
+      "title": "Istanza di modifica del congelamento dei beni",
+      "summary": "Presentata richiesta di modifica totale o parziale delle restrizioni.",
+      "details": "È stata presentata un’istanza per ottenere la modifica totale o parziale del congelamento dei beni per motivi legati alla salute e al trattamento. Nella versione pubblica sono omessi i dettagli medici e le posizioni interne dei legali."
     },
     "2026-11-hearing-scheduled": {
-      "when_label": "Novembre 2026",
-      "title": "Udienza fissata per l’istanza",
+      "when_label": "November 2026",
+      "title": "Udienza sull’istanza programmata",
       "summary": "Il tribunale ha fissato un’udienza per novembre 2026.",
-      "details": "Nell’agosto 2025, il tribunale ha accettato di esaminare l’istanza di Adam e ha fissato un’udienza per novembre 2026."
+      "details": "Secondo il registro del procedimento, il tribunale ha fissato un’udienza sull’istanza per novembre 2026."
     }
   }
 }

@@ -1,29 +1,29 @@
 {
   "page": {
-    "title": "Linha do tempo jurídica",
+    "title": "Cronologia jurídica",
     "loading": "Carregando…",
     "errorLoadGeneric": "Falha ao carregar os dados",
-    "errorLoadJson": "Falha ao carregar legal-timeline.json"
+    "errorLoadJson": "Falha ao carregar o JSON"
   },
   "meta": {
     "updated": "Atualizado: {date} • {user} • versão: {version}",
-	"updated_short": "Atualizado: {date} • {user}"
+    "updated_short": "Atualizado: {date} • {user}"
   },
   "legend": {
-    "pre": "Contexto (antes do processo)",
-    "base": "Período dos processos judiciais",
-    "freeze": "Período de bloqueio",
-    "future": "Perspectivas judiciais (futuro)",
+    "pre": "Pressupostos (antes da ação)",
+    "base": "Período de litígio",
+    "freeze": "Período de bloqueio de ativos",
+    "future": "Perspectivas jurídicas (adiante)",
     "event": "Evento",
     "eventHint": "(clicável)",
     "eventClickable": "Evento (clicável)",
     "now": "Momento atual"
   },
   "tooltip": {
-    "dot": "Evento — clique para mais detalhes"
+    "dot": "Evento — clique para ver detalhes"
   },
   "a11y": {
-    "dotButton": "Evento — clique para mais detalhes"
+    "dotButton": "Evento — clique para ver detalhes"
   },
   "modal": {
     "close": "Fechar",
@@ -33,105 +33,115 @@
     "singleTitle": "{when} — {title}"
   },
   "monthShort": [
-    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+    "Janeiro",
+    "Fevereiro",
+    "Março",
+    "Abril",
+    "Maio",
+    "Junho",
+    "Julho",
+    "Agosto",
+    "Setembro",
+    "Outubro",
+    "Novembro",
+    "Dezembro"
   ],
   "items": {
     "2020-09-will-mother": {
-      "when_label": "Setembro 2020",
-      "title": "Testamento da mãe em favor de Adam",
-      "summary": "A mãe faleceu; testamento em favor de Adam.",
-      "details": "Em setembro de 2020, a mãe de Adam faleceu, deixando um testamento em seu favor. Nos meses seguintes, ele não utilizou os bens herdados. Os parentes não apresentaram reivindicações enquanto o pai estava vivo."
+      "when_label": "September 2020",
+      "title": "Testamento da mãe nomeando Adam",
+      "summary": "Falecimento da mãe; testamento que nomeia Adam.",
+      "details": "Segundo os registros disponíveis, a mãe de Adam faleceu em setembro de 2020 e deixou um testamento nomeando‑o. Naquele momento, não havia disputas registradas no tribunal."
     },
     "2021-04-father-dx-will": {
-      "when_label": "Abril 2021",
-      "title": "Diagnóstico do pai; testamento em favor de Adam",
-      "summary": "O pai foi diagnosticado com câncer; testamento já feito.",
-      "details": "Em abril de 2021, o pai de Adam foi diagnosticado com câncer em estágio terminal. Naquela época, ele já havia feito um testamento em favor de Adam."
+      "when_label": "April 2021",
+      "title": "Testamento do pai confirmado",
+      "summary": "Testamento em favor de Adam confirmado antes do falecimento do pai.",
+      "details": "Até abril de 2021, o pai de Adam já havia lavrado um testamento em favor de Adam. Detalhes médicos de terceiros são omitidos na versão pública."
     },
     "2021-07-father-death-claims": {
-      "when_label": "Julho 2021",
-      "title": "Morte do pai; abertura de processos internacionais",
-      "summary": "Os parentes abriram processos; petições extensas (≈100 páginas).",
-      "details": "Em julho de 2021, o pai de Adam faleceu. Quase ao mesmo tempo, os parentes abriram processos internacionais contestando os testamentos dos pais. As petições tinham dezenas de páginas (cerca de 100) e tinham como objetivo bloquear os bens e direitos de Adam pelo máximo de tempo possível. Parte das petições foi apresentada ainda em vida do pai, quando ele já estava praticamente incapaz. Por recomendação do advogado, Adam suspendeu as operações em suas contas pessoais."
+      "when_label": "July 2021",
+      "title": "Falecimento do pai; ações contestando os testamentos",
+      "summary": "Familiares apresentaram ações contestando os testamentos dos pais.",
+      "details": "Em julho de 2021, após o falecimento do pai, foram apresentadas ações para contestar os testamentos dos pais. Medidas provisórias foram aplicadas enquanto ocorria a análise."
     },
     "2021-07-asset-freeze": {
-      "when_label": "Desde julho 2021",
-      "title": "Bloqueio total de ativos e restrições",
-      "summary": "Medidas de bloqueio de ativos e restrições de movimento em vigor.",
-      "details": "Foram impostas medidas de bloqueio total dos ativos e restrições de deslocamento. O bloqueio abrange contas e imóveis e permanece em vigor até hoje."
+      "when_label": "Since July 2021",
+      "title": "Bloqueio judicial de ativos e restrições",
+      "summary": "O bloqueio de contas e imóveis permanece em vigor.",
+      "details": "Por ordem judicial, foi imposto bloqueio de ativos e restrições correlatas sobre contas e bens imóveis. O bloqueio permanece em vigor."
     },
     "2021-09-apartment-dispute": {
-      "when_label": "Setembro 2021",
-      "title": "Disputa sobre o apartamento de Adam",
-      "summary": "Recusa da irmã em hospedagem temporária; disputa sobre saída.",
-      "details": "Durante uma viagem aos EUA para diagnóstico de CAR-T, Adam entrou em contato com a irmã, que morava em seu apartamento, pedindo hospedagem temporária. Ela recusou, alegando 'desconforto'. Adam informou que não queria mais que ela continuasse vivendo gratuitamente e pediu que saísse. Ela recusou, afirmando que, com o bloqueio em vigor, Adam não tinha direito de expulsá-la."
+      "when_label": "September 2021",
+      "title": "Disputa sobre o uso do apartamento de Adam",
+      "summary": "Disputa sobre uso durante o bloqueio de bens.",
+      "details": "Durante uma viagem para avaliação médica, surgiu uma disputa sobre o uso do apartamento de Adam. Questões de residência e uso ficaram sujeitas ao bloqueio em vigor e a atos processuais subsequentes."
     },
     "2021-11-prelim-scheduled": {
-      "when_label": "Novembro 2021",
-      "title": "Audiência preliminar marcada",
+      "when_label": "November 2021",
+      "title": "Audiência preliminar agendada",
       "summary": "Audiência preliminar marcada para julho de 2024.",
-      "details": "O tribunal marcou uma audiência preliminar sobre a herança para julho de 2024."
+      "details": "O tribunal agendou audiência preliminar do caso sucessório para julho de 2024."
     },
     "2022-03-hearing-travel": {
-      "when_label": "Março 2022 (início)",
-      "title": "Audiência sobre direito de viajar para tratamento",
-      "summary": "Análise do direito de viajar aos EUA; objeções dos parentes.",
-      "details": "O tribunal analisou o pedido de Adam de autorização para viajar aos EUA para tratamento CAR-T. Os parentes se opuseram. Foi realizada uma perícia médica judicial."
+      "when_label": "March 2022 (beginning)",
+      "title": "Audiência sobre autorização para viajar para tratamento",
+      "summary": "O tribunal considerou a autorização para viajar ao exterior para tratamento.",
+      "details": "O tribunal analisou conceder a Adam autorização para viajar ao exterior para tratamento. Foram apresentadas objeções pelos autores; realizou‑se uma avaliação médico‑pericial nomeada pelo tribunal."
     },
     "2022-03-permission-travel": {
-      "when_label": "Março 2022 (fim)",
-      "title": "Autorização para viajar para tratamento",
-      "summary": "O tribunal autorizou a viagem aos EUA para terapia.",
-      "details": "O tribunal aceitou o pedido de Adam e concedeu autorização para viajar aos EUA a fim de receber a terapia."
+      "when_label": "March 2022 (end)",
+      "title": "Autorização para viajar por tratamento concedida",
+      "summary": "O tribunal autorizou a viagem ao exterior para terapia.",
+      "details": "O tribunal deferiu o pedido de Adam e autorizou a viagem ao exterior para realizar a terapia."
     },
     "2022-05-visit-med-exam": {
-      "when_label": "Maio 2022",
-      "title": "Visita dos parentes; exigência de exame médico",
-      "summary": "A polícia interveio; restrições impostas aos parentes.",
-      "details": "Os parentes foram até a casa de Adam, exigindo que ele fosse submetido a exame médico, alegando possível decisão judicial de tutela. Adam recusou, e a equipe médica não lhes deu acesso. A polícia interveio no conflito. O tribunal determinou que tais exigências não eram permitidas sem o consentimento de Adam e puniu os parentes com um mês de prisão e proibição de entrada no país por seis meses por tentativa de levá-lo à força para um local desconhecido."
+      "when_label": "May 2022",
+      "title": "Incidente na residência; entendimento do tribunal sobre exames",
+      "summary": "O tribunal confirmou que exames exigem consentimento ou base legal.",
+      "details": "Um incidente na residência de Adam levou à intervenção policial. O tribunal esclareceu que exames médicos obrigatórios requerem consentimento ou uma base legal válida. Medidas restritivas quanto ao acesso foram aplicadas em conexão com o incidente."
     },
     "2024-06-eviction-start": {
-      "when_label": "Junho 2024 (fim)",
-      "title": "Iniciada a expulsão da irmã",
-      "summary": "Processo de expulsão iniciado no apartamento de Adam.",
-      "details": "No final de junho de 2024, Adam iniciou o processo de expulsão da irmã de seu apartamento, ao descobrir que ela era a principal autora do processo. Anteriormente (em 2021-09), ela havia recusado hospedá-lo temporariamente. Mais tarde, ela afirmou em tribunal que a expulsão era ilegal, mas o tribunal não encontrou irregularidades."
+      "when_label": "June 2024 (end)",
+      "title": "Início de ação de despejo relativa a um parente",
+      "summary": "Processo de despejo iniciado; posteriormente apreciado pelo tribunal.",
+      "details": "No fim de junho de 2024, foi iniciada ação de despejo relativa a um parente que ocupava o apartamento de Adam. Posteriormente, o tribunal não identificou irregularidades processuais no protocolo."
     },
     "2024-07-docs-fee": {
-      "when_label": "Julho 2024 (início)",
-      "title": "Apresentação de documentos; pagamento de taxa",
-      "summary": "Documentos apresentados antes da audiência; taxa de $5.350 paga.",
-      "details": "Antes da audiência preliminar, Adam apresentou documentos financeiros sobre suas contas e registros médicos, além de pagar a taxa judicial de $5.350."
+      "when_label": "July 2024 (beginning)",
+      "title": "Apresentação de documentos; taxa judicial paga",
+      "summary": "Documentos processuais apresentados; taxa exigida paga.",
+      "details": "Antes da audiência preliminar, foram apresentados documentos processuais. A taxa judicial exigida foi paga (o valor é omitido na versão pública)."
     },
     "2024-07-prelim-hearing": {
-      "when_label": "Julho 2024 (meados)",
-      "title": "Audiência preliminar; dois desfechos possíveis",
-      "summary": "O tribunal apontou 2 desfechos; recusa de acordo.",
-      "details": "O tribunal indicou duas opções: (1) validar os testamentos e atribuir a herança a Adam; (2) dividir a herança entre todos os filhos se for provada pressão sobre os pais ao fazer os testamentos. Os parentes recusaram um acordo."
+      "when_label": "July 2024 (middle)",
+      "title": "Audiência preliminar; cenários delineados",
+      "summary": "O tribunal expôs possíveis desfechos; conversas de acordo foram registradas.",
+      "details": "Na audiência preliminar, o tribunal delineou possíveis desfechos da controvérsia sucessória. As conversas sobre acordo não resultaram em consenso."
     },
     "2024-07-motion-freeze-relatives": {
-      "when_label": "Julho 2024 (meados)",
-      "title": "Pedido de bloqueio das contas dos parentes",
-      "summary": "Solicitação de bloqueio e verificação de operações financeiras.",
-      "details": "Na mesma audiência, Adam apresentou um pedido para bloquear as contas dos parentes e verificar suas operações financeiras."
+      "when_label": "July 2024 (middle)",
+      "title": "Petição relativa às contas de familiares",
+      "summary": "Solicitação de bloqueio e revisão de operações apresentada.",
+      "details": "Foi apresentada petição solicitando o bloqueio das contas de familiares e a revisão de operações. O tribunal tomou a petição em consideração."
     },
     "2024-08-relatives-freeze": {
-      "when_label": "Agosto 2024",
-      "title": "Bloqueio das contas dos parentes",
-      "summary": "O tribunal aprovou o pedido de bloqueio.",
-      "details": "O tribunal aprovou o pedido de Adam para bloquear as contas dos parentes e verificar suas operações financeiras."
+      "when_label": "August 2024",
+      "title": "Ordem judicial sobre contas de familiares",
+      "summary": "Bloqueio concedido para fins de revisão.",
+      "details": "O tribunal concedeu o bloqueio das contas de familiares para fins de revisão no âmbito do processo."
     },
     "2025-07-unfreeze-motion": {
-      "when_label": "Julho 2025",
-      "title": "Pedido de desbloqueio de ativos",
-      "summary": "Solicitado desbloqueio total ou parcial.",
-      "details": "Devido ao seu estado de saúde e a uma nova forma de leucemia diagnosticada, Adam apresentou um pedido de desbloqueio total ou parcial dos ativos, apesar de seu advogado ter se manifestado contra, alegando que isso atrasaria ainda mais o processo. No entanto, Adam não tinha outra opção: precisava urgentemente de recursos por causa da nova forma de leucemia e do cenário incerto de tratamento e manutenção da remissão."
+      "when_label": "July 2025",
+      "title": "Petição para modificar o bloqueio de ativos",
+      "summary": "Solicitou‑se modificar total ou parcialmente as restrições.",
+      "details": "Apresentou‑se petição para modificar total ou parcialmente o bloqueio de ativos com base em motivos relacionados à saúde e ao tratamento. A versão pública omite detalhes médicos e posições internas da defesa."
     },
     "2026-11-hearing-scheduled": {
-      "when_label": "Novembro 2026",
-      "title": "Audiência marcada para o pedido",
-      "summary": "O tribunal marcou uma audiência para novembro de 2026.",
-      "details": "Em agosto de 2025, o tribunal aceitou examinar o pedido de Adam e marcou uma audiência para novembro de 2026."
+      "when_label": "November 2026",
+      "title": "Audiência sobre a petição agendada",
+      "summary": "O tribunal agendou audiência para novembro de 2026.",
+      "details": "Segundo o registro do processo, o tribunal agendou audiência sobre a petição para novembro de 2026."
     }
   }
 }

@@ -1,0 +1,168 @@
+{
+  "labels": {
+    "chemotherapy": "Chemotherapie",
+    "chemotherapy + radiotherapy": "Chemotherapie + Strahlentherapie",
+    "diagnosis": "Diagnose",
+    "event": "Ereignis",
+    "event + surgery": "Ereignis + Operation",
+    "other": "Sonstiges",
+    "rehab": "Rehabilitation",
+    "transplant": "Transplantation"
+  },
+  "ui": {
+    "page_title": "Medizinische Zeitleiste",
+    "meta_updated": "Aktualisiert",
+    "legend_done": "Erledigt — abgeschlossene Etappen/Ereignisse",
+    "legend_now": "Jetzt — laufende Etappe",
+    "legend_planned": "Geplant — terminiert/vorgesehen",
+    "legend_tentative": "Vorläufig — möglich, nicht bestätigt",
+    "section_completed": "Abgeschlossen",
+    "section_now": "Laufend",
+    "section_plans": "Pläne",
+    "no_entries": "Noch keine Einträge.",
+    "btn_details": "Details",
+    "btn_hide": "Ausblenden",
+    "confidence": "Vertrauen",
+    "notice_tbd": "„TBD“ = „wird bestimmt“ (Termine/Details noch offen). Diese Karte dient nur zu Informationszwecken und stellt keine medizinische Beratung dar."
+  },
+  "items": {
+    "2019-01-dx-staging": {
+      "when_label": "Januar–März 2019",
+      "title": "Erstdiagnose — T‑Lymphoblasten (Lymphom); Stadieneinteilung",
+      "summary": "Die Erstbeurteilung bestätigte ein Lymphom mit T‑lymphoblastischen Merkmalen; Basisuntersuchungen und Stadieneinteilung abgeschlossen.",
+      "details": "Hämatologie‑Konsil, Bildgebung und Biopsien ergaben Diagnose und Stadium. Vor Therapiebeginn wurden kardiologische und laborchemische Ausgangswerte dokumentiert."
+    },
+    "2019-03-first-chemo-rt": {
+      "when_label": "März–August 2019",
+      "title": "Chemotherapie gegen Lymphom (T‑lymphoblastisch)",
+      "summary": "Systemische Chemotherapie mit Supportivtherapie; adjuvante Strahlentherapie.",
+      "details": "Geplante Zyklen mit Zwischenkontrollen der Response und Abschlussbeurteilung. Strahlentherapie in der Konsolidation durchgeführt."
+    },
+    "2020-04-relapse-dx": {
+      "when_label": "April 2020",
+      "title": "Rezidiv — T‑lymphoblastisches Lymphom (Diagnose)",
+      "summary": "Rezidiv bestätigt; Behandlungsplan aktualisiert.",
+      "details": "Die erneute Diagnostik reconfirmierte das T‑lymphoblastische Lymphom; Wiederaufnahme einer systemischen Therapie angezeigt."
+    },
+    "2020-04-11-chemo-rt-mi": {
+      "when_label": "April–November 2020",
+      "title": "Chemotherapie mit adjuvanter Strahlentherapie; GI‑Blutung mit Myokardinfarkt",
+      "summary": "Chemotherapie mit Strahlentherapie wiederaufgenommen; eine ulzeröse GI‑Blutung wurde durch einen Myokardinfarkt kompliziert; Fortführung der Therapie nach Stabilisierung.",
+      "details": "Ausgeprägte Anämie und Tachyarrhythmie wurden mit Transfusionen und Intensivmedizin behandelt. Strahlentherapie parallel zur Chemotherapie verabreicht."
+    },
+    "2021-05-aggressive-leukocytosis-dx": {
+      "when_label": "Mai 2021",
+      "title": "Aggressive Leukämie mit extremer Leukozytose — Diagnose",
+      "summary": "Extrem hohe Leukozytenzahl; Diagnose gestellt; cytoreduktiver Plan begonnen.",
+      "details": "Rasch progredienter leukämischer Prozess (später Ph+‑Merkmale); dringliche Cytoreduktion und transfusionsmedizinische Unterstützung angezeigt."
+    },
+    "2021-05-2023-09-chemo-aggr-leukemia": {
+      "when_label": "Mai 2021–September 2023",
+      "title": "Chemotherapie bei aggressiver Leukämie",
+      "summary": "Langandauernde systemische Chemotherapie zur Erreichung der CAR‑T‑Eignung und Krankheitskontrolle.",
+      "details": "Eskalierte/angepasste Schemata mit dem Ziel, die Leukozyten unter die CAR‑T‑Schwelle zu senken; begleitende Infektionen wurden behandelt."
+    },
+    "2022-03-26-neuro-shock": {
+      "when_label": "März–April 2022",
+      "title": "Systemischer Schock mit Lähmung und Amnesie",
+      "summary": "Reanimation durchgeführt; anhaltende neurologische Defizite mit schrittweiser Besserung.",
+      "details": "Der akute Kollaps erforderte Reanimationsmaßnahmen. Anschließend: Lähmung, Gedächtnisverlust und kognitive Verlangsamung; stufenweise Erholung unter neurologischer Überwachung."
+    },
+    "2022-10-invasive-fungal-sepsis": {
+      "when_label": "Oktober 2022",
+      "title": "Invasive Pilzinfektion mit Sepsis",
+      "summary": "Bedeutender oropharyngealer Fokus mit systemischer Beteiligung; erfolgreich behandelt.",
+      "details": "Stationäre Therapie mit Antiinfektiva; begleitende Arrhythmien und eine Episode eines Mikro‑Schlaganfalls im Verlauf des Jahres 2022."
+    },
+    "2022-12-covid-icu-gi-bleed": {
+      "when_label": "Dezember 2022–Januar 2023",
+      "title": "COVID‑19‑Pneumonie (ITS, Intubation) und GI‑Blutung; Erholung",
+      "summary": "Kritisches COVID‑19 mit Intubation; GI‑Blutung; Koma; Erholung.",
+      "details": "Rasche Progression der Pneumonie unter Immunsuppression; Erholung nach ITS‑Behandlung mit anschließender Stabilisierung."
+    },
+    "2023-06-respiratory-arrest-sepsis": {
+      "when_label": "Juni–September 2023",
+      "title": "Atemstillstand (reanimiert) und Bakteriämie; intensivierte Chemotherapie",
+      "summary": "Kardiorespiratorisches Ereignis behoben; Bakteriämie behandelt; Chemotherapie intensiviert, um CAR‑T‑Kriterien zu erfüllen.",
+      "details": "Therapie eskaliert, um die Leukozyten unter die CAR‑T‑Schwelle zu senken; Infektionen gemanagt."
+    },
+    "2023-10-car-t": {
+      "when_label": "Oktober–November 2023",
+      "title": "CAR‑T‑Zelltherapie",
+      "summary": "CAR‑T verabreicht; Toxizitäten gemanagt (Fieber, neurologische und kardiale Ereignisse).",
+      "details": "Hohes Fieber, Erbrechen, vorübergehende Beinlähmung, kardiales Ereignis und deutlicher Gedächtnisverlust, vereinbar mit Neurotoxizität; anschließend schrittweise Erholung."
+    },
+    "2024-01-allo-sct-brother-bradonor": {
+      "when_label": "Januar 2024",
+      "title": "Allogene Stammzellinfusion — kompatibler Spender",
+      "summary": "Allogene Stammzellinfusion als Konsolidation nach CAR‑T.",
+      "details": "Engraftment‑Phase unter strengem Infektionsschutz; anschließende ambulante Erholung."
+    },
+    "2024-07-abdominal-mass-hl": {
+      "when_label": "Juli 2024",
+      "title": "Große abdominelle Masse; aggressives Hodgkin‑Lymphom",
+      "summary": "Neues HL diagnostiziert, verschieden von der vorherigen Erkrankung; Therapieplan angepasst.",
+      "details": "Onkologie schlug eine neue Chemotherapiestrategie vor; Plan angepasst."
+    },
+    "2024-08-2025-06-chemo-rt": {
+      "when_label": "August 2024–Juni 2025",
+      "title": "Eskalierte Chemotherapie mit septischer Komplikation; Schema angepasst; Konsolidationsbestrahlung",
+      "summary": "Septische Komplikation während des initialen Zyklus; Schema angepasst; Konsolidationsbestrahlung abgeschlossen.",
+      "details": "Nach einem septischen Ereignis im ersten Zyklus wurde das Schema geändert; anschließend verbesserte Response. Strahlentherapie zur Konsolidation hinzugefügt."
+    },
+    "2024-10-nasal-fracture-rhinoplasty": {
+      "when_label": "Oktober–November 2024",
+      "title": "Ausgeprägte Nasenfraktur; funktionelle Nasen‑OP",
+      "summary": "Sturz mit mehrfacher Nasenfraktur → persistierende Epistaxis und Atemwegsobstruktion; definitive funktionelle Nasen‑OP im November.",
+      "details": "Ein traumatischer Sturz Ende Oktober 2024 führte zu einer multifragmentären Nasenfraktur. Anhaltende Epistaxis und Atemwegsverlegung schlossen eine spontane Heilung aus; im November erfolgte eine funktionelle Operation zur Reposition der Knochen und Weichteilrekonstruktion. Die Symptome erschwerten zudem die Verträglichkeit intensiver Chemotherapie, bis die Obstruktion behoben war."
+    },
+    "2025-06-relapse-Ph-pos": {
+      "when_label": "Ende Juni 2025",
+      "title": "Leukozytenanstieg; Ph+‑lymphoide Zellen nachgewiesen",
+      "summary": "Leukozyten nahmen innerhalb weniger Tage rasch zu; Ph+‑lymphoide Linie identifiziert.",
+      "details": "Onkologie schlug eine orale Chemotherapie, gefolgt von TKI nach Stabilisierung, vor."
+    },
+    "2025-07-oral-chemo-14": {
+      "when_label": "Juli 2025 – jetzt",
+      "title": "Orale multikomponentige Chemotherapie — kurzer Kurs",
+      "summary": "Strukturiertes orales Schema zu Hause; kurzer Kurs.",
+      "details": "Komplexe orale Kombination mit Zwischenanalysen und Verträglichkeitsmonitoring; Entscheidungszeitpunkte nach Abschluss."
+    },
+    "plan-2025-support-recovery": {
+      "when_label": "Post‑Chemo (n. z. b.)",
+      "title": "Support und funktionelle Erholung",
+      "summary": "Strukturierte Supportivtherapie und Rehabilitation nach dem aktuellen Kurs.",
+      "details": "Umfang und Zeitplan werden am postchemotherapeutischen Zustand und der Labordynamik ausgerichtet."
+    },
+    "plan-2025-tki-lifelong": {
+      "when_label": "Nach Stabilisierung (n. z. b.)",
+      "title": "Erhaltung mit Tyrosinkinase‑Inhibitor (TKI) — langfristig (nach Indikation)",
+      "summary": "TKI‑Erhaltung nach Cytoreduktion beginnen; langfristig (nach Indikation).",
+      "details": "Start bei akzeptabler hämatologischer Kontrolle; Überwachung von Ansprechen und Nebenwirkungen; Schemaoptimierung erwartet."
+    },
+    "plan-2025-re-irradiation": {
+      "when_label": "Bei Indikation (n. z. b.)",
+      "title": "Mögliche Re‑Bestrahlung",
+      "summary": "Erwägen, falls für die Krankheitskontrolle erforderlich.",
+      "details": "Im interdisziplinären Tumorboard zu besprechen; abhängig von Bildgebung und bisherigen Einschränkungen."
+    },
+    "plan-2025-chemo-switch": {
+      "when_label": "Bei unzureichendem Ansprechen des aktuellen Schemas (n. z. b.)",
+      "title": "Möglicher Wechsel des aktuellen Chemotherapie‑Protokolls",
+      "summary": "Ein Wechsel kann je nach Response oder Toxizität erforderlich sein.",
+      "details": "Entscheidung nach Reevaluation von Labor, Bildgebung und Verträglichkeit; alternativs Schema wird bei Indikation gewählt."
+    },
+    "plan-2025-next-line-chemo": {
+      "when_label": "Bei Bedarf (n. z. b.)",
+      "title": "Mögliche weitere Chemotherapielinie",
+      "summary": "Eine weitere Linie kann je nach Krankheitsdynamik erforderlich sein.",
+      "details": "Vom Tumorboard nach Bewertung des aktuellen Kurses festzulegen."
+    },
+    "plan-2026-repeat-allo-sct": {
+      "when_label": "2026 (möglich)",
+      "title": "Mögliche Wiederholung einer allogenen Stammzelltransplantation",
+      "summary": "Option, falls die Krankheitsentwicklung eine definitive Konsolidierung erfordert.",
+      "details": "Abhängig vom Ansprechen auf TKI und Chemotherapie; erfordert Spender‑/Zentrumsevaluierung und Nutzen‑Risiko‑Abwägung."
+    }
+  }
+}
