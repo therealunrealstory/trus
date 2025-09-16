@@ -1,30 +1,59 @@
 // /assets/js/core/glocal.js
-// Smart Glocal donor widget launcher with graceful fallbacks.
-// Shows clear messages if env/config is missing or network fails.
+// Smart Glocal payment widget launcher (compliant with official docs).
+// - Creates a session+token via your Netlify function: POST /api/donate/token
+// - Loads Smart Glocal assets (payment-form.css/js) for demo/live
+// - Renders SmglPaymentForm(publicToken) inside our site modal
+// - Shows clear user-visible errors if something goes wrong
 
-import { openModal } from './modal.js'; // adjust import path if needed
+import { openModal } from './modal.js';
 import { t } from './i18n.js';
 
-// Small helper to load external scripts once
-function loadExternalScript(src, attrName){
-  return new Promise((resolve, reject)=>{
-    if (attrName && document.querySelector(`script[${attrName}]`)) return resolve();
-    if (document.querySelector(`script[src="${src}"]`)) return resolve();
-    const s = document.createElement('script');
-    s.src = src;
-    if (attrName) s.setAttribute(attrName, 'true');
-    s.async = true;
-    s.onload = ()=>resolve();
-    s.onerror = ()=>reject(new Error('failed-to-load-script'));
-    document.head.appendChild(s);
+let _assetsPromise;
+
+/**
+ * Ensure the provider's CSS/JS are present.
+ * @param {"demo"|"live"} mode
+ */
+function ensureSmglAssets(mode) {
+  if (_assetsPromise) return _assetsPromise;
+  _assetsPromise = new Promise((resolve, reject) => {
+    try {
+      const isDemo = (mode || 'demo') !== 'live';
+      const host = isDemo ? 'https://widget-demo.smart-glocal.com' : 'https://widget.smart-glocal.com';
+
+      // CSS
+      const cssHref = `${host}/payment-form.css`;
+      if (!document.querySelector(`link[href="${cssHref}"]`)) {
+        const l = document.createElement('link');
+        l.rel = 'stylesheet';
+        l.href = cssHref;
+        document.head.appendChild(l);
+      }
+
+      // JS
+      const jsSrc = `${host}/payment-form.js`;
+      if (window.SmglPaymentForm) return resolve(); // already loaded
+      const existing = document.querySelector(`script[src="${jsSrc}"]`);
+      if (existing && (existing as any).__loaded) return resolve();
+      const s = existing || document.createElement('script');
+      s.src = jsSrc;
+      s.defer = true;
+      (s as any).__loaded = false;
+      s.onload = () => { (s as any).__loaded = true; resolve(); };
+      s.onerror = () => reject(new Error('failed-to-load-smgl-assets'));
+      if (!existing) document.head.appendChild(s);
+    } catch (e) {
+      reject(e);
+    }
   });
+  return _assetsPromise;
 }
 
 function showErrorModal(devMessage){
   const title = t('donate.error.title','Donations are temporarily unavailable');
   const html = t('donate.error.body', `
     <div class="space-y-3 text-sm leading-relaxed">
-      <p>Sorry — the payment widget can’t be opened right now.</p>
+      <p>Sorry — the payment form can’t be opened right now.</p>
       <ul class="list-disc ml-5">
         <li>Configuration is still being finalized, or</li>
         <li>There’s a temporary connection issue.</li>
@@ -38,62 +67,63 @@ function showErrorModal(devMessage){
 
 export async function openGlocalDonate({ amount, currency='usd', recurrent=false }={}){
   try {
-    const locale = (document.documentElement.getAttribute('lang') || 'en').toLowerCase();
-    const body = {
-      amount: Number.isFinite(amount) ? Number(amount) : undefined,
-      currency,
-      locale,
-      showRecurrent: true,
-      metadata: recurrent ? 'donation:recurrent' : 'donation:oneoff'
-    };
+    const lang = (document.documentElement.getAttribute('lang') || 'en').toLowerCase();
+    // Per docs, widget locales currently: en, ru
+    const locale = (lang === 'ru' ? 'ru' : 'en');
 
+    // Step 1: request public token from our backend
     const res = await fetch('/api/donate/token', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(body)
+      body: JSON.stringify({
+        amount: Number.isFinite(amount) ? Number(amount) : undefined,
+        currency,
+        locale,
+        showRecurrent: !!recurrent
+      })
     });
-
     const data = await res.json().catch(()=>({}));
     if (!res.ok || !data?.public_token) {
       const msg = data?.error || `HTTP ${res.status}`;
-      // Visible message for users, details expandable for you
       showErrorModal(msg);
       return;
     }
 
     const mode = (data.mode || 'demo').toLowerCase();
-    const token = data.public_token;
-
-    // Try to load the provider's widget script
-    const src = mode === 'live'
-      ? 'https://widget.smart-glocal.com/widget.js'
-      : 'https://widget-demo.smart-glocal.com/widget.js';
-
-    try {
-      await loadExternalScript(src, 'data-smart-glocal');
-    } catch (e) {
-      showErrorModal('Widget script failed to load');
+    await ensureSmglAssets(mode);
+    if (!window.SmglPaymentForm) {
+      showErrorModal('SmglPaymentForm is not available after script load');
       return;
     }
 
-    // Try to open the widget via global API.
-    // We don't know exact API surface; attempt common shapes to stay resilient.
-    const g = window.SmartGlocal || window.smartGlocal || window.GlocalWidget || window.glocalWidget;
-    if (g && typeof g.openAcquiringWidget === 'function') {
-      g.openAcquiringWidget({
-        publicToken: token,
-        onSuccess(){ /* optionally show thank you modal */ },
-        onClose(){ /* nothing */ }
-      });
-      return;
-    }
-    if (g && typeof g.open === 'function') {
-      g.open({ publicToken: token });
+    // Step 2: open a modal with container for the widget
+    const containerId = 'smgl-payment-form';
+    const title = t('donate.form.title','Support');
+    const html = `<div id="${containerId}" class="mt-2"></div>`;
+    openModal(title, html);
+
+    // Step 3: render the widget per docs
+    const el = document.getElementById(containerId);
+    if (!el) {
+      showErrorModal('Container not found');
       return;
     }
 
-    // If we got here, script loaded but there is no known API
-    showErrorModal('Widget API not found after script load');
+    const paymentForm = new window.SmglPaymentForm(String(data.public_token), {
+      container: el,
+      isCvcMasked: true,
+      customerInteractionRedirect: { target: '_top' },
+      // Example: you can customize UI texts via `texts` if needed
+    });
+
+    // Optional: attach simple event hooks
+    paymentForm.onReady = function(){ /* form is ready */ };
+    paymentForm.onPaymentStart = function(){ /* start */ };
+    paymentForm.onPaymentSuccess = function(){ /* success */ };
+    paymentForm.onPaymentFail = function(error){ /* fail */ console.error('SMGL payment fail', error); };
+    paymentForm.onDestroy = function(){ /* closed */ };
+
+    paymentForm.render();
   } catch (e) {
     showErrorModal(String(e && e.message || e));
   }
