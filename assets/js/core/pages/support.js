@@ -2,6 +2,7 @@
 import { $, loadScript } from '../dom.js';
 import { t } from '../i18n.js';
 import { openModal } from '../modal.js';
+import { openGlocalDonate } from '../glocal.js'; // Smart Glocal widget launcher
 
 let L;                  // Leaflet
 let map = null;
@@ -49,6 +50,7 @@ function drawMarksBatch(points, batch=300) {
   })();
 }
 async function loadAllMarksPaged() {
+  if (!layer) return;
   layer.clearLayers();
   let total = 0;
   marksOffset = 0;
@@ -113,8 +115,20 @@ function parseDonateConfigFromDOM(root){
   const wrap = root.querySelector('[data-donate-buttons]');
   if (!wrap) return null;
 
+  // Read attributes
+  let provider = (wrap.getAttribute('data-donate-provider') || 'gofundme').toLowerCase();
   const rawBase = (wrap.getAttribute('data-donate-base') || '').trim();
   const rawAmts = (wrap.getAttribute('data-donate-amounts') || '').trim();
+  const currency = (wrap.getAttribute('data-donate-currency') || 'usd').toLowerCase();
+
+  // Dev override via URL or localStorage (?donate=glocal|gofundme)
+  try {
+    const usp = new URLSearchParams(location.search);
+    const urlProv = usp.get('donate');
+    const lsProv = localStorage.getItem('donateProvider');
+    const override = (urlProv || lsProv || '').toLowerCase();
+    if (override === 'glocal' || override === 'gofundme') provider = override;
+  } catch {}
 
   const base = rawBase
     ? String(rawBase).replace(/\/donate.*$/,'/donate')
@@ -124,17 +138,82 @@ function parseDonateConfigFromDOM(root){
     ? rawAmts.split(',').map(s=>Number(s.trim())).filter(n=>Number.isFinite(n) && n>0)
     : [5, 10, 25, 50, 100, 250, 500];
 
-  return { base, amounts, wrap };
+  return { provider, base, amounts, currency, wrap };
 }
 
 function renderDonateButtons(root){
   const cfg = parseDonateConfigFromDOM(root);
   if (!cfg || !cfg.wrap) return;
 
-  const { base, amounts, wrap } = cfg;
+  const { provider, base, amounts, currency, wrap } = cfg;
   wrap.innerHTML = '';
 
-  // Фиксированные суммы — SOLID как активная кнопка «Вовлечённости»
+  if (provider === 'glocal') {
+    // Monthly toggle
+    const toggleWrap = document.createElement('div');
+    toggleWrap.className = 'mb-2 flex items-center gap-2';
+    toggleWrap.innerHTML = `
+      <input id="donateRecurring" type="checkbox" class="accent-cyan-500 rounded">
+      <label for="donateRecurring" class="text-sm text-gray-200" data-i18n="donate.monthly">${t('donate.monthly','Make this monthly')}</label>
+    `;
+    wrap.appendChild(toggleWrap);
+
+    // Fixed amount buttons
+    amounts.forEach((amt) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'donate-tier px-3 py-2 rounded-xl text-sm';
+      btn.dataset.amount = String(amt);
+      btn.textContent = `$${amt}`;
+      btn.addEventListener('click', () => {
+        const recurrent = !!document.getElementById('donateRecurring')?.checked;
+        openGlocalDonate({ amount: amt, currency, recurrent });
+      });
+      wrap.appendChild(btn);
+    });
+
+    // Custom / open form
+    const custom = document.createElement('button');
+    custom.type = 'button';
+    custom.className = 'donate-tier px-3 py-2 rounded-xl text-sm';
+    custom.setAttribute('data-i18n','btn.donate');
+    custom.textContent = t('btn.donate','Donate');
+    custom.addEventListener('click', () => {
+      const recurrent = !!document.getElementById('donateRecurring')?.checked;
+      openGlocalDonate({ currency, recurrent });
+    });
+    wrap.appendChild(custom);
+
+    // Info button
+    const infoBtn = document.createElement('button');
+    infoBtn.type = 'button';
+    infoBtn.className = 'inline-flex items-center gap-1 text-xs text-gray-300 underline ml-2';
+    infoBtn.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+      <span data-i18n="donate.info.link">${t('donate.info.link','Why this matters')}</span>
+    `;
+    infoBtn.addEventListener('click', ()=>{
+      const title = t('donate.info.title','About support and project plans');
+      const html = t('donate.info.body', `<div class="space-y-3 text-sm leading-relaxed">
+        <p>I create and run the media side of this project alone: research and writing, editing and translation, visuals and audio, publishing, and site upkeep. To be clear: right now <strong>we are in a difficult financial situation</strong> — myself, Adam, and others involved — as a direct result of the events you read about here.</p>
+        <p>Almost all my time and energy now go to <strong>supporting Adam</strong>: coordination, communication, daily logistics. In parallel, I <strong>tell this story</strong> across formats — writing, fact-gathering, translation, visuals and audio — and I keep the site running.</p>
+        <p><strong>Your voluntary contribution is very important to us:</strong> it not only supports my work on creating and developing the project (research, texts, translations, visuals and audio, publishing, hosting, site maintenance), <strong>it also helps cover financial needs that arise directly from this story.</strong> That’s how I can keep the pace of work and care around it.</p>
+        <p><strong>What’s next.</strong> In parallel I am preparing <strong>practical learning courses</strong> and <strong>my own web-apps</strong> where I’ll share <strong>my unique AI-driven methods</strong>; part of the functionality will be <strong>free</strong>. I want readers and followers to have clear, useful tools to create meaningful content by the same principles.</p>
+        <p><strong>Stay tuned:</strong> even if today isn’t the moment to donate, please check back — updates, releases, and news will appear here.</p>
+      </div>`);
+      openModal(title, html);
+    });
+    wrap.appendChild(infoBtn);
+
+    document.dispatchEvent(new CustomEvent('locale-apply-request'));
+    return;
+  }
+
+  // === Default: GoFundMe links ===
   amounts.forEach((amt) => {
     const a = document.createElement('a');
     a.className = 'donate-tier px-3 py-2 rounded-xl text-sm';
@@ -146,7 +225,6 @@ function renderDonateButtons(root){
     wrap.appendChild(a);
   });
 
-  // Кнопка «Donate» — тот же стиль
   const custom = document.createElement('a');
   custom.className = 'donate-tier px-3 py-2 rounded-xl text-sm';
   custom.target = '_blank';
@@ -160,17 +238,12 @@ function renderDonateButtons(root){
 }
 
 export async function init(root){
-  // Маркер страницы для тематического CSS
   const subpageEl = document.getElementById('subpage');
   if (subpageEl) subpageEl.classList.add('page--support');
 
-  // Вовлеченность
   initEngagement(root);
-
-  // Донат-кнопки
   renderDonateButtons(root);
 
-  // Карта
   const mapEl = root.querySelector('#map');
   if (mapEl) {
     await ensureLeaflet();
@@ -214,7 +287,6 @@ export async function init(root){
     setTimeout(()=> map?.invalidateSize(), 50);
   }
 
-  // Hearts
   if (root.querySelector('#heartsSplide')) {
     await ensureSplide();
     allHearts = []; heartsOffset = 0;
@@ -256,7 +328,6 @@ export async function init(root){
     });
   }
 
-  // Единый SOLID-стайл (как у «Вовлечённости») для Add / Leave heart и Add mark
   ['#addHeart', '#addMark'].forEach(sel => {
     const btn = root.querySelector(sel);
     if (btn) {
@@ -265,14 +336,12 @@ export async function init(root){
     }
   });
 
-  // «I want to help» → такая же cyan-кнопка, как в Donate Funds
   const wantHelp = root.querySelector('#wantHelp');
   if (wantHelp) {
     wantHelp.classList.remove('btn-ghost','bg-green-600','bg-green-500','bg-cyan-500','text-white');
     wantHelp.classList.add('donate-tier','px-3','py-2','rounded-xl','text-sm');
   }
 
-  // Modal: Practical help
   root.querySelector('#wantHelp')?.addEventListener('click', () => {
     openModal(
       t('modal.help.title', t('support.physical','Practical help')),
