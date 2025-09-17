@@ -1,9 +1,10 @@
 {
-  "meta.titleRest": "Con speranza nel futuro",
-  "meta.description": "La vera storia di un chirurgo che ha dedicato la sua vita a salvare gli altri e che ora lotta per la propria.",
-  "hero.titleRest": "Con speranza nel futuro",
-  "hero.lead1": "La vera storia di un chirurgo che ha dedicato la sua vita a salvare gli altri e che ora lotta per la propria.",
-  "hero.note": "",
+  "meta.titleRest": "sostegno per Adam",
+  "meta.description": "La vera storia di un chirurgo che ha salvato gli altri per tutta la vita e ora lotta per la propria.",
+
+  "hero.titleRest": "sostegno per Adam",
+  "hero.lead1": "La vera storia di un chirurgo che ha dedicato la sua vita a salvare gli altri e ora lotta per la sua.",
+  "hero.note": "* “Adam” è uno pseudonimo di una persona reale. Il nome è stato cambiato per proteggere la privacy.",
 
   "audio.play": "Storia in musica",
   "audio.pause": "‖ Pausa",

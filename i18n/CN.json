@@ -1,9 +1,10 @@
 {
-  "meta.titleRest": "对未来的希望",
-  "meta.description": "一位毕生救人、而今为自己生命而战的外科医生的真实故事。",
-  "hero.titleRest": "对未来的希望",
-  "hero.lead1": "一位毕生救人、而今为自己生命而战的外科医生的真实故事。",
-  "hero.note": "",
+  "meta.titleRest": "支持 Adam",
+  "meta.description": "一位外科医生一生拯救他人，如今却为自己的生命而战的真实故事。",
+
+  "hero.titleRest": "支持 Adam",
+  "hero.lead1": "一位终身救人的外科医生，如今正在为自己的生命而战的真实故事。",
+  "hero.note": "* “Adam” 为化名。为保护隐私，姓名已作更改。",
 
   "audio.play": "音乐中的故事",
   "audio.pause": "‖ 暂停",

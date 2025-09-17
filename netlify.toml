@@ -6,18 +6,7 @@
   node_bundler = "esbuild"
   external_node_modules = ["pg"]
 
-# === Security headers (Netlify will apply to all routes) ===
-[[headers]]
-  for = "/*"
-  [headers.values]
-    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
-    X-Content-Type-Options    = "nosniff"
-    Referrer-Policy           = "strict-origin-when-cross-origin"
-    Permissions-Policy        = "geolocation=(self), microphone=(), camera=()"
-    # Content Security Policy — allow Smart Glocal (demo/prod), CDN and OSM tiles
-    Content-Security-Policy   = "default-src 'self'; base-uri 'self'; form-action 'self' https://widget.smart-glocal.com https://widget-demo.smart-glocal.com; frame-ancestors 'self'; img-src 'self' data: https:; font-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net https://widget.smart-glocal.com https://widget-demo.smart-glocal.com; script-src 'self' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net https://widget.smart-glocal.com https://widget-demo.smart-glocal.com; connect-src 'self' https://demo.smart-glocal.com https://proxy.smart-glocal.com https://widget.smart-glocal.com https://widget-demo.smart-glocal.com https://tile.openstreetmap.org https://*.tile.openstreetmap.org; frame-src 'self' https://widget.smart-glocal.com https://widget-demo.smart-glocal.com https:"
-
-# === Clean API paths to Functions ===
+# Проксируем «чистые» пути на функции (если нужно)
 [[redirects]]
   from = "/api/marks"
   to   = "/.netlify/functions/marks"
@@ -36,15 +25,4 @@
 [[redirects]]
   from = "/tg-file/*"
   to   = "/.netlify/functions/tg-file"
-  status = 200
-
-# Smart Glocal: public endpoints (token + webhook)
-[[redirects]]
-  from = "/api/donate/token"
-  to   = "/.netlify/functions/glocal-token"
-  status = 200
-
-[[redirects]]
-  from = "/api/donate/webhook"
-  to   = "/.netlify/functions/glocal-webhook"
   status = 200

@@ -1,9 +1,10 @@
 {
-  "meta.titleRest": "Dans l’espoir de l’avenir",
-  "meta.description": "L’histoire vraie d’un chirurgien qui a consacré sa vie à sauver les autres et qui se bat aujourd’hui pour la sienne.",
-  "hero.titleRest": "Dans l’espoir de l’avenir",
-  "hero.lead1": "L’histoire vraie d’un chirurgien qui a consacré sa vie à sauver les autres et qui se bat aujourd’hui pour la sienne.",
-  "hero.note": "",
+  "meta.titleRest": "soutien pour Adam",
+  "meta.description": "La véritable histoire d’un chirurgien qui a sauvé des vies toute sa vie et qui se bat aujourd’hui pour la sienne.",
+
+  "hero.titleRest": "soutien pour Adam",
+  "hero.lead1": "La véritable histoire d’un chirurgien qui a consacré sa vie à sauver les autres et qui se bat maintenant pour sa propre vie.",
+  "hero.note": "* « Adam » est un pseudonyme d’une personne réelle. Le nom a été modifié pour protéger sa vie privée.",
 
   "audio.play": "Histoire en musique",
   "audio.pause": "‖ Pause",

@@ -1,132 +1,102 @@
-// /assets/js/core/glocal.js
-// Smart Glocal payment widget launcher (compliant with official docs).
-// - Creates a session+token via your Netlify function: POST /api/donate/token
-// - Loads Smart Glocal assets (payment-form.css/js) for demo/live
-// - Renders SmglPaymentForm(publicToken) inside our site modal
-// - Shows clear user-visible errors if something goes wrong
-
+// assets/js/core/glocal.js
 import { openModal } from './modal.js';
 import { t } from './i18n.js';
 
-let _assetsPromise;
+function loadWidgetAssets(mode="demo"){
+  const head = document.head;
+  const host = mode === "live" ? "https://widget.smart-glocal.com" : "https://widget-demo.smart-glocal.com";
+  if (!document.querySelector(`link[data-smgl]`)) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = `${host}/payment-form.css`;
+    link.setAttribute('data-smgl','');
+    head.appendChild(link);
+  }
+  return new Promise((resolve)=>{
+    if (window.SmglPaymentForm) return resolve();
+    const sc = document.createElement('script');
+    sc.src = `${host}/payment-form.js`;
+    sc.defer = true;
+    sc.onload = ()=> resolve();
+    sc.onerror = ()=> resolve(); // чтобы не зависнуть
+    head.appendChild(sc);
+  });
+}
 
 /**
- * Ensure the provider's CSS/JS are present.
- * @param {"demo"|"live"} mode
+ * Открыть модалку доната и отрендерить виджет
+ * @param {Object} opts { amount, currency, locale, recurrent }
  */
-function ensureSmglAssets(mode) {
-  if (_assetsPromise) return _assetsPromise;
-  _assetsPromise = new Promise((resolve, reject) => {
-    try {
-      const isDemo = (mode || 'demo') !== 'live';
-      const host = isDemo ? 'https://widget-demo.smart-glocal.com' : 'https://widget.smart-glocal.com';
+export async function openGlocalDonate(opts={}){
+  // Пауза медиаплееров / чтения — как делаете в reader.js
+  document.dispatchEvent(new CustomEvent('pause-others', { detail: 'donate' }));
 
-      // CSS
-      const cssHref = `${host}/payment-form.css`;
-      if (!document.querySelector(`link[href="${cssHref}"]`)) {
-        const l = document.createElement('link');
-        l.rel = 'stylesheet';
-        l.href = cssHref;
-        document.head.appendChild(l);
-      }
+  // 1) запрашиваем токен с сервера
+  const resp = await fetch('/.netlify/functions/glocal-token', {
+    method: 'POST',
+    headers: { 'content-type':'application/json' },
+    body: JSON.stringify({
+      amount: opts.amount,           // например 10.00
+      currency: opts.currency || 'usd',
+      locale: (document.documentElement.getAttribute('lang')||'en').split('-')[0].toLowerCase(),
+      showRecurrent: !!opts.recurrent,
+      metadata: opts.metadata || 'donation'
+    })
+  }).then(r=> r.json());
 
-      // JS
-      const jsSrc = `${host}/payment-form.js`;
-      if (window.SmglPaymentForm) return resolve(); // already loaded
-      const existing = document.querySelector(`script[src="${jsSrc}"]`);
-      if (existing && (existing as any).__loaded) return resolve();
-      const s = existing || document.createElement('script');
-      s.src = jsSrc;
-      s.defer = true;
-      (s as any).__loaded = false;
-      s.onload = () => { (s as any).__loaded = true; resolve(); };
-      s.onerror = () => reject(new Error('failed-to-load-smgl-assets'));
-      if (!existing) document.head.appendChild(s);
-    } catch (e) {
-      reject(e);
-    }
-  });
-  return _assetsPromise;
-}
+  if (!resp?.public_token) {
+    openModal(t('donate.error','Donation error'), `<div class="text-red-300">${t('donate.trylater','Please try again later.')}</div>`);
+    return;
+  }
 
-function showErrorModal(devMessage){
-  const title = t('donate.error.title','Donations are temporarily unavailable');
-  const html = t('donate.error.body', `
-    <div class="space-y-3 text-sm leading-relaxed">
-      <p>Sorry — the payment form can’t be opened right now.</p>
-      <ul class="list-disc ml-5">
-        <li>Configuration is still being finalized, or</li>
-        <li>There’s a temporary connection issue.</li>
-      </ul>
-      <p>Please try again a bit later. Your willingness to support us matters a lot ❤️</p>
-      ${devMessage ? `<details class="text-xs opacity-70"><summary>Technical details</summary><pre class="whitespace-pre-wrap">${devMessage}</pre></details>` : ''}
+  // 2) модалка с контейнером
+  openModal(t('donate.title','Donate securely'), `
+    <div id="smglPaymentWrap">
+      <div id="smgl-payment-form"></div>
     </div>
   `);
-  openModal(title, html);
-}
 
-export async function openGlocalDonate({ amount, currency='usd', recurrent=false }={}){
-  try {
-    const lang = (document.documentElement.getAttribute('lang') || 'en').toLowerCase();
-    // Per docs, widget locales currently: en, ru
-    const locale = (lang === 'ru' ? 'ru' : 'en');
+  // 3) подгружаем ассеты виджета (demo/live)
+  await loadWidgetAssets(resp.mode);
 
-    // Step 1: request public token from our backend
-    const res = await fetch('/api/donate/token', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        amount: Number.isFinite(amount) ? Number(amount) : undefined,
-        currency,
-        locale,
-        showRecurrent: !!recurrent
-      })
-    });
-    const data = await res.json().catch(()=>({}));
-    if (!res.ok || !data?.public_token) {
-      const msg = data?.error || `HTTP ${res.status}`;
-      showErrorModal(msg);
-      return;
-    }
-
-    const mode = (data.mode || 'demo').toLowerCase();
-    await ensureSmglAssets(mode);
-    if (!window.SmglPaymentForm) {
-      showErrorModal('SmglPaymentForm is not available after script load');
-      return;
-    }
-
-    // Step 2: open a modal with container for the widget
-    const containerId = 'smgl-payment-form';
-    const title = t('donate.form.title','Support');
-    const html = `<div id="${containerId}" class="mt-2"></div>`;
-    openModal(title, html);
-
-    // Step 3: render the widget per docs
-    const el = document.getElementById(containerId);
-    if (!el) {
-      showErrorModal('Container not found');
-      return;
-    }
-
-    const paymentForm = new window.SmglPaymentForm(String(data.public_token), {
-      container: el,
-      isCvcMasked: true,
-      customerInteractionRedirect: { target: '_top' },
-      // Example: you can customize UI texts via `texts` if needed
-    });
-
-    // Optional: attach simple event hooks
-    paymentForm.onReady = function(){ /* form is ready */ };
-    paymentForm.onPaymentStart = function(){ /* start */ };
-    paymentForm.onPaymentSuccess = function(){ /* success */ };
-    paymentForm.onPaymentFail = function(error){ /* fail */ console.error('SMGL payment fail', error); };
-    paymentForm.onDestroy = function(){ /* closed */ };
-
-    paymentForm.render();
-  } catch (e) {
-    showErrorModal(String(e && e.message || e));
+  if (!window.SmglPaymentForm) {
+    document.getElementById('smglPaymentWrap').innerHTML =
+      `<div class="text-red-300">${t('donate.error','Failed to load payment form.')}</div>`;
+    return;
   }
-}
 
-export default { openGlocalDonate };
+  // 4) инициализация виджета
+  const pf = new window.SmglPaymentForm(resp.public_token, {
+    container: document.getElementById('smgl-payment-form'),
+    isCvcMasked: true,
+    customerInteractionRedirect: { target: '_blank' }, // 3DS лучше открывать вне фреймов
+    // Кастомизация текстов UI (ошибки всё равно прилетают на англ. от провайдера)
+    // Можно собрать из вашего i18n:
+    texts: {
+      paymentForm: {
+        buttonPayLabel: t('donate.pay','Pay'),
+        cardholderLabel: t('donate.cardholder','Cardholder'),
+        cardNumberLabel: t('donate.cardnumber','Card number'),
+        cvvLabel: t('donate.cvc','CVC'),
+        expireDateLabel: t('donate.expiry','Expiration date'),
+        recurrentLabel: t('donate.recurring','I agree to recurrent payments'),
+        termsAgreement: t('donate.terms','By pressing Pay, you accept the terms of our {{#link}}user agreement{{/link}}')
+      }
+    }
+  });
+
+  pf.onReady = ()=> { /* метрика: виджет готов */ };
+  pf.onPaymentStart = ()=> { /* метрика: старт */ };
+  pf.onPaymentSuccess = ()=> {
+    // Покажем спасибо и закроем модалку
+    document.getElementById('smgl-payment-form').innerHTML =
+      `<div class="p-4 rounded-xl border border-emerald-500/40 bg-emerald-500/10">
+        ${t('donate.success','Thank you! Payment success.')}
+      </div>`;
+  };
+  pf.onPaymentFail = (err)=> {
+    console.warn('payment.fail', err);
+  };
+
+  pf.render(); // рендер формы
+}
