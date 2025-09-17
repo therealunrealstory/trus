@@ -1,17 +1,11 @@
 // /assets/js/core/glocal.js
-// Smart Glocal payment widget launcher (compliant with official docs).
-// - Creates a session+token via your Netlify function: POST /api/donate/token
-// - Loads Smart Glocal assets (payment-form.css/js) for demo/live
-// - Renders SmglPaymentForm(publicToken) inside our site modal
-// - Shows clear user-visible errors if something goes wrong
+// Smart Glocal payment widget launcher (no top-level side effects).
+// All heavy deps (i18n, modal, provider assets) are loaded *lazily* when the user clicks Donate.
 
-import { openModal } from './modal.js';
-import { t } from './i18n.js';
-
-let _assetsPromise;
+let _assetsPromise = null;
 
 /**
- * Ensure the provider's CSS/JS are present.
+ * Load provider CSS/JS once.
  * @param {"demo"|"live"} mode
  */
 function ensureSmglAssets(mode) {
@@ -34,7 +28,6 @@ function ensureSmglAssets(mode) {
       const jsSrc = `${host}/payment-form.js`;
       if (window.SmglPaymentForm) return resolve(); // already loaded
       const existing = document.querySelector(`script[src="${jsSrc}"]`);
-      // use data attribute instead of TS casts
       if (existing && existing.getAttribute('data-smgl-loaded') === '1') return resolve();
       const s = existing || document.createElement('script');
       s.src = jsSrc;
@@ -50,29 +43,34 @@ function ensureSmglAssets(mode) {
   return _assetsPromise;
 }
 
-function showErrorModal(devMessage){
-  const title = t('donate.error.title','Donations are temporarily unavailable');
-  const html = t('donate.error.body', `
-    <div class="space-y-3 text-sm leading-relaxed">
-      <p>Sorry — the payment form can’t be opened right now.</p>
-      <ul class="list-disc ml-5">
-        <li>Configuration is still being finalized, or</li>
-        <li>There’s a temporary connection issue.</li>
-      </ul>
-      <p>Please try again a bit later. Your willingness to support us matters a lot ❤️</p>
-      ${devMessage ? `<details class="text-xs opacity-70"><summary>Technical details</summary><pre class="whitespace-pre-wrap">${devMessage}</pre></details>` : ''}
-    </div>
-  `);
-  openModal(title, html);
-}
+export async function openGlocalDonate({ amount, currency='usd', recurrent=false } = {}) {
+  // Lazy import UI deps to avoid any side effects on pages that never open the widget.
+  const [{ openModal }, { t }] = await Promise.all([
+    import('./modal.js'),
+    import('./i18n.js')
+  ]);
 
-export async function openGlocalDonate({ amount, currency='usd', recurrent=false }={}){
+  function showErrorModal(devMessage){
+    const title = t('donate.error.title','Donations are temporarily unavailable');
+    const html = t('donate.error.body', `
+      <div class="space-y-3 text-sm leading-relaxed">
+        <p>Sorry — the payment form can’t be opened right now.</p>
+        <ul class="list-disc ml-5">
+          <li>Configuration is still being finalized, or</li>
+          <li>There’s a temporary connection issue.</li>
+        </ul>
+        <p>Please try again a bit later. Your willingness to support us matters a lot ❤️</p>
+        ${devMessage ? `<details class="text-xs opacity-70"><summary>Technical details</summary><pre class="whitespace-pre-wrap">${devMessage}</pre></details>` : ''}
+      </div>
+    `);
+    openModal(title, html);
+  }
+
   try {
     const lang = (document.documentElement.getAttribute('lang') || 'en').toLowerCase();
-    // Per docs, widget locales currently: en, ru
     const locale = (lang === 'ru' ? 'ru' : 'en');
 
-    // Step 1: request public token from our backend
+    // Step 1: token
     const res = await fetch('/api/donate/token', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -83,6 +81,7 @@ export async function openGlocalDonate({ amount, currency='usd', recurrent=false
         showRecurrent: !!recurrent
       })
     });
+
     const data = await res.json().catch(()=>({}));
     if (!res.ok || !data?.public_token) {
       const msg = data?.error || `HTTP ${res.status}`;
@@ -97,13 +96,12 @@ export async function openGlocalDonate({ amount, currency='usd', recurrent=false
       return;
     }
 
-    // Step 2: open a modal with container for the widget
+    // Step 2: open modal and render
     const containerId = 'smgl-payment-form';
     const title = t('donate.form.title','Support');
     const html = `<div id="${containerId}" class="mt-2"></div>`;
     openModal(title, html);
 
-    // Step 3: render the widget per docs
     const el = document.getElementById(containerId);
     if (!el) {
       showErrorModal('Container not found');
@@ -116,7 +114,6 @@ export async function openGlocalDonate({ amount, currency='usd', recurrent=false
       customerInteractionRedirect: { target: '_top' }
     });
 
-    // Optional hooks
     paymentForm.onPaymentFail = function(error){ console.error('SMGL payment fail', error); };
 
     paymentForm.render();
