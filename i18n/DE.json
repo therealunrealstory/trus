@@ -1,10 +1,9 @@
 {
-  "meta.titleRest": "Unterstützung für Adam",
-  "meta.description": "Die wahre Geschichte eines Chirurgen, der sein Leben lang andere rettete und nun um sein eigenes Leben kämpft.",
-
-  "hero.titleRest": "Unterstützung für Adam",
-  "hero.lead1": "Die wahre Geschichte eines Chirurgen, der sein Leben der Rettung anderer widmete und nun um sein eigenes Leben kämpft.",
-  "hero.note": "* „Adam“ ist ein Pseudonym einer realen Person. Der Name wurde zum Schutz der Privatsphäre geändert.",
+  "meta.titleRest": "In der Hoffnung auf die Zukunft",
+  "meta.description": "Die wahre Geschichte eines Chirurgen, der sein Leben dem Retten anderer gewidmet hat und nun um sein eigenes Leben kämpft.",
+  "hero.titleRest": "In der Hoffnung auf die Zukunft",
+  "hero.lead1": "Die wahre Geschichte eines Chirurgen, der sein Leben dem Retten anderer gewidmet hat und nun um sein eigenes Leben kämpft.",
+  "hero.note": "",
 
   "audio.play": "Geschichte in Musik",
   "audio.pause": "‖ Pause",
