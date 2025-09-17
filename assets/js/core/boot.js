@@ -49,31 +49,24 @@ function onceFlag(el, flag) {
 })();
 
 // —————————————————————————————————————————————
-// 2) Музыка в шапке — делегированный клик (работает даже без #bgAudio в момент старта)
-//(function initHeaderMusicDelegated() {
-//  if (document.__headerMusicDelegated__) return;
-//  document.__headerMusicDelegated__ = true;
+// 2) Музыка в шапке — делегированный клик
+(function initHeaderMusicDelegated() {
+  if (document.__headerMusicDelegated__) return;
+  document.__headerMusicDelegated__ = true;
 
- // document.addEventListener('click', (e) => {
-  //   const btn = e.target.closest('#audioBtn');
-  //   if (!btn) return;
-  //   e.preventDefault();
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('#audioBtn');
+    if (!btn) return;
+    e.preventDefault();
 
-  //   const L = ( $('#lang')?.value || document.documentElement.getAttribute('lang') || 'EN').toUpperCase();
+    const L = ($('#lang')?.value || document.documentElement.getAttribute('lang') || 'EN').toUpperCase();
+    setMainAudioForLang(L, true);
+    updateAudioLabels();
+  }, false);
 
-    // setMainAudioForLang сама ничего не сломает, если аудио пока отсутствует
-    // а как только аудио будет в DOM — src подставится и воспроизведение начнётся
-  //   const hadAudio = !!document.getElementById('bgAudio');
-  //   setMainAudioForLang(L, true);
-  //   updateAudioLabels();
+  onLocaleChanged(() => updateAudioLabels());
+})();
 
-    // Если аудио уже было — «пауза/плей» обработается внутри setMainAudioForLang
-    // (Если не было — просто ждём появления элемента; обработчики привяжет audio.js)
- //  }, false);
-
-  // При смене языка обновим подписи кнопки
- //  onLocaleChanged(() => updateAudioLabels());
- //})();
 
 // —————————————————————————————————————————————
 // 3) Share — уже работал, оставляем делегированно
