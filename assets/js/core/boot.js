@@ -84,7 +84,7 @@ function onceFlag(el, flag) {
     e.preventDefault();
     const shareData = {
       title: t('share.title', 'The Real Unreal Story'),
-	  text: t('share.text', 'Read and share the story'),
+      text:  t('share.text',  'Support Adam’s journey'),
       url:   location.href
     };
     try {
