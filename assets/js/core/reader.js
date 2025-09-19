@@ -1,4 +1,4 @@
-// assets/js/core/reader.js — modal reader with bottom icon controls + cover-as-stage (stacked)
+// assets/js/core/reader.js — modal reader with bottom icon controls + cover-as-stage (stacked, meta+title ABOVE cover)
 import { t } from './i18n.js';
 import { openModal } from './modal.js';
 
@@ -130,6 +130,10 @@ export async function openReader(version='full', startIndex=NaN){
         #readerToc button{color:#e5e7eb}
       </style>
 
+      <!-- МЕТА И ЗАГОЛОВОК ПЕРЕД ОБЛОЖКОЙ -->
+      <div class="mb-2 text-xs opacity-80" id="readerMeta"></div>
+      <h4 id="readerTitle" class="text-base font-semibold mb-2"></h4>
+
       <!-- СТЕК: сцена обложки + текст одной сеткой -->
       <div id="readerStack" class="rstack">
         <div id="readerStage" class="rstage">
@@ -144,9 +148,6 @@ export async function openReader(version='full', startIndex=NaN){
         <!-- ТЕКСТ теперь в том же контейнере, поверх сцены -->
         <div id="readerBody" class="text-sm leading-relaxed space-y-3"></div>
       </div>
-
-      <div class="mb-2 text-xs opacity-80" id="readerMeta"></div>
-      <h4 id="readerTitle" class="text-base font-semibold mb-2"></h4>
 
       <div id="readerControls" class="mt-4 flex items-center justify-center gap-3 flex-wrap">
         <button class="icon-btn" data-act="toc" title="${t('reader.toc','Table of contents')}" aria-label="${t('reader.toc','Table of contents')}">
