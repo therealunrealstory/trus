@@ -776,3 +776,27 @@ body.modal-open{ overflow:hidden; }
     max-height: min(72vh, calc(100vh - 180px));
   }
 }
+/* Стек: обложка + текст */
+#modalBody #readerWrap .rstack{
+  position: relative;
+  width: min(768px, 100%);
+  margin: 0 auto 12px;
+}
+
+/* Текст как слой поверх сцены, по умолчанию скрыт */
+#modalBody #readerWrap .rstack > #readerBody{
+  position: absolute;
+  inset: 0;
+  height: var(--stage-h, auto); /* в Text-режиме равна высоте обложки */
+  overflow: auto;
+  opacity: 0;
+  pointer-events: none;
+  padding: 0 16px;
+  transition: opacity .22s ease;
+}
+
+/* В режиме текста показываем слой */
+#modalBody #readerWrap .rstack.is-text > #readerBody{
+  opacity: 1;
+  pointer-events: auto;
+}
