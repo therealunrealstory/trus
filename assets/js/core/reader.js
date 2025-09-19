@@ -1,17 +1,20 @@
-// assets/js/core/reader.js — minimal delta: outer (modal) scroll only, modal grows to cover height
+// assets/js/core/reader.js — robust single-scroll (Cover: outer scroll; Text: inner scroll sized to cover)
 import { t } from './i18n.js';
 import { openModal } from './modal.js';
 
 const DEFAULT_TITLE = 'The Real Unreal Story';
-const _bookCache = new Map(); // key = `${version}:${langLower}`
+const _bookCache = new Map();
 
-// ---------- utils ----------
 function normalizeLang(input){
   const raw = (input || 'en').toString().trim();
   const short = raw.split(/[-_]/)[0].toLowerCase();
   return { upper: short.toUpperCase(), lower: short };
 }
-function getCurrentLang(){ const sel = document.querySelector('#lang'); const raw = (sel && sel.value) || document.documentElement.getAttribute('lang') || 'en'; return normalizeLang(raw).upper; }
+function getCurrentLang(){
+  const sel = document.querySelector('#lang');
+  const raw = (sel && sel.value) || document.documentElement.getAttribute('lang') || 'en';
+  return normalizeLang(raw).upper;
+}
 function storageKey(version, langUpper){ return `reader:last:${version}:${langUpper}`; }
 function modeKey(version, langUpper, chapterIdx0){ return `reader:mode:${version}:${langUpper}:${chapterIdx0}`; }
 function readMode(version, langUpper, chapterIdx0){ try { return localStorage.getItem(modeKey(version, langUpper, chapterIdx0)) || 'cover'; } catch { return 'cover'; } }
@@ -27,10 +30,13 @@ function svg(name){
 }
 function pad3(n){ return String(n).padStart(3,'0'); }
 
-// ---------- covers index ----------
 async function loadCoversIndex(version, langUpper, book){
-  const tryUrls = []; if (book && book.coversIndex) tryUrls.push(book.coversIndex); tryUrls.push(`/books/covers.json?ts=${Date.now()}`);
-  for (const url of tryUrls){ try { const res = await fetch(url, { cache: 'no-store' }); if (!res.ok) continue; const data = await res.json(); if (data && typeof data === 'object') return data; } catch {} }
+  const tryUrls = [];
+  if (book && book.coversIndex) tryUrls.push(book.coversIndex);
+  tryUrls.push(`/books/covers.json?ts=${Date.now()}`);
+  for (const url of tryUrls){
+    try { const res = await fetch(url, { cache:'no-store' }); if (!res.ok) continue; const data = await res.json(); if (data && typeof data === 'object') return data; } catch {}
+  }
   return null;
 }
 function resolveCoverUrl(coversIndex, chapterIdx1){
@@ -40,27 +46,32 @@ function resolveCoverUrl(coversIndex, chapterIdx1){
   if (coversIndex.pattern) return String(coversIndex.pattern).replace('{NNN}', nnn);
   return null;
 }
-
-// ---------- data ----------
 async function loadBook(version, langUpper){
   const { lower } = normalizeLang(langUpper);
-  const cacheKey = `${version}:${lower}`;
-  if (_bookCache.has(cacheKey)) return _bookCache.get(cacheKey);
+  const key = `${version}:${lower}`;
+  if (_bookCache.has(key)) return _bookCache.get(key);
   const url = `/books/${version}/${lower}/book.json?ts=${Date.now()}`;
-  const res = await fetch(url, { cache: 'no-store' });
-  if (!res.ok) throw new Error(`reader.load.failed: ${url}`);
+  const res = await fetch(url, { cache:'no-store' });
+  if (!res.ok) throw new Error('reader.load.failed');
   const data = await res.json();
   if (!data || !Array.isArray(data.chapters) || !data.chapters.length) throw new Error('reader.empty');
-  _bookCache.set(cacheKey, data); return data;
+  _bookCache.set(key, data); return data;
 }
 
-// ---------- main ----------
+// find modal scroll host
+function getModalScrollHost(){
+  const body = document.getElementById('modalBody');
+  if (!body) return null;
+  // usually .modal-dialog is the scroll host; fallback to backdrop
+  return body.closest('.modal-dialog') || body.parentElement || body;
+}
+
 export async function openReader(version='full', startIndex=NaN){
-  document.dispatchEvent(new CustomEvent('pause-others', { detail: 'reader' }));
+  document.dispatchEvent(new CustomEvent('pause-others', { detail:'reader' }));
 
   const L = getCurrentLang();
   let book = null;
-  try { book = await loadBook(version, L); } catch (e) { console.warn('reader.load.failed', e); }
+  try { book = await loadBook(version, L); } catch(e){ console.warn(e); }
 
   openModal(book?.title || DEFAULT_TITLE, `
     <div id="readerWrap" style="max-width:100%;overflow-x:hidden">
@@ -69,8 +80,6 @@ export async function openReader(version='full', startIndex=NaN){
         #readerWrap .icon-btn:disabled{opacity:.5;cursor:not-allowed}
         #readerBody{word-break:break-word;overflow-wrap:anywhere}
         #readerToc button{color:#e5e7eb}
-        /* override modal height limits only while reader is open */
-        #modalBody{max-height:none;}
       </style>
 
       <div class="mb-2 text-xs opacity-80" id="readerMeta"></div>
@@ -78,7 +87,7 @@ export async function openReader(version='full', startIndex=NaN){
 
       <div id="readerStack" class="rstack">
         <div id="readerStage" class="rstage">
-          <div class="rstage-bg" id="readerBg" role="img" aria-label="${t('reader.cover.alt','Chapter cover')}"></div>
+          <div class="rstage-bg" id="readerBg"></div>
           <div class="rstage-fog" id="readerFog" aria-hidden="true"></div>
           <div class="rstage-overlay" id="readerOverlay">
             <button class="rstage-read" id="rstageReadBtn">${t('reader.read','Read')}</button>
@@ -99,37 +108,28 @@ export async function openReader(version='full', startIndex=NaN){
     </div>
   `);
 
-  // DOM
-  const wrap  = document.getElementById('readerWrap');
   const meta  = document.getElementById('readerMeta');
   const title = document.getElementById('readerTitle');
   const body  = document.getElementById('readerBody');
   const toc   = document.getElementById('readerToc');
-  const btnPrev = wrap.querySelector('[data-act="prev"]');
-  const btnNext = wrap.querySelector('[data-act="next"]');
-  const btnToc  = wrap.querySelector('[data-act="toc"]');
-  const btnMode = wrap.querySelector('[data-act="mode"]');
+  const btnPrev = document.querySelector('#readerWrap [data-act="prev"]');
+  const btnNext = document.querySelector('#readerWrap [data-act="next"]');
+  const btnToc  = document.querySelector('#readerWrap [data-act="toc"]');
+  const btnMode = document.querySelector('#readerWrap [data-act="mode"]');
 
   const stack = document.getElementById('readerStack');
   const stage = document.getElementById('readerStage');
   const bg    = document.getElementById('readerBg');
   const ovl   = document.getElementById('readerOverlay');
   const ovlBtn= document.getElementById('rstageReadBtn');
+  const scrollHost = getModalScrollHost();
 
-  // help modal grow as needed
-  const modalBodyEl = document.getElementById('modalBody');
-  const dialog = modalBodyEl ? modalBodyEl.closest('.modal-dialog') : null;
-  if (modalBodyEl){ modalBodyEl.style.maxHeight = 'none'; modalBodyEl.style.overflowY = 'auto'; }
-  if (dialog){ dialog.style.maxHeight = 'none'; dialog.style.overflowY = 'auto'; }
-
-  if (!book) { if (body) body.innerHTML = `<div class="text-red-300">${t('reader.error','Failed to load the book. Please try again later.')}</div>`; return; }
-
+  if (!book){ body.innerHTML = `<div class="text-red-300">${t('reader.error','Failed to load the book.')}</div>`; return; }
   const coversIndex = await loadCoversIndex(version, L, book);
 
   let current = Number.isFinite(startIndex) ? Math.max(0, startIndex|0) : (Number(localStorage.getItem(storageKey(version, L)))||0);
   current = Math.min(Math.max(0,current), book.chapters.length-1);
 
-  function savePos(){ try { localStorage.setItem(storageKey(version, L), String(current)); } catch {} }
   function updateButtons(){
     const total = book.chapters.length;
     btnPrev.disabled = current <= 0;
@@ -137,51 +137,74 @@ export async function openReader(version='full', startIndex=NaN){
     btnPrev.classList.toggle('opacity-50', btnPrev.disabled);
     btnNext.classList.toggle('opacity-50', btnNext.disabled);
   }
+  function savePos(){ try { localStorage.setItem(storageKey(version, L), String(current)); } catch {} }
 
-  // mode (no inner scroll: readerBody never gets overflow:auto)
+  function measureAndApply(){
+    // set CSS var for stage height
+    const h = stage?.getBoundingClientRect().height || 0;
+    stack?.style.setProperty('--stage-h', `${Math.round(h)}px`);
+    if (stage?.classList.contains('is-text')){
+      // text mode: inner scroll container height = stage height; outer scroll locked
+      if (body){
+        body.style.height = `${Math.round(h)}px`;
+        body.style.maxHeight = `${Math.round(h)}px`;
+        body.style.overflowY = 'auto';
+      }
+      if (scrollHost) scrollHost.style.overflowY = 'hidden';
+    } else {
+      // cover mode: let modal scroll
+      if (body){
+        body.style.height = 'auto';
+        body.style.maxHeight = 'none';
+        body.style.overflow = 'visible';
+      }
+      if (scrollHost) scrollHost.style.overflowY = 'auto';
+    }
+  }
+
   let toggling = false;
-  function safeSetMode(mode){
+  function setMode(mode){ // 'cover' | 'text'
     if (!stage || toggling) return;
     toggling = true;
     stage.classList.toggle('is-text', mode==='text');
     stack?.classList.toggle('is-text', mode==='text');
-    if (mode==='text'){ ovl?.classList.add('hidden'); }
-    else { ovl?.classList.remove('hidden'); }
+    if (mode==='text'){ ovl?.classList.add('hidden'); } else { ovl?.classList.remove('hidden'); }
     writeMode(version, L, current, mode);
-    setTimeout(()=> { toggling = false; }, 80);
+    requestAnimationFrame(()=>{ measureAndApply(); toggling=false; });
   }
 
   function openIdx(i){
     current = Math.min(Math.max(i,0), book.chapters.length-1);
     const ch = book.chapters[current];
-    if (meta)  meta.textContent = `${t('reader.chapter','Chapter')} ${current+1} ${t('reader.of','of')} ${book.chapters.length}`;
-    if (title) title.textContent = ch?.title || `${t('reader.chapter','Chapter')} ${current+1}`;
-    if (body)  body.innerHTML = ch?.html || '';
+    meta.textContent = `${t('reader.chapter','Chapter')} ${current+1} ${t('reader.of','of')} ${book.chapters.length}`;
+    title.textContent = ch?.title || `${t('reader.chapter','Chapter')} ${current+1}`;
+    body.innerHTML = ch?.html || '';
 
     const cu = resolveCoverUrl(coversIndex, current+1);
     if (cu){
-      stage?.classList.remove('hidden');
-      if (bg) bg.style.backgroundImage = `url("${cu}")`;
+      stage.classList.remove('hidden');
+      bg.style.backgroundImage = `url("${cu}")`;
       const probe = new Image();
-      probe.onload = () => {
+      probe.onload = ()=> {
         const w = probe.naturalWidth || 768, h = probe.naturalHeight || 1365;
         stage.style.aspectRatio = `${w}/${h}`;
-        stage.style.minHeight = ''; 
+        stage.style.minHeight = '';
+        requestAnimationFrame(measureAndApply);
       };
       probe.src = cu;
-      const remembered = readMode(version, L, current);
-      safeSetMode(remembered);
-      const prevU = current>0 ? resolveCoverUrl(coversIndex, current) : null;
-      const nextU = current<book.chapters.length-1 ? resolveCoverUrl(coversIndex, current+2) : null;
-      if (prevU){ const i1 = new Image(); i1.src = prevU; }
-      if (nextU){ const i2 = new Image(); i2.src = nextU; }
+      setMode(readMode(version, L, current));
     } else {
-      stage?.classList.add('hidden');
-      safeSetMode('text');
+      stage.classList.add('hidden');
+      stack.style.removeProperty('--stage-h');
+      // no cover -> use default vh fallback (modal scroll)
+      if (body){
+        body.style.height='auto'; body.style.maxHeight=''; body.style.overflow='visible';
+      }
+      if (scrollHost) scrollHost.style.overflowY='auto';
+      setMode('text');
     }
-    updateButtons();
-    savePos();
-    body?.scrollTo({ top:0, behavior:'auto' });
+
+    updateButtons(); savePos(); body.scrollTo({top:0, behavior:'auto'});
   }
 
   function renderToc(){
@@ -189,8 +212,7 @@ export async function openReader(version='full', startIndex=NaN){
     toc.innerHTML = `<div class="rounded-2xl border border-gray-700 p-2" style="background:rgba(0,0,0,.25)">${items.join('')}</div>`;
     toc.addEventListener('click', (e)=>{
       const b = e.target.closest('button[data-idx]'); if (!b) return;
-      const idx = Number(b.getAttribute('data-idx'))||0;
-      openIdx(idx);
+      openIdx(Number(b.getAttribute('data-idx'))||0);
       toc.classList.add('hidden');
     });
   }
@@ -198,12 +220,19 @@ export async function openReader(version='full', startIndex=NaN){
   btnPrev.addEventListener('click', ()=> openIdx(current-1));
   btnNext.addEventListener('click', ()=> openIdx(current+1));
   btnToc .addEventListener('click', ()=> toc.classList.toggle('hidden'));
-  btnMode?.addEventListener('click', (e)=> { e.preventDefault(); e.stopPropagation(); const next = (stage?.classList.contains('is-text')) ? 'cover' : 'text'; safeSetMode(next); });
-  ovlBtn?.addEventListener('click', (e)=> { e.preventDefault(); e.stopPropagation(); safeSetMode('text'); });
-  stage?.addEventListener('dblclick', (e)=> { e.preventDefault(); e.stopPropagation(); safeSetMode('text'); });
+  btnMode.addEventListener('click', (e)=>{ e.preventDefault(); const next = (stage.classList.contains('is-text')?'cover':'text'); setMode(next); });
+  ovlBtn.addEventListener('click', (e)=>{ e.preventDefault(); setMode('text'); });
+  stage.addEventListener('dblclick', (e)=>{ e.preventDefault(); setMode('text'); });
 
-  const onKey = (e)=>{ if (!document.getElementById('modalBody')) return; if (e.key === 'ArrowLeft') { e.preventDefault(); openIdx(current-1); } if (e.key === 'ArrowRight') { e.preventDefault(); openIdx(current+1); } };
+  const onKey = (e)=>{
+    if (!document.getElementById('modalBody')) return;
+    if (e.key==='ArrowLeft'){ e.preventDefault(); openIdx(current-1); }
+    if (e.key==='ArrowRight'){ e.preventDefault(); openIdx(current+1); }
+  };
   document.addEventListener('keydown', onKey);
+
+  const onResize = ()=>{ requestAnimationFrame(measureAndApply); };
+  window.addEventListener('resize', onResize);
 
   renderToc();
   openIdx(current);
@@ -212,9 +241,8 @@ export async function openReader(version='full', startIndex=NaN){
   const obs = new MutationObserver(()=>{
     if (!modal.classList.contains('show')){
       document.removeEventListener('keydown', onKey);
-      // cleanup overrides
-      if (modalBodyEl){ modalBodyEl.style.maxHeight=''; modalBodyEl.style.overflowY=''; }
-      if (dialog){ dialog.style.maxHeight=''; dialog.style.overflowY=''; }
+      window.removeEventListener('resize', onResize);
+      if (scrollHost) scrollHost.style.overflowY='';
       obs.disconnect();
     }
   });
