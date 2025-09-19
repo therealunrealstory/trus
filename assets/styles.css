@@ -724,23 +724,22 @@ body.modal-open{ overflow:hidden; }
   grid-area: stack; z-index: 2;
   /* по умолчанию текст скрыт (режим Cover) */
   opacity: 0; pointer-events: none;
-  max-height: 0; overflow: hidden;
+  max-height: 0; overflow: hidden; /* max-height: 0 для скрытого состояния остается */
   padding: 0 16px; /* чтобы на мобиле не липло к краям */
   transition: opacity .22s ease;
 }
 
-/* когда включён режим текста (добавляется класс .is-text на .rstage И на .rstack) */
+/* когда включён режим текста (добавляется класс .is-text на .rstack) */
 #modalBody #readerWrap .rstack.is-text > #readerBody{
   opacity: 1; pointer-events: auto;
-  max-height: min(70vh, calc(100vh - 220px)); /* скролл внутри текста */
+  /* max-height БОЛЬШЕ НЕ НУЖЕН ЗДЕСЬ, он придет из JS */
   overflow: auto;
 }
 
 #modalBody #readerWrap .rstage{
   position: relative;
   width: 100%;
-  /* высоту зададим из JS через aspect-ratio, но страховка на случай ошибки: */
-  min-height: clamp(240px, 42vh, 520px);
+  /* УБИРАЕМ min-height, теперь за высоту отвечает только aspect-ratio из JS */
   border-radius: 14px; overflow: hidden;
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.04);
@@ -773,6 +772,6 @@ body.modal-open{ overflow:hidden; }
 @media (max-width: 768px){
   #modalBody #readerWrap .rstage{ border-radius:12px; }
   #modalBody #readerWrap .rstack.is-text > #readerBody{
-    max-height: min(72vh, calc(100vh - 180px));
+    /* max-height ТАКЖЕ УДАЛЯЕМ ОТСЮДА */
   }
 }

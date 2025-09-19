@@ -130,11 +130,9 @@ export async function openReader(version='full', startIndex=NaN){
         #readerToc button{color:#e5e7eb}
       </style>
 
-      <!-- МЕТА И ЗАГОЛОВОК ПЕРЕД ОБЛОЖКОЙ -->
       <div class="mb-2 text-xs opacity-80" id="readerMeta"></div>
       <h4 id="readerTitle" class="text-base font-semibold mb-2"></h4>
 
-      <!-- СТЕК: сцена обложки + текст одной сеткой -->
       <div id="readerStack" class="rstack">
         <div id="readerStage" class="rstage">
           <div class="rstage-bg" id="readerBg" role="img" aria-label="${t('reader.cover.alt','Chapter cover')}"></div>
@@ -145,7 +143,6 @@ export async function openReader(version='full', startIndex=NaN){
           </div>
         </div>
 
-        <!-- ТЕКСТ теперь в том же контейнере, поверх сцены -->
         <div id="readerBody" class="text-sm leading-relaxed space-y-3"></div>
       </div>
 
@@ -246,9 +243,17 @@ export async function openReader(version='full', startIndex=NaN){
       const probe = new Image();
       probe.onload = () => {
         const w = probe.naturalWidth || 768, h = probe.naturalHeight || 1365;
-        // выставляем aspect-ratio контейнера
+        // 1. Выставляем aspect-ratio контейнера обложки
         stage.style.aspectRatio = `${w}/${h}`;
         stage.style.minHeight = ''; // страховку можно снять
+
+        // 2. НОВОЕ: Задаем максимальную высоту для текста равной высоте обложки
+        if (body) {
+          // Даем браузеру отрисовать изменения и потом забираем высоту
+          requestAnimationFrame(() => {
+            body.style.maxHeight = `${stage.clientHeight}px`;
+          });
+        }
       };
       probe.src = cu;
 
