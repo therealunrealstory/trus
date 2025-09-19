@@ -137,6 +137,9 @@
   "reader.hint": "Use ←/→ to navigate, Esc to close",
   "reader.error": "Failed to load the book. Please try again later.",
   
+  "reader.read": "Read",
+  "reader.mode": "Cover/Text",
+  
     "video.disclaimer": "All footage in this video shows real events and real people. The full meaning of these scenes becomes clear after reading our story.",
   
   "donate.info.link": "Why this matters",
