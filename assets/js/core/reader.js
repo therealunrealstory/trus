@@ -1,4 +1,4 @@
-// assets/js/core/reader.js — ratio-driven sizing + single-scroll
+// assets/js/core/reader.js — cover fitted to dialog; text height = cover; single-scroll
 import { t } from './i18n.js';
 import { openModal } from './modal.js';
 
@@ -58,49 +58,28 @@ function coverUrl(covers, chapterIdx1){
   return null;
 }
 
-// ---------- helpers for modal sizing ----------
+// ---------- helpers ----------
 const byId = id => document.getElementById(id);
-const backdrop = () => byId('modalBackdrop');
-const dialog   = () => document.querySelector('.modal-backdrop .modal-dialog');
-const modalBody= () => byId('modalBody');
-
-// compute desired cover height from ratio and current stage width
-function desiredCoverHeight(imgW, imgH, stageEl){
-  const stageW = stageEl?.clientWidth || 1;
-  if (!imgW || !imgH) return Math.round(stageW * (16/9)); // fallback
-  return Math.round(stageW * (imgH / imgW));
-}
+const dialog = () => document.querySelector('.modal-backdrop .modal-dialog');
 function chromeHeight(){
   const meta  = byId('readerMeta')?.offsetHeight || 0;
   const title = byId('readerTitle')?.offsetHeight || 0;
   const ctrls = byId('readerControls')?.offsetHeight || 0;
-  const pads  = 40;
+  const pads  = 40; // внутренние паддинги карточки
   return meta + title + ctrls + pads;
 }
-function applyCoverLayout(h){
-  const dlg = dialog(), bd = modalBody(), bdrop = backdrop();
-  if (!dlg || !bd) return;
-  bdrop?.classList.add('reader-fit');
-  const max = Math.floor(window.innerHeight * 0.95);
-  const H   = Math.min(h + chromeHeight(), max);
-  dlg.style.maxHeight = H + 'px';
-  dlg.style.height    = H + 'px';
-  dlg.style.overflowY = 'auto';
-  bd.style.maxHeight  = 'none';
-  bd.style.height     = 'auto';
-}
-function applyTextLayout(h){
-  const dlg = dialog(), bd = modalBody();
-  if (!dlg || !bd) return;
-  // модалка не скроллит
-  dlg.style.overflowY = 'hidden';
-  // текст скроллит внутри h
-  const body = byId('readerBody');
-  if (body){
-    body.style.height    = h + 'px';
-    body.style.maxHeight = h + 'px';
-    body.style.overflowY = 'auto';
-  }
+
+// computes stage height so that: 
+//   1) it honors the image ratio (imgH/imgW)
+//   2) it fits into the current dialog's max usable height (dialogHeightBudget)
+function fittedStageHeight(imgW, imgH, stageEl){
+  const stageW = stageEl?.clientWidth || 1;
+  const desired = Math.round(stageW * (imgH && imgW ? (imgH/imgW) : (16/9)));
+  const dlg = dialog();
+  // если у диалога есть max-height (часто 80vh), то нам доступно:
+  const maxDlg = Math.max(dlg?.clientHeight || Math.floor(window.innerHeight*0.8), 320);
+  const usable = Math.max(maxDlg - chromeHeight(), 200);
+  return Math.min(desired, usable);
 }
 
 // ---------- main ----------
@@ -166,7 +145,7 @@ export async function openReader(version='full', startIndex=NaN){
   let current = Number.isFinite(startIndex) ? Math.max(0, startIndex|0) : (Number(localStorage.getItem(storageKey(version, L)))||0);
   current = Math.min(Math.max(0,current), book.chapters.length-1);
 
-  let imgW=0, imgH=0; // natural image ratio cache
+  let imgW=0, imgH=0; // natural size cache
 
   function updateButtons(){
     const total = book.chapters.length;
@@ -175,16 +154,23 @@ export async function openReader(version='full', startIndex=NaN){
   }
   const savePos = () => { try{ localStorage.setItem(storageKey(version, L), String(current)); }catch{} };
 
-  function applyLayoutForMode(mode){
-    // desired height from ratio
-    const h = desiredCoverHeight(imgW, imgH, stage);
+  function applyLayout(mode){
+    const h = fittedStageHeight(imgW, imgH, stage);
     stack?.style.setProperty('--stage-h', h+'px');
+    // фиксируем stage визуально корректно
+    if (imgW && imgH) stage.style.aspectRatio = `${imgW}/${imgH}`;
     if (mode==='text'){
       stage.classList.add('is-text'); stack.classList.add('is-text'); ovl.classList.add('hidden');
-      applyTextLayout(h);
+      // у текста ровно высота сцены, один скролл внутри текста
+      body.style.height = h+'px'; body.style.maxHeight = h+'px'; body.style.overflowY = 'auto';
+      // модалка — без собственного скролла
+      const dlg = dialog(); if (dlg) dlg.style.overflowY = 'hidden';
     } else {
       stage.classList.remove('is-text'); stack.classList.remove('is-text'); ovl.classList.remove('hidden');
-      applyCoverLayout(h);
+      // текст — без скролла
+      body.style.height = 'auto'; body.style.maxHeight='none'; body.style.overflow='visible';
+      // модалка — скроллит, кнопки видны, сцена не больше её бюджета
+      const dlg = dialog(); if (dlg) dlg.style.overflowY = 'auto';
     }
   }
 
@@ -203,23 +189,14 @@ export async function openReader(version='full', startIndex=NaN){
       probe.onload = ()=>{
         imgW = probe.naturalWidth || 768;
         imgH = probe.naturalHeight || 1365;
-        // set aspect-ratio for visual correctness
-        stage.style.aspectRatio = `${imgW}/${imgH}`;
-        stage.style.minHeight = '';
-        requestAnimationFrame(()=> applyLayoutForMode(readMode(version, L, current)));
+        requestAnimationFrame(()=> applyLayout(readMode(version, L, current)));
       };
       probe.src = cu;
-      // preload neighbors
-      const p = current>0 ? coverUrl(covers, current) : null;
-      const n = current<book.chapters.length-1 ? coverUrl(covers, current+2) : null;
-      if (p){ const i1 = new Image(); i1.src = p; }
-      if (n){ const i2 = new Image(); i2.src = n; }
     } else {
-      // no cover — behave like simple text
       stage.classList.add('hidden');
       stack.style.removeProperty('--stage-h');
-      byId('modalBackdrop')?.classList.remove('reader-fit');
-      const dlg = dialog(); if (dlg){ dlg.style.height=''; dlg.style.maxHeight=''; dlg.style.overflowY='auto'; }
+      const dlg = dialog(); if (dlg) dlg.style.overflowY='auto';
+      // обычный текст (как раньше)
       stage.classList.add('is-text'); stack.classList.add('is-text'); ovl.classList.add('hidden');
       body.style.height=''; body.style.maxHeight=''; body.style.overflowY='auto';
     }
@@ -228,7 +205,7 @@ export async function openReader(version='full', startIndex=NaN){
   }
 
   function renderToc(){
-    const items = book.chapters.map((ch,i)=> `<button data-idx="${i}" class="block w-full text-left px-3 py-2 rounded hover:bg-white/5 text-sm">${esc(ch?.title || (t('reader.chapter','Chapter')+' '+(i+1)))}</button>`);
+    const items = book.chapters.map((ch,i)=> `<button data-idx="${i}" class="block w-full text-left px-3 py-2 rounded hover:bg:white/5 text-sm">${esc(ch?.title || (t('reader.chapter','Chapter')+' '+(i+1)))}</button>`);
     toc.innerHTML = `<div class="rounded-2xl border border-gray-700 p-2" style="background:rgba(0,0,0,.25)">${items.join('')}</div>`;
     toc.addEventListener('click', e=>{
       const b = e.target.closest('button[data-idx]'); if (!b) return;
@@ -237,22 +214,17 @@ export async function openReader(version='full', startIndex=NaN){
     });
   }
 
-  // controls
   btnPrev.addEventListener('click', ()=> openIdx(current-1));
   btnNext.addEventListener('click', ()=> openIdx(current+1));
   btnToc .addEventListener('click', ()=> toc.classList.toggle('hidden'));
   btnMode.addEventListener('click', e=>{ e.preventDefault();
     const next = stage.classList.contains('is-text') ? 'cover' : 'text';
     writeMode(version, L, current, next);
-    applyLayoutForMode(next);
+    applyLayout(next);
   });
-  ovlBtn.addEventListener('click', e=>{ e.preventDefault();
-    writeMode(version, L, current, 'text');
-    applyLayoutForMode('text');
-  });
-  stage.addEventListener('dblclick', e=>{ e.preventDefault(); writeMode(version, L, current, 'text'); applyLayoutForMode('text'); });
+  ovlBtn.addEventListener('click', e=>{ e.preventDefault(); writeMode(version, L, current, 'text'); applyLayout('text'); });
+  stage.addEventListener('dblclick', e=>{ e.preventDefault(); writeMode(version, L, current, 'text'); applyLayout('text'); });
 
-  // keys
   const onKey = (e)=>{
     if (!document.getElementById('modalBody')) return;
     if (e.key==='ArrowLeft'){ e.preventDefault(); openIdx(current-1); }
@@ -260,21 +232,19 @@ export async function openReader(version='full', startIndex=NaN){
   };
   document.addEventListener('keydown', onKey);
 
-  // resize: recompute desired height from ratio
-  const onResize = ()=>{ requestAnimationFrame(()=> applyLayoutForMode(readMode(version, L, current))); };
+  const onResize = ()=>{ requestAnimationFrame(()=> applyLayout(readMode(version, L, current))); };
   window.addEventListener('resize', onResize);
 
   renderToc();
   openIdx(current);
 
-  // cleanup on close
-  const modal = byId('modalBackdrop');
+  const modal = document.getElementById('modalBackdrop');
   const obs = new MutationObserver(()=>{
     if (!modal.classList.contains('show')){
       document.removeEventListener('keydown', onKey);
       window.removeEventListener('resize', onResize);
-      modal.classList.remove('reader-fit');
-      const dlg = dialog(); if (dlg){ dlg.style.height=''; dlg.style.maxHeight=''; dlg.style.overflowY=''; }
+      // cleanup
+      const dlg = dialog(); if (dlg){ dlg.style.overflowY=''; }
       const b = byId('readerBody'); if (b){ b.style.height=''; b.style.maxHeight=''; b.style.overflow=''; }
       obs.disconnect();
     }
