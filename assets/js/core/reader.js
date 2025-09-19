@@ -138,7 +138,6 @@ export async function openReader(version='full', startIndex=NaN){
           <div class="rstage-bg" id="readerBg" role="img" aria-label="${t('reader.cover.alt','Chapter cover')}"></div>
           <div class="rstage-fog" id="readerFog" aria-hidden="true"></div>
           <div class="rstage-overlay" id="readerOverlay">
-            <div class="rstage-title" id="rstageTitle"></div>
             <button class="rstage-read" id="rstageReadBtn">${t('reader.read','Read')}</button>
           </div>
         </div>
@@ -183,7 +182,6 @@ export async function openReader(version='full', startIndex=NaN){
   const bg    = document.getElementById('readerBg');
   const fog   = document.getElementById('readerFog');
   const ovl   = document.getElementById('readerOverlay');
-  const ovlTitle = document.getElementById('rstageTitle');
   const ovlBtn   = document.getElementById('rstageReadBtn');
 
   // если книги нет — показываем ошибку и выходим
@@ -238,7 +236,6 @@ export async function openReader(version='full', startIndex=NaN){
     if (cu){
       stage?.classList.remove('hidden');
       if (bg) bg.style.backgroundImage = `url("${cu}")`;
-      if (ovlTitle) ovlTitle.textContent = ch?.title || `${t('reader.chapter','Chapter')} ${current+1}`;
       // подгоняем реальную пропорцию кадра -> меньше обрезаний
       const probe = new Image();
       probe.onload = () => {
