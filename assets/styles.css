@@ -654,8 +654,16 @@ body.modal-open{ overflow:hidden; }
   /* Туман: затемнение + легкий blur. Fallback: если backdrop-filter не поддерживается,
      остаётся просто затемнение (background). */
   background: rgba(0,0,0,0.50);
-  backdrop-filter: blur(6px) saturate(110%) brightness(0.88);
-  -webkit-backdrop-filter: blur(6px) saturate(110%) brightness(0.88);
+  backdrop-filter: blur(6px) saturate(110%) brightness(0.90);
+  -webkit-backdrop-filter: blur(6px) saturate(110%) brightness(0.90);
+}
+/* Режим текста: включаем и усиливаем туман для комфортного чтения */
+#modalBody #readerWrap .rstack.is-text .rstage-fog,
+#modalBody #readerWrap .rstage.is-text .rstage-fog{
+  opacity: 1; /* показать слой тумана */
+  background: rgba(0,0,0,0.75); /* было 0.50 — стало темнее */
+  backdrop-filter: blur(10px) saturate(100%) brightness(0.60); /* было 0.74 — стало темнее */
+  -webkit-backdrop-filter: blur(10px) saturate(100%) brightness(0.60);
 }
 
 #modalBody #readerWrap .rstage-overlay{
