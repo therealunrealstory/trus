@@ -8,7 +8,7 @@
   "audio.play": "Histoire en musique",
   "audio.pause": "‖ Pause",
   
-  "story.full.title": "Version complète de notre histoire",
+  "story.full.title": "Notre histoire (jusqu’en juillet 2025)",
 "full.play": "▶︎ Lecture",
 "full.pause": "‖ Pause",
 "full.note": "Récit intégral narré",
@@ -37,7 +37,7 @@
 
   "video.title": "Bande-annonce vidéo",
 
-  "short.title": "Version courte de notre histoire",
+  "short.title": "L’histoire maintenant (après juillet 2025)",
   "short.note": "À propos des événements du début 2019 à la mi-2025.",
   "short.play": "▶︎ Lire",
   "short.pause": "‖ Pause",
@@ -136,5 +136,9 @@
   "reader.hint": "Utilisez ←/→ pour naviguer et Esc pour fermer",
   "reader.error": "Échec du chargement du livre. Veuillez réessayer plus tard.",
   
-   "video.disclaimer": "Toutes les séquences de cette vidéo montrent des événements réels et des personnes réelles. Le sens de ces scènes apparaît pleinement après la lecture de notre histoire."
+   "video.disclaimer": "Toutes les séquences de cette vidéo montrent des événements réels et des personnes réelles. Le sens de ces scènes apparaît pleinement après la lecture de notre histoire.",
+   
+  "donate.info.link": "Pourquoi c’est important",
+  "donate.info.title": "À propos du soutien et des plans du projet",
+  "donate.info.body": "<div class=\"space-y-3 text-sm leading-relaxed\"><p>Je gère seul la partie média du projet : recherche et écriture, édition et traduction, visuels et audio, publication et maintenance du site. En ce moment — Adam, moi et d’autres impliqués — nous sommes dans une situation financière difficile, conséquence directe des événements que vous lisez ici.</p><p>La majeure partie de mon temps et de mon énergie est consacrée au soutien d’Adam : coordination, communication, logistique quotidienne. En parallèle, je raconte cette histoire sous plusieurs formats — textes, vérification des faits, traductions, visuels et audio — et je maintiens le site en ligne.</p><p>Votre contribution volontaire compte : elle soutient le travail du projet (recherche, textes, traductions, visuels et audio, publication, hébergement, maintenance) et aide à couvrir les dépenses qui découlent directement de cette histoire. C’est ainsi que je peux garder le rythme du travail et de l’attention autour d’elle.</p><p><strong>La suite — formation & outils.</strong><br>— cours pratiques — pratique de l’IA, architecture de contenu, architecture web, bots et automatisations, avatars IA ;<br>— applications web (certaines fonctions gratuites) — stylisation d’images et bandes dessinées, photo/vidéo réalistes, mélodies et musique, etc.</p><p>Restez informés : même si aujourd’hui n’est pas le moment de donner, repassez — des mises à jour, sorties et nouvelles seront publiées ici. Les partages aident beaucoup.</p></div>"
 }

@@ -196,17 +196,19 @@ function renderDonateButtons(root){
       </svg>
       <span data-i18n="donate.info.link">${t('donate.info.link','Why this matters')}</span>
     `;
-    infoBtn.addEventListener('click', ()=>{
-      const title = t('donate.info.title','About support and project plans');
-      const html = t('donate.info.body', `<div class="space-y-3 text-sm leading-relaxed">
-        <p>I create and run the media side of this project alone: research and writing, editing and translation, visuals and audio, publishing, and site upkeep. To be clear: right now <strong>we are in a difficult financial situation</strong> — myself, Adam, and others involved — as a direct result of the events you read about here.</p>
-        <p>Almost all my time and energy now go to <strong>supporting Adam</strong>: coordination, communication, daily logistics. In parallel, I <strong>tell this story</strong> across formats — writing, fact-gathering, translation, visuals and audio — and I keep the site running.</p>
-        <p><strong>Your voluntary contribution is very important to us:</strong> it not only supports my work on creating and developing the project (research, texts, translations, visuals and audio, publishing, hosting, site maintenance), <strong>it also helps cover financial needs that arise directly from this story.</strong> That’s how I can keep the pace of work and care around it.</p>
-        <p><strong>What’s next.</strong> In parallel I am preparing <strong>practical learning courses</strong> and <strong>my own web-apps</strong> where I’ll share <strong>my unique AI-driven methods</strong>; part of the functionality will be <strong>free</strong>. I want readers and followers to have clear, useful tools to create meaningful content by the same principles.</p>
-        <p><strong>Stay tuned:</strong> even if today isn’t the moment to donate, please check back — updates, releases, and news will appear here.</p>
-      </div>`);
-      openModal(title, html);
-    });
+		infoBtn.addEventListener('click', ()=>{
+		  const title = t('donate.info.title','About support and project plans');
+		  const html = t('donate.info.body', `<div class="space-y-3 text-sm leading-relaxed">
+			<p>I run the media side of this project alone: research and writing, editing and translation, visuals and audio, publishing, and site upkeep. Right now we — Adam, myself, and others involved — are in a difficult financial situation as a direct result of the events you read about here.</p>
+			<p>Most of my time and energy go to supporting Adam: coordination, communication, daily logistics. In parallel I tell this story across formats — writing, fact-checking, translation, visuals and audio — and keep the site running.</p>
+			<p>Your voluntary contribution matters: it supports work on the project (research, texts, translations, visuals and audio, publishing, hosting, site maintenance) and helps cover expenses that arise directly from this story. That’s how I can keep the pace of work and care around it.</p>
+			<p><strong>What’s next — learning & tools.</strong><br>
+			— practical courses — AI practice, content architecture, web architecture, bots & automations, AI avatars;<br>
+			— web apps (some features free) — image stylization and comics, realistic photo/video, melodies and music, and more.</p>
+			<p>Stay tuned: even if today isn’t the moment to donate, please check back — updates, releases, and news will appear here. Reposts help a lot.</p>
+		  </div>`);
+		  openModal(title, html);
+		});
     wrap.appendChild(infoBtn);
 
     document.dispatchEvent(new CustomEvent('locale-apply-request'));

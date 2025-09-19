@@ -8,7 +8,7 @@
   "audio.play": "Geschichte in Musik",
   "audio.pause": "‖ Pause",
   
-  "story.full.title": "Komplette Version unserer Geschichte",
+  "story.full.title": "Unsere Geschichte (bis Juli 2025)",
 "full.play": "▶︎ Abspielen",
 "full.pause": "‖ Pause",
 "full.note": "Vollständige erzählte Geschichte",
@@ -37,7 +37,7 @@
 
   "video.title": "Video-Teaser",
 
-  "short.title": "Kurzfassung unserer Geschichte",
+  "short.title": "Die Geschichte jetzt (nach Juli 2025)",
   "short.note": "Über die Ereignisse von Anfang 2019 bis Mitte 2025.",
   "short.play": "▶︎ Abspielen",
   "short.pause": "‖ Pause",
@@ -136,5 +136,9 @@
   "reader.hint": "Mit ←/→ navigieren, mit Esc schließen",
   "reader.error": "Das Buch konnte nicht geladen werden. Bitte versuchen Sie es später erneut.",
   
-  "video.disclaimer": "Alles Filmmaterial in diesem Video zeigt reale Ereignisse und echte Menschen. Die volle Bedeutung dieser Szenen wird nach dem Lesen unserer Geschichte deutlich."
+  "video.disclaimer": "Alles Filmmaterial in diesem Video zeigt reale Ereignisse und echte Menschen. Die volle Bedeutung dieser Szenen wird nach dem Lesen unserer Geschichte deutlich.",
+  
+  "donate.info.link": "Warum das wichtig ist",
+  "donate.info.title": "Über Unterstützung und Projektpläne",
+  "donate.info.body": "<div class=\"space-y-3 text-sm leading-relaxed\"><p>Ich betreibe die Medienarbeit des Projekts allein: Recherche und Schreiben, Redaktion und Übersetzung, Visuals und Audio, Veröffentlichung und Pflege der Website. Zurzeit — Adam, ich und andere Beteiligte — befinden wir uns aufgrund der hier geschilderten Ereignisse in einer schwierigen finanziellen Lage.</p><p>Der Großteil meiner Zeit und Energie geht in die Unterstützung von Adam: Koordination, Kommunikation und tägliche Logistik. Parallel erzähle ich diese Geschichte in mehreren Formaten — Texte, Fact-Checking, Übersetzungen, Visuals und Audio — und halte die Website am Laufen.</p><p>Dein freiwilliger Beitrag zählt: Er unterstützt die Arbeit am Projekt (Recherche, Texte, Übersetzungen, Visuals und Audio, Veröffentlichung, Hosting, Wartung) und hilft, Ausgaben zu decken, die direkt aus dieser Geschichte entstehen. So kann ich Tempo und Fürsorge aufrechterhalten.</p><p><strong>Wie geht es weiter — Lernen & Tools.</strong><br>— praxisnahe Kurse — KI-Praxis, Inhaltsarchitektur, Webarchitektur, Bots & Automatisierungen, KI-Avatare;<br>— Web-Apps (teils kostenlos) — Bildstiliserung und Comics, realistische Foto/Video-Generierung, Melodien und Musik und mehr.</p><p>Bleib dran: Auch wenn heute nicht der Moment für eine Spende ist, schau wieder vorbei — hier erscheinen Updates, Releases und Neuigkeiten. Reposts helfen sehr.</p></div>"
 }

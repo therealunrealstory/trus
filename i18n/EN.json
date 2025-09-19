@@ -8,7 +8,7 @@
   "audio.play": "Story in music",
   "audio.pause": "‖ Pause",
   
-  "story.full.title": "Full version of our story",
+  "story.full.title": "Our story (up to July 2025)",
 "full.play": "▶︎ Play",
 "full.pause": "‖ Pause",
 "full.note": "Complete narrated story",
@@ -37,7 +37,7 @@
 
   "video.title": "Video teaser",
 
-  "short.title": "Short version of our story",
+  "short.title": "The Story Now (after July 2025)",
   "short.note": "About the events from early 2019 to mid-2025.",
   "short.play": "▶︎ Play",
   "short.pause": "‖ Pause",
@@ -135,5 +135,11 @@
   "reader.chapter": "Chapter",
   "reader.of": "of",
   "reader.hint": "Use ←/→ to navigate, Esc to close",
-  "reader.error": "Failed to load the book. Please try again later."
+  "reader.error": "Failed to load the book. Please try again later.",
+  
+    "video.disclaimer": "All footage in this video shows real events and real people. The full meaning of these scenes becomes clear after reading our story.",
+  
+  "donate.info.link": "Why this matters",
+  "donate.info.title": "About support and project plans",
+  "donate.info.body": "<div class=\"space-y-3 text-sm leading-relaxed\"><p>I run the media side of this project alone: research and writing, editing and translation, visuals and audio, publishing, and site upkeep. Right now we — Adam, myself, and others involved — are in a difficult financial situation as a direct result of the events you read about here.</p><p>Most of my time and energy go to supporting Adam: coordination, communication, daily logistics. In parallel I tell this story across formats — writing, fact-checking, translation, visuals and audio — and keep the site running.</p><p>Your voluntary contribution matters: it supports work on the project (research, texts, translations, visuals and audio, publishing, hosting, site maintenance) and helps cover expenses that arise directly from this story. That’s how I can keep the pace of work and care around it.</p><p><strong>What’s next — learning & tools.</strong><br>— practical courses — AI practice, content architecture, web architecture, bots & automations, AI avatars;<br>— web apps (some features free) — image stylization and comics, realistic photo/video, melodies and music, and more.</p><p>Stay tuned: even if today isn’t the moment to donate, please check back — updates, releases, and news will appear here. Reposts help a lot.</p></div>"
 }
