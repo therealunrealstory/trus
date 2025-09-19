@@ -28,9 +28,9 @@ function fmtTime(sec){
 }
 function resumeKey(trackKey, lang){ return `seek:${trackKey}:${(lang||'EN').toUpperCase()}`; }
 function readResume(trackKey, lang){
-  try { const v = localStorage.getItem(resumeKey(trackKey, lang)); if (v==null) return NaN; const n = Number(v); return Number.isFinite(n)?Math.max(0,n):NaN; } catch { return NaN; }
+  try { const v = localStorage.getItem(resumeKey(trackKey, lang)); const n = v==null?NaN:Number(v); return Number.isFinite(n)?Math.max(0,n):NaN; } catch { return NaN; }
 }
-function writeResume(trackKey, lang, seconds){ try { localStorage.setItem(resumeKey(trackKey,lang), String(Math.max(0, Math.floor(seconds||0)))); } catch {} }
+function writeResume(trackKey, lang, seconds){ try { localStorage.setItem(resumeKey(trackKey, lang), String(Math.max(0, Math.floor(seconds||0)))); } catch {} }
 function clearResumeIfCompleted(trackKey, lang){ try { localStorage.removeItem(resumeKey(trackKey, lang)); } catch {} }
 
 function updateMiniLabels(){
@@ -40,12 +40,11 @@ function updateMiniLabels(){
 }
 
 function setAudioFromRouter(audioEl, key, lang, autoplay=false){
-  if (!audioEl) return false;
-  const url = getSoundUrl(key, lang);
-  const trySet = ()=>{
-    const cur = !audioEl.paused ? audioEl.currentTime : 0;
-    if (audioEl.src && audioEl.src.endsWith(url)){
-      // если уже на нужном языке — просто авто-проигрываем (если надо)
+  if (!audioEl) return;
+  const trySet = () => {
+    const url = getSoundUrl(key, lang);
+    if (!url) return false;
+    if (audioEl.src && (audioEl.src === url || audioEl.src.endsWith(url))) {
       if (autoplay && audioEl.paused) audioEl.play().catch(()=>{});
       return true;
     }
@@ -76,49 +75,56 @@ function setupMiniPlayer({ key, audioEl, btnEl, statusEl, seekEl, timeCurEl, tim
       if (key === 'announcement') setAnnouncementForLang(L, true);
       else if (key === 'short')   setShortForLang(L, true);
       else if (key === 'full')    setFullForLang(L, true);
-      document.dispatchEvent(new CustomEvent('pause-others', { detail:{ except: audioEl } }));
+      document.dispatchEvent(new CustomEvent('pause-others', { detail: { except: audioEl }}));
     } else audioEl.pause();
   });
 
-  onPauseOthers = (e)=>{
-    const ex = e?.detail?.except;
-    [announceAudio, shortAudio, fullAudio].forEach(a => { if (a && a !== ex && !a.paused) a.pause(); });
+  const onMeta = ()=>{
+    const d = audioEl.duration;
+    if (Number.isFinite(d) && d>0){
+      timeDurEl && (timeDurEl.textContent = fmtTime(d));
+      if (seekEl){ seekEl.max = Math.floor(d); seekEl.disabled = false; }
+      if (RESUME_ENABLED && appliedResumeForLang !== getLang()){
+        const saved = readResume(key, getLang());
+        if (Number.isFinite(saved) && saved >= RESUME_MIN_SECONDS && saved < (d - RESUME_MARGIN_TAIL)){
+          try { audioEl.currentTime = saved; } catch {}
+          if (seekEl) seekEl.value = Math.floor(audioEl.currentTime || 0);
+        } else if (Number.isFinite(saved) && saved >= (d - RESUME_MARGIN_TAIL)) {
+          clearResumeIfCompleted(key, getLang());
+        }
+        appliedResumeForLang = getLang();
+      }
+    } else {
+      timeDurEl && (timeDurEl.textContent='--:--');
+      if (seekEl){ seekEl.value = 0; seekEl.max = 0; seekEl.disabled = true; }
+    }
   };
-  document.addEventListener('pause-others', onPauseOthers);
+  audioEl.addEventListener('loadedmetadata', onMeta);
 
-  audioEl.addEventListener('play', ()=>{
+  const tick = ()=>{
+    if (!dragging && seekEl){
+      const t = audioEl.currentTime || 0;
+      if (Number.isFinite(t)) seekEl.value = Math.floor(t);
+    }
+    timeCurEl && (timeCurEl.textContent = fmtTime(audioEl.currentTime || 0));
+    rafId = audioEl.paused ? 0 : requestAnimationFrame(tick);
+  };
+
+  ['play','playing'].forEach(ev => audioEl.addEventListener(ev, ()=>{
     statusEl && (statusEl.textContent = (I18N['status.playing']||'Playing…'));
     updateMiniLabels();
-    const loop = ()=>{
-      if (!audioEl || audioEl.paused) return;
-      const cur = audioEl.currentTime || 0;
-      if (!dragging && seekEl){ seekEl.value = Math.floor(cur); }
-      timeCurEl && (timeCurEl.textContent = fmtTime(cur));
-      rafId = requestAnimationFrame(loop);
-    };
-    if (rafId){ cancelAnimationFrame(rafId); }
-    rafId = requestAnimationFrame(loop);
-
-    // Resume-on-first-play per language
-    if (RESUME_ENABLED){
+    if (!rafId) rafId = requestAnimationFrame(tick);
+    if (RESUME_ENABLED && !saveTimer){
       const L = getLang();
-      if (appliedResumeForLang === L) return;
-      const p = readResume(key, L);
-      const resume = ()=>{
-        if (!audioEl || audioEl.readyState < 1) { setTimeout(resume, 80); return; }
-        if (Number.isFinite(p) && p >= RESUME_MIN_SECONDS){
-          const wasPlaying = !audioEl.paused;
-          try { audioEl.currentTime = Math.max(0, Math.min(audioEl.duration || p, p)); } catch {}
-          if (wasPlaying) audioEl.play().catch(()=>{});
-          const d = audioEl.duration;
-          timeDurEl && (timeDurEl.textContent = fmtTime(d));
-          if (seekEl){ seekEl.max = Math.floor(d); seekEl.disabled = false; }
-        } else setTimeout(resume, 80);
-      };
-      resume();
-      appliedResumeForLang = null;
+      saveTimer = setInterval(()=>{
+        try {
+          const cur = audioEl.currentTime || 0, d = audioEl.duration;
+          if (Number.isFinite(d) && d - cur <= RESUME_MARGIN_TAIL) clearResumeIfCompleted(key, L);
+          else writeResume(key, L, cur);
+        } catch {}
+      }, RESUME_SAVE_INTERVAL);
     }
-  });
+  }));
 
   ['pause','ended'].forEach(ev => audioEl.addEventListener(ev, ()=>{
     statusEl && (statusEl.textContent = (I18N['status.paused']||'Paused'));
@@ -138,41 +144,50 @@ function setupMiniPlayer({ key, audioEl, btnEl, statusEl, seekEl, timeCurEl, tim
   if (seekEl){
     seekEl.addEventListener('pointerdown', ()=>{ dragging = true; });
     seekEl.addEventListener('input', ()=>{ const v=Number(seekEl.value)||0; timeCurEl && (timeCurEl.textContent = fmtTime(v)); });
-    const finalize = ()=>{
+    const commit = ()=>{
+      const v = Number(seekEl.value)||0;
+      if (Number.isFinite(v)) {
+        try { audioEl.currentTime = v; } catch {}
+        if (RESUME_ENABLED){
+          const L = getLang();
+          const d = audioEl.duration;
+          if (Number.isFinite(d) && d - v <= RESUME_MARGIN_TAIL) clearResumeIfCompleted(key, L);
+          else writeResume(key, L, v);
+        }
+      }
       dragging = false;
-      try { const v=Number(seekEl.value)||0; audioEl.currentTime = v; } catch {}
-      if (!audioEl.paused) audioEl.play().catch(()=>{});
+      if (!audioEl.paused && !rafId) rafId = requestAnimationFrame(tick);
     };
-    seekEl.addEventListener('pointerup', finalize);
-    seekEl.addEventListener('change', finalize);
+    seekEl.addEventListener('change', commit);
+    seekEl.addEventListener('pointerup', commit);
+    seekEl.addEventListener('pointercancel', ()=>{ dragging = false; });
+    seekEl.addEventListener('keydown', (e)=>{
+      if (e.key==='Home'){ seekEl.value = 0; seekEl.dispatchEvent(new Event('change')); }
+      if (e.key==='End' && Number.isFinite(audioEl.duration)){ seekEl.value = Math.floor(audioEl.duration); seekEl.dispatchEvent(new Event('change')); }
+    });
   }
 
-  audioEl.addEventListener('loadedmetadata', ()=>{
-    const d = audioEl.duration;
-    if (seekEl){ seekEl.max = Math.floor(d||0); seekEl.disabled = !Number.isFinite(d); }
-    timeDurEl && (timeDurEl.textContent = fmtTime(d));
-    if (RESUME_ENABLED){
-      const L = getLang();
-      const p = readResume(key, L);
-      if (Number.isFinite(p) && p >= RESUME_MIN_SECONDS){
-        try { audioEl.currentTime = Math.max(0, Math.min(d||p, p)); } catch {}
-        timeCurEl && (timeCurEl.textContent = fmtTime(audioEl.currentTime||0));
-      }
+  return {
+    onLocaleChange(nextLang){
+      const wasPlaying = !audioEl.paused;
+      const pos = audioEl.currentTime || 0;
+      if (key==='announcement') setAnnouncementForLang(nextLang,false);
+      else if (key==='short')   setShortForLang(nextLang,false);
+      else if (key==='full')    setFullForLang(nextLang,false);
+      const resume = ()=>{
+        if (Number.isFinite(audioEl.duration) && audioEl.duration>0){
+          try { audioEl.currentTime = Math.min(pos, audioEl.duration - 0.25); } catch {}
+          if (seekEl) seekEl.value = Math.floor(audioEl.currentTime || 0);
+          if (wasPlaying) audioEl.play().catch(()=>{});
+          const d = audioEl.duration;
+          timeDurEl && (timeDurEl.textContent = fmtTime(d));
+          if (seekEl){ seekEl.max = Math.floor(d); seekEl.disabled = false; }
+        } else setTimeout(resume, 80);
+      };
+      resume();
+      appliedResumeForLang = null;
     }
-  });
-
-  audioEl.addEventListener('play', ()=>{
-    if (RESUME_ENABLED && !saveTimer){
-      const L = getLang();
-      saveTimer = setInterval(()=>{
-        try {
-          const cur = audioEl.currentTime || 0, d = audioEl.duration;
-          if (Number.isFinite(d) && d - cur <= RESUME_MARGIN_TAIL) clearResumeIfCompleted(key, L);
-          else writeResume(key, L, cur);
-        } catch {}
-      }, RESUME_SAVE_INTERVAL);
-    }
-  }));
+  };
 }
 
 /* =======================
@@ -180,7 +195,9 @@ function setupMiniPlayer({ key, audioEl, btnEl, statusEl, seekEl, timeCurEl, tim
    ======================= */
 function readerCalloutNode(kind, playCard){
   const wrap = document.createElement('div');
-  wrap.className = 'my-2';
+  wrap.className = playCard ? playCard.className : 'rounded-2xl border border-gray-700 p-4';
+  wrap.classList.add('reader-card');  
+  wrap.style.background = 'rgba(0,0,0,0.35)';
   wrap.style.marginTop = '8px';
   wrap.style.marginBottom = '12px';
 
@@ -197,45 +214,23 @@ function readerCalloutNode(kind, playCard){
   btn.style.whiteSpace = 'nowrap';
   btn.style.display = 'inline-flex';
   btn.style.alignItems = 'center';
-  btn.addEventListener('click', (e)=>{
-    e?.preventDefault?.();
-    const langSel = document.querySelector('#lang') || document.querySelector('[data-lang-select]');
-    const L = (langSel?.value || 'EN').toUpperCase();
-    openReader({ kind, lang: L });
-  });
+  btn.addEventListener('click', ()=> openReader(kind));
 
   const note = document.createElement('div');
-  note.className = 'text-sm text-gray-500';
+  note.className = 'text-sm text-gray-200';
+  note.style.flex = '1 1 auto';
+  note.style.minWidth = '0';
   note.textContent = (kind==='short')
     ? t('reader.short.note','Some details are omitted. The text focuses on the chronology of events and the overall arc.')
-    : t('reader.full.note','Covers the complete story arc with extensive detail.');
+    : t('reader.full.note','Richer descriptive detail and emotional context, with character interactions and a deeper sense of their personalities.');
 
-  const btnRow = document.createElement('div');
-  btnRow.className = 'flex items-center gap-3';
-  btnRow.appendChild(btn);
-
-  const right = document.createElement('div');
-  right.className = 'flex-1 min-w-0';
-  right.appendChild(note);
-
-  wrap.appendChild(btnRow);
-  wrap.appendChild(right);
-
-  // если есть карточка плеера (с мини-кнопкой), дублируем её статус справа
-  if (playCard){
-    const mini = playCard.cloneNode(true);
-    // чистим лишние id, чтобы не дублировать
-    ['announceBtn','shortBtn','fullBtn','announceSeek','shortSeek','fullSeek','announceStatus','shortStatus','fullStatus','announceTimeCur','announceTimeDur','shortTimeCur','shortTimeDur','fullTimeCur','fullTimeDur'].forEach(id=>{
-      const el = mini.querySelector('#'+id); if (el) el.removeAttribute('id');
-    });
-    mini.querySelectorAll('button').forEach(b=>{ b.disabled = true; b.classList.remove('pulse'); });
-    right.appendChild(mini);
-  }
-
+  row.appendChild(btn);
+  row.appendChild(note);
+  wrap.appendChild(row);
   return wrap;
 }
 
-function ensureReaderCallouts(root){
+function insertReaders(root){
   // SHORT
   {
     const section = root.querySelector('#shortBtn')?.closest('section') || root.querySelector('#shortSeek')?.closest('section');
@@ -286,36 +281,37 @@ function applyResponsiveLayout(root){
     { btn: shortBtn,    status: shortStatus    },
     { btn: fullBtn,     status: fullStatus     },
   ];
-  sets.forEach(({btn,status})=>{
-    if (!btn || !status) return;
+  sets.forEach(({btn, status})=>{
+    if (!btn) return;
+    const row = btn.parentElement; // контейнер кнопки и подписи
+    if (!row) return;
+
+    row.style.display = 'flex';
+    row.style.alignItems = 'center';
+    row.style.gap = '12px';
+
+    // фикс «двух строк» на кнопке (▶︎ и текст вместе)
+    btn.style.whiteSpace = 'nowrap';
+    btn.style.display = 'inline-flex';
+    btn.style.alignItems = 'center';
+
     if (isMobile){
-      status.style.display = 'block';
-      status.style.marginTop = '6px';
+      row.style.flexDirection = 'column';
+      row.style.flexWrap = 'nowrap';
+      if (status){ status.style.width = '100%'; status.style.marginTop = '8px'; status.style.flex = '0 0 auto'; }
     } else {
-      status.style.display = 'inline';
-      status.style.marginTop = '0';
-      status.style.marginLeft = '8px';
+      row.style.flexDirection = 'row';
+      row.style.flexWrap = 'nowrap';
+      if (status){ status.style.flex = '1 1 auto'; status.style.marginTop = '0'; status.style.minWidth = '0'; }
     }
   });
 }
+/* ---------------------------------------------------------------- */
 
 export function init(root){
   initSounds();
 
   // Bind DOM
-  // --- Ensure block order: move Short section below Full section ---
-  try {
-    const shortSection = (root.querySelector('#shortBtn') || root.querySelector('#shortSeek'))?.closest('section');
-    const fullSection  = (root.querySelector('#fullBtn')  || root.querySelector('#fullSeek'))?.closest('section');
-    if (shortSection && fullSection && fullSection.nextSibling !== shortSection) {
-      fullSection.parentNode.insertBefore(shortSection, fullSection.nextSibling);
-    }
-    // Optional: hide Short block via data-flag (set data-hide-short="true" on <main> or container)
-    const shouldHideShort = root.closest('[data-hide-short="true"]') || root.querySelector('[data-hide-short="true"]');
-    if (shouldHideShort && shortSection) { shortSection.classList.add('hidden'); }
-  } catch {}
-  // ---------------------------------------------------------------
-
   announceAudio  = root.querySelector('#announceAudio') || root.querySelector('[data-audio="announce"]') || null;
   shortAudio     = root.querySelector('#shortAudio')    || root.querySelector('[data-audio="short"]')    || null;
   fullAudio      = root.querySelector('#fullAudio')     || root.querySelector('[data-audio="full"]')     || null;
@@ -328,33 +324,30 @@ export function init(root){
   fullStatus     = root.querySelector('#fullStatus');
 
   announceSeek   = root.querySelector('#announceSeek');
-  shortSeek      = root.querySelector('#shortSeek');
-  fullSeek       = root.querySelector('#fullSeek');
-
   announceTimeCur= root.querySelector('#announceTimeCur');
   announceTimeDur= root.querySelector('#announceTimeDur');
+
+  shortSeek      = root.querySelector('#shortSeek');
   shortTimeCur   = root.querySelector('#shortTimeCur');
   shortTimeDur   = root.querySelector('#shortTimeDur');
+
+  fullSeek       = root.querySelector('#fullSeek');
   fullTimeCur    = root.querySelector('#fullTimeCur');
   fullTimeDur    = root.querySelector('#fullTimeDur');
+  
 
-  const langSel = document.querySelector('#lang') || document.querySelector('[data-lang-select]');
-  const currentLang = ()=> (langSel?.value || 'EN').toUpperCase();
+  const langSel  = $('#lang');
+  const currentLang = () => (langSel?.value || 'EN').toUpperCase();
 
+  // Mini players
   const p1 = setupMiniPlayer({ key:'announcement', audioEl:announceAudio, btnEl:announceBtn, statusEl:announceStatus, seekEl:announceSeek, timeCurEl:announceTimeCur, timeDurEl:announceTimeDur, getLang: currentLang });
   const p2 = setupMiniPlayer({ key:'short',        audioEl:shortAudio,    btnEl:shortBtn,    statusEl:shortStatus,    seekEl:shortSeek,    timeCurEl:shortTimeCur,    timeDurEl:shortTimeDur,    getLang: currentLang });
   const p3 = setupMiniPlayer({ key:'full',         audioEl:fullAudio,     btnEl:fullBtn,     statusEl:fullStatus,     seekEl:fullSeek,     timeCurEl:fullTimeCur,     timeDurEl:fullTimeDur,     getLang: currentLang });
 
-  // Первичная загрузка по языку
-  const L = currentLang();
-  setAnnouncementForLang(L,false);
-  setShortForLang(L,false);
-  setFullForLang(L,false);
+  // Reader cards under headings
+  insertReaders(root);
 
-  // Reader callouts (под заголовками)
-  ensureReaderCallouts(root);
-
-  // Responsive
+  // Responsive: применяем и подписываемся
   applyResponsiveLayout(root);
   const mql = window.matchMedia('(max-width: 768px)');
   const onResp = ()=> applyResponsiveLayout(root);
@@ -374,16 +367,20 @@ export function init(root){
     const sBtn = root.querySelector('#shortReadBtn'); const fBtn = root.querySelector('#fullReadBtn');
     if (sBtn) sBtn.textContent = t('reader.open','Read');
     if (fBtn) fBtn.textContent = t('reader.open','Read');
-
-    setAnnouncementForLang(l,false);
-    setShortForLang(l,false);
-    setFullForLang(l,false);
-
-    // обновляем подписи в карточках мини-плееров
-    const sNote = root.querySelector('.trus-reader-row .text-sm');
+    const sNote = sBtn ? sBtn.parentElement.querySelector('.text-sm') : null;
+    const fNote = fBtn ? fBtn.parentElement.querySelector('.text-sm') : null;
     if (sNote) sNote.textContent = t('reader.short.note','Some details are omitted. The text focuses on the chronology of events and the overall arc.');
+    if (fNote) fNote.textContent = t('reader.full.note','Richer descriptive detail and emotional context, with character interactions and a deeper sense of their personalities.');
     updateMiniLabels();
   });
+
+  // Pause other players on play
+  onPauseOthers = (e)=>{
+    const ex = e.detail?.except;
+    [announceAudio, shortAudio, fullAudio].forEach(a => { if (a && a !== ex && !a.paused) a.pause(); });
+    updateMiniLabels();
+  };
+  document.addEventListener('pause-others', onPauseOthers);
 
   // --- Tile modals (image-buttons above announcement) ---
   const bindTile = (sel, titleKey, titleFallback, bodyKey, bodyFallback) => {
@@ -398,7 +395,7 @@ export function init(root){
   bindTile('#tile1', 'tiles.me', 'I\u2019m Nico', 'modal.tile1.body', '…');
   bindTile('#tile2', 'tiles.about', 'About Adam', 'modal.tile2.body', '…');
   bindTile('#tile3', 'tiles.others', 'Other people in the story', 'modal.tile3.body', '…');
-  // --------------------------------
+  // ------------------------------------------------------
 
   updateMiniLabels();
 }
