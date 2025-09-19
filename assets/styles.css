@@ -653,17 +653,17 @@ body.modal-open{ overflow:hidden; }
   transition: opacity .25s ease;
   /* Туман: затемнение + легкий blur. Fallback: если backdrop-filter не поддерживается,
      остаётся просто затемнение (background). */
-  background: rgba(0,0,0,0.90);
-  backdrop-filter: blur(6px) saturate(110%) brightness(0.90);
-  -webkit-backdrop-filter: blur(6px) saturate(110%) brightness(0.90);
+  background: rgba(0,0,0,0.05);
+  backdrop-filter: blur(6px) saturate(110%) brightness(0.95);
+  -webkit-backdrop-filter: blur(6px) saturate(110%) brightness(0.95);
 }
 /* Режим текста: включаем и усиливаем туман для комфортного чтения */
 #modalBody #readerWrap .rstack.is-text .rstage-fog,
 #modalBody #readerWrap .rstage.is-text .rstage-fog{
   opacity: 1; /* показать слой тумана */
   background: rgba(0,0,0,0.15); /* ТУТ ЗАТЕМНЯТЬ ОБЛОЖКУ ПРИ ЧТЕНИИ - чем больше цифра тем темнее */
-  backdrop-filter: blur(10px) saturate(100%) brightness(0.90); /* было 0.74 — стало темнее */
-  -webkit-backdrop-filter: blur(10px) saturate(100%) brightness(0.90);
+  backdrop-filter: blur(10px) saturate(100%) brightness(0.15); /* было 0.74 — стало темнее */
+  -webkit-backdrop-filter: blur(10px) saturate(100%) brightness(0.15);
 }
 
 #modalBody #readerWrap .rstage-overlay{
