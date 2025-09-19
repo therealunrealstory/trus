@@ -732,7 +732,8 @@ body.modal-open{ overflow:hidden; }
 /* когда включён режим текста (добавляется класс .is-text на .rstage И на .rstack) */
 #modalBody #readerWrap .rstack.is-text > #readerBody{
   opacity: 1; pointer-events: auto;
-  max-height: min(70vh, calc(100vh - 220px)); /* скролл внутри текста */
+  height: var(--stage-h, min(70vh, calc(100vh - 220px))); /* если есть обложка → по её высоте */
+  max-height: none;
   overflow: auto;
 }
 

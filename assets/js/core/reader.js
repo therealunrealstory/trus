@@ -1,4 +1,4 @@
-// assets/js/core/reader.js — modal reader with bottom icon controls + cover-as-stage (stacked, meta+title ABOVE cover)
+// assets/js/core/reader.js — minimal patch to make text height follow cover height (single inner scroll), keeping your current structure
 import { t } from './i18n.js';
 import { openModal } from './modal.js';
 
@@ -189,6 +189,9 @@ export async function openReader(version='full', startIndex=NaN){
   const ovlTitle = document.getElementById('rstageTitle');
   const ovlBtn   = document.getElementById('rstageReadBtn');
 
+  // ссылка на саму карточку модалки — чтобы управлять её прокруткой в Text-режиме
+  const dialog = document.querySelector('.modal-backdrop .modal-dialog');
+
   // если книги нет — показываем ошибку и выходим
   if (!book) {
     if (body) body.innerHTML = `<div class="text-red-300">${t('reader.error','Failed to load the book. Please try again later.')}</div>`;
@@ -212,19 +215,39 @@ export async function openReader(version='full', startIndex=NaN){
     btnNext.classList.toggle('opacity-50', btnNext.disabled);
   }
 
-  // стабильный переключатель режима (без дребезга)
+  // синхронизация высоты текста с высотой сцены
+  function syncTextHeightToStage(){
+    if (!stack || !stage) return;
+    const h = stage.getBoundingClientRect().height || 0;
+    stack.style.setProperty('--stage-h', h ? `${Math.round(h)}px` : '');
+  }
+
+  // стабильный переключатель режима
   let toggling = false;
   function safeSetMode(mode){ // 'cover' | 'text'
     if (!stage || toggling) return;
     toggling = true;
+
     // класс на сцене — для тумана/оверлея
     stage.classList.toggle('is-text', mode==='text');
     if (mode==='text'){ ovl?.classList.add('hidden'); }
     else { ovl?.classList.remove('hidden'); }
-    // класс на стеке — для появления слоя текста
+
+    // класс на стеке — для показа текста поверх
     stack?.classList.toggle('is-text', mode==='text');
+
+    // в режиме текста высота текста = высоте обложки + блокируем внешний скролл модалки
+    if (mode==='text'){
+      syncTextHeightToStage();
+      if (dialog) dialog.style.overflowY = 'hidden';
+    } else {
+      // в режиме обложки всё по умолчанию
+      stack?.style.removeProperty('--stage-h');
+      if (dialog) dialog.style.overflowY = 'auto';
+    }
+
     writeMode(version, L, current, mode);
-    setTimeout(()=> { toggling = false; }, 120);
+    setTimeout(()=> { toggling = false; }, 80);
   }
 
   function openIdx(i){
@@ -242,13 +265,13 @@ export async function openReader(version='full', startIndex=NaN){
       stage?.classList.remove('hidden');
       if (bg) bg.style.backgroundImage = `url("${cu}")`;
       if (ovlTitle) ovlTitle.textContent = ch?.title || `${t('reader.chapter','Chapter')} ${current+1}`;
-      // подгоняем реальную пропорцию кадра -> меньше обрезаний
+      // подгоняем реальную пропорцию кадра -> выставляем aspect-ratio и пересчитываем высоту
       const probe = new Image();
       probe.onload = () => {
         const w = probe.naturalWidth || 768, h = probe.naturalHeight || 1365;
-        // выставляем aspect-ratio контейнера
         stage.style.aspectRatio = `${w}/${h}`;
         stage.style.minHeight = ''; // страховку можно снять
+        requestAnimationFrame(syncTextHeightToStage);
       };
       probe.src = cu;
 
@@ -263,13 +286,16 @@ export async function openReader(version='full', startIndex=NaN){
       if (nextU){ const img = new Image(); img.src = nextU; }
     } else {
       stage?.classList.add('hidden');
+      // убираем подстройку высоты — используем CSS fallback (vh)
+      stack?.style.removeProperty('--stage-h');
+      if (dialog) dialog.style.overflowY = 'auto';
       safeSetMode('text');
     }
 
     updateButtons();
     savePos();
-    // скролл к началу текста при смене главы (на мобиле особенно)
-    body?.scrollTo({ top:0, behavior:'smooth' });
+    // скролл к началу текста при смене главы
+    body?.scrollTo({ top:0, behavior:'auto' });
   }
 
   function renderToc(){
@@ -308,11 +334,20 @@ export async function openReader(version='full', startIndex=NaN){
   renderToc();
   openIdx(current);
 
-  // снятие слушателя при закрытии модалки
+  // на ресайз подстраиваем высоту текста (в текстовом режиме)
+  const onResize = ()=>{
+    if (stage?.classList.contains('is-text')) syncTextHeightToStage();
+  };
+  window.addEventListener('resize', onResize);
+
+  // снятие слушателей при закрытии модалки
   const modal = document.getElementById('modalBackdrop');
   const obs = new MutationObserver(()=>{
     if (!modal.classList.contains('show')){
       document.removeEventListener('keydown', onKey);
+      window.removeEventListener('resize', onResize);
+      // вернуть дефолт прокрутку
+      if (dialog) dialog.style.overflowY = 'auto';
       obs.disconnect();
     }
   });
