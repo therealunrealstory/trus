@@ -661,7 +661,7 @@ body.modal-open{ overflow:hidden; }
 #modalBody #readerWrap .rstack.is-text .rstage-fog,
 #modalBody #readerWrap .rstage.is-text .rstage-fog{
   opacity: 1; /* показать слой тумана */
-  background: rgba(0,0,0,0.75); /* было 0.50 — стало темнее */
+  background: rgba(0,0,0,0.15); /* было 0.50 — стало темнее */
   backdrop-filter: blur(10px) saturate(100%) brightness(0.60); /* было 0.74 — стало темнее */
   -webkit-backdrop-filter: blur(10px) saturate(100%) brightness(0.60);
 }
