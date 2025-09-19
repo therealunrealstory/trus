@@ -654,8 +654,8 @@ body.modal-open{ overflow:hidden; }
   /* Туман: затемнение + легкий blur. Fallback: если backdrop-filter не поддерживается,
      остаётся просто затемнение (background). */
   background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(8px) saturate(110%) brightness(0.20);
-  -webkit-backdrop-filter: blur(6px) saturate(110%) brightness(0.88);
+  backdrop-filter: blur(10px) saturate(110%) brightness(0.20);
+  -webkit-backdrop-filter: blur(10px) saturate(110%) brightness(0.20);
 }
 
 #modalBody #readerWrap .rstage-overlay{
