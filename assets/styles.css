@@ -661,9 +661,9 @@ body.modal-open{ overflow:hidden; }
 #modalBody #readerWrap .rstack.is-text .rstage-fog,
 #modalBody #readerWrap .rstage.is-text .rstage-fog{
   opacity: 1; /* показать слой тумана */
-  background: rgba(0,0,0,0.65); /* ТУТ ЗАТЕМНЯТЬ ОБЛОЖКУ ПРИ ЧТЕНИИ - чем больше цифра тем темнее */
-  backdrop-filter: blur(6px) saturate(100%) brightness(0.35); /* ТУТ ТОЖЕ ЗАТЕМНЯТЬ ОБЛОЖКУ ПРИ ЧТЕНИИ - чем меньше цифра тем темнее */
-  -webkit-backdrop-filter: blur(6px) saturate(100%) brightness(0.35); /* оставлять значения как в строке выше */
+  background: rgba(0,0,0,0.55); /* ТУТ ЗАТЕМНЯТЬ ОБЛОЖКУ ПРИ ЧТЕНИИ - чем больше цифра тем темнее */
+  backdrop-filter: blur(6px) saturate(100%) brightness(0.45); /* ТУТ ТОЖЕ ЗАТЕМНЯТЬ ОБЛОЖКУ ПРИ ЧТЕНИИ - чем меньше цифра тем темнее */
+  -webkit-backdrop-filter: blur(6px) saturate(100%) brightness(0.45); /* оставлять значения как в строке выше */
 }
 
 #modalBody #readerWrap .rstage-overlay{
