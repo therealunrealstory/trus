@@ -698,3 +698,15 @@ body.modal-open{ overflow:hidden; }
 
 /* Плиточное ТОС (если внедряли ранее превью-обложки) дружит с новыми размерами */
 #readerToc .toc-grid{ grid-template-columns: repeat(auto-fill, minmax(92px,1fr)); }
+/* Reader: фикс высоты сцены обложки */
+#modalBody #readerWrap .rstage{
+  /* твой текущий width/бордер/радиусы оставляем как есть */
+  min-height: clamp(240px, 42vh, 520px); /* сцена видима на любом экране */
+  position: relative;                   /* обязательно, чтобы abs-внутренности работали */
+}
+
+@media (max-width: 768px){
+  #modalBody #readerWrap .rstage{
+    min-height: clamp(220px, 46vh, 560px);
+  }
+}
