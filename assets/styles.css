@@ -731,17 +731,16 @@ body.modal-open{ overflow:hidden; }
 
 /* когда включён режим текста (добавляется класс .is-text на .rstage И на .rstack) */
 
-/* Текстовый слой по умолчанию НЕ скроллит */
+/* текстовый слой по умолчанию не скроллит — скролл включаем только в Text-режиме через JS */
 #modalBody #readerWrap .rstack > #readerBody{
   position: absolute; inset: 0;
   opacity: 0; pointer-events: none;
   overflow: visible;
 }
 
-/* В режиме текста скролл управляет JS (ставит height/overflow) */
 #modalBody #readerWrap .rstack.is-text > #readerBody{
   opacity: 1; pointer-events: auto;
-  /* height/max-height выставит JS под высоту обложки */
+  /* height / max-height / overflow выставляет JS под высоту обложки */
 }
 
 #modalBody #readerWrap .rstage{

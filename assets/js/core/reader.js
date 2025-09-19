@@ -1,4 +1,4 @@
-// assets/js/core/reader.js — robust single-scroll (Cover: outer scroll; Text: inner scroll sized to cover)
+// assets/js/core/reader.js — dialog sized to cover; single-scroll logic solid
 import { t } from './i18n.js';
 import { openModal } from './modal.js';
 
@@ -34,9 +34,7 @@ async function loadCoversIndex(version, langUpper, book){
   const tryUrls = [];
   if (book && book.coversIndex) tryUrls.push(book.coversIndex);
   tryUrls.push(`/books/covers.json?ts=${Date.now()}`);
-  for (const url of tryUrls){
-    try { const res = await fetch(url, { cache:'no-store' }); if (!res.ok) continue; const data = await res.json(); if (data && typeof data === 'object') return data; } catch {}
-  }
+  for (const url of tryUrls){ try { const r = await fetch(url, {cache:'no-store'}); if (!r.ok) continue; const j = await r.json(); if (j && typeof j==='object') return j; } catch {} }
   return null;
 }
 function resolveCoverUrl(coversIndex, chapterIdx1){
@@ -58,13 +56,8 @@ async function loadBook(version, langUpper){
   _bookCache.set(key, data); return data;
 }
 
-// find modal scroll host
-function getModalScrollHost(){
-  const body = document.getElementById('modalBody');
-  if (!body) return null;
-  // usually .modal-dialog is the scroll host; fallback to backdrop
-  return body.closest('.modal-dialog') || body.parentElement || body;
-}
+function getDialog(){ return document.querySelector('.modal-backdrop .modal-dialog'); }
+function getModalBody(){ return document.getElementById('modalBody'); }
 
 export async function openReader(version='full', startIndex=NaN){
   document.dispatchEvent(new CustomEvent('pause-others', { detail:'reader' }));
@@ -122,7 +115,6 @@ export async function openReader(version='full', startIndex=NaN){
   const bg    = document.getElementById('readerBg');
   const ovl   = document.getElementById('readerOverlay');
   const ovlBtn= document.getElementById('rstageReadBtn');
-  const scrollHost = getModalScrollHost();
 
   if (!book){ body.innerHTML = `<div class="text-red-300">${t('reader.error','Failed to load the book.')}</div>`; return; }
   const coversIndex = await loadCoversIndex(version, L, book);
@@ -139,26 +131,52 @@ export async function openReader(version='full', startIndex=NaN){
   }
   function savePos(){ try { localStorage.setItem(storageKey(version, L), String(current)); } catch {} }
 
+  function sizeDialogToCover(coverH){
+    // высота «хрома» над/под сценой (мета, заголовок, отступы, кнопки)
+    const metaH   = document.getElementById('readerMeta')?.offsetHeight || 0;
+    const titleH  = document.getElementById('readerTitle')?.offsetHeight || 0;
+    const ctrlsH  = document.getElementById('readerControls')?.offsetHeight || 0;
+    const topPad  = 24;  // внутренние паддинги карточки
+    const botPad  = 24;
+    const desired = Math.ceil(coverH + metaH + titleH + ctrlsH + topPad + botPad);
+
+    const dlg   = getDialog();
+    const mBody = getModalBody();
+    if (!dlg || !mBody) return;
+
+    const max = Math.floor(window.innerHeight * 0.95); // не больше 95vh (иначе карточка выйдет за край)
+    const h   = Math.min(desired, max);
+
+    // фиксируем размеры и включаем скролл у модалки
+    dlg.style.maxHeight = h + 'px';
+    dlg.style.height    = h + 'px';
+    dlg.style.overflowY = 'auto';
+
+    // тело модалки не должно ограничивать контент
+    mBody.style.maxHeight = 'none';
+    mBody.style.height = 'auto';
+  }
+
   function measureAndApply(){
-    // set CSS var for stage height
-    const h = stage?.getBoundingClientRect().height || 0;
+    const rect = stage?.getBoundingClientRect();
+    const h = rect ? rect.height : 0;
     stack?.style.setProperty('--stage-h', `${Math.round(h)}px`);
+
     if (stage?.classList.contains('is-text')){
-      // text mode: inner scroll container height = stage height; outer scroll locked
-      if (body){
-        body.style.height = `${Math.round(h)}px`;
-        body.style.maxHeight = `${Math.round(h)}px`;
-        body.style.overflowY = 'auto';
-      }
-      if (scrollHost) scrollHost.style.overflowY = 'hidden';
+      // Text: скролл внутри текста, диалог не скроллит
+      body.style.height = `${Math.round(h)}px`;
+      body.style.maxHeight = `${Math.round(h)}px`;
+      body.style.overflowY = 'auto';
+
+      const dlg = getDialog();
+      if (dlg) dlg.style.overflowY = 'hidden';
     } else {
-      // cover mode: let modal scroll
-      if (body){
-        body.style.height = 'auto';
-        body.style.maxHeight = 'none';
-        body.style.overflow = 'visible';
-      }
-      if (scrollHost) scrollHost.style.overflowY = 'auto';
+      // Cover: скролл у модалки, текст растянут по контенту
+      body.style.height = 'auto';
+      body.style.maxHeight = 'none';
+      body.style.overflow = 'visible';
+
+      sizeDialogToCover(h);
     }
   }
 
@@ -185,26 +203,30 @@ export async function openReader(version='full', startIndex=NaN){
       stage.classList.remove('hidden');
       bg.style.backgroundImage = `url("${cu}")`;
       const probe = new Image();
-      probe.onload = ()=> {
+      probe.onload = ()=>{
         const w = probe.naturalWidth || 768, h = probe.naturalHeight || 1365;
         stage.style.aspectRatio = `${w}/${h}`;
         stage.style.minHeight = '';
         requestAnimationFrame(measureAndApply);
       };
       probe.src = cu;
+
       setMode(readMode(version, L, current));
+
+      // прелоад соседей
+      const p = current>0 ? resolveCoverUrl(coversIndex, current) : null;
+      const n = current<book.chapters.length-1 ? resolveCoverUrl(coversIndex, current+2) : null;
+      if (p){ const img1 = new Image(); img1.src = p; }
+      if (n){ const img2 = new Image(); img2.src = n; }
     } else {
       stage.classList.add('hidden');
       stack.style.removeProperty('--stage-h');
-      // no cover -> use default vh fallback (modal scroll)
-      if (body){
-        body.style.height='auto'; body.style.maxHeight=''; body.style.overflow='visible';
-      }
-      if (scrollHost) scrollHost.style.overflowY='auto';
-      setMode('text');
+      const dlg = getDialog();
+      if (dlg){ dlg.style.height=''; dlg.style.maxHeight=''; dlg.style.overflowY='auto'; }
+      setMode('text'); // fallback: как обычная статья
     }
 
-    updateButtons(); savePos(); body.scrollTo({top:0, behavior:'auto'});
+    updateButtons(); savePos(); body.scrollTo({ top:0, behavior:'auto' });
   }
 
   function renderToc(){
@@ -242,7 +264,8 @@ export async function openReader(version='full', startIndex=NaN){
     if (!modal.classList.contains('show')){
       document.removeEventListener('keydown', onKey);
       window.removeEventListener('resize', onResize);
-      if (scrollHost) scrollHost.style.overflowY='';
+      const dlg = getDialog();
+      if (dlg){ dlg.style.height=''; dlg.style.maxHeight=''; dlg.style.overflowY=''; }
       obs.disconnect();
     }
   });
