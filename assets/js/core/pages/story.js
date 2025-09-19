@@ -30,7 +30,7 @@ function resumeKey(trackKey, lang){ return `seek:${trackKey}:${(lang||'EN').toUp
 function readResume(trackKey, lang){
   try { const v = localStorage.getItem(resumeKey(trackKey, lang)); const n = v==null?NaN:Number(v); return Number.isFinite(n)?Math.max(0,n):NaN; } catch { return NaN; }
 }
-function writeResume(trackKey, lang, seconds){ try { localStorage.setItem(resumeKey(trackKey, lang), String(Math.max(0, Math.floor(seconds||0)))); } catch {} }
+function writeResume(trackKey, lang, seconds){ try { localStorage.setItem(resumeKey(trackKey,lang), String(Math.max(0, Math.floor(seconds||0)))); } catch {} }
 function clearResumeIfCompleted(trackKey, lang){ try { localStorage.removeItem(resumeKey(trackKey, lang)); } catch {} }
 
 function updateMiniLabels(){
@@ -204,7 +204,7 @@ function readerCalloutNode(kind, playCard){
   const row = document.createElement('div');
   row.className = 'flex items-center gap-3 trus-reader-row';
   row.style.justifyContent = 'flex-start';
-  row.style.flexWrap = 'nowrap'; // по умолчанию (десктоп) — одна строка
+  row.style.flexWrap = 'nowrap';
   row.classList.add('reader-row'); 
 
   const btn = document.createElement('button');
@@ -283,14 +283,13 @@ function applyResponsiveLayout(root){
   ];
   sets.forEach(({btn, status})=>{
     if (!btn) return;
-    const row = btn.parentElement; // контейнер кнопки и подписи
+    const row = btn.parentElement;
     if (!row) return;
 
     row.style.display = 'flex';
     row.style.alignItems = 'center';
     row.style.gap = '12px';
 
-    // фикс «двух строк» на кнопке (▶︎ и текст вместе)
     btn.style.whiteSpace = 'nowrap';
     btn.style.display = 'inline-flex';
     btn.style.alignItems = 'center';
@@ -308,8 +307,42 @@ function applyResponsiveLayout(root){
 }
 /* ---------------------------------------------------------------- */
 
+/* ===== Strong, root-agnostic reordering ===== */
+function reorderShortBelowFull() {
+  // находим секции максимально надёжно
+  const findSection = (by) => {
+    if (!by) return null;
+    const el = document.querySelector(by);
+    return el ? el.closest('section') : null;
+  };
+
+  let shortSection =
+      findSection('#shortBtn') ||
+      findSection('#shortSeek') ||
+      document.querySelector('section h2[data-i18n="short.title"]')?.closest('section');
+
+  let fullSection  =
+      findSection('#fullBtn') ||
+      findSection('#fullSeek') ||
+      document.querySelector('section h2[data-i18n="story.full.title"]')?.closest('section');
+
+  if (shortSection && fullSection && fullSection.nextSibling !== shortSection) {
+    fullSection.parentNode.insertBefore(shortSection, fullSection.nextSibling);
+    return true;
+  }
+  return !!(shortSection && fullSection);
+}
+
 export function init(root){
   initSounds();
+
+  // Надёжная перестановка: до биндинга DOM узлов и мини-плееров
+  let tries = 0;
+  const tryReorder = ()=>{
+    const ok = reorderShortBelowFull();
+    if (!ok && tries < 12) { tries++; requestAnimationFrame(tryReorder); }
+  };
+  tryReorder();
 
   // Bind DOM
   announceAudio  = root.querySelector('#announceAudio') || root.querySelector('[data-audio="announce"]') || null;
@@ -334,7 +367,6 @@ export function init(root){
   fullSeek       = root.querySelector('#fullSeek');
   fullTimeCur    = root.querySelector('#fullTimeCur');
   fullTimeDur    = root.querySelector('#fullTimeDur');
-  
 
   const langSel  = $('#lang');
   const currentLang = () => (langSel?.value || 'EN').toUpperCase();
@@ -347,7 +379,7 @@ export function init(root){
   // Reader cards under headings
   insertReaders(root);
 
-  // Responsive: применяем и подписываемся
+  // Responsive
   applyResponsiveLayout(root);
   const mql = window.matchMedia('(max-width: 768px)');
   const onResp = ()=> applyResponsiveLayout(root);
@@ -382,7 +414,7 @@ export function init(root){
   };
   document.addEventListener('pause-others', onPauseOthers);
 
-  // --- Tile modals (image-buttons above announcement) ---
+  // --- Tile modals ---
   const bindTile = (sel, titleKey, titleFallback, bodyKey, bodyFallback) => {
     const el = root.querySelector(sel);
     if (!el) return;
@@ -395,7 +427,6 @@ export function init(root){
   bindTile('#tile1', 'tiles.me', 'I\u2019m Nico', 'modal.tile1.body', '…');
   bindTile('#tile2', 'tiles.about', 'About Adam', 'modal.tile2.body', '…');
   bindTile('#tile3', 'tiles.others', 'Other people in the story', 'modal.tile3.body', '…');
-  // ------------------------------------------------------
 
   updateMiniLabels();
 }
