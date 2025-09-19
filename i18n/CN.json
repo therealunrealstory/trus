@@ -11,7 +11,7 @@
   "story.full.title": "我们的故事（截至2025年7月）",
 "full.play": "▶︎ 播放",
 "full.pause": "‖ 暂停",
-"full.note": "完整解说版故事",
+"full.note": "本故事的音频版本，涵盖截至2025年7月的事件。",
   
   "menu.story": "故事",
   "menu.support": "支持",
@@ -38,7 +38,7 @@
   "video.title": "视频预告",
 
   "short.title": "当下的故事（2025年7月之后）",
-  "short.note": "涵盖 2019 年初至 2025 年中期的事件。",
+  "short.note": "本故事的音频版本，讲述2025年7月之后的事件。",
   "short.play": "▶︎ 播放",
   "short.pause": "‖ 暂停",
   "short.langLabel": "语言：",
@@ -126,8 +126,8 @@
 "menu.reporting": "报告",
 
   "reader.open": "阅读",
-  "reader.short.note": "部分细节已省略，文本更侧重于事件时间线和整体叙事框架。",
-  "reader.full.note": "提供更丰富的描述细节与情感背景，包含人物互动，并更深入地展现其性格。",
+"reader.short.note": "《The Real Unreal Story》在2025年7月之后的部分，定期更新。",
+"reader.full.note": "这是一段从故事开端到尼科决定讲述它的全过程：涵盖2018年至2025年7月。",
   "reader.prev": "上一章",
   "reader.next": "下一章",
   "reader.toc": "目录",

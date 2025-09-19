@@ -11,7 +11,7 @@
   "story.full.title": "Nuestra historia (hasta julio de 2025)",
 "full.play": "▶︎ Reproducir",
 "full.pause": "‖ Pausa",
-"full.note": "Relato completo narrado",
+"full.note": "Versión en audio de la historia que abarca los hechos hasta julio de 2025.",
   
   "menu.story": "La Historia",
   "menu.support": "Apoyo",
@@ -38,7 +38,7 @@
   "video.title": "Avance en video",
 
   "short.title": "La historia ahora (después de julio de 2025)",
-  "short.note": "Sobre los acontecimientos desde inicios de 2019 hasta mediados de 2025.",
+  "short.note": "Versión en audio de la historia sobre los hechos posteriores a julio de 2025.",
   "short.play": "▶︎ Reproducir",
   "short.pause": "‖ Pausa",
   "short.langLabel": "Idioma: ",
@@ -125,8 +125,8 @@
 "menu.reporting": "Informes",
 
   "reader.open": "Leer",
-  "reader.short.note": "Se omiten algunos detalles. El texto se centra en la cronología de los acontecimientos y el arco general.",
-  "reader.full.note": "Más detalles descriptivos y contexto emocional, con interacciones entre personajes y una comprensión más profunda de sus personalidades.",
+"reader.short.note": "The Real Unreal Story después de julio de 2025, con actualizaciones periódicas.",
+"reader.full.note": "La historia desde su inicio hasta el momento en que Nico decidió contarla: de 2018 a julio de 2025.",
   "reader.prev": "Anterior",
   "reader.next": "Siguiente",
   "reader.toc": "Índice",
