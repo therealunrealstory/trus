@@ -710,3 +710,69 @@ body.modal-open{ overflow:hidden; }
     min-height: clamp(220px, 46vh, 560px);
   }
 }
+/* === Stack: обложка + текст в одном слое сетки === */
+#modalBody #readerWrap .rstack{
+  display: grid;
+  grid-template-areas: "stack";
+  place-items: stretch;
+  width: min(768px, 100%);
+  margin: 0 auto 12px;
+  position: relative;
+}
+#modalBody #readerWrap .rstack > .rstage{ grid-area: stack; z-index: 1; }
+#modalBody #readerWrap .rstack > #readerBody{
+  grid-area: stack; z-index: 2;
+  /* по умолчанию текст скрыт (режим Cover) */
+  opacity: 0; pointer-events: none;
+  max-height: 0; overflow: hidden;
+  padding: 0 16px; /* чтобы на мобиле не липло к краям */
+  transition: opacity .22s ease;
+}
+
+/* когда включён режим текста (добавляется класс .is-text на .rstage И на .rstack) */
+#modalBody #readerWrap .rstack.is-text > #readerBody{
+  opacity: 1; pointer-events: auto;
+  max-height: min(70vh, calc(100vh - 220px)); /* скролл внутри текста */
+  overflow: auto;
+}
+
+#modalBody #readerWrap .rstage{
+  position: relative;
+  width: 100%;
+  /* высоту зададим из JS через aspect-ratio, но страховка на случай ошибки: */
+  min-height: clamp(240px, 42vh, 520px);
+  border-radius: 14px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+}
+#modalBody #readerWrap .rstage-bg{
+  position:absolute; inset:0;
+  background-size: cover; background-position: center; background-repeat: no-repeat;
+}
+#modalBody #readerWrap .rstage-fog{
+  position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .25s ease;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px) saturate(110%) brightness(0.88);
+  -webkit-backdrop-filter: blur(6px) saturate(110%) brightness(0.88);
+}
+#modalBody #readerWrap .rstage-overlay{
+  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:12px; text-align:center; padding:16px;
+  background: linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.10) 35%, rgba(0,0,0,.35));
+}
+#modalBody #readerWrap .rstage-title{
+  font-size: clamp(16px, 3.2vw, 22px); font-weight:700; color:#fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,.55);
+  max-width: 90%;
+}
+
+/* В режиме текста: включаем туман, убираем оверлей «Read» */
+#modalBody #readerWrap .rstage.is-text .rstage-fog{ opacity:1; }
+#modalBody #readerWrap .rstage.is-text .rstage-overlay{ display:none; }
+
+@media (max-width: 768px){
+  #modalBody #readerWrap .rstage{ border-radius:12px; }
+  #modalBody #readerWrap .rstack.is-text > #readerBody{
+    max-height: min(72vh, calc(100vh - 180px));
+  }
+}

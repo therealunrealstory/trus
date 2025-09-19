@@ -1,4 +1,4 @@
-// assets/js/core/reader.js — modal reader with bottom icon controls + cover-as-stage
+// assets/js/core/reader.js — modal reader with bottom icon controls + cover-as-stage (stacked)
 import { t } from './i18n.js';
 import { openModal } from './modal.js';
 
@@ -130,19 +130,23 @@ export async function openReader(version='full', startIndex=NaN){
         #readerToc button{color:#e5e7eb}
       </style>
 
-      <!-- Сцена обложки -->
-      <div id="readerStage" class="rstage">
-        <div class="rstage-bg" id="readerBg" role="img" aria-label="${t('reader.cover.alt','Chapter cover')}"></div>
-        <div class="rstage-fog" id="readerFog" aria-hidden="true"></div>
-        <div class="rstage-overlay" id="readerOverlay">
-          <div class="rstage-title" id="rstageTitle"></div>
-          <button class="rstage-read" id="rstageReadBtn">${t('reader.read','Read')}</button>
+      <!-- СТЕК: сцена обложки + текст одной сеткой -->
+      <div id="readerStack" class="rstack">
+        <div id="readerStage" class="rstage">
+          <div class="rstage-bg" id="readerBg" role="img" aria-label="${t('reader.cover.alt','Chapter cover')}"></div>
+          <div class="rstage-fog" id="readerFog" aria-hidden="true"></div>
+          <div class="rstage-overlay" id="readerOverlay">
+            <div class="rstage-title" id="rstageTitle"></div>
+            <button class="rstage-read" id="rstageReadBtn">${t('reader.read','Read')}</button>
+          </div>
         </div>
+
+        <!-- ТЕКСТ теперь в том же контейнере, поверх сцены -->
+        <div id="readerBody" class="text-sm leading-relaxed space-y-3"></div>
       </div>
 
       <div class="mb-2 text-xs opacity-80" id="readerMeta"></div>
       <h4 id="readerTitle" class="text-base font-semibold mb-2"></h4>
-      <div id="readerBody" class="text-sm leading-relaxed space-y-3"></div>
 
       <div id="readerControls" class="mt-4 flex items-center justify-center gap-3 flex-wrap">
         <button class="icon-btn" data-act="toc" title="${t('reader.toc','Table of contents')}" aria-label="${t('reader.toc','Table of contents')}">
@@ -175,7 +179,8 @@ export async function openReader(version='full', startIndex=NaN){
   const btnToc  = wrap.querySelector('[data-act="toc"]');
   const btnMode = wrap.querySelector('[data-act="mode"]');
 
-  // stage elements
+  // stack + stage elements
+  const stack = document.getElementById('readerStack');
   const stage = document.getElementById('readerStage');
   const bg    = document.getElementById('readerBg');
   const fog   = document.getElementById('readerFog');
@@ -205,12 +210,20 @@ export async function openReader(version='full', startIndex=NaN){
     btnPrev.classList.toggle('opacity-50', btnPrev.disabled);
     btnNext.classList.toggle('opacity-50', btnNext.disabled);
   }
-  function setMode(mode){ // 'cover' | 'text'
-    if (!stage) return;
+
+  // стабильный переключатель режима (без дребезга)
+  let toggling = false;
+  function safeSetMode(mode){ // 'cover' | 'text'
+    if (!stage || toggling) return;
+    toggling = true;
+    // класс на сцене — для тумана/оверлея
     stage.classList.toggle('is-text', mode==='text');
     if (mode==='text'){ ovl?.classList.add('hidden'); }
     else { ovl?.classList.remove('hidden'); }
+    // класс на стеке — для появления слоя текста
+    stack?.classList.toggle('is-text', mode==='text');
     writeMode(version, L, current, mode);
+    setTimeout(()=> { toggling = false; }, 120);
   }
 
   function openIdx(i){
@@ -228,10 +241,19 @@ export async function openReader(version='full', startIndex=NaN){
       stage?.classList.remove('hidden');
       if (bg) bg.style.backgroundImage = `url("${cu}")`;
       if (ovlTitle) ovlTitle.textContent = ch?.title || `${t('reader.chapter','Chapter')} ${current+1}`;
+      // подгоняем реальную пропорцию кадра -> меньше обрезаний
+      const probe = new Image();
+      probe.onload = () => {
+        const w = probe.naturalWidth || 768, h = probe.naturalHeight || 1365;
+        // выставляем aspect-ratio контейнера
+        stage.style.aspectRatio = `${w}/${h}`;
+        stage.style.minHeight = ''; // страховку можно снять
+      };
+      probe.src = cu;
 
       // режим по памяти
       const remembered = readMode(version, L, current);
-      setMode(remembered);
+      safeSetMode(remembered);
 
       // прелоад соседей
       const prevU = current>0 ? resolveCoverUrl(coversIndex, current) : null;
@@ -240,7 +262,7 @@ export async function openReader(version='full', startIndex=NaN){
       if (nextU){ const img = new Image(); img.src = nextU; }
     } else {
       stage?.classList.add('hidden');
-      setMode('text');
+      safeSetMode('text');
     }
 
     updateButtons();
@@ -264,13 +286,14 @@ export async function openReader(version='full', startIndex=NaN){
   btnPrev.addEventListener('click', ()=> openIdx(current-1));
   btnNext.addEventListener('click', ()=> openIdx(current+1));
   btnToc .addEventListener('click', ()=> toc.classList.toggle('hidden'));
-  btnMode?.addEventListener('click', ()=> {
+  btnMode?.addEventListener('click', (e)=> {
+    e.preventDefault(); e.stopPropagation();
     const next = (stage?.classList.contains('is-text')) ? 'cover' : 'text';
-    setMode(next);
+    safeSetMode(next);
   });
-  ovlBtn?.addEventListener('click', ()=> setMode('text'));
+  ovlBtn?.addEventListener('click', (e)=> { e.preventDefault(); e.stopPropagation(); safeSetMode('text'); });
   // бонус: двойной клик по сцене — тоже "читать"
-  stage?.addEventListener('dblclick', ()=> setMode('text'));
+  stage?.addEventListener('dblclick', (e)=> { e.preventDefault(); e.stopPropagation(); safeSetMode('text'); });
 
   // клавиатура
   const onKey = (e)=>{
