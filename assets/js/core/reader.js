@@ -1,20 +1,20 @@
-// assets/js/core/reader.js — cover-as-stage (meta/title above, overlay without title, single scrollbar)
+// assets/js/core/reader.js — cover-as-stage (single-scroll via scroll-host lock)
 import { t } from './i18n.js';
 import { openModal } from './modal.js';
 
 const DEFAULT_TITLE = 'The Real Unreal Story';
-const _bookCache = new Map(); // key = `${version}:${langLower}`
+const _bookCache = new Map(); // key = `${version}:${langLower}`;
 
 // ---------- utils ----------
 function normalizeLang(input){
   const raw = (input || 'en').toString().trim();
-  const short = raw.split(/[-_]/)[0].toLowerCase(); // "ru-RU" -> "ru"
+  const short = raw.split(/[-_]/)[0].toLowerCase();
   return { upper: short.toUpperCase(), lower: short };
 }
 function getCurrentLang(){
   const sel = document.querySelector('#lang');
   const raw = (sel && sel.value) || document.documentElement.getAttribute('lang') || 'en';
-  return normalizeLang(raw).upper; // "RU"
+  return normalizeLang(raw).upper;
 }
 function storageKey(version, langUpper){ return `reader:last:${version}:${langUpper}`; }
 function modeKey(version, langUpper, chapterIdx0){ return `reader:mode:${version}:${langUpper}:${chapterIdx0}`; }
@@ -24,31 +24,16 @@ function readMode(version, langUpper, chapterIdx0){
 function writeMode(version, langUpper, chapterIdx0, mode){
   try { localStorage.setItem(modeKey(version, langUpper, chapterIdx0), (mode==='text'?'text':'cover')); } catch {}
 }
-
 function htmlEscape(s){
   return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 function svg(name){
-  if (name === 'book') {
-    return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M5 4h9a3 3 0 0 1 3 3v11.5a.5.5 0 0 1-.77.42A6.5 6.5 0 0 0 12 18H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm14 14V7a4 4 0 0 0-4-4H6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-  }
-  if (name === 'prev') {
-    return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-  }
-  if (name === 'next') {
-    return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-  }
-  if (name === 'mode') {
-    return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M3 6.5c1.8-1.2 4-1.8 6.5-1.5 1.3.1 2.6.5 3.8 1.1M21 6.5c-1.8-1.2-4-1.8-6.5-1.5-1.3.1-2.6.5-3.8 1.1M3 17.5c1.8 1.2 4 1.8 6.5 1.5 1.3-.1 2.6-.5 3.8-1.1M21 17.5c-1.8 1.2-4 1.8-6.5 1.5-1.3-.1-2.6-.5-3.8-1.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-      <circle cx="12" cy="12" r="2.4" stroke="currentColor" stroke-width="1.5"/></svg>`;
-  }
+  if (name === 'book') return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 4h9a3 3 0 0 1 3 3v11.5a.5.5 0 0 1-.77.42A6.5 6.5 0 0 0 12 18H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm14 14V7a4 4 0 0 0-4-4H6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  if (name === 'prev') return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  if (name === 'next') return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  if (name === 'mode') return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 6.5c1.8-1.2 4-1.8 6.5-1.5 1.3.1 2.6.5 3.8 1.1M21 6.5c-1.8-1.2-4-1.8-6.5-1.5-1.3.1-2.6.5-3.8 1.1M3 17.5c1.8 1.2 4 1.8 6.5 1.5 1.3-.1 2.6-.5 3.8-1.1M21 17.5c-1.8 1.2-4 1.8-6.5 1.5-1.3-.1-2.6-.5-3.8-1.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="12" r="2.4" stroke="currentColor" stroke-width="1.5"/></svg>`;
   return '';
 }
-
 function pad3(n){ return String(n).padStart(3,'0'); }
 
 // ---------- covers index ----------
@@ -57,12 +42,7 @@ async function loadCoversIndex(version, langUpper, book){
   if (book && book.coversIndex) tryUrls.push(book.coversIndex);
   tryUrls.push(`/books/covers.json?ts=${Date.now()}`);
   for (const url of tryUrls){
-    try {
-      const res = await fetch(url, { cache: 'no-store' });
-      if (!res.ok) continue;
-      const data = await res.json();
-      if (data && typeof data === 'object') return data;
-    } catch {}
+    try { const res = await fetch(url, { cache: 'no-store' }); if (!res.ok) continue; const data = await res.json(); if (data && typeof data === 'object') return data; } catch {}
   }
   return null;
 }
@@ -88,6 +68,34 @@ async function loadBook(version, langUpper){
   return data;
 }
 
+// ---------- scroll host lock ----------
+let _scrollHost = null;
+let _scrollHostPrevOverflow = '';
+function findScrollableAncestor(start){
+  let el = start;
+  while (el && el !== document.body){
+    const cs = getComputedStyle(el);
+    const oy = cs.overflowY;
+    const canScroll = (oy === 'auto' || oy === 'scroll') && el.scrollHeight > el.clientHeight;
+    if (canScroll) return el;
+    el = el.parentElement;
+  }
+  return null;
+}
+function lockScrollHost(el){
+  if (!el) return;
+  if (_scrollHost && _scrollHost !== el) unlockScrollHost();
+  _scrollHost = el;
+  _scrollHostPrevOverflow = _scrollHost.style.overflowY;
+  _scrollHost.style.overflowY = 'hidden';
+}
+function unlockScrollHost(){
+  if (_scrollHost){
+    _scrollHost.style.overflowY = _scrollHostPrevOverflow || '';
+    _scrollHost = null;
+  }
+}
+
 // ---------- main ----------
 export async function openReader(version='full', startIndex=NaN){
   document.dispatchEvent(new CustomEvent('pause-others', { detail: 'reader' }));
@@ -105,22 +113,17 @@ export async function openReader(version='full', startIndex=NaN){
         #readerToc button{color:#e5e7eb}
       </style>
 
-      <!-- МЕТА И ЗАГОЛОВОК ПЕРЕД ОБЛОЖКОЙ -->
       <div class="mb-2 text-xs opacity-80" id="readerMeta"></div>
       <h4 id="readerTitle" class="text-base font-semibold mb-2"></h4>
 
-      <!-- СТЕК: сцена обложки + текст одной сеткой -->
       <div id="readerStack" class="rstack">
         <div id="readerStage" class="rstage">
           <div class="rstage-bg" id="readerBg" role="img" aria-label="${t('reader.cover.alt','Chapter cover')}"></div>
           <div class="rstage-fog" id="readerFog" aria-hidden="true"></div>
           <div class="rstage-overlay" id="readerOverlay">
-            <!-- Заголовок удалён по требованию, оставляем только кнопку -->
             <button class="rstage-read" id="rstageReadBtn">${t('reader.read','Read')}</button>
           </div>
         </div>
-
-        <!-- ТЕКСТ поверх сцены -->
         <div id="readerBody" class="text-sm leading-relaxed space-y-3"></div>
       </div>
 
@@ -150,10 +153,8 @@ export async function openReader(version='full', startIndex=NaN){
   const stack = document.getElementById('readerStack');
   const stage = document.getElementById('readerStage');
   const bg    = document.getElementById('readerBg');
-  const fog   = document.getElementById('readerFog');
   const ovl   = document.getElementById('readerOverlay');
   const ovlBtn= document.getElementById('rstageReadBtn');
-  const modalBody = document.getElementById('modalBody');
 
   if (!book) { if (body) body.innerHTML = `<div class="text-red-300">${t('reader.error','Failed to load the book. Please try again later.')}</div>`; return; }
 
@@ -171,22 +172,29 @@ export async function openReader(version='full', startIndex=NaN){
     btnNext.classList.toggle('opacity-50', btnNext.disabled);
   }
 
-  // единый скролл: блокируем скролл модалки в режиме текста
+  // mode
   let toggling = false;
+  function syncTextHeightToStage(){
+    const h = stage?.getBoundingClientRect().height || 0;
+    if (stack) stack.style.setProperty('--stage-h', `${Math.max(0, Math.round(h))}px`);
+  }
   function safeSetMode(mode){ // 'cover' | 'text'
     if (!stage || toggling) return;
     toggling = true;
     stage.classList.toggle('is-text', mode==='text');
     stack?.classList.toggle('is-text', mode==='text');
-    if (mode==='text'){ ovl?.classList.add('hidden'); modalBody && (modalBody.style.overflowY = 'hidden'); }
-    else { ovl?.classList.remove('hidden'); modalBody && (modalBody.style.overflowY = 'auto'); }
+    if (mode==='text'){
+      ovl?.classList.add('hidden');
+      syncTextHeightToStage();
+      // lock outer scroll host to avoid double scrollbars
+      const host = findScrollableAncestor(stack);
+      if (host) lockScrollHost(host);
+    } else {
+      ovl?.classList.remove('hidden');
+      unlockScrollHost();
+    }
     writeMode(version, L, current, mode);
-    // синхронизируем высоту текста с высотой сцены
-    requestAnimationFrame(()=>{
-      const h = stage?.getBoundingClientRect().height || 0;
-      if (stack) stack.style.setProperty('--stage-h', `${Math.max(0, Math.round(h))}px`);
-      toggling = false;
-    });
+    setTimeout(()=> { toggling = false; }, 100);
   }
 
   function openIdx(i){
@@ -200,32 +208,26 @@ export async function openReader(version='full', startIndex=NaN){
     if (cu){
       stage?.classList.remove('hidden');
       if (bg) bg.style.backgroundImage = `url("${cu}")`;
-      // выставляем точный аспект и высоту текста
       const probe = new Image();
       probe.onload = () => {
         const w = probe.naturalWidth || 768, h = probe.naturalHeight || 1365;
         stage.style.aspectRatio = `${w}/${h}`;
-        stage.style.minHeight = ''; // убираем страховку
-        // после layout обновим переменную высоты
-        requestAnimationFrame(()=>{
-          const sh = stage?.getBoundingClientRect().height || 0;
-          stack?.style.setProperty('--stage-h', `${Math.round(sh)}px`);
-        });
+        stage.style.minHeight = '';
+        requestAnimationFrame(syncTextHeightToStage);
       };
       probe.src = cu;
 
       const remembered = readMode(version, L, current);
       safeSetMode(remembered);
 
-      // прелоад соседей
       const prevU = current>0 ? resolveCoverUrl(coversIndex, current) : null;
       const nextU = current<book.chapters.length-1 ? resolveCoverUrl(coversIndex, current+2) : null;
-      if (prevU){ const img = new Image(); img.src = prevU; }
-      if (nextU){ const img = new Image(); img.src = nextU; }
+      if (prevU){ const i1 = new Image(); i1.src = prevU; }
+      if (nextU){ const i2 = new Image(); i2.src = nextU; }
     } else {
       stage?.classList.add('hidden');
-      // убираем кастомную высоту -> вернется fallback на vh
       stack?.style.removeProperty('--stage-h');
+      unlockScrollHost(); // allow modal to scroll normally
       safeSetMode('text');
     }
 
@@ -245,7 +247,7 @@ export async function openReader(version='full', startIndex=NaN){
     });
   }
 
-  // кнопки
+  // buttons
   btnPrev.addEventListener('click', ()=> openIdx(current-1));
   btnNext.addEventListener('click', ()=> openIdx(current+1));
   btnToc .addEventListener('click', ()=> toc.classList.toggle('hidden'));
@@ -253,7 +255,7 @@ export async function openReader(version='full', startIndex=NaN){
   ovlBtn?.addEventListener('click', (e)=> { e.preventDefault(); e.stopPropagation(); safeSetMode('text'); });
   stage?.addEventListener('dblclick', (e)=> { e.preventDefault(); e.stopPropagation(); safeSetMode('text'); });
 
-  // клавиатура
+  // keyboard
   const onKey = (e)=>{
     if (!document.getElementById('modalBody')) return;
     if (e.key === 'ArrowLeft')  { e.preventDefault(); openIdx(current-1); }
@@ -261,24 +263,20 @@ export async function openReader(version='full', startIndex=NaN){
   };
   document.addEventListener('keydown', onKey);
 
-  // перестраиваем высоту при ресайзе
-  const onResize = ()=>{
-    if (!stage || !stack) return;
-    const sh = stage.getBoundingClientRect().height || 0;
-    stack.style.setProperty('--stage-h', `${Math.round(sh)}px`);
-  };
+  // resize
+  const onResize = ()=>{ syncTextHeightToStage(); };
   window.addEventListener('resize', onResize);
 
   renderToc();
   openIdx(current);
 
-  // очистка
+  // cleanup
   const modal = document.getElementById('modalBackdrop');
   const obs = new MutationObserver(()=>{
     if (!modal.classList.contains('show')){
       document.removeEventListener('keydown', onKey);
       window.removeEventListener('resize', onResize);
-      if (modalBody) modalBody.style.overflowY = 'auto';
+      unlockScrollHost();
       obs.disconnect();
     }
   });
