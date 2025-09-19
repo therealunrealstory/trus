@@ -731,16 +731,22 @@ body.modal-open{ overflow:hidden; }
 
 /* когда включён режим текста (добавляется класс .is-text на .rstage И на .rstack) */
 
-/* текстовый слой по умолчанию не скроллит — скролл включаем только в Text-режиме через JS */
+/* Текстовый слой по умолчанию НЕ скроллит */
 #modalBody #readerWrap .rstack > #readerBody{
   position: absolute; inset: 0;
   opacity: 0; pointer-events: none;
   overflow: visible;
 }
 
+/* В режиме текста скролл управляет JS (ставит height/overflow) */
 #modalBody #readerWrap .rstack.is-text > #readerBody{
   opacity: 1; pointer-events: auto;
-  /* height / max-height / overflow выставляет JS под высоту обложки */
+  /* height/max-height выставит JS под высоту обложки */
+}
+
+/* Увеличенный потолок модалки для ридера */
+.modal-backdrop.reader-fit .modal-dialog{
+  max-height: 95vh;
 }
 
 #modalBody #readerWrap .rstage{
@@ -776,10 +782,3 @@ body.modal-open{ overflow:hidden; }
 /* В режиме текста: включаем туман, убираем оверлей «Read» */
 #modalBody #readerWrap .rstage.is-text .rstage-fog{ opacity:1; }
 #modalBody #readerWrap .rstage.is-text .rstage-overlay{ display:none; }
-
-@media (max-width: 768px){
-  #modalBody #readerWrap .rstage{ border-radius:12px; }
-  #modalBody #readerWrap .rstack.is-text > #readerBody{
-    max-height: min(72vh, calc(100vh - 180px));
-  }
-}
