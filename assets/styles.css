@@ -733,9 +733,12 @@ body.modal-open{ overflow:hidden; }
   /* по умолчанию текст скрыт (режим Cover) */
   opacity: 0; pointer-events: none;
   max-height: 0; overflow: hidden; /* max-height: 0 для скрытого состояния остается */
-  padding: 0 16px; /* чтобы на мобиле не липло к краям */
+  padding: 20px 20px 20px; /* чтобы на мобиле не липло к краям */
   transition: opacity .22s ease;
 }
+#modalBody #readerWrap .rstack > #readerBody > :first-child{ margin-top: 0; }
+#modalBody #readerWrap .rstack > #readerBody > :last-child{ margin-bottom: 0; }
+
 
 /* когда включён режим текста (добавляется класс .is-text на .rstack) */
 #modalBody #readerWrap .rstack.is-text > #readerBody{
