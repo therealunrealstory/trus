@@ -1,5 +1,5 @@
 {
-  "pattern": "https://archive.org/download/trus-covers/{NNN}.jpg",
+  "pattern": "https://archive.org/download/trus-covers/{NNN}.png",
   "formatNote": "Use {NNN}=001..052; any ratio allowed; max width 768",
   "chapters": {
     "1": "https://archive.org/download/trus-covers/001.jpg"
