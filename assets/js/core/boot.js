@@ -142,43 +142,44 @@ function onceFlag(el, flag) {
     return root.firstElementChild;
   }
 
-  function mount(){
-    // рендерим только на маршруте "now"
-    if (document.documentElement.getAttribute('data-route') !== 'now') return;
-    const host = document.getElementById('subpage');
-    if (!host || host[FLAG]) return;
+// банер
+//  function mount(){
+//    // рендерим только на маршруте "now"
+//    if (document.documentElement.getAttribute('data-route') !== 'now') return;
+//    const host = document.getElementById('subpage');
+//    if (!host || host[FLAG]) return;
+//
+//    const img = new Image();
+//    img.src = HERO_URL;
+//    img.alt = 'The Story Now — photo';
+//    img.loading = 'lazy';
+//    img.decoding = 'async';
+//   img.referrerPolicy = 'no-referrer';
+//    img.className = 'storynow-hero';
+//
+//    const anchor = findAnchor(host) || host.firstChild;
+//    if (anchor && anchor.parentNode) {
+//      anchor.parentNode.insertBefore(img, anchor);
+//      host[FLAG] = true;
+//    }
+//  }
 
-    const img = new Image();
-    img.src = HERO_URL;
-    img.alt = 'The Story Now — photo';
-    img.loading = 'lazy';
-    img.decoding = 'async';
-    img.referrerPolicy = 'no-referrer';
-    img.className = 'storynow-hero';
-
-    const anchor = findAnchor(host) || host.firstChild;
-    if (anchor && anchor.parentNode) {
-      anchor.parentNode.insertBefore(img, anchor);
-      host[FLAG] = true;
-    }
-  }
-
-  // Вставляем после рендера страницы и при смене языка
-  const sub = document.getElementById('subpage');
-  if (sub) {
-    new MutationObserver(() => mount()).observe(sub, { childList: true });
-  }
-  document.addEventListener('DOMContentLoaded', mount);
+//  // Вставляем после рендера страницы и при смене языка
+//  const sub = document.getElementById('subpage');
+//  if (sub) {
+//    new MutationObserver(() => mount()).observe(sub, { childList: true });
+//  }
+//  document.addEventListener('DOMContentLoaded', mount);
 
   // при смене языка страница перерендеривается — повторим вставку
-  import('./i18n.js').then(({ onLocaleChanged }) => {
-    onLocaleChanged(() => {
-      const host = document.getElementById('subpage');
-      if (host) host[FLAG] = false;
-      mount();
-    });
-  }).catch(()=>{});
-})();
+//  import('./i18n.js').then(({ onLocaleChanged }) => {
+//    onLocaleChanged(() => {
+//      const host = document.getElementById('subpage');
+//      if (host) host[FLAG] = false;
+//      mount();
+//    });
+//  }).catch(()=>{});
+//})();
 
 
 // —————————————————————————————————————————————
