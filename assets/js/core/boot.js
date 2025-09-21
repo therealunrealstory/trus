@@ -119,6 +119,69 @@ function onceFlag(el, flag) {
 })();
 
 // —————————————————————————————————————————————
+// Story Now: hero-image before "The story continues now"
+(function injectStoryNowHero(){
+  const HERO_URL = 'https://archive.org/download/orus-pics/storynow.jpg';
+  const FLAG = '__storyNowHeroMounted__';
+
+  function findAnchor(root){
+    // 1) пытаемся найти секцию по data-i18n ключам заголовков (если есть)
+    const byKey = root.querySelector(
+      'h1[data-i18n*="now"], h2[data-i18n*="now"], h3[data-i18n*="now"], [role="heading"][data-i18n*="now"]'
+    );
+    if (byKey) return byKey.closest('section') || byKey;
+
+    // 2) fallback: ищем заголовок по видимому тексту (ENG; регистронезависимо)
+    const headings = root.querySelectorAll('h1,h2,h3,[role="heading"]');
+    for (const h of headings) {
+      const txt = (h.textContent || '').trim().toLowerCase();
+      if (txt.includes('the story continues now')) return h.closest('section') || h;
+    }
+
+    // 3) если не нашли — ставим в самый верх страницы
+    return root.firstElementChild;
+  }
+
+  function mount(){
+    // рендерим только на маршруте "now"
+    if (document.documentElement.getAttribute('data-route') !== 'now') return;
+    const host = document.getElementById('subpage');
+    if (!host || host[FLAG]) return;
+
+    const img = new Image();
+    img.src = HERO_URL;
+    img.alt = 'The Story Now — photo';
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.referrerPolicy = 'no-referrer';
+    img.className = 'storynow-hero';
+
+    const anchor = findAnchor(host) || host.firstChild;
+    if (anchor && anchor.parentNode) {
+      anchor.parentNode.insertBefore(img, anchor);
+      host[FLAG] = true;
+    }
+  }
+
+  // Вставляем после рендера страницы и при смене языка
+  const sub = document.getElementById('subpage');
+  if (sub) {
+    new MutationObserver(() => mount()).observe(sub, { childList: true });
+  }
+  document.addEventListener('DOMContentLoaded', mount);
+
+  // при смене языка страница перерендеривается — повторим вставку
+  import('./i18n.js').then(({ onLocaleChanged }) => {
+    onLocaleChanged(() => {
+      const host = document.getElementById('subpage');
+      if (host) host[FLAG] = false;
+      mount();
+    });
+  }).catch(()=>{});
+})();
+
+
+// —————————————————————————————————————————————
 // 5) Язык + роутер (загружаем локаль ПЕРЕД стартом)
 (async function initLangAndRouter(){
   const select = $('#lang');
