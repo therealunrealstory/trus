@@ -448,72 +448,166 @@ export function destroy(){
 }
 
 // === CAST MODULE ===
-(function(){
+(function () {
   const CAST_BASE = '/cast';
-  function getActiveLang(){
+  let CAST_DATA = null;      // кеш списка персонажей
+  let CURR_DICT = null;      // кеш текущего словаря локали
+
+  function getActiveLang() {
     try { return (window.i18n && i18n.getLocale && i18n.getLocale()) || document.documentElement.lang || 'en'; }
-    catch(_){ return 'en'; }
+    catch (_) { return document.documentElement.lang || 'en'; }
   }
-  async function j(u){ const r=await fetch(u,{cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }
-  async function loadCastLocale(lang){
+
+  async function j(u) {
+    const r = await fetch(u, { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }
+
+  async function loadCastLocale(lang) {
     try { return await j(`${CAST_BASE}/i18n/${lang}.json`); }
-    catch(_){ return await j(`${CAST_BASE}/i18n/en.json`); }
+    catch (_) { return await j(`${CAST_BASE}/i18n/en.json`); }
   }
-  async function renderCast(root){
+
+  async function getCastData() {
+    if (CAST_DATA) return CAST_DATA;
+    CAST_DATA = await j(`${CAST_BASE}/cast.json`);
+    return CAST_DATA;
+  }
+
+  // первичный рендер сетки (без привязки к языку)
+  async function renderCast(root) {
     const grid = root.querySelector('#castGrid');
-    const titleEl = root.querySelector('[data-castkey="title"]');
-    if(!grid) return;
-    const lang = getActiveLang();
-    const [data, dict] = await Promise.all([ j(`${CAST_BASE}/cast.json`), loadCastLocale(lang) ]);
-    if(titleEl && dict.title) titleEl.textContent = dict.title;
+    if (!grid) return;
+    const data = await getCastData();
 
     const frag = document.createDocumentFragment();
-    (data.cast||[]).forEach(item=>{
+    (data.cast || []).forEach(item => {
       const id = item.id;
-      const name = (dict[id] && dict[id].name) || id;
       const li = document.createElement('li');
       li.className = 'text-center';
-
       li.innerHTML = `
-        <button class='group w-full' data-cast-id='${id}' aria-label='${name}'>
+        <button class='group w-full' data-cast-id='${id}'>
           <span class='block aspect-[9/16] overflow-hidden rounded-2xl border border-gray-700 bg-gray-900/40'>
             <img src='${item.thumb}' alt='' loading='lazy' decoding='async'
                  class='w-full h-full object-cover select-none pointer-events-none'/>
           </span>
-          <span class='mt-1 block text-xs text-gray-300'>${name}</span>
+          <span class='mt-1 block text-xs text-gray-300' data-cast-name></span>
         </button>
       `;
-
-      li.querySelector('button').addEventListener('click', ()=>{
-        const bio = (dict[id] && dict[id].bio) || '';
-        const poster = item.poster || item.thumb;
-        const body = `
-          <div class='cast-modal'>
-            <div class='cast-modal__media'>
-              <video class='cast-modal__video'
-                     src='${item.video}'
-                     poster='${poster}'
-                     preload='none'
-                     muted
-                     playsinline
-                     controls></video>
-            </div>
-            <div class='cast-modal__text'>
-              <h3 class='text-base font-semibold mb-2'>${name}</h3>
-              ${bio ? `<div class='cast-modal__bio text-sm leading-relaxed'>${bio}</div>` : ''}
-            </div>
-          </div>`;
-        openModal(name, body);
-        setTimeout(()=>{
-          const v = document.querySelector('#modalBody .cast-modal__video');
-          if(v) v.play().catch(()=>{});
-        }, 0);
-      });
-
+      li.querySelector('button').addEventListener('click', () => openCastModal(id));
       frag.appendChild(li);
     });
     grid.replaceChildren(frag);
+
+    // сразу применим подписи текущей локали
+    await applyCastLocale(root);
   }
-  function onReady(fn){ if(document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
-  onReady(()=>{ renderCast(document).catch(console.error); });
+
+  // применить локаль (обновляет заголовок и подписи под карточками)
+  async function applyCastLocale(root) {
+    const titleEl = root.querySelector('[data-castkey="title"]');
+    const lang = getActiveLang();
+    CURR_DICT = await loadCastLocale(lang);
+
+    if (titleEl && CURR_DICT.title) titleEl.textContent = CURR_DICT.title;
+
+    root.querySelectorAll('#castGrid button[data-cast-id]').forEach(btn => {
+      const id = btn.getAttribute('data-cast-id');
+      const name = (CURR_DICT[id] && CURR_DICT[id].name) || id;
+      const nameEl = btn.querySelector('[data-cast-name]');
+      if (nameEl) nameEl.textContent = name;
+    });
+
+    // если модалка уже открыта — обновим её контент без закрытия
+    const modalBody = document.querySelector('#modalBody .cast-modal');
+    if (modalBody) {
+      const openId = modalBody.getAttribute('data-open-id');
+      if (openId) refreshOpenModal(openId);
+    }
+  }
+
+  // открыть модалку
+  async function openCastModal(id) {
+    const data = await getCastData();
+    const item = (data.cast || []).find(x => x.id === id);
+    if (!item) return;
+
+    const name = (CURR_DICT && CURR_DICT[id] && CURR_DICT[id].name) || id;
+    const bio  = (CURR_DICT && CURR_DICT[id] && CURR_DICT[id].bio) || '';
+    const poster = item.poster || item.thumb;
+
+    const body = `
+      <div class='cast-modal' data-open-id='${id}'>
+        <div class='cast-modal__media'>
+          <video class='cast-modal__video'
+                 src='${item.video}'
+                 poster='${poster}'
+                 preload='none'
+                 muted
+                 playsinline
+                 controls></video>
+        </div>
+        <div class='cast-modal__text'>
+          <h3 class='text-base font-semibold mb-2' data-cast-title>${name}</h3>
+          ${bio ? `<div class='cast-modal__bio text-sm leading-relaxed' data-cast-bio>${bio}</div>` : `<div data-cast-bio></div>`}
+        </div>
+      </div>
+    `;
+    openModal(name, body);
+    setTimeout(() => {
+      const v = document.querySelector('#modalBody .cast-modal__video');
+      if (v) v.play().catch(() => {});
+    }, 0);
+  }
+
+  // обновить заголовок/био в уже открытой модалке при смене языка
+  async function refreshOpenModal(id) {
+    const name = (CURR_DICT && CURR_DICT[id] && CURR_DICT[id].name) || id;
+    const bio  = (CURR_DICT && CURR_DICT[id] && CURR_DICT[id].bio) || '';
+    const box  = document.querySelector('#modalBody .cast-modal');
+    if (!box) return;
+    const titleEl = box.querySelector('[data-cast-title]');
+    const bioEl   = box.querySelector('[data-cast-bio]');
+    if (titleEl) titleEl.textContent = name;
+    if (bioEl)   bioEl.textContent   = bio;
+    // ещё обновим заголовок модалки (в её шапке)
+    const modalTitle = document.querySelector('#modalTitle');
+    if (modalTitle) modalTitle.textContent = name;
+  }
+
+  // ловим смену языка разными способами
+  function onLanguageChange(cb) {
+    // 1) стандартное браузерное событие (используется не всегда, но пусть будет)
+    window.addEventListener('languagechange', cb);
+
+    // 2) наше кастомное, если кто-то диспатчит CustomEvent('trus:lang', {detail:{lang}})
+    document.addEventListener('trus:lang', cb);
+
+    // 3) наблюдаем за изменением <html lang="…">
+    const html = document.documentElement;
+    new MutationObserver(() => cb()).observe(html, { attributes: true, attributeFilter: ['lang'] });
+
+    // 4) мягко патчим i18n.setLocale, чтобы оно диспатчило событие и выставляло html@lang
+    if (window.i18n && typeof i18n.setLocale === 'function' && !i18n.__patchedForCast) {
+      const orig = i18n.setLocale;
+      i18n.setLocale = function (lang) {
+        const res = orig.call(this, lang);
+        try {
+          document.documentElement.setAttribute('lang', lang);
+          document.dispatchEvent(new CustomEvent('trus:lang', { detail: { lang } }));
+        } catch (_) {}
+        return res;
+      };
+      i18n.__patchedForCast = true;
+    }
+  }
+
+  // init
+  function onReady(fn) { if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+  onReady(() => {
+    const root = document;
+    renderCast(root).catch(console.error);
+    onLanguageChange(() => applyCastLocale(root).catch(console.error));
+  });
 })();
