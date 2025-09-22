@@ -496,8 +496,7 @@ export function destroy(){
                      preload='none'
                      muted
                      playsinline
-                     controls
-                     crossorigin='anonymous'></video>
+                     controls></video>
             </div>
             <div class='cast-modal__text'>
               <h3 class='text-base font-semibold mb-2'>${name}</h3>
