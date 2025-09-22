@@ -66,6 +66,7 @@ section, footer{ background:rgba(0,0,0,0.2); border-radius:1rem; margin-top:1rem
   background-position: center;
   cursor: pointer;
   border: 1px solid rgba(255,255,255,0.08);
+  background-clip: padding-box;  /* фон не будет рисоваться под border */
 }
 @supports not (aspect-ratio: 4 / 3){
   .tile::before{ content:""; display:block; padding-top:75%; } /* 4:3 */
