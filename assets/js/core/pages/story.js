@@ -30,7 +30,7 @@ function resumeKey(trackKey, lang){ return `seek:${trackKey}:${(lang||'EN').toUp
 function readResume(trackKey, lang){
   try { const v = localStorage.getItem(resumeKey(trackKey, lang)); const n = v==null?NaN:Number(v); return Number.isFinite(n)?Math.max(0,n):NaN; } catch { return NaN; }
 }
-function writeResume(trackKey, lang, seconds){ try { localStorage.setItem(resumeKey(trackKey,lang), String(Math.max(0, Math.floor(seconds||0)))); } catch {} }
+function writeResume(trackKey, lang, seconds){ try { localStorage.setItem(resumeKey(trackKey, lang), String(Math.max(0, Math.floor(seconds||0)))); } catch {} }
 function clearResumeIfCompleted(trackKey, lang){ try { localStorage.removeItem(resumeKey(trackKey, lang)); } catch {} }
 
 function updateMiniLabels(){
@@ -204,7 +204,7 @@ function readerCalloutNode(kind, playCard){
   const row = document.createElement('div');
   row.className = 'flex items-center gap-3 trus-reader-row';
   row.style.justifyContent = 'flex-start';
-  row.style.flexWrap = 'nowrap';
+  row.style.flexWrap = 'nowrap'; // по умолчанию (десктоп) — одна строка
   row.classList.add('reader-row'); 
 
   const btn = document.createElement('button');
@@ -283,13 +283,14 @@ function applyResponsiveLayout(root){
   ];
   sets.forEach(({btn, status})=>{
     if (!btn) return;
-    const row = btn.parentElement;
+    const row = btn.parentElement; // контейнер кнопки и подписи
     if (!row) return;
 
     row.style.display = 'flex';
     row.style.alignItems = 'center';
     row.style.gap = '12px';
 
+    // фикс «двух строк» на кнопке (▶︎ и текст вместе)
     btn.style.whiteSpace = 'nowrap';
     btn.style.display = 'inline-flex';
     btn.style.alignItems = 'center';
@@ -307,42 +308,8 @@ function applyResponsiveLayout(root){
 }
 /* ---------------------------------------------------------------- */
 
-/* ===== Strong, root-agnostic reordering ===== */
-function reorderShortBelowFull() {
-  // находим секции максимально надёжно
-  const findSection = (by) => {
-    if (!by) return null;
-    const el = document.querySelector(by);
-    return el ? el.closest('section') : null;
-  };
-
-  let shortSection =
-      findSection('#shortBtn') ||
-      findSection('#shortSeek') ||
-      document.querySelector('section h2[data-i18n="short.title"]')?.closest('section');
-
-  let fullSection  =
-      findSection('#fullBtn') ||
-      findSection('#fullSeek') ||
-      document.querySelector('section h2[data-i18n="story.full.title"]')?.closest('section');
-
-  if (shortSection && fullSection && fullSection.nextSibling !== shortSection) {
-    fullSection.parentNode.insertBefore(shortSection, fullSection.nextSibling);
-    return true;
-  }
-  return !!(shortSection && fullSection);
-}
-
 export function init(root){
   initSounds();
-
-  // Надёжная перестановка: до биндинга DOM узлов и мини-плееров
-  let tries = 0;
-  const tryReorder = ()=>{
-    const ok = reorderShortBelowFull();
-    if (!ok && tries < 12) { tries++; requestAnimationFrame(tryReorder); }
-  };
-  tryReorder();
 
   // Bind DOM
   announceAudio  = root.querySelector('#announceAudio') || root.querySelector('[data-audio="announce"]') || null;
@@ -367,6 +334,7 @@ export function init(root){
   fullSeek       = root.querySelector('#fullSeek');
   fullTimeCur    = root.querySelector('#fullTimeCur');
   fullTimeDur    = root.querySelector('#fullTimeDur');
+  
 
   const langSel  = $('#lang');
   const currentLang = () => (langSel?.value || 'EN').toUpperCase();
@@ -379,7 +347,7 @@ export function init(root){
   // Reader cards under headings
   insertReaders(root);
 
-  // Responsive
+  // Responsive: применяем и подписываемся
   applyResponsiveLayout(root);
   const mql = window.matchMedia('(max-width: 768px)');
   const onResp = ()=> applyResponsiveLayout(root);
@@ -414,7 +382,7 @@ export function init(root){
   };
   document.addEventListener('pause-others', onPauseOthers);
 
-  // --- Tile modals ---
+  // --- Tile modals (image-buttons above announcement) ---
   const bindTile = (sel, titleKey, titleFallback, bodyKey, bodyFallback) => {
     const el = root.querySelector(sel);
     if (!el) return;
@@ -427,6 +395,7 @@ export function init(root){
   bindTile('#tile1', 'tiles.me', 'I\u2019m Nico', 'modal.tile1.body', '…');
   bindTile('#tile2', 'tiles.about', 'About Adam', 'modal.tile2.body', '…');
   bindTile('#tile3', 'tiles.others', 'Other people in the story', 'modal.tile3.body', '…');
+  // ------------------------------------------------------
 
   updateMiniLabels();
 }
@@ -453,6 +422,7 @@ export function destroy(){
   const CAST_BASE = '/cast';
   let CAST_DATA = null;
   let CURR_DICT = null;
+  let GRID_OBSERVER_ATTACHED = false;
 
   // --- helpers ---
   function normLang(raw){
@@ -485,12 +455,27 @@ export function destroy(){
     return CAST_DATA;
   }
 
+  // Wait until #castGrid exists (handles SPA re-renders)
+  function whenGridReady(cb) {
+    const tryNow = () => document.querySelector('#castGrid');
+    const grid = tryNow();
+    if (grid) { cb(); return; }
+    if (GRID_OBSERVER_ATTACHED) return;
+    GRID_OBSERVER_ATTACHED = true;
+    const mo = new MutationObserver(() => {
+      const g = tryNow();
+      if (g) { mo.disconnect(); GRID_OBSERVER_ATTACHED = false; cb(); }
+    });
+    mo.observe(document.body, {childList:true, subtree:true});
+  }
+
   // primary render (language-agnostic DOM)
   async function renderCast(root){
     const grid = root.querySelector('#castGrid');
     if (!grid) return;
-    const data = await getCastData();
+    if (grid.children.length) return; // уже отрисовано
 
+    const data = await getCastData();
     const frag = document.createDocumentFragment();
     (data.cast || []).forEach(item => {
       const id = item.id;
@@ -578,27 +563,54 @@ export function destroy(){
     }, 0);
   }
 
-  // subscribe to your i18n hook if available
+  // subscribe to language changes
   function subscribeLocaleChanges(root){
-    try {
-      if (typeof window.onLocaleChanged === 'function') {
-        window.onLocaleChanged(({ detail }) => {
-          const next = (detail && detail.lang) || document.documentElement.lang || 'en';
-          applyCastLocale(root, next);
-        });
-        return;
-      }
-    } catch(_){}
+    // Preferred: your site-level hook
+    if (typeof window.onLocaleChanged === 'function') {
+      window.onLocaleChanged(({ detail }) => {
+        const next = (detail && detail.lang) || document.documentElement.lang || 'en';
+        // ПОСЛЕ смены языка фреймворк часто пересобирает DOM.
+        // Дождёмся появления #castGrid и только потом применим.
+        setTimeout(() => {
+          whenGridReady(() => {
+            const grid = document.querySelector('#castGrid');
+            const needRender = !grid || grid.children.length === 0;
+            if (needRender) renderCast(root).then(()=> applyCastLocale(root, next));
+            else applyCastLocale(root, next);
+          });
+        }, 0);
+      });
+      return;
+    }
 
-    // Fallbacks: custom event or html@lang change
-    document.addEventListener('trus:lang', (e)=> applyCastLocale(root, e?.detail?.lang));
-    new MutationObserver(()=> applyCastLocale(root)).observe(document.documentElement, {attributes:true, attributeFilter:['lang']});
+    // Fallbacks
+    document.addEventListener('trus:lang', (e)=> {
+      const next = e?.detail?.lang;
+      setTimeout(() => {
+        whenGridReady(() => {
+          const grid = document.querySelector('#castGrid');
+          const needRender = !grid || grid.children.length === 0;
+          if (needRender) renderCast(root).then(()=> applyCastLocale(root, next));
+          else applyCastLocale(root, next);
+        });
+      }, 0);
+    });
+
+    new MutationObserver(() => {
+      // если блок был пересобран, дорисуем
+      const grid = document.querySelector('#castGrid');
+      if (grid && grid.children.length === 0) {
+        renderCast(document).catch(console.error);
+      }
+    }).observe(document.body, { childList: true, subtree: true });
   }
 
   function onReady(fn){ if (document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
   onReady(()=>{
     const root = document;
-    renderCast(root).then(()=> subscribeLocaleChanges(root)).catch(console.error);
+    whenGridReady(() => {
+      renderCast(root).then(()=> subscribeLocaleChanges(root)).catch(console.error);
+    });
   });
 })();
 
