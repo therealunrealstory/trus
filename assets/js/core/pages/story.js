@@ -504,7 +504,7 @@ export function destroy(){
               ${bio ? `<div class='cast-modal__bio text-sm leading-relaxed'>${bio}</div>` : ''}
             </div>
           </div>`;
-        (window.openModal ? window.openModal : function(title, html){ alert(title); })(name, body);
+        openModal(name, body);
         setTimeout(()=>{
           const v = document.querySelector('#modalBody .cast-modal__video');
           if(v) v.play().catch(()=>{});

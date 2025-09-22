@@ -18,6 +18,12 @@
       "poster": "https://archive.org/download/trus-cast/Barbara-poster.jpg",
       "video": "https://archive.org/download/trus-cast/Barbara.mp4"
     },
+	{
+      "id": "FATHER",
+      "thumb": "https://archive.org/download/trus-cast/Father-poster.jpg",
+      "poster": "https://archive.org/download/trus-cast/Father-poster.jpg",
+      "video": "https://archive.org/download/trus-cast/Father.mp4"
+    },
     {
       "id": "SOFIA",
       "thumb": "https://archive.org/download/trus-cast/Sofia-poster.jpg",
@@ -41,12 +47,6 @@
       "thumb": "https://archive.org/download/trus-cast/Lara-poster.jpg",
       "poster": "https://archive.org/download/trus-cast/Lara-poster.jpg",
       "video": "https://archive.org/download/trus-cast/Lara.mp4"
-    },
-    {
-      "id": "FATHER",
-      "thumb": "https://archive.org/download/trus-cast/Father-poster.jpg",
-      "poster": "https://archive.org/download/trus-cast/Father-poster.jpg",
-      "video": "https://archive.org/download/trus-cast/Father.mp4"
     }
   ]
 }
