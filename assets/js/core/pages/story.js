@@ -447,54 +447,46 @@ export function destroy(){
   onPauseOthers = unLocale = null;
 }
 
+
 // === CAST MODULE ===
 (function () {
   const CAST_BASE = '/cast';
   let CAST_DATA = null;
   let CURR_DICT = null;
-  let PREV_LANG = null;
 
-  // --- НОРМАЛИЗАЦИЯ КОДОВ ЯЗЫКА ---
-  function normLang(raw) {
+  // --- helpers ---
+  function normLang(raw){
     if (!raw) return 'en';
     let s = String(raw).toLowerCase();
-    // обрезаем регион: pt-br -> pt
-    if (s.includes('-')) s = s.split('-')[0];
-    // алиасы
-    const map = { zh: 'cn', cn: 'cn', ar: 'ar', de: 'de', es: 'es', fr: 'fr', it: 'it', pt: 'pt', ru: 'ru', en: 'en' };
+    if (s.includes('-')) s = s.split('-')[0]; // pt-BR -> pt
+    const map = { zh:'cn', cn:'cn', ar:'ar', de:'de', es:'es', fr:'fr', it:'it', pt:'pt', ru:'ru', en:'en' };
     return map[s] || 'en';
   }
 
-  function getActiveLang() {
+  function getActiveLang(){
     try {
-      const fromI18n = (window.i18n && i18n.getLocale && i18n.getLocale()) || '';
+      const fromI18n = (window.i18n && typeof i18n.getLocale === 'function' && i18n.getLocale()) || '';
       const fromHtml = document.documentElement.lang || '';
-      // приоритет i18n, затем html@lang
-      return normLang(fromI18n || fromHtml);
-    } catch (_) {
-      return normLang(document.documentElement.lang || 'en');
+      return normLang(fromI18n || fromHtml || 'en');
+    } catch(_){
+      return 'en';
     }
   }
 
-  async function j(u) {
-    const r = await fetch(u, { cache: 'no-store' });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    return r.json();
+  async function j(u){ const r=await fetch(u,{cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }
+  async function loadCastLocale(langRaw){
+    const l = normLang(langRaw || getActiveLang());
+    try { return await j(`${CAST_BASE}/i18n/${l}.json`); }
+    catch(_){ return await j(`${CAST_BASE}/i18n/en.json`); }
   }
-
-  async function loadCastLocale(langRaw) {
-    const lang = getActiveLang();           // уже нормализован
-    try { return await j(`${CAST_BASE}/i18n/${lang}.json`); }
-    catch (_) { return await j(`${CAST_BASE}/i18n/en.json`); }
-  }
-
-  async function getCastData() {
+  async function getCastData(){
     if (CAST_DATA) return CAST_DATA;
     CAST_DATA = await j(`${CAST_BASE}/cast.json`);
     return CAST_DATA;
   }
 
-  async function renderCast(root) {
+  // primary render (language-agnostic DOM)
+  async function renderCast(root){
     const grid = root.querySelector('#castGrid');
     if (!grid) return;
     const data = await getCastData();
@@ -518,12 +510,14 @@ export function destroy(){
     });
     grid.replaceChildren(frag);
 
-    await applyCastLocale(root);
+    await applyCastLocale(root, getActiveLang());
   }
 
-  async function applyCastLocale(root) {
+  // apply current locale to titles & captions (and open modal content)
+  async function applyCastLocale(root, langFromEvent){
+    CURR_DICT = await loadCastLocale(langFromEvent || getActiveLang());
+
     const titleEl = root.querySelector('[data-castkey="title"]');
-    CURR_DICT = await loadCastLocale(getActiveLang());
     if (titleEl && CURR_DICT.title) titleEl.textContent = CURR_DICT.title;
 
     root.querySelectorAll('#castGrid button[data-cast-id]').forEach(btn => {
@@ -533,24 +527,25 @@ export function destroy(){
       if (nameEl) nameEl.textContent = name;
     });
 
-    // если модалка открыта — обновим текст
+    // refresh open modal texts if any
     const box = document.querySelector('#modalBody .cast-modal');
     if (box) {
       const openId = box.getAttribute('data-open-id');
       if (openId) {
         const name = (CURR_DICT[openId] && CURR_DICT[openId].name) || openId;
         const bio  = (CURR_DICT[openId] && CURR_DICT[openId].bio)  || '';
-        const titleEl = box.querySelector('[data-cast-title]');
-        const bioEl   = box.querySelector('[data-cast-bio]');
-        if (titleEl) titleEl.textContent = name;
-        if (bioEl)   bioEl.textContent   = bio;
+        const tEl = box.querySelector('[data-cast-title]');
+        const bEl = box.querySelector('[data-cast-bio]');
+        if (tEl) tEl.textContent = name;
+        if (bEl) bEl.textContent = bio;
         const modalTitle = document.querySelector('#modalTitle');
         if (modalTitle) modalTitle.textContent = name;
       }
     }
   }
 
-  async function openCastModal(id) {
+  // open modal (no crossorigin to avoid CORS on archive.org)
+  async function openCastModal(id){
     const data = await getCastData();
     const item = (data.cast || []).find(x => x.id === id);
     if (!item) return;
@@ -577,38 +572,33 @@ export function destroy(){
         </div>
       </div>`;
     openModal(name, body);
-    setTimeout(() => {
+    setTimeout(()=>{
       const v = document.querySelector('#modalBody .cast-modal__video');
-      if (v) v.play().catch(() => {});
+      if (v) v.play().catch(()=>{});
     }, 0);
   }
 
-  // --- W A T C H E R  ---
-  function startLangWatcher(root) {
-    // 1) быстрая реакция на любые изменения lang в DOM/hash
-    window.addEventListener('hashchange', () => applyCastLocale(root));
-    new MutationObserver(() => applyCastLocale(root)).observe(
-      document.documentElement, { attributes: true, attributeFilter: ['lang'] }
-    );
-
-    // 2) если i18n где-то диспатчит события — тоже ловим
-    window.addEventListener('languagechange', () => applyCastLocale(root));
-    document.addEventListener('trus:lang', () => applyCastLocale(root));
-
-    // 3) страховочный интервал — ловит смену языка даже без событий
-    PREV_LANG = getActiveLang();
-    setInterval(() => {
-      const now = getActiveLang();
-      if (now !== PREV_LANG) {
-        PREV_LANG = now;
-        applyCastLocale(root);
+  // subscribe to your i18n hook if available
+  function subscribeLocaleChanges(root){
+    try {
+      if (typeof window.onLocaleChanged === 'function') {
+        window.onLocaleChanged(({ detail }) => {
+          const next = (detail && detail.lang) || document.documentElement.lang || 'en';
+          applyCastLocale(root, next);
+        });
+        return;
       }
-    }, 600);
+    } catch(_){}
+
+    // Fallbacks: custom event or html@lang change
+    document.addEventListener('trus:lang', (e)=> applyCastLocale(root, e?.detail?.lang));
+    new MutationObserver(()=> applyCastLocale(root)).observe(document.documentElement, {attributes:true, attributeFilter:['lang']});
   }
 
-  function onReady(fn) { if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
-  onReady(() => {
+  function onReady(fn){ if (document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+  onReady(()=>{
     const root = document;
-    renderCast(root).then(() => startLangWatcher(root)).catch(console.error);
+    renderCast(root).then(()=> subscribeLocaleChanges(root)).catch(console.error);
   });
 })();
+
