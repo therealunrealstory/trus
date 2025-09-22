@@ -786,3 +786,53 @@ body.modal-open{ overflow:hidden; }
     /* max-height ТАКЖЕ УДАЛЯЕМ ОТСЮДА */
   }
 }
+/* Карточка в сетке = постер 9:16 внутри скругленного прямоугольника */
+.aspect-\[9\/16] { aspect-ratio: 9 / 16; }
+
+/* Контейнер модалки для каста */
+#modalBody .cast-modal {
+  display: grid;
+  grid-template-columns: 1fr;       /* мобайл: видео сверху, текст снизу */
+  gap: 12px;
+  height: 100%;                     /* ровняемся по максимальной высоте тела модалки */
+}
+
+/* Десктоп: две равные колонки (симметрия ширин) */
+@media (min-width: 1024px) {
+  #modalBody .cast-modal {
+    grid-template-columns: 1fr 1fr; /* видео слева, текст справа, ровно 50/50 */
+    align-items: stretch;
+  }
+}
+
+/* Левая колонка с видео: вписать по высоте модалки, без горизонтального скролла */
+#modalBody .cast-modal__media {
+  display: flex;
+  align-items: center;              /* вертикально центрируем */
+  justify-content: flex-start;      /* прижимаем к левой стороне */
+  overflow: hidden;
+  height: 100%;
+}
+
+#modalBody .cast-modal__video {
+  max-height: 100%;                 /* КЛЮЧ: видео ограничено высотой модалки */
+  height: 100%;
+  width: auto;                      /* сохраняем пропорции 9:16 */
+  object-fit: contain;
+  display: block;
+}
+
+/* Правая колонка с текстом: та же ширина, вертикальный скролл только здесь */
+#modalBody .cast-modal__text {
+  height: 100%;
+  overflow: auto;                   /* длинные био скроллятся справа */
+  padding-right: 4px;
+}
+
+/* Внешность карточки (если Tailwind недоступен) */
+.rounded-2xl { border-radius: 1rem; }
+.border { border-width: 1px; }
+.border-gray-700 { border-color: #374151; }
+.bg-gray-900\/40 { background-color: rgba(17,24,39,.4); }
+.text-gray-300 { color: #D1D5DB; }
+.text-xs { font-size: 0.75rem; line-height: 1rem; }

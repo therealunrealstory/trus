@@ -1,0 +1,35 @@
+{
+  "title": "Main characters",
+  "ADAM": {
+    "name": "Adam",
+    "bio": "Adam is a brilliant surgeon and stubborn perfectionist with a private code: never walk past. Empathetic, composed, intolerant of sloppy work. In the story he is the axis everything spirals around—and the field of battle between medical duty and human vulnerability. For Adam this path is a test of dignity and the ability to hold course when the ground gives way."
+  },
+  "NICO": {
+    "name": "Nico",
+    "bio": "Nico is the narrator and mover of the plot: rational without coldness, able to gather facts and people when everything comes apart at the seams. In the story he is the voice that stitches episodes together and keeps the tempo. For Adam he is a mirror and an advocate—arguing, supporting, restoring meaning when only silence seems left."
+  },
+  "BARBARA": {
+    "name": "Barbara",
+    "bio": "Barbara is maternal bedrock and practical kindness. Her warmth is active; her words are short and to the point. In the story she is a source of steadiness and inner discipline. For Adam she is the root one returns to for support, not consolation; their dry dialogues quietly form the spine of decisions."
+  },
+  "SOFIA": {
+    "name": "Sofia",
+    "bio": "Sofia deals in clear questions and exact actions: tenderness without sugar, care as schedules and calls. She carries her own diagnoses and does not play at illusions. In the story she is a vaccination of sobriety. For Adam she tunes the mode of ‘live on,’ where the word ‘tomorrow’ sounds like a plan, not ritual."
+  },
+  "SUSANNA": {
+    "name": "Susanna",
+    "bio": "Susanna is a bright shadow: her presence is felt even off‑screen. There is resolve in her pauses and care in her choices. In the story she is the cause of several quiet forks whose echoes arrive later. For Adam she is the memory of a love that both warms and obliges."
+  },
+  "ROXANA": {
+    "name": "Roxana",
+    "bio": "Roxana is a strategist of everyday and large tasks, finding doors where others see a wall. Independent, composed, sometimes sharp for the sake of results. In the story she is the survival OS: routes, letters, clinics, moves. For Adam she is the nerve of autonomy: her energy strengthens his self‑reliance, even when it requires distance."
+  },
+  "LARA": {
+    "name": "Lara",
+    "bio": "Lara is a quiet planet of gravity that keeps the family orbit. Fragility lives beside a bright persistence. In the story she reminds that care is not a plot twist but a rhythm. For Adam she is a reason to remain soft where the world demands stone."
+  },
+  "FATHER": {
+    "name": "Father",
+    "bio": "Father is a man of calm presence and precise listening; he always found common ground with Adam. He spoke little, listened to the end, and could release tension with a sentence or two. Unlike Barbara, whose love is action and plans, his love is acceptance and quiet."
+  }
+}
