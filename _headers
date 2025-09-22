@@ -1,0 +1,11 @@
+  Content-Security-Policy: default-src 'self';
+  Content-Security-Policy: base-uri 'self';
+  Content-Security-Policy: img-src 'self' data: https://archive.org https://*.archive.org https://*.us.archive.org;
+  Content-Security-Policy: media-src 'self' https://archive.org https://*.archive.org https://*.us.archive.org;
+  Content-Security-Policy: style-src 'self' 'unsafe-inline';
+  Content-Security-Policy: script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://www.googletagmanager.com;
+  Content-Security-Policy: connect-src 'self';
+  Content-Security-Policy: font-src 'self' data:;
+  Content-Security-Policy: frame-src https://www.youtube.com;
+  Content-Security-Policy: worker-src 'self' blob:;
+  Content-Security-Policy: object-src 'none';
