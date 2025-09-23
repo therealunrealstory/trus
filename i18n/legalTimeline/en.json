@@ -3,17 +3,17 @@
     "title": "Legal Timeline",
     "loading": "Loading…",
     "errorLoadGeneric": "Failed to load data",
-    "errorLoadJson": "Failed to load json"
+    "errorLoadJson": "Failed to load JSON"
   },
   "meta": {
     "updated": "Updated: {date} • {user} • version: {version}",
     "updated_short": "Updated: {date} • {user}"
   },
   "legend": {
-    "pre": "Prerequisites (before lawsuit)",
+    "pre": "Background (pre-lawsuit)",
     "base": "Litigation period",
     "freeze": "Asset freeze period",
-    "future": "Legal prospects (ahead)",
+    "future": "Legal outlook (ahead)",
     "event": "Event",
     "eventHint": "(clickable)",
     "eventClickable": "Event (clickable)",
@@ -27,7 +27,7 @@
   },
   "modal": {
     "close": "Close",
-    "more": "More details",
+    "more": "More",
     "less": "Collapse",
     "clusterTitle": "Events ({count})",
     "singleTitle": "{when} — {title}"
@@ -46,102 +46,105 @@
     "November",
     "December"
   ],
+
+  "Event (clickable)": "Event (clickable)",
+
   "items": {
     "2020-09-will-mother": {
       "when_label": "September 2020",
       "title": "Mother’s will naming Adam",
-      "summary": "Death of mother; will naming Adam.",
-      "details": "According to available records, Adam’s mother died in September 2020 and left a will naming him. At that time no disputes were recorded in court."
+      "summary": "Mother’s death; a will naming Adam.",
+      "details": "In September 2020, Adam’s mother passed away and left a will naming Adam. No court dispute was recorded at that time."
     },
     "2021-04-father-dx-will": {
       "when_label": "April 2021",
       "title": "Father’s will confirmed",
-      "summary": "Will in favor of Adam confirmed prior to father’s passing.",
-      "details": "By April 2021, Adam’s father had already executed a will in Adam’s favor. Medical details of third parties are omitted in the public version."
+      "summary": "A will in Adam’s favor confirmed before the father’s death.",
+      "details": "By April 2021, Adam’s father had executed a will in Adam’s favor; this document was later confirmed. Medical information about third parties is omitted in the public version."
     },
     "2021-07-father-death-claims": {
       "when_label": "July 2021",
-      "title": "Father’s death; suits contesting wills filed",
-      "summary": "Relatives filed suits contesting the parents’ wills.",
-      "details": "In July 2021, following the father’s death, suits were filed to contest the parents’ wills. The proceedings resulted in interim restrictions pending review."
+      "title": "Father’s death; claims filed to contest the wills",
+      "summary": "Relatives filed claims contesting the parents’ wills.",
+      "details": "In July 2021, after the father’s death, claims were filed to contest the parents’ wills. As proceedings commenced, temporary restrictions were imposed pending review."
     },
     "2021-07-asset-freeze": {
-      "when_label": "Since July 2021",
-      "title": "Court‑ordered asset freeze and restrictions",
+      "when_label": "From July 2021",
+      "title": "Court-ordered asset freeze and restrictions",
       "summary": "Freeze on accounts and real estate remains in force.",
-      "details": "A court‑ordered asset freeze and related restrictions were imposed on accounts and real estate. The freeze remains in effect."
+      "details": "By court order, bank accounts and real estate were frozen with associated restrictions. The freeze remains in force."
     },
     "2021-09-apartment-dispute": {
       "when_label": "September 2021",
-      "title": "Occupancy dispute regarding Adam’s apartment",
-      "summary": "Dispute over occupancy during asset freeze.",
-      "details": "During travel for medical evaluation, a dispute arose over occupancy of Adam’s apartment. Questions of residence and use became subject to the ongoing freeze and subsequent proceedings."
+      "title": "Dispute over use of Adam’s apartment",
+      "summary": "Usage dispute during the period of asset freeze.",
+      "details": "During a medical trip, a dispute arose over use of Adam’s apartment. Access issues were tied to the existing freeze and subsequent procedural steps."
     },
     "2021-11-prelim-scheduled": {
       "when_label": "November 2021",
       "title": "Preliminary hearing scheduled",
       "summary": "Preliminary hearing set for July 2024.",
-      "details": "The court scheduled a preliminary hearing on the inheritance case for July 2024."
+      "details": "The court scheduled a preliminary hearing in the inheritance case for July 2024."
     },
     "2022-03-hearing-travel": {
       "when_label": "March 2022 (beginning)",
       "title": "Hearing on permission to travel for treatment",
-      "summary": "Court considered permission to travel abroad for treatment.",
-      "details": "The court considered granting Adam permission to travel abroad for treatment. Objections were filed by the plaintiffs; a court‑appointed medical evaluation was conducted."
+      "summary": "Court considered permission to travel abroad for therapy.",
+      "details": "The court considered granting Adam permission to travel abroad for therapy. Objections were filed by the plaintiffs; a forensic medical examination was conducted."
     },
     "2022-03-permission-travel": {
       "when_label": "March 2022 (end)",
       "title": "Permission to travel for treatment granted",
-      "summary": "Court authorized travel abroad for therapy.",
-      "details": "The court granted Adam’s request and authorized travel abroad for therapy."
+      "summary": "Court allowed travel abroad for therapy.",
+      "details": "The court granted Adam’s motion and allowed travel abroad to undergo therapy."
     },
     "2022-05-visit-med-exam": {
       "when_label": "May 2022",
-      "title": "Incident at residence; court guidance on examinations",
-      "summary": "Court confirmed examinations require consent or legal basis.",
-      "details": "An incident at Adam’s residence led to police involvement. The court clarified that compulsory medical examinations require consent or a valid legal basis. Restraining measures regarding access were applied in connection with the incident."
+      "title": "Incident at residence; court clarifications on examinations",
+      "summary": "Court confirmed: examinations require consent or a legal basis.",
+      "details": "An incident at Adam’s residence led to police involvement. The court clarified that mandatory medical examinations are possible only with consent or another legal basis. Restrictive measures regarding access were applied."
     },
     "2024-06-eviction-start": {
       "when_label": "June 2024 (end)",
-      "title": "Eviction proceedings initiated regarding relative",
-      "summary": "Eviction process initiated; later reviewed by court.",
-      "details": "In late June 2024, eviction proceedings were initiated concerning a relative occupying Adam’s apartment. The court later found no procedural violations in the filing."
+      "title": "Eviction initiated regarding a relative",
+      "summary": "Eviction process initiated; later reviewed by the court.",
+      "details": "At the end of June 2024, an eviction process was initiated against a relative occupying Adam’s apartment. The court later found no procedural violations in the filing."
     },
     "2024-07-docs-fee": {
       "when_label": "July 2024 (beginning)",
-      "title": "Submission of documents; court fee paid",
-      "summary": "Procedural documents submitted; required fee paid.",
-      "details": "Prior to the preliminary hearing, procedural documents were submitted. A required court fee was paid (amount omitted in the public version)."
+      "title": "Documents filed; court fee paid",
+      "summary": "Procedural documents filed; mandatory fee paid.",
+      "details": "Before the preliminary hearing, procedural documents were filed. The mandatory court fee was paid (amount withheld in the public version)."
     },
     "2024-07-prelim-hearing": {
-      "when_label": "July 2024 (middle)",
+      "when_label": "July 2024 (mid)",
       "title": "Preliminary hearing; scenarios outlined",
-      "summary": "Court outlined possible outcomes; settlement discussions noted.",
-      "details": "At the preliminary hearing, the court outlined possible outcomes of the inheritance dispute. Settlement discussions did not result in an agreement."
+      "summary": "Court outlined possible outcomes; settlement talks noted.",
+      "details": "At the preliminary hearing, the court outlined possible scenarios for the inheritance dispute. Settlement discussions did not yield a result."
     },
     "2024-07-motion-freeze-relatives": {
-      "when_label": "July 2024 (middle)",
+      "when_label": "July 2024 (mid)",
       "title": "Motion regarding relatives’ accounts",
-      "summary": "Request for freeze and transaction review filed.",
-      "details": "A motion was filed requesting a freeze of relatives’ accounts and a review of transactions. The court took the motion under consideration."
+      "summary": "Request filed for freezes and transaction review.",
+      "details": "A motion was filed to freeze relatives’ accounts and review transactions. The court accepted the motion for consideration."
     },
     "2024-08-relatives-freeze": {
       "when_label": "August 2024",
       "title": "Court order on relatives’ accounts",
-      "summary": "Freeze granted for review purposes.",
-      "details": "The court granted a freeze on relatives’ accounts for the purposes of review within the proceedings."
+      "summary": "Freeze granted for verification purposes.",
+      "details": "The court granted a freeze on relatives’ accounts for verification within the ongoing case."
     },
     "2025-07-unfreeze-motion": {
       "when_label": "July 2025",
-      "title": "Motion to modify asset freeze",
-      "summary": "Request filed to fully or partially modify restrictions.",
-      "details": "A motion was filed seeking full or partial modification of the asset freeze on health and treatment‑related grounds. This public version omits medical specifics and counsel’s internal positions."
+      "title": "Motion to modify the asset freeze",
+      "summary": "Request filed for full or partial modification of restrictions.",
+      "details": "A motion was filed to fully or partially modify the asset freeze on grounds related to health and treatment. Medical details and internal positions of representatives are omitted in the public version."
     },
     "2026-11-hearing-scheduled": {
       "when_label": "November 2026",
-      "title": "Hearing on motion scheduled",
-      "summary": "Court scheduled a hearing for November 2026.",
-      "details": "According to the docket, the court scheduled a hearing on the motion for November 2026."
+      "title": "Hearing on the motion scheduled",
+      "summary": "Court set a hearing for November 2026.",
+      "details": "According to the case docket, the court scheduled a hearing on the motion for November 2026."
     }
   }
 }
