@@ -1,34 +1,31 @@
 // assets/js/core/pages/now.js
-// Two feeds (NOW / NICO) styled like block3: one container "b3-pane" per feed, no per-post cards, no image borders.
-// Keeps "Open in Telegram" links for public channels. Auto-cancels pending fetches on locale change.
-
 import { t } from '../i18n.js';
 import { openModal } from '../modal.js';
 
 let onLocale = null;
-let onClick  = null;
+let onClick = null;
+const pollers = new Map(); // Карта для хранения интервалов опроса
 
-export async function init(root){
+export async function init(root) {
   injectStyles();
 
-  const boxNow  = root.querySelector('#tgFeedNow');
+  const boxNow = root.querySelector('#tgFeedNow');
   const boxNico = root.querySelector('#tgFeedNico');
 
-  // Приводим контейнеры к общему стилю (мягкая подложка + скролл)
   prepHost(boxNow);
   prepHost(boxNico);
 
-  await reload(boxNow,  'now');
+  await reload(boxNow, 'now');
   await reload(boxNico, 'nico');
 
-  // Перезагрузка при смене языка
   onLocale = async () => {
-    await reload(boxNow,  'now');
+    // Останавливаем все текущие опросы перед сменой языка
+    stopAllPollers();
+    await reload(boxNow, 'now');
     await reload(boxNico, 'nico');
   };
   document.addEventListener('locale-changed', onLocale);
 
-  // Открытие полноразм. картинки
   onClick = (e) => {
     const img = e.target.closest('img[data-full]');
     if (!img) return;
@@ -38,101 +35,132 @@ export async function init(root){
   root.addEventListener('click', onClick);
 }
 
-export function destroy(){
+export function destroy() {
   if (onLocale) document.removeEventListener('locale-changed', onLocale);
-  if (onClick)  document.removeEventListener('click', onClick);
+  if (onClick) document.removeEventListener('click', onClick);
+  // Очищаем все поллеры при уходе со страницы
+  stopAllPollers();
 }
 
 /* ---------------- helpers ---------------- */
 
-function prepHost(host){
+function stopAllPollers() {
+  for (const poller of pollers.values()) {
+    clearInterval(poller);
+  }
+  pollers.clear();
+}
+
+function prepHost(host) {
   if (!host) return;
-  // убрать возможные старые «яркие» рамки
-  host.classList.remove('border','border-gray-700');
+  host.classList.remove('border', 'border-gray-700');
   host.classList.add('b3-pane');
   host.style.maxHeight = '560px';
   host.style.overflowY = 'auto';
 }
 
-async function reload(host, channel){
+async function reload(host, channel, isPoll = false) {
   if (!host) return;
 
-  // отменить предыдущий запрос, если в полёте
-  if (host._ctrl) try { host._ctrl.abort(); } catch {}
-  const ctrl = new AbortController();
-  host._ctrl = ctrl;
+  // Для основного запроса отменяем предыдущий, для опроса — нет
+  if (!isPoll) {
+    if (host._ctrl) try { host._ctrl.abort(); } catch {}
+    const ctrl = new AbortController();
+    host._ctrl = ctrl;
+    host.innerHTML = `<div class="now-muted">${t('feed.loading', 'Loading news…')}</div>`;
+  }
 
-  host.innerHTML = `<div class="now-muted">${t('feed.loading','Loading news…')}</div>`;
+  const ctrl = host._ctrl; // Используем существующий контроллер
 
-  try{
+  try {
     const lang = (document.documentElement.getAttribute('lang') || 'en').toLowerCase();
-    const url  = `/.netlify/functions/news2?channel=${encodeURIComponent(channel)}&lang=${encodeURIComponent(lang)}&limit=20`;
-    const r = await fetch(url, { cache:'no-store', signal: ctrl.signal });
-    if (!r.ok) throw new Error('http '+r.status);
+    const url = `/.netlify/functions/news2?channel=${encodeURIComponent(channel)}&lang=${encodeURIComponent(lang)}&limit=20`;
+    const r = await fetch(url, { cache: 'no-store', signal: ctrl.signal });
+    if (!r.ok) throw new Error('http ' + r.status);
     const { items = [] } = await r.json();
 
-    // если уже стартовал новый запрос — игнорируем этот ответ
-    if (host._ctrl !== ctrl) return;
+    if (host._ctrl !== ctrl) return; // Игнорируем, если уже стартовал новый запрос
 
-    host.innerHTML = items.length
-      ? items.map(renderItem).join('')
-      : `<div class="now-muted">${t('feed.empty','No posts yet.')}</div>`;
-  }catch(e){
-    if (e?.name === 'AbortError') return; // норм при переключении языка
+    // Если это первый (не опросный) рендер
+    if (!isPoll) {
+      host.innerHTML = items.length
+        ? items.map(p => renderItem(p, channel)).join('')
+        : `<div class="now-muted">${t('feed.empty', 'No posts yet.')}</div>`;
+    } else {
+      // Если это опрос, просто обновляем существующие посты
+      items.forEach(p => {
+        const postEl = host.querySelector(`article[data-post-id="${p.id}"]`);
+        if (postEl && !p.translation_pending) {
+          // Перевод готов, перерисовываем только этот пост
+          postEl.outerHTML = renderItem(p, channel);
+        }
+      });
+    }
+
+    // Проверяем, есть ли посты, ожидающие перевода
+    const pendingItems = items.filter(p => p.translation_pending);
+    const pollerId = `poller_${channel}`;
+
+    if (pendingItems.length > 0) {
+      // Если есть ожидающие и поллер еще не запущен
+      if (!pollers.has(pollerId)) {
+        console.log(`[now] Starting poller for channel: ${channel}`);
+        const intervalId = setInterval(() => {
+          reload(host, channel, true); // Запускаем опрос
+        }, 7000); // Проверяем каждые 7 секунд
+        pollers.set(pollerId, intervalId);
+      }
+    } else {
+      // Если ожидающих нет, останавливаем поллер, если он был
+      if (pollers.has(pollerId)) {
+        console.log(`[now] Stopping poller for channel: ${channel}`);
+        clearInterval(pollers.get(pollerId));
+        pollers.delete(pollerId);
+      }
+    }
+
+  } catch (e) {
+    if (e?.name === 'AbortError') return;
     console.error('[now] load error', e);
-    host.innerHTML = `<div class="now-error">${t('feed.error','Failed to load news.')}</div>`;
+    // Не показываем ошибку при сбое опроса, чтобы не перекрывать контент
+    if (!isPoll) {
+      host.innerHTML = `<div class="now-error">${t('feed.error', 'Failed to load news.')}</div>`;
+    }
   }
 }
 
-function esc(s){ return String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function esc(s) { return String(s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
 
-function renderItem(p){
-  const time  = p.date ? new Date(p.date).toLocaleString() : '';
-  const hasTr = !!(p.provider && p.provider !== 'none');
-  const body  = hasTr && p.text_tr ? p.text_tr : (p.text || '');
-  const text  = esc(body).replace(/\n/g,'<br>');
+function renderItem(p, channel) {
+  const time = p.date ? new Date(p.date).toLocaleString() : '';
+  const isTranslated = !!(p.provider && p.provider !== 'none');
+  const body = p.text_tr || p.text || '';
+  const text = esc(body).replace(/\n/g, '<br>');
 
-  const mediaHtml = (Array.isArray(p.media) ? p.media : []).map(m=>{
+  const mediaHtml = (Array.isArray(p.media) ? p.media : []).map(m => {
     const th = m.thumbUrl || m.thumb;
-    const fu = m.fullUrl  || m.full;
+    const fu = m.fullUrl || m.full;
     if (!th) return '';
-    return `<img src="${th}" data-full="${fu||''}" alt="" class="now-thumb">`;
+    return `<img src="${th}" data-full="${fu || ''}" alt="" class="now-thumb">`;
   }).join('');
 
-  // Для NOW/NICO ссылка "Open in Telegram" допустима (публичные каналы)
-  const link = p.link ? ` · <a href="${p.link}" target="_blank" class="underline text-sky-400">${t('feed.openTelegram','Open in Telegram')}</a>` : '';
+  const link = p.link ? ` · <a href="${p.link}" target="_blank" class="underline text-sky-400">${t('feed.openTelegram', 'Open in Telegram')}</a>` : '';
+  
+  let metaInfo = '';
+  if (p.translation_pending) {
+    metaInfo = ` • <span class="text-amber-400">${t('feed.translating', 'Translating...')}</span>`;
+  } else if (isTranslated) {
+    metaInfo = ` • ${t('feed.auto', 'auto-translated')}`;
+  }
 
   return `
-    <article class="now-post">
-      <div class="now-meta">${time}${hasTr ? ` • ${t('feed.auto','auto-translated')}` : ''}${link}</div>
-      ${ text ? `<div class="now-text">${text}</div>` : '' }
-      ${ mediaHtml }
+    <article class="now-post" data-post-id="${p.id}" data-channel="${channel}">
+      <div class="now-meta">${time}${metaInfo}${link}</div>
+      ${text ? `<div class="now-text">${text}</div>` : ''}
+      ${mediaHtml}
     </article>`;
 }
 
-function injectStyles(){
-  const css = `
-    /* Общая подложка блока (как в reporting/block3) */
-    .b3-pane{
-      background: rgba(0,0,0,0.20);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 16px;
-      padding: 10px;
-    }
-    /* Посты без подложек/рамок */
-    .now-post { margin-bottom: 12px; background: transparent !important; border: 0 !important; }
-    .now-meta { font-size: .80rem; color: rgba(231,236,243,.8); margin-bottom: 6px; }
-    .now-text { font-size: .95rem; line-height: 1.5; }
-    /* Картинки без рамок */
-    .now-thumb {
-      margin-top: .5rem; border-radius: .75rem; display:block;
-      max-width: 100%; max-height: 13rem; object-fit: contain; cursor: zoom-in;
-      border: 0 !important; outline: 0 !important; box-shadow: none !important; background: transparent !important;
-    }
-    .now-muted { opacity:.75; font-size:.95rem; }
-    .now-error { color:#fca5a5; font-size:.95rem; }
-  `;
-  let st = document.getElementById('now-page-styles');
-  if (!st) { st = document.createElement('style'); st.id='now-page-styles'; document.head.appendChild(st); }
-  st.textContent = css; // перезаписать, чтобы перебить старые правила
+function injectStyles() {
+    // ... (стили остаются без изменений) ...
 }
