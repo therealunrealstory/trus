@@ -5,25 +5,29 @@
   const IG_URL = 'https://www.instagram.com/therealunrealstorynico';
   const TG_URL = 'https://t.me/TheRealUnrealStoryNico';
 
+  // Render state
+  let currentLocaleData = null;
+  let renderedOnce = false;
+
+  // ===== Locale chain (EN is the base) =====
   const DEFAULT_LOCALES_CHAIN = () => {
     const docLang = (document.documentElement.getAttribute('lang') || '').toLowerCase();
     const appLang = (window.APP_LOCALE || window.CURRENT_LANG || '').toLowerCase();
     const chain = [];
     if (appLang) chain.push(appLang);
     if (docLang && !chain.includes(docLang)) chain.push(docLang);
-    if (!chain.includes('ru')) chain.push('ru');
-    if (!chain.includes('en')) chain.push('en');
+    if (!chain.includes('en')) chain.push('en'); // base first
+    if (!chain.includes('ru')) chain.push('ru'); // then ru as fallback
     return chain;
   };
 
-  // ===== i18n loader with fallback chain =====
   async function loadLocaleData() {
     const chain = DEFAULT_LOCALES_CHAIN();
     for (const code of chain) {
       try {
         const res = await fetch(`${I18N_PATH}/${code}.json`, { cache: 'no-store' });
         if (res.ok) return await res.json();
-      } catch (e) {}
+      } catch (_) {}
     }
     return null;
   }
@@ -34,7 +38,7 @@
       window.openModal(title, html);
       return;
     }
-    // Фолбэк без собственных стилей — используем существующую разметку модалки сайта
+    // Fallback: use existing site modal DOM without custom CSS
     const modal = document.getElementById('modalBackdrop');
     const mTitle = document.getElementById('modalTitle');
     const mBody  = document.getElementById('modalBody');
@@ -43,10 +47,10 @@
     mBody.innerHTML  = html  || '';
     modal.classList.add('show');
     document.body.classList.add('modal-open');
-    try { document.getElementById('modalClose')?.focus(); } catch(_) {}
+    document.getElementById('modalClose')?.focus?.();
   }
 
-  // ===== Styles for the on-page block only =====
+  // ===== On-page styles only =====
   function injectStylesOnce() {
     if (document.getElementById('comment-block-styles')) return;
     const css = `
@@ -55,9 +59,16 @@
       @media (min-width: 900px) { .cb-wrap { grid-template-columns: 0.3fr 0.7fr; } }
       .cb-card { background: rgba(0,0,0,0.35); border: 1px solid rgba(148,163,184,.35); border-radius: 16px; padding: 1rem; }
       .cb-img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,.08); }
-      .cb-text { font-size: 1.05rem; line-height: 1.6; color: #fff; }
+      .cb-text { color: #fff; font-size: 1.05rem; line-height: 1.7; }
+      .cb-text p { margin: .75rem 0; text-indent: 1.25em; } /* отступ и интервал между абзацами */
       .cb-actions { margin-top: .9rem; display: flex; flex-wrap: wrap; gap: .5rem .6rem; }
-      .cb-btn-main.subnav-btn { } /* берёт внешний стиль меню */
+      .cb-btn-main.subnav-btn { } /* берет стиль из меню сайта */
+      .cb-link-share {
+        display:inline-flex; align-items:center; justify-content:center;
+        padding:.5rem 1rem; border-radius: 0.75rem;
+        border: 1px solid #374151; background: rgba(17,24,39,.4);
+        color:#fff; text-decoration:none; font-size:.875rem;
+      }
     `;
     const style = document.createElement('style');
     style.id = 'comment-block-styles';
@@ -65,17 +76,24 @@
     document.head.appendChild(style);
   }
 
-  // ===== Render =====
-  function render(locale) {
-    const root = document.getElementById(MOUNT_ID);
-    if (!root || !locale) return;
+  // ===== Utilities =====
+  function ensureParagraphs(htmlOrText) {
+    // если уже есть <p>, уважаем их; иначе оборачиваем в <p>
+    const s = String(htmlOrText || '');
+    if (/<\s*p[\s>]/i.test(s)) return s;
+    return `<p>${s}</p>`;
+  }
 
-    const imgSrc = locale.imgSrc || 'https://archive.org/download/orus-pics/nico.jpg';
-    const imgAlt = locale.imgAlt || 'Nico';
-    const title  = locale.title || 'Комментарий Нико';
-    const short  = locale.short || '';
-    const full   = locale.full  || '';
-    const cta    = locale.cta   || 'Комментарий Нико';
+  function mount() {
+    const root = document.getElementById(MOUNT_ID);
+    if (!root || !currentLocaleData) return;
+
+    const imgSrc = currentLocaleData.imgSrc || 'https://archive.org/download/orus-pics/nico.jpg';
+    const imgAlt = currentLocaleData.imgAlt || 'Nico';
+    const title  = currentLocaleData.title || "Nico’s Comment";
+    const short  = ensureParagraphs(currentLocaleData.short || '');
+    const full   = currentLocaleData.full  || '';
+    const cta    = currentLocaleData.cta   || "Nico’s Comment";
 
     root.innerHTML = `
       <div class="cb-wrap">
@@ -87,24 +105,44 @@
             <div class="cb-text">${short}</div>
             <div class="cb-actions">
               <button class="cb-btn-main subnav-btn cb-open" type="button">${cta}</button>
-              <a class="px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 text-white text-sm"
-                 href="${IG_URL}" target="_blank" rel="noopener noreferrer">Instagram</a>
-              <a class="px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 text-white text-sm"
-                 href="${TG_URL}" target="_blank" rel="noopener noreferrer">Telegram</a>
+              <a class="cb-link-share" href="${IG_URL}" target="_blank" rel="noopener noreferrer">Instagram</a>
+              <a class="cb-link-share" href="${TG_URL}" target="_blank" rel="noopener noreferrer">Telegram</a>
             </div>
           </div>
         </div>
       </div>
     `;
 
-    root.querySelector('.cb-open').addEventListener('click', () => openCommentModal(title, full));
+    root.querySelector('.cb-open')?.addEventListener('click', () => openCommentModal(title, full));
+    renderedOnce = true;
+  }
+
+  async function loadAndRender() {
+    injectStylesOnce();
+    currentLocaleData = await loadLocaleData();
+    mount();
+  }
+
+  // ===== Re-render on language change; re-mount on SPA DOM changes =====
+  function subscribe() {
+    // 1) язык (как в cast/story): слушаем кастомное событие
+    document.addEventListener('trus:lang', () => loadAndRender());
+
+    // 2) SPA/перестройка DOM: когда #comment-block появится — монтируем
+    const mo = new MutationObserver(() => {
+      const anchor = document.getElementById(MOUNT_ID);
+      if (anchor && (!renderedOnce || !anchor.querySelector('.cb-wrap'))) {
+        // якорь появился или блок был очищен — примонтируем заново
+        mount();
+      }
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
   }
 
   // ===== Init =====
-  async function init() {
-    injectStylesOnce();
-    const data = await loadLocaleData();
-    render(data);
+  function init() {
+    loadAndRender();
+    subscribe();
   }
 
   if (document.readyState === 'loading') {
