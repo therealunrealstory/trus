@@ -28,12 +28,22 @@
     return null;
   }
 
-  // ===== Open site modal (no custom styles) =====
+  // ===== Open site modal (native styles only) =====
   function openCommentModal(title, html) {
-    // Используем ТОЛЬКО модалку сайта
     if (typeof window.openModal === 'function') {
       window.openModal(title, html);
+      return;
     }
+    // Фолбэк без собственных стилей — используем существующую разметку модалки сайта
+    const modal = document.getElementById('modalBackdrop');
+    const mTitle = document.getElementById('modalTitle');
+    const mBody  = document.getElementById('modalBody');
+    if (!modal || !mTitle || !mBody) return;
+    mTitle.innerHTML = title || '';
+    mBody.innerHTML  = html  || '';
+    modal.classList.add('show');
+    document.body.classList.add('modal-open');
+    try { document.getElementById('modalClose')?.focus(); } catch(_) {}
   }
 
   // ===== Styles for the on-page block only =====
@@ -42,23 +52,12 @@
     const css = `
       #${MOUNT_ID} { margin: 2.5rem 0; }
       .cb-wrap { display: grid; gap: 1.25rem; align-items: start; }
-      @media (min-width: 900px) {
-        .cb-wrap { grid-template-columns: 0.3fr 0.7fr; }
-      }
-      .cb-card {
-        background: rgba(0,0,0,0.35);
-        border: 1px solid rgba(148,163,184,.35);
-        border-radius: 16px;
-        padding: 1rem;
-      }
-      .cb-img {
-        width: 100%; aspect-ratio: 1 / 1; object-fit: cover;
-        border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,.08);
-      }
-      .cb-text { font-size: 1.05rem; line-height: 1.6; color: #fff; } /* белый текст */
+      @media (min-width: 900px) { .cb-wrap { grid-template-columns: 0.3fr 0.7fr; } }
+      .cb-card { background: rgba(0,0,0,0.35); border: 1px solid rgba(148,163,184,.35); border-radius: 16px; padding: 1rem; }
+      .cb-img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,.08); }
+      .cb-text { font-size: 1.05rem; line-height: 1.6; color: #fff; }
       .cb-actions { margin-top: .9rem; display: flex; flex-wrap: wrap; gap: .5rem .6rem; }
-      /* Кнопка "Комментарий Нико" — как меню */
-      .cb-btn-main.subnav-btn { }
+      .cb-btn-main.subnav-btn { } /* берёт внешний стиль меню */
     `;
     const style = document.createElement('style');
     style.id = 'comment-block-styles';
