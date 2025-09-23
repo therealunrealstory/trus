@@ -17,7 +17,7 @@
     if (appLang) chain.push(appLang);
     if (docLang && !chain.includes(docLang)) chain.push(docLang);
     if (!chain.includes('en')) chain.push('en'); // base first
-    if (!chain.includes('ru')) chain.push('ru'); // ru as secondary fallback
+    if (!chain.includes('ru')) chain.push('ru'); // fallback
     return chain;
   };
 
@@ -34,12 +34,12 @@
 
   // ===== Open site modal (native styles only) =====
   function openCommentModal(title, html) {
-    const wrapped = `<div class="cb-full">${html || ''}</div>`;
+    const wrapped = `<div class="cb-full">${toParagraphs(html || '')}</div>`;
     if (typeof window.openModal === 'function') {
       window.openModal(title, wrapped);
       return;
     }
-    // Fallback: используем существующую разметку модалки сайта, без своих тем
+    // Fallback: использовать штатную разметку модалки без своих тем
     const modal = document.getElementById('modalBackdrop');
     const mTitle = document.getElementById('modalTitle');
     const mBody  = document.getElementById('modalBody');
@@ -60,9 +60,11 @@
       @media (min-width: 900px) { .cb-wrap { grid-template-columns: 0.3fr 0.7fr; } }
       .cb-card { background: rgba(0,0,0,0.35); border: 1px solid rgba(148,163,184,.35); border-radius: 16px; padding: 1rem; }
       .cb-img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,.08); }
-      /* Краткая версия на странице — базовый размер, как lead-параграф */
+
+      /* Краткая версия на странице — как lead-параграф */
       .cb-text { color: #fff; font-size: 1rem; line-height: 1.7; }
-      .cb-text p { margin: .75rem 0; text-indent: 1.25em; } /* отступ и интервал на странице */
+      .cb-text p { margin: .75rem 0; text-indent: 1.25em; } /* отступ первой строки + интервалы */
+
       .cb-actions { margin-top: .9rem; display: flex; flex-wrap: wrap; gap: .5rem .6rem; }
       .cb-btn-main.subnav-btn { } /* берет стиль из меню сайта */
       .cb-link-share {
@@ -71,7 +73,8 @@
         border: 1px solid #374151; background: rgba(17,24,39,.4);
         color:#fff; text-decoration:none; font-size:.875rem;
       }
-      /* Абзацы внутри модалки: только типографика (без изменения темы модалки) */
+
+      /* Типографика ПОЛНОГО текста внутри штатной модалки */
       #modalBody .cb-full p { margin: .9rem 0; text-indent: 1.25em; }
     `;
     const style = document.createElement('style');
@@ -82,9 +85,23 @@
 
   // ===== Utilities =====
   function ensureParagraphs(htmlOrText) {
-    const s = String(htmlOrText || '');
-    if (/<\s*p[\s>]/i.test(s)) return s;
+    const s = String(htmlOrText || '').trim();
+    if (!s) return '';
+    if (/<\s*p[\s>]/i.test(s)) return s; // уже есть <p>
+    // одиночный абзац
     return `<p>${s}</p>`;
+  }
+
+  function toParagraphs(htmlOrText) {
+    let s = String(htmlOrText || '').trim();
+    if (!s) return '';
+    // если уже размечено <p> — отдаем как есть
+    if (/<\s*p[\s>]/i.test(s)) return s;
+    // приводим <br> к переводам строки и режем по пустым строкам
+    s = s.replace(/<br\s*\/?>/gi, '\n');
+    const parts = s.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
+    if (parts.length <= 1) return `<p>${s}</p>`;
+    return parts.map(p => `<p>${p}</p>`).join('');
   }
 
   function mount() {
