@@ -655,21 +655,34 @@ export function destroy(){
   }
 
   // вставка секции после #castBlock (или в конец страницы, если блока cast нет)
-  function ensureQrSection(){
-    if (document.getElementById('qrBlock')) return;
-    const section = document.createElement('section');
-    section.id = 'qrBlock';
-    section.setAttribute('aria-labelledby','qrHeading');
-    section.innerHTML = `
-      <h2 id="qrHeading" class="text-xl font-semibold mb-4" data-qrkey="title">
-        Join The Real Unreal Story on social media
-      </h2>
-      <ul id="qrGrid" class="grid grid-cols-5 md:grid-cols-10 gap-3"></ul>
-    `;
-    const after = document.getElementById('castBlock'); // опора на существующий блок cast (см. story.json) :contentReference[oaicite:3]{index=3}
-    if (after && after.parentNode) after.parentNode.insertBefore(section, after.nextSibling);
-    else (document.getElementById('subpage') || document.body).appendChild(section);
-  }
+	// заменить старую ensureQrSection на эту версию
+	function ensureQrSection(){
+	  if (document.getElementById('qrBlock')) return;
+
+	  const section = document.createElement('section');
+	  section.id = 'qrBlock';
+	  section.setAttribute('aria-labelledby','qrHeading');
+	  section.innerHTML = `
+		<h2 id="qrHeading" class="text-xl font-semibold mb-4" data-qrkey="title">
+		  Join The Real Unreal Story on social media
+		</h2>
+		<ul id="qrGrid" class="grid grid-cols-5 md:grid-cols-10 gap-3"></ul>
+	  `;
+
+	  // сначала пытаемся встать сразу под блоком Comment
+	  const anchors = ['comment-block', 'castBlock']; // приоритет: Comment, затем Cast (фолбэк)
+	  let after = null;
+	  for (const id of anchors){
+		const el = document.getElementById(id);
+		if (el){ after = el; break; }
+	  }
+
+	  if (after && after.parentNode) {
+		after.parentNode.insertBefore(section, after.nextSibling);
+	  } else {
+		(document.getElementById('subpage') || document.body).appendChild(section);
+	  }
+	}
 
   function whenQrGridReady(cb){
     const tryNow = () => document.querySelector('#qrGrid');
@@ -735,39 +748,51 @@ export function destroy(){
   }
 
   async function openQrModal(id){
-    const data = await getQrData();
-    const item = (data.qr || []).find(x => x.id === id);
-    if (!item) return;
+  const data = await getQrData();
+  const item = (data.qr || []).find(x => x.id === id);
+  if (!item) return;
 
-    const dict  = QR_I18N || await loadQrLocale(getActiveLang());
-    const d     = dict[id] || {};
-    const title = d.title || id;
-    const desc  = d.desc  || '';
+  const dict  = QR_I18N || await loadQrLocale(getActiveLang());
+  const d     = dict[id] || {};
+  const title = d.title || id;
+  const desc  = d.desc  || '';
+  const btnLabel = (dict['btn.open'] || 'Open'); // en по умолчанию
 
-    const body = `
-      <div class='qr-modal' data-open-id='${id}'>
-        <style>
-          @media (min-width: 769px){
-            .qr-modal { display:flex; gap:16px; align-items:flex-start; }
-            .qr-modal__media { flex:0 0 320px; }
-            .qr-modal__text  { flex:1 1 auto; min-width:0; }
-          }
-          .qr-modal__media img{
-            width:100%; height:auto;
-            border-radius:12px; border:1px solid rgba(148,163,184,.35);
-            background:rgba(0,0,0,.25);
-          }
-        </style>
-        <div class='qr-modal__media'>
-          <img src='${item.thumb}' alt='${title}' loading='eager' decoding='async'/>
-        </div>
-        <div class='qr-modal__text'>
-          <h3 class='text-base font-semibold mb-2' data-qr-title>${title}</h3>
-          <div class='text-sm leading-relaxed' data-qr-desc>${desc}</div>
-        </div>
-      </div>`;
-    openModal(title, body);
-  }
+  const body = `
+    <div class='qr-modal' data-open-id='${id}'>
+      <style>
+        @media (min-width: 769px){
+          .qr-modal { display:flex; gap:16px; align-items:flex-start; }
+          .qr-modal__media { flex:0 0 320px; }
+          .qr-modal__text  { flex:1 1 auto; min-width:0; }
+        }
+        .qr-modal__media img{
+          width:100%; height:auto;
+          border-radius:12px; border:1px solid rgba(148,163,184,.35);
+          background:rgba(0,0,0,.25);
+        }
+        .qr-modal__btn {
+          display:inline-block;
+          margin-top:14px;
+          text-decoration:none !important;
+        }
+      </style>
+      <div class='qr-modal__media'>
+        <img src='${item.thumb}' alt='${title}' loading='eager' decoding='async'/>
+      </div>
+      <div class='qr-modal__text'>
+        <h3 class='text-base font-semibold mb-2' data-qr-title>${title}</h3>
+        <div class='text-sm leading-relaxed' data-qr-desc>${desc}</div>
+        ${item.url ? `
+          <a class="qr-modal__btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 text-white text-sm"
+             href="${item.url}" target="_blank" rel="noopener noreferrer" data-qr-btn>
+            ${btnLabel}
+          </a>` : ``}
+      </div>
+    </div>`;
+  openModal(title, body);
+}
+
 
   function subscribeLocaleChanges(root){
     // вариант через onLocaleChanged (если доступен ваш i18n-эмиттер)

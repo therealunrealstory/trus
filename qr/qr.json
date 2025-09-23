@@ -1,14 +1,14 @@
 {
   "qr": [
-    { "id": "IG",       "thumb": "https://archive.org/download/trus-qr/1.png",  "label": "IG" },
-    { "id": "TT",       "thumb": "https://archive.org/download/trus-qr/2.png",  "label": "TT" },
-    { "id": "YT",       "thumb": "https://archive.org/download/trus-qr/3.png",  "label": "YT" },
-    { "id": "TG",       "thumb": "https://archive.org/download/trus-qr/4.png",  "label": "TG" },
-    { "id": "TG_NOW",   "thumb": "https://archive.org/download/trus-qr/5.png",  "label": "TG Now" },
-    { "id": "X",        "thumb": "https://archive.org/download/trus-qr/6.png",  "label": "X" },
-    { "id": "X_NOW",    "thumb": "https://archive.org/download/trus-qr/7.png",  "label": "X Now" },
-    { "id": "IG_NICO",  "thumb": "https://archive.org/download/trus-qr/8.png",  "label": "IG Nico" },
-    { "id": "TT_NICO",  "thumb": "https://archive.org/download/trus-qr/9.png",  "label": "TT Nico" },
-    { "id": "TG_NICO",  "thumb": "https://archive.org/download/trus-qr/10.png", "label": "TG Nico" }
+    { "id": "IG",       "thumb": "https://archive.org/download/trus-qr/1.png",  "label": "IG",       "url": "https://trus.short.gy/Instagram" },
+    { "id": "TT",       "thumb": "https://archive.org/download/trus-qr/2.png",  "label": "TT",       "url": "https://trus.short.gy/TikTok" },
+    { "id": "YT",       "thumb": "https://archive.org/download/trus-qr/3.png",  "label": "YT",       "url": "https://trus.short.gy/YouTube" },
+    { "id": "TG",       "thumb": "https://archive.org/download/trus-qr/4.png",  "label": "TG",       "url": "https://trus.short.gy/Telegram" },
+    { "id": "TG_NOW",   "thumb": "https://archive.org/download/trus-qr/5.png",  "label": "TG Now",   "url": "https://trus.short.gy/Telegram-Now" },
+    { "id": "X",        "thumb": "https://archive.org/download/trus-qr/6.png",  "label": "X",        "url": "https://trus.short.gy/X" },
+    { "id": "X_NOW",    "thumb": "https://archive.org/download/trus-qr/7.png",  "label": "X Now",    "url": "https://trus.short.gy/X-Now" },
+    { "id": "IG_NICO",  "thumb": "https://archive.org/download/trus-qr/8.png",  "label": "IG Nico",  "url": "https://trus.short.gy/Instagram-Nico" },
+    { "id": "TT_NICO",  "thumb": "https://archive.org/download/trus-qr/9.png",  "label": "TT Nico",  "url": "https://trus.short.gy/TikTok-Nico" },
+    { "id": "TG_NICO",  "thumb": "https://archive.org/download/trus-qr/10.png", "label": "TG Nico",  "url": "https://trus.short.gy/Telegram-Nico" }
   ]
 }
