@@ -308,6 +308,20 @@ function applyResponsiveLayout(root){
 }
 /* ---------------------------------------------------------------- */
 
+// === Comment block: автозагрузка comment.js по наличию якоря ===
+let commentScriptLoaded = false;
+
+function ensureCommentBlock(root){
+  if (commentScriptLoaded) return;
+  const anchor = root.querySelector('#comment-block');
+  if (!anchor) return;
+  const s = document.createElement('script');
+  s.src = '/comment/comment.js';
+  s.defer = true;
+  s.onload = () => { commentScriptLoaded = true; };
+  document.head.appendChild(s);
+}
+
 export function init(root){
   initSounds();
 
@@ -346,6 +360,9 @@ export function init(root){
 
   // Reader cards under headings
   insertReaders(root);
+
+  // Комментарий Нико — подгружаем, если якорь есть
+  ensureCommentBlock(root);
 
   // Responsive: применяем и подписываемся
   applyResponsiveLayout(root);
@@ -613,4 +630,3 @@ export function destroy(){
     });
   });
 })();
-
