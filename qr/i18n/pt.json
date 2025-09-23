@@ -1,0 +1,45 @@
+{
+  "title": "Junte-se a The Real Unreal Story nas redes sociais",
+  "btn.open": "Abrir",
+
+  "IG": {
+    "title": "Instagram",
+    "desc": "A história é publicada por capítulos: cada post é um capítulo com uma breve capa em vídeo. É um bom ponto de entrada para conhecer e ler em um fluxo visual. Após o ciclo principal, adicionaremos séries fotográficas temáticas e vídeos curtos/médios que aprofundam os eventos e os personagens — seus sentimentos e perspectivas. Também aparecerão cenas e trechos que ficaram fora do relato central. Publicações em inglês."
+  },
+  "TT": {
+    "title": "TikTok",
+    "desc": "A história é publicada por capítulos: cada vídeo é uma mini-capítulo em ordem cronológica. Formato exclusivamente em vídeo. Após o ciclo principal, adicionaremos conjuntos de vídeos curtos/médios que expandem eventos e personagens. Também aparecerão cenas e episódios fora do núcleo da narrativa. Publicações em inglês."
+  },
+  "YT": {
+    "title": "YouTube",
+    "desc": "Prioridade para Shorts: mini-capítulos e capas em vídeo agrupados em playlists para visualização sequencial. Diferente de Instagram e TikTok, a estrutura do canal facilita explorar por playlists separadas (“História por capítulos”, “Personagens”, “Cenas extras”). Ocasionalmente publicamos episódios de formato longo — cenas completas com integrações musicais. Publicações em inglês."
+  },
+  "TG": {
+    "title": "Telegram",
+    "desc": "Um navegador sóbrio para público internacional: pouco carregado de visual, com fios de eventos organizados do início à continuação. A linha canônica cobre os fatos até julho de 2025; os episódios posteriores serão publicados como atualizações em blocos. Há atalhos práticos para texto, áudio e vídeo, além de dicas para escolher idioma e acessar localizações. Está previsto um bot do Telegram: abrir a história em todos os idiomas dentro do app, receber resumos ocasionais e usar recursos extras, incluindo um canal de contato. Publicações em inglês."
+  },
+  "TG_NOW": {
+    "title": "Telegram Now",
+    "desc": "Registro cronológico de notas: de julho de 2023 até o presente, documenta eventos que comprovam a história principal e mostram seu desenvolvimento em tempo real. Por padrão, as entradas são em inglês; para leitores internacionais, o canal funciona em conjunto com o site: as publicações são importadas automaticamente e ficam disponíveis em nove idiomas. Você pode instalar o site como aplicativo para seguir confortavelmente a cadeia “passado → presente → próximas atualizações”."
+  },
+  "X": {
+    "title": "X",
+    "desc": "Entrega visual da história: em vez de textos longos, usamos séries de imagens organizadas em threads. Isso permite apresentar capítulos como sequências estilo quadrinhos, mantendo a cronologia e adicionando cenas além do enredo principal. As threads formam uma corrente visual clara e deixam espaço para a imaginação: onde o site e outros canais trazem o relato completo, aqui o sentido se monta a partir das imagens. Publicações em inglês."
+  },
+  "X_NOW": {
+    "title": "X Now",
+    "desc": "Feed de atualizações ultracurtas sobre eventos atuais e participantes: extratos factuais sem longas explicações, práticos para acompanhar o “aqui e agora”. Por padrão, as publicações são em inglês; não há integração de tradução automática com o site, portanto, para leitura multilíngue recomendamos o Telegram em conjunto com o site. Funcionalmente se aproxima do formato “acompanhar a história”, mas o X é familiar para muitos e funciona bem como canal rápido de follow."
+  },
+  "IG_NICO": {
+    "title": "Instagram Nico",
+    "desc": "Uma das plataformas-chave do ecossistema The Real Unreal Story. Aqui saem as notas pessoais de Nico: atualizações organizacionais (o que foi feito, o que está previsto, ideias em andamento) e posts sobre eventos ao redor de Nico, Adam e outros. Diferente do relato canônico narrado de forma distanciada, este feed capta uma perspectiva pessoal: como os episódios foram vividos, o que se sentiu no momento, como a compreensão foi se formando. O foco é o visual — fotos e vídeos são a forma principal; o texto acompanha sem dominar. Ocasionalmente publicamos capturas editadas de conversas originais como fontes primárias, com moderação e respeito à privacidade. Publicações em inglês."
+  },
+  "TT_NICO": {
+    "title": "TikTok Nico",
+    "desc": "Vídeos curtos/médios do autor de The Real Unreal Story. Transmitem como Nico vivenciou as pessoas e os momentos ao redor de Adam — o clima das cenas, o ritmo dos lugares, a dinâmica das interações. Diferente do Instagram Nico, aqui não há capturas de conversas, atualizações organizacionais nem textos extensos: o foco é a experiência visual e o movimento do quadro. Publicações em inglês."
+  },
+  "TG_NICO": {
+    "title": "Telegram Nico",
+    "desc": "Feed voltado ao texto, do autor. Reúne notas de sentido — como Nico viveu os episódios, o que pensou sobre eventos e pessoas ao redor de Adam — e atualizações organizacionais cuidadosas (o que foi feito e o que vem a seguir). O visual é moderado e somente em imagens; não há vídeo. Por padrão, as entradas são em inglês; para o público internacional, o canal funciona em conjunto com o site: os posts são importados automaticamente e ficam disponíveis em nove idiomas. Instalar o site como aplicativo facilita acompanhar a cronologia e as atualizações sem barreira de idioma. O canal mantém um vínculo semântico com o autor; para conteúdo visual mais rico de Nico — clipes e mini-cenas — recorra a Instagram Nico e TikTok Nico."
+  }
+}
