@@ -837,3 +837,20 @@ body.modal-open{ overflow:hidden; }
 .bg-gray-900\/40 { background-color: rgba(17,24,39,.4); }
 .text-gray-300 { color: #D1D5DB; }
 .text-xs { font-size: 0.75rem; line-height: 1rem; }
+
+/* Универсальная типографика для текста в модалках/ридере */
+.rtxt p { 
+  margin: 0 0 1em !important;  /* расстояние между абзацами */
+  line-height: 1.65; 
+}
+.rtxt p:last-child { margin-bottom: 0 !important; }
+
+/* Отступ первой строки только там, где отмечено .indent */
+.rtxt p.indent { 
+  text-indent: 1.5em !important; 
+}
+
+/* На всякий случай отключим конфликтующие white-space */
+.rtxt { 
+  white-space: normal; 
+}
