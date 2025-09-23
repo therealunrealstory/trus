@@ -8,16 +8,35 @@
   // Render state
   let currentLocaleData = null;
   let renderedOnce = false;
+  let lastLang = null;
+  let langPollTimer = 0;
 
-  // ===== Locale chain (EN is the base) =====
+  // ===== Lang helpers (EN is the base) =====
+  function normLang(raw) {
+    if (!raw) return '';
+    let s = String(raw).toLowerCase();
+    // сокращаем pt-BR -> pt
+    if (s.includes('-')) s = s.split('-')[0];
+    return s;
+  }
+
+  function getActiveLang() {
+    try {
+      // если на сайте есть глобальный i18n с getLocale
+      const fromI18n = (window.i18n && typeof window.i18n.getLocale === 'function' && window.i18n.getLocale()) || '';
+      const fromHtml = document.documentElement.getAttribute('lang') || '';
+      return normLang(fromI18n || fromHtml || '');
+    } catch (_) {
+      return normLang(document.documentElement.getAttribute('lang') || '');
+    }
+  }
+
   const DEFAULT_LOCALES_CHAIN = () => {
-    const docLang = (document.documentElement.getAttribute('lang') || '').toLowerCase();
-    const appLang = (window.APP_LOCALE || window.CURRENT_LANG || '').toLowerCase();
+    const appLang = normLang(window.APP_LOCALE || window.CURRENT_LANG || getActiveLang());
     const chain = [];
     if (appLang) chain.push(appLang);
-    if (docLang && !chain.includes(docLang)) chain.push(docLang);
-    if (!chain.includes('en')) chain.push('en'); // base first
-    if (!chain.includes('ru')) chain.push('ru'); // fallback
+    if (!chain.includes('en')) chain.push('en'); // base
+    if (!chain.includes('ru')) chain.push('ru'); // secondary fallback
     return chain;
   };
 
@@ -39,7 +58,7 @@
       window.openModal(title, wrapped);
       return;
     }
-    // Fallback: использовать штатную разметку модалки без своих тем
+    // Fallback: используем штатную разметку модалки без своих тем
     const modal = document.getElementById('modalBackdrop');
     const mTitle = document.getElementById('modalTitle');
     const mBody  = document.getElementById('modalBody');
@@ -63,7 +82,7 @@
 
       /* Краткая версия на странице — как lead-параграф */
       .cb-text { color: #fff; font-size: 1rem; line-height: 1.7; }
-      .cb-text p { margin: .75rem 0; text-indent: 1.25em; } /* отступ первой строки + интервалы */
+      .cb-text p { margin: .75rem 0; text-indent: 1.25em; }
 
       .cb-actions { margin-top: .9rem; display: flex; flex-wrap: wrap; gap: .5rem .6rem; }
       .cb-btn-main.subnav-btn { } /* берет стиль из меню сайта */
@@ -87,17 +106,14 @@
   function ensureParagraphs(htmlOrText) {
     const s = String(htmlOrText || '').trim();
     if (!s) return '';
-    if (/<\s*p[\s>]/i.test(s)) return s; // уже есть <p>
-    // одиночный абзац
+    if (/<\s*p[\s>]/i.test(s)) return s;
     return `<p>${s}</p>`;
   }
 
   function toParagraphs(htmlOrText) {
     let s = String(htmlOrText || '').trim();
     if (!s) return '';
-    // если уже размечено <p> — отдаем как есть
     if (/<\s*p[\s>]/i.test(s)) return s;
-    // приводим <br> к переводам строки и режем по пустым строкам
     s = s.replace(/<br\s*\/?>/gi, '\n');
     const parts = s.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
     if (parts.length <= 1) return `<p>${s}</p>`;
@@ -143,21 +159,41 @@
     mount();
   }
 
-  // ===== Re-render on language change; re-mount on SPA DOM changes =====
-  function subscribe() {
-    document.addEventListener('trus:lang', () => loadAndRender());
+  // ===== React to language changes robustly =====
+  function onLangMaybeChanged() {
+    const now = getActiveLang();
+    if (now && now !== lastLang) {
+      lastLang = now;
+      loadAndRender();
+    }
+  }
 
-    const mo = new MutationObserver(() => {
+  function subscribe() {
+    // 1) кастомное событие, которое уже используется в проекте
+    document.addEventListener('trus:lang', onLangMaybeChanged);
+
+    // 2) атрибут lang на <html>
+    const htmlMo = new MutationObserver(onLangMaybeChanged);
+    htmlMo.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+
+    // 3) периодическая проверка (на случай смены языка без событий)
+    if (!langPollTimer) {
+      langPollTimer = setInterval(onLangMaybeChanged, 1000);
+    }
+
+    // 4) SPA/перестройка DOM — монтируем, если якорь появился
+    const domMo = new MutationObserver(() => {
       const anchor = document.getElementById(MOUNT_ID);
       if (anchor && (!renderedOnce || !anchor.querySelector('.cb-wrap'))) {
         mount();
       }
     });
-    mo.observe(document.body, { childList: true, subtree: true });
+    domMo.observe(document.body, { childList: true, subtree: true });
   }
 
   // ===== Init =====
   function init() {
+    lastLang = getActiveLang() || 'en';
     loadAndRender();
     subscribe();
   }
