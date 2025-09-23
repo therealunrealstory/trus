@@ -621,6 +621,8 @@ export function destroy(){
     });
   });
 })();
+
+
 // === QR MODULE ===
 ;(() => {
   const QR_BASE = '/qr';
@@ -654,47 +656,66 @@ export function destroy(){
     return QR_DATA;
   }
 
-  // вставка секции после #castBlock (или в конец страницы, если блока cast нет)
-	// заменить старую ensureQrSection на эту версию
-	function ensureQrSection(){
-	  if (document.getElementById('qrBlock')) return;
+  // ——— вставка секции под Comment (фолбэк под Cast, затем в конец subpage)
+  function ensureQrSection(){
+    if (document.getElementById('qrBlock')) return;
 
-	  const section = document.createElement('section');
-	  section.id = 'qrBlock';
-	  section.setAttribute('aria-labelledby','qrHeading');
-	  section.innerHTML = `
-		<h2 id="qrHeading" class="text-xl font-semibold mb-4" data-qrkey="title">
-		  Join The Real Unreal Story on social media
-		</h2>
-		<ul id="qrGrid" class="grid grid-cols-5 md:grid-cols-10 gap-3"></ul>
-	  `;
+    const section = document.createElement('section');
+    section.id = 'qrBlock';
+    section.setAttribute('aria-labelledby','qrHeading');
+    section.innerHTML = `
+      <h2 id="qrHeading" class="text-xl font-semibold mb-4" data-qrkey="title">
+        Join The Real Unreal Story on social media
+      </h2>
+      <ul id="qrGrid" class="grid grid-cols-5 md:grid-cols-10 gap-3"></ul>
+    `;
 
-	  // сначала пытаемся встать сразу под блоком Comment
-	  const anchors = ['comment-block', 'castBlock']; // приоритет: Comment, затем Cast (фолбэк)
-	  let after = null;
-	  for (const id of anchors){
-		const el = document.getElementById(id);
-		if (el){ after = el; break; }
-	  }
+    const anchors = ['comment-block', 'castBlock'];
+    let after = null;
+    for (const id of anchors){
+      const el = document.getElementById(id);
+      if (el){ after = el; break; }
+    }
 
-	  if (after && after.parentNode) {
-		after.parentNode.insertBefore(section, after.nextSibling);
-	  } else {
-		(document.getElementById('subpage') || document.body).appendChild(section);
-	  }
-	}
+    if (after && after.parentNode) {
+      after.parentNode.insertBefore(section, after.nextSibling);
+    } else {
+      (document.getElementById('subpage') || document.body).appendChild(section);
+    }
+  }
+
+  // ——— keep-alive сторож: возвращает секцию, если её снёс роутер/смена языка
+  function keepQrAlive(){
+    const target = document.getElementById('subpage') || document.body;
+    const mo = new MutationObserver(() => {
+      const anchor = document.getElementById('comment-block') || document.getElementById('castBlock');
+      const hasQr  = !!document.getElementById('qrBlock');
+      if (anchor && !hasQr){
+        ensureQrSection();
+        const grid = document.getElementById('qrGrid');
+        if (grid && grid.children.length === 0){
+          renderQr(document).catch(console.error);
+        }
+      }
+    });
+    mo.observe(target, { childList:true, subtree:true });
+  }
 
   function whenQrGridReady(cb){
-    const tryNow = () => document.querySelector('#qrGrid');
+    const tryNow = () => {
+      ensureQrSection(); // секция могла исчезнуть — восстанавливаем
+      return document.querySelector('#qrGrid');
+    };
     const grid = tryNow();
     if (grid) { cb(); return; }
     if (QR_GRID_OBS) return;
     QR_GRID_OBS = true;
+    const target = document.getElementById('subpage') || document.body;
     const mo = new MutationObserver(() => {
       const g = tryNow();
       if (g) { mo.disconnect(); QR_GRID_OBS = false; cb(); }
     });
-    mo.observe(document.body, { childList:true, subtree:true });
+    mo.observe(target, { childList:true, subtree:true });
   }
 
   async function renderQr(root){
@@ -731,7 +752,7 @@ export function destroy(){
     const titleEl = root.querySelector('[data-qrkey="title"]');
     if (titleEl && QR_I18N.title) titleEl.textContent = QR_I18N.title;
 
-    // если открыта модалка — обновим заголовок/описание под язык
+    // если открыта модалка — обновим заголовок/описание/кнопку под язык
     const box = document.querySelector('#modalBody .qr-modal');
     if (box) {
       const openId = box.getAttribute('data-open-id');
@@ -741,6 +762,8 @@ export function destroy(){
         const bEl = box.querySelector('[data-qr-desc]');
         if (tEl) tEl.textContent = d.title || openId;
         if (bEl) bEl.textContent = d.desc  || '';
+        const btnEl = box.querySelector('[data-qr-btn]');
+        if (btnEl) btnEl.textContent = (QR_I18N['btn.open'] || 'Open');
         const modalTitle = document.querySelector('#modalTitle');
         if (modalTitle) modalTitle.textContent = d.title || openId;
       }
@@ -748,58 +771,58 @@ export function destroy(){
   }
 
   async function openQrModal(id){
-  const data = await getQrData();
-  const item = (data.qr || []).find(x => x.id === id);
-  if (!item) return;
+    const data = await getQrData();
+    const item = (data.qr || []).find(x => x.id === id);
+    if (!item) return;
 
-  const dict  = QR_I18N || await loadQrLocale(getActiveLang());
-  const d     = dict[id] || {};
-  const title = d.title || id;
-  const desc  = d.desc  || '';
-  const btnLabel = (dict['btn.open'] || 'Open'); // en по умолчанию
+    const dict  = QR_I18N || await loadQrLocale(getActiveLang());
+    const d     = dict[id] || {};
+    const title = d.title || id;
+    const desc  = d.desc  || '';
+    const btnLabel = (dict['btn.open'] || 'Open'); // en по умолчанию
 
-  const body = `
-    <div class='qr-modal' data-open-id='${id}'>
-      <style>
-        @media (min-width: 769px){
-          .qr-modal { display:flex; gap:16px; align-items:flex-start; }
-          .qr-modal__media { flex:0 0 320px; }
-          .qr-modal__text  { flex:1 1 auto; min-width:0; }
-        }
-        .qr-modal__media img{
-          width:100%; height:auto;
-          border-radius:12px; border:1px solid rgba(148,163,184,.35);
-          background:rgba(0,0,0,.25);
-        }
-        .qr-modal__btn {
-          display:inline-block;
-          margin-top:14px;
-          text-decoration:none !important;
-        }
-      </style>
-      <div class='qr-modal__media'>
-        <img src='${item.thumb}' alt='${title}' loading='eager' decoding='async'/>
-      </div>
-      <div class='qr-modal__text'>
-        <h3 class='text-base font-semibold mb-2' data-qr-title>${title}</h3>
-        <div class='text-sm leading-relaxed' data-qr-desc>${desc}</div>
-        ${item.url ? `
-          <a class="qr-modal__btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 text-white text-sm"
-             href="${item.url}" target="_blank" rel="noopener noreferrer" data-qr-btn>
-            ${btnLabel}
-          </a>` : ``}
-      </div>
-    </div>`;
-  openModal(title, body);
-}
-
+    const body = `
+      <div class='qr-modal' data-open-id='${id}'>
+        <style>
+          @media (min-width: 769px){
+            .qr-modal { display:flex; gap:16px; align-items:flex-start; }
+            .qr-modal__media { flex:0 0 320px; }
+            .qr-modal__text  { flex:1 1 auto; min-width:0; }
+          }
+          .qr-modal__media img{
+            width:100%; height:auto;
+            border-radius:12px; border:1px solid rgba(148,163,184,.35);
+            background:rgba(0,0,0,.25);
+          }
+          .qr-modal__btn {
+            display:inline-block;
+            margin-top:14px;
+            text-decoration:none !important;
+          }
+        </style>
+        <div class='qr-modal__media'>
+          <img src='${item.thumb}' alt='${title}' loading='eager' decoding='async'/>
+        </div>
+        <div class='qr-modal__text'>
+          <h3 class='text-base font-semibold mb-2' data-qr-title>${title}</h3>
+          <div class='text-sm leading-relaxed' data-qr-desc>${desc}</div>
+          ${item.url ? `
+            <a class="qr-modal__btn px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 text-white text-sm"
+               href="${item.url}" target="_blank" rel="noopener noreferrer" data-qr-btn>
+              ${btnLabel}
+            </a>` : ``}
+        </div>
+      </div>`;
+    openModal(title, body);
+  }
 
   function subscribeLocaleChanges(root){
-    // вариант через onLocaleChanged (если доступен ваш i18n-эмиттер)
+    // через onLocaleChanged (если доступен ваш i18n-эмиттер)
     if (typeof window.onLocaleChanged === 'function') {
       window.onLocaleChanged(({ detail }) => {
         const next = (detail && detail.lang) || document.documentElement.lang || 'en';
         setTimeout(() => {
+          ensureQrSection(); // секция могла пропасть
           whenQrGridReady(() => {
             const grid = document.querySelector('#qrGrid');
             const needRender = !grid || grid.children.length === 0;
@@ -810,10 +833,12 @@ export function destroy(){
       });
       return;
     }
-    // совместимость с вашим кастомным событием (как в cast) :contentReference[oaicite:4]{index=4}
+
+    // совместимость с кастомным событием
     document.addEventListener('trus:lang', (e)=> {
       const next = e?.detail?.lang;
       setTimeout(() => {
+        ensureQrSection();
         whenQrGridReady(() => {
           const grid = document.querySelector('#qrGrid');
           const needRender = !grid || grid.children.length === 0;
@@ -823,6 +848,7 @@ export function destroy(){
       }, 0);
     });
 
+    // подстрахуемся при любых мутациях DOM
     new MutationObserver(() => {
       const grid = document.querySelector('#qrGrid');
       if (grid && grid.children.length === 0) {
@@ -834,6 +860,7 @@ export function destroy(){
   function onReady(fn){ if (document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
   onReady(()=>{
     const root = document;
+    keepQrAlive();                // — keep-alive сторож
     ensureQrSection();
     whenQrGridReady(() => {
       renderQr(root).then(()=> subscribeLocaleChanges(root)).catch(console.error);
