@@ -1,6 +1,6 @@
 {
   "page": {
-    "title": "Cronología legal",
+    "title": "Cronología jurídica",
     "loading": "Cargando…",
     "errorLoadGeneric": "No se pudieron cargar los datos",
     "errorLoadJson": "No se pudo cargar el JSON"
@@ -10,14 +10,14 @@
     "updated_short": "Actualizado: {date} • {user}"
   },
   "legend": {
-    "pre": "Supuestos previos (antes de la demanda)",
-    "base": "Período del litigio",
-    "freeze": "Período de embargo de activos",
-    "future": "Perspectivas legales (más adelante)",
+    "pre": "Antecedentes (previos a la demanda)",
+    "base": "Periodo de litigio",
+    "freeze": "Periodo de congelación de activos",
+    "future": "Perspectiva jurídica (por delante)",
     "event": "Evento",
     "eventHint": "(clicable)",
     "eventClickable": "Evento (clicable)",
-    "now": "Momento actual"
+    "now": "Tiempo actual"
   },
   "tooltip": {
     "dot": "Evento — haga clic para ver detalles"
@@ -27,7 +27,7 @@
   },
   "modal": {
     "close": "Cerrar",
-    "more": "Más detalles",
+    "more": "Más",
     "less": "Contraer",
     "clusterTitle": "Eventos ({count})",
     "singleTitle": "{when} — {title}"
@@ -46,102 +46,105 @@
     "Noviembre",
     "Diciembre"
   ],
+
+  "Event (clickable)": "Evento (clicable)",
+
   "items": {
     "2020-09-will-mother": {
-      "when_label": "September 2020",
+      "when_label": "Septiembre de 2020",
       "title": "Testamento de la madre nombrando a Adam",
-      "summary": "Fallecimiento de la madre; testamento que nombra a Adam.",
-      "details": "Según los registros disponibles, la madre de Adam falleció en septiembre de 2020 y dejó un testamento en el que lo nombraba. En ese momento no constaban controversias en el tribunal."
+      "summary": "Fallecimiento de la madre; testamento en el que se nombra a Adam.",
+      "details": "En septiembre de 2020 falleció la madre de Adam y dejó un testamento en el que lo nombra heredero. En ese momento no se registró ninguna disputa judicial."
     },
     "2021-04-father-dx-will": {
-      "when_label": "April 2021",
+      "when_label": "Abril de 2021",
       "title": "Testamento del padre confirmado",
       "summary": "Testamento a favor de Adam confirmado antes del fallecimiento del padre.",
-      "details": "Para abril de 2021, el padre de Adam ya había otorgado un testamento a favor de Adam. Los detalles médicos de terceros se omiten en la versión pública."
+      "details": "Para abril de 2021 el padre de Adam había otorgado un testamento a favor de Adam; posteriormente este documento fue confirmado. La información médica de terceros se omite en la versión pública."
     },
     "2021-07-father-death-claims": {
-      "when_label": "July 2021",
-      "title": "Fallecimiento del padre; demandas de impugnación de testamentos",
+      "when_label": "Julio de 2021",
+      "title": "Fallecimiento del padre; demandas para impugnar los testamentos",
       "summary": "Familiares presentaron demandas impugnando los testamentos de los padres.",
-      "details": "En julio de 2021, tras el fallecimiento del padre, se presentaron demandas para impugnar los testamentos de los padres. Se aplicaron restricciones provisionales mientras se examinaba el asunto."
+      "details": "En julio de 2021, tras el fallecimiento del padre, se presentaron demandas para impugnar los testamentos de los padres. Con el inicio del proceso se impusieron restricciones temporales hasta su revisión."
     },
     "2021-07-asset-freeze": {
-      "when_label": "Since July 2021",
-      "title": "Embargo judicial de activos y restricciones",
-      "summary": "El embargo de cuentas y bienes inmuebles sigue vigente.",
-      "details": "Se impuso por orden judicial un embargo de activos y restricciones relacionadas sobre cuentas y bienes inmuebles. El embargo permanece en vigor."
+      "when_label": "Desde julio de 2021",
+      "title": "Congelación judicial de activos y restricciones",
+      "summary": "La congelación de cuentas y bienes inmuebles sigue en vigor.",
+      "details": "Por orden judicial se congelaron cuentas bancarias y bienes inmuebles con las restricciones correspondientes. La medida permanece en vigor."
     },
     "2021-09-apartment-dispute": {
-      "when_label": "September 2021",
-      "title": "Controversia sobre el uso del apartamento de Adam",
-      "summary": "Disputa sobre el uso durante el embargo de bienes.",
-      "details": "Durante un viaje para evaluación médica, surgió una controversia sobre el uso del apartamento de Adam. Las cuestiones de residencia y uso quedaron sujetas al embargo vigente y a actuaciones posteriores."
+      "when_label": "Septiembre de 2021",
+      "title": "Disputa por el uso del apartamento de Adam",
+      "summary": "Disputa de uso durante el periodo de congelación de activos.",
+      "details": "Durante un viaje médico surgió una disputa sobre el uso del apartamento de Adam. Las cuestiones de acceso estaban vinculadas a la congelación vigente y a pasos procesales posteriores."
     },
     "2021-11-prelim-scheduled": {
-      "when_label": "November 2021",
+      "when_label": "Noviembre de 2021",
       "title": "Se programa audiencia preliminar",
       "summary": "Audiencia preliminar fijada para julio de 2024.",
-      "details": "El tribunal programó una audiencia preliminar del caso sucesorio para julio de 2024."
+      "details": "El tribunal programó la audiencia preliminar del caso de herencia para julio de 2024."
     },
     "2022-03-hearing-travel": {
-      "when_label": "March 2022 (beginning)",
-      "title": "Audiencia sobre permiso para viajar por tratamiento",
-      "summary": "El tribunal consideró el permiso para viajar al extranjero por tratamiento.",
-      "details": "El tribunal examinó la concesión a Adam de permiso para viajar al extranjero por tratamiento. Los demandantes presentaron objeciones; se realizó una evaluación médico-forense designada por el tribunal."
+      "when_label": "Marzo de 2022 (inicio)",
+      "title": "Audiencia sobre permiso para viajar a tratamiento",
+      "summary": "El tribunal consideró permitir viajar al extranjero para terapia.",
+      "details": "El tribunal examinó conceder a Adam permiso para viajar al extranjero a fin de recibir terapia. Los demandantes presentaron objeciones; se realizó una pericia médico-forense."
     },
     "2022-03-permission-travel": {
-      "when_label": "March 2022 (end)",
-      "title": "Concedido permiso para viajar por tratamiento",
-      "summary": "El tribunal autorizó el viaje al extranjero para la terapia.",
-      "details": "El tribunal concedió la solicitud de Adam y autorizó el viaje al extranjero para recibir la terapia."
+      "when_label": "Marzo de 2022 (final)",
+      "title": "Se concede permiso para viajar a tratamiento",
+      "summary": "El tribunal autorizó viajar al extranjero para la terapia.",
+      "details": "El tribunal estimó la solicitud de Adam y autorizó el viaje al extranjero para someterse a la terapia."
     },
     "2022-05-visit-med-exam": {
-      "when_label": "May 2022",
-      "title": "Incidente en el domicilio; criterio del tribunal sobre exámenes",
-      "summary": "El tribunal confirmó que los exámenes requieren consentimiento o base legal.",
-      "details": "Un incidente en el domicilio de Adam dio lugar a la intervención policial. El tribunal aclaró que los exámenes médicos obligatorios requieren consentimiento o una base legal válida. En relación con el incidente se aplicaron medidas restrictivas sobre el acceso."
+      "when_label": "Mayo de 2022",
+      "title": "Incidente en el domicilio; aclaraciones del tribunal sobre exámenes",
+      "summary": "El tribunal confirmó: los exámenes requieren consentimiento o base legal.",
+      "details": "Un incidente en el domicilio de Adam derivó en intervención policial. El tribunal aclaró que los exámenes médicos obligatorios solo son posibles con consentimiento u otra base legal. Se aplicaron medidas restrictivas respecto al acceso."
     },
     "2024-06-eviction-start": {
-      "when_label": "June 2024 (end)",
-      "title": "Inicio de actuaciones de desahucio respecto de un pariente",
-      "summary": "Se inicia el proceso de desahucio; posteriormente revisado por el tribunal.",
-      "details": "A finales de junio de 2024 se iniciaron actuaciones de desahucio respecto de un pariente que ocupaba el apartamento de Adam. Posteriormente el tribunal no apreció infracciones procesales en la presentación."
+      "when_label": "Junio de 2024 (final)",
+      "title": "Se inicia desahucio respecto a un familiar",
+      "summary": "Proceso de desahucio iniciado; posteriormente revisado por el tribunal.",
+      "details": "A finales de junio de 2024 se inició un proceso de desahucio contra un familiar que ocupaba el apartamento de Adam. Posteriormente el tribunal no halló infracciones procesales en la presentación."
     },
     "2024-07-docs-fee": {
-      "when_label": "July 2024 (beginning)",
-      "title": "Presentación de documentos; tasa judicial abonada",
-      "summary": "Se presentaron documentos procesales; se abonó la tasa requerida.",
-      "details": "Antes de la audiencia preliminar se presentaron documentos procesales. Se abonó la tasa judicial requerida (el importe se omite en la versión pública)."
+      "when_label": "Julio de 2024 (inicio)",
+      "title": "Presentación de documentos; tasa judicial pagada",
+      "summary": "Se presentaron escritos procesales; se pagó la tasa obligatoria.",
+      "details": "Antes de la audiencia preliminar se presentaron documentos procesales. Se pagó la tasa judicial obligatoria (el importe se omite en la versión pública)."
     },
     "2024-07-prelim-hearing": {
-      "when_label": "July 2024 (middle)",
-      "title": "Audiencia preliminar; se delinean escenarios",
-      "summary": "El tribunal expuso posibles desenlaces; hubo conversaciones de acuerdo.",
-      "details": "En la audiencia preliminar, el tribunal expuso posibles desenlaces de la controversia sucesoria. Las conversaciones sobre un acuerdo no dieron resultado."
+      "when_label": "Julio de 2024 (mitad)",
+      "title": "Audiencia preliminar; se esbozan escenarios",
+      "summary": "El tribunal expuso posibles resultados; se mencionaron conversaciones de acuerdo.",
+      "details": "En la audiencia preliminar el tribunal expuso posibles escenarios de la disputa sucesoria. Las conversaciones sobre un acuerdo no dieron resultado."
     },
     "2024-07-motion-freeze-relatives": {
-      "when_label": "July 2024 (middle)",
-      "title": "Moción relativa a las cuentas de familiares",
-      "summary": "Se solicitó embargo y revisión de operaciones.",
-      "details": "Se presentó una moción solicitando el embargo de cuentas de familiares y la revisión de operaciones. El tribunal tomó la moción en consideración."
+      "when_label": "Julio de 2024 (mitad)",
+      "title": "Solicitud respecto a cuentas de familiares",
+      "summary": "Se pidió congelación y revisión de operaciones.",
+      "details": "Se presentó una moción para congelar cuentas de familiares y revisar operaciones. El tribunal la admitió a trámite."
     },
     "2024-08-relatives-freeze": {
-      "when_label": "August 2024",
-      "title": "Orden judicial sobre cuentas de familiares",
-      "summary": "Embargo concedido con fines de revisión.",
-      "details": "El tribunal concedió el embargo de cuentas de familiares con fines de revisión dentro del procedimiento."
+      "when_label": "Agosto de 2024",
+      "title": "Auto judicial sobre cuentas de familiares",
+      "summary": "Se concedió la congelación con fines de verificación.",
+      "details": "El tribunal concedió la congelación de cuentas de familiares con fines de verificación en el marco del caso en curso."
     },
     "2025-07-unfreeze-motion": {
-      "when_label": "July 2025",
-      "title": "Moción para modificar el embargo de activos",
+      "when_label": "Julio de 2025",
+      "title": "Moción para modificar la congelación de activos",
       "summary": "Se solicitó modificar total o parcialmente las restricciones.",
-      "details": "Se presentó una moción para modificar total o parcialmente el embargo de activos por motivos relacionados con la salud y el tratamiento. En la versión pública se omiten detalles médicos y posiciones internas de la defensa."
+      "details": "Se presentó una moción para modificar total o parcialmente la congelación de activos por motivos relacionados con la salud y el tratamiento. Los detalles médicos y posiciones internas de los representantes se omiten en la versión pública."
     },
     "2026-11-hearing-scheduled": {
-      "when_label": "November 2026",
+      "when_label": "Noviembre de 2026",
       "title": "Se programa audiencia sobre la moción",
-      "summary": "El tribunal fijó una audiencia para noviembre de 2026.",
-      "details": "Según el expediente, el tribunal fijó una audiencia sobre la moción para noviembre de 2026."
+      "summary": "El tribunal fijó audiencia para noviembre de 2026.",
+      "details": "Según el expediente, el tribunal programó una audiencia sobre la moción para noviembre de 2026."
     }
   }
 }

@@ -1,0 +1,44 @@
+{
+  "title": "Join The Real Unreal Story on social media",
+
+  "IG": {
+    "title": "Instagram",
+    "desc": "The story is released chapter-by-chapter: each post is a chapter with a short video cover. It’s a good place for a first look and for reading in a visual, swipeable flow. After the main cycle finishes, we’ll add thematic photo series and short/medium videos that go deeper into events and characters—their feelings and perspectives. You’ll also find extra scenes and fragments outside the core narrative. Posts are in English."
+  },
+  "TT": {
+    "title": "TikTok",
+    "desc": "The story is published chapter-by-chapter: each video is a mini-chapter in chronological order. Format: video only. After the main cycle, we’ll add short/medium sets that expand on events and characters. Extra scenes and episodes that didn’t fit the core narrative will also appear. Posts are in English."
+  },
+  "YT": {
+    "title": "YouTube",
+    "desc": "Shorts are the priority: mini-chapters and video covers grouped into playlists for sequential viewing. Unlike Instagram and TikTok, the channel structure makes it easy to explore via separate playlists (“Story by Chapters”, “Characters”, “Extra Scenes”). Occasionally we publish long-form episodes—complete scenes with musical integrations. Posts are in English."
+  },
+  "TG": {
+    "title": "Telegram",
+    "desc": "A restrained navigator for an international audience: light on visuals, with tidy event threads from the beginning into the continuation. The canonical line covers events up to July 2025; later episodes will be published as bundled updates. There are convenient jumps to text, audio, and video, plus tips for choosing language and localizations. A Telegram bot is planned: open the story in all languages inside the app, receive occasional update digests, and use extra features including a contact channel. Posts are in English."
+  },
+  "TG_NOW": {
+    "title": "Telegram Now",
+    "desc": "A chronological log of notes from July 2023 to the present, recording events that verify the main story and show its development in real time. Entries are in English by default; for international readers the channel is linked with the site, where posts are auto-pulled and available in nine languages. Install the site as an app to comfortably follow the chain “past → present → further updates”."
+  },
+  "X": {
+    "title": "X",
+    "desc": "A visual delivery of the story: instead of long texts we use image series arranged into threads. This lets us lay out chapters like comic-style sequences, keeping chronology and adding scenes beyond the main plot. Threads form a clear visual chain and leave room for imagination: where the site and other channels give the full narrative, here meaning is assembled from images. Posts are in English."
+  },
+  "X_NOW": {
+    "title": "X Now",
+    "desc": "A feed of ultra-short updates about current events and participants: factual snippets without long explanations, convenient for tracking the here-and-now. Posts are in English by default; there’s no auto-translation integration with the site, so for multilingual reading we recommend Telegram paired with the site. Functionally overlaps with “follow the story”, but X is familiar and works well as a quick follow channel."
+  },
+  "IG_NICO": {
+    "title": "Instagram Nico",
+    "desc": "One of the key platforms in The Real Unreal Story ecosystem. It features Nico’s personal notes: organizational updates (what’s done, what’s planned, working ideas) and posts about events around Nico, Adam, and others. Unlike the canonical story told in a detached narrative voice, this feed captures a personal perspective—how episodes were lived, what was felt, how understanding formed. Emphasis is on visuals (photos and videos); text supports without dominating. Sometimes we post redacted screenshots of original chats with participants as primary sources—sparingly and with respect for privacy. Posts in English."
+  },
+  "TT_NICO": {
+    "title": "TikTok Nico",
+    "desc": "Short/medium videos from the author of The Real Unreal Story. They convey how Nico experienced the people and moments around Adam—the mood of scenes, the rhythm of places, the dynamics of interactions. Unlike Instagram Nico, there are no chat screenshots, organizational updates, or extended text explanations: the focus is purely on visual experience and motion. Posts are in English."
+  },
+  "TG_NICO": {
+    "title": "Telegram Nico",
+    "desc": "A text-first feed by the author. It collects meaning-focused notes—how Nico lived through episodes, what he thought about events and people around Adam—plus careful organizational updates (what’s been done and what’s next). Visuals are modest and image-only; no video. Entries are in English by default; for international readers the channel works together with the site, where posts are auto-pulled and available in nine languages. Installing the site as an app makes it easy to follow the timeline and updates without a language barrier. The channel keeps a semantic link with the author; for rich visual content by Nico—clips and mini-scenes—see Instagram Nico and TikTok Nico."
+  }
+}

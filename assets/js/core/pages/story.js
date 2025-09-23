@@ -621,3 +621,197 @@ export function destroy(){
     });
   });
 })();
+// === QR MODULE ===
+;(() => {
+  const QR_BASE = '/qr';
+  let QR_DATA = null;
+  let QR_I18N = null;
+  let QR_GRID_OBS = false;
+
+  function normLang(raw){
+    if (!raw) return 'en';
+    let s = String(raw).toLowerCase();
+    if (s.includes('-')) s = s.split('-')[0];
+    const map = { zh:'cn', cn:'cn', ar:'ar', de:'de', es:'es', fr:'fr', it:'it', pt:'pt', ru:'ru', en:'en' };
+    return map[s] || 'en';
+  }
+  function getActiveLang(){
+    try {
+      const fromI18n = (window.i18n && typeof i18n.getLocale === 'function' && i18n.getLocale()) || '';
+      const fromHtml = document.documentElement.lang || '';
+      return normLang(fromI18n || fromHtml || 'en');
+    } catch(_){ return 'en'; }
+  }
+  async function j(u){ const r=await fetch(u,{cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }
+  async function loadQrLocale(langRaw){
+    const l = normLang(langRaw || getActiveLang());
+    try { return await j(`${QR_BASE}/i18n/${l}.json`); }
+    catch(_){ return await j(`${QR_BASE}/i18n/en.json`); }
+  }
+  async function getQrData(){
+    if (QR_DATA) return QR_DATA;
+    QR_DATA = await j(`${QR_BASE}/qr.json`);
+    return QR_DATA;
+  }
+
+  // вставка секции после #castBlock (или в конец страницы, если блока cast нет)
+  function ensureQrSection(){
+    if (document.getElementById('qrBlock')) return;
+    const section = document.createElement('section');
+    section.id = 'qrBlock';
+    section.setAttribute('aria-labelledby','qrHeading');
+    section.innerHTML = `
+      <h2 id="qrHeading" class="text-xl font-semibold mb-4" data-qrkey="title">
+        Join The Real Unreal Story on social media
+      </h2>
+      <ul id="qrGrid" class="grid grid-cols-5 md:grid-cols-10 gap-3"></ul>
+    `;
+    const after = document.getElementById('castBlock'); // опора на существующий блок cast (см. story.json) :contentReference[oaicite:3]{index=3}
+    if (after && after.parentNode) after.parentNode.insertBefore(section, after.nextSibling);
+    else (document.getElementById('subpage') || document.body).appendChild(section);
+  }
+
+  function whenQrGridReady(cb){
+    const tryNow = () => document.querySelector('#qrGrid');
+    const grid = tryNow();
+    if (grid) { cb(); return; }
+    if (QR_GRID_OBS) return;
+    QR_GRID_OBS = true;
+    const mo = new MutationObserver(() => {
+      const g = tryNow();
+      if (g) { mo.disconnect(); QR_GRID_OBS = false; cb(); }
+    });
+    mo.observe(document.body, { childList:true, subtree:true });
+  }
+
+  async function renderQr(root){
+    ensureQrSection();
+    const grid = root.querySelector('#qrGrid');
+    if (!grid || grid.children.length) return;
+
+    const data = await getQrData();
+    const frag = document.createDocumentFragment();
+    (data.qr || []).forEach(item => {
+      const id = item.id;
+      const li = document.createElement('li');
+      li.className = 'text-center';
+      li.innerHTML = `
+        <button class='group w-full' data-qr-id='${id}'>
+          <span class='block aspect-square overflow-hidden rounded-2xl border border-gray-700 bg-gray-900/40'>
+            <img src='${item.thumb}' alt='' loading='lazy' decoding='async'
+                 class='w-full h-full object-contain select-none pointer-events-none'/>
+          </span>
+          <span class='mt-1 block text-xs text-gray-300'>${item.label || id}</span>
+        </button>
+      `;
+      li.querySelector('button').addEventListener('click', () => openQrModal(id));
+      frag.appendChild(li);
+    });
+    grid.replaceChildren(frag);
+
+    await applyQrLocale(root, getActiveLang());
+  }
+
+  async function applyQrLocale(root, langFromEvent){
+    QR_I18N = await loadQrLocale(langFromEvent || getActiveLang());
+
+    const titleEl = root.querySelector('[data-qrkey="title"]');
+    if (titleEl && QR_I18N.title) titleEl.textContent = QR_I18N.title;
+
+    // если открыта модалка — обновим заголовок/описание под язык
+    const box = document.querySelector('#modalBody .qr-modal');
+    if (box) {
+      const openId = box.getAttribute('data-open-id');
+      if (openId) {
+        const d = QR_I18N[openId] || {};
+        const tEl = box.querySelector('[data-qr-title]');
+        const bEl = box.querySelector('[data-qr-desc]');
+        if (tEl) tEl.textContent = d.title || openId;
+        if (bEl) bEl.textContent = d.desc  || '';
+        const modalTitle = document.querySelector('#modalTitle');
+        if (modalTitle) modalTitle.textContent = d.title || openId;
+      }
+    }
+  }
+
+  async function openQrModal(id){
+    const data = await getQrData();
+    const item = (data.qr || []).find(x => x.id === id);
+    if (!item) return;
+
+    const dict  = QR_I18N || await loadQrLocale(getActiveLang());
+    const d     = dict[id] || {};
+    const title = d.title || id;
+    const desc  = d.desc  || '';
+
+    const body = `
+      <div class='qr-modal' data-open-id='${id}'>
+        <style>
+          @media (min-width: 769px){
+            .qr-modal { display:flex; gap:16px; align-items:flex-start; }
+            .qr-modal__media { flex:0 0 320px; }
+            .qr-modal__text  { flex:1 1 auto; min-width:0; }
+          }
+          .qr-modal__media img{
+            width:100%; height:auto;
+            border-radius:12px; border:1px solid rgba(148,163,184,.35);
+            background:rgba(0,0,0,.25);
+          }
+        </style>
+        <div class='qr-modal__media'>
+          <img src='${item.thumb}' alt='${title}' loading='eager' decoding='async'/>
+        </div>
+        <div class='qr-modal__text'>
+          <h3 class='text-base font-semibold mb-2' data-qr-title>${title}</h3>
+          <div class='text-sm leading-relaxed' data-qr-desc>${desc}</div>
+        </div>
+      </div>`;
+    openModal(title, body);
+  }
+
+  function subscribeLocaleChanges(root){
+    // вариант через onLocaleChanged (если доступен ваш i18n-эмиттер)
+    if (typeof window.onLocaleChanged === 'function') {
+      window.onLocaleChanged(({ detail }) => {
+        const next = (detail && detail.lang) || document.documentElement.lang || 'en';
+        setTimeout(() => {
+          whenQrGridReady(() => {
+            const grid = document.querySelector('#qrGrid');
+            const needRender = !grid || grid.children.length === 0;
+            if (needRender) renderQr(root).then(()=> applyQrLocale(root, next));
+            else applyQrLocale(root, next);
+          });
+        }, 0);
+      });
+      return;
+    }
+    // совместимость с вашим кастомным событием (как в cast) :contentReference[oaicite:4]{index=4}
+    document.addEventListener('trus:lang', (e)=> {
+      const next = e?.detail?.lang;
+      setTimeout(() => {
+        whenQrGridReady(() => {
+          const grid = document.querySelector('#qrGrid');
+          const needRender = !grid || grid.children.length === 0;
+          if (needRender) renderQr(root).then(()=> applyQrLocale(root, next));
+          else applyQrLocale(root, next);
+        });
+      }, 0);
+    });
+
+    new MutationObserver(() => {
+      const grid = document.querySelector('#qrGrid');
+      if (grid && grid.children.length === 0) {
+        renderQr(document).catch(console.error);
+      }
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+
+  function onReady(fn){ if (document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+  onReady(()=>{
+    const root = document;
+    ensureQrSection();
+    whenQrGridReady(() => {
+      renderQr(root).then(()=> subscribeLocaleChanges(root)).catch(console.error);
+    });
+  });
+})();

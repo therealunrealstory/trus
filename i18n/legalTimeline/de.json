@@ -1,22 +1,22 @@
 {
   "page": {
-    "title": "Juristische Zeitleiste",
+    "title": "Juristische Chronologie",
     "loading": "Wird geladen…",
-    "errorLoadGeneric": "Fehler beim Laden der Daten",
-    "errorLoadJson": "Fehler beim Laden der JSON-Datei"
+    "errorLoadGeneric": "Daten konnten nicht geladen werden",
+    "errorLoadJson": "JSON konnte nicht geladen werden"
   },
   "meta": {
     "updated": "Aktualisiert: {date} • {user} • Version: {version}",
     "updated_short": "Aktualisiert: {date} • {user}"
   },
   "legend": {
-    "pre": "Voraussetzungen (vor Klageerhebung)",
-    "base": "Zeitraum des Rechtsstreits",
+    "pre": "Vorgeschichte (vor der Klage)",
+    "base": "Zeitraum des Gerichtsverfahrens",
     "freeze": "Zeitraum der Vermögenssperre",
-    "future": "Rechtliche Perspektiven (Ausblick)",
+    "future": "Rechtlicher Ausblick (vor uns)",
     "event": "Ereignis",
-    "eventHint": "(anklickbar)",
-    "eventClickable": "Ereignis (anklickbar)",
+    "eventHint": "(klickbar)",
+    "eventClickable": "Ereignis (klickbar)",
     "now": "Aktuelle Zeit"
   },
   "tooltip": {
@@ -27,7 +27,7 @@
   },
   "modal": {
     "close": "Schließen",
-    "more": "Mehr Details",
+    "more": "Mehr",
     "less": "Einklappen",
     "clusterTitle": "Ereignisse ({count})",
     "singleTitle": "{when} — {title}"
@@ -46,102 +46,105 @@
     "November",
     "Dezember"
   ],
+
+  "Event (clickable)": "Ereignis (klickbar)",
+
   "items": {
     "2020-09-will-mother": {
       "when_label": "September 2020",
-      "title": "Testament der Mutter, das Adam benennt",
+      "title": "Testament der Mutter mit Benennung Adams",
       "summary": "Tod der Mutter; Testament, in dem Adam benannt ist.",
-      "details": "Den verfügbaren Unterlagen zufolge verstarb Adams Mutter im September 2020 und hinterließ ein Testament, in dem er benannt ist. Zu diesem Zeitpunkt waren vor Gericht keine Streitigkeiten registriert."
+      "details": "Im September 2020 verstarb Adams Mutter und hinterließ ein Testament, das Adam als Erben benennt. Zu diesem Zeitpunkt war kein Rechtsstreit registriert."
     },
     "2021-04-father-dx-will": {
       "when_label": "April 2021",
       "title": "Testament des Vaters bestätigt",
       "summary": "Testament zugunsten Adams vor dem Tod des Vaters bestätigt.",
-      "details": "Bis April 2021 hatte Adams Vater bereits ein Testament zugunsten Adams errichtet. Medizinische Angaben zu Dritten sind in der öffentlichen Version ausgelassen."
+      "details": "Bis April 2021 hatte Adams Vater ein Testament zugunsten Adams errichtet; dieses Dokument wurde später bestätigt. Medizinische Angaben zu Dritten sind in der öffentlichen Fassung ausgelassen."
     },
     "2021-07-father-death-claims": {
-      "when_label": "July 2021",
+      "when_label": "Juli 2021",
       "title": "Tod des Vaters; Klagen zur Anfechtung der Testamente",
-      "summary": "Verwandte reichten Klagen zur Anfechtung der elterlichen Testamente ein.",
-      "details": "Im Juli 2021, nach dem Tod des Vaters, wurden Klagen zur Anfechtung der Testamente der Eltern eingereicht. Im Verfahren wurden bis zur Prüfung vorläufige Beschränkungen angewandt."
+      "summary": "Verwandte reichten Klagen gegen die Testamente der Eltern ein.",
+      "details": "Im Juli 2021, nach dem Tod des Vaters, wurden Klagen zur Anfechtung der Testamente der Eltern eingereicht. Mit Beginn des Verfahrens wurden bis zur Prüfung vorübergehende Beschränkungen verhängt."
     },
     "2021-07-asset-freeze": {
-      "when_label": "Since July 2021",
+      "when_label": "Seit Juli 2021",
       "title": "Gerichtlich angeordnete Vermögenssperre und Beschränkungen",
       "summary": "Sperre von Konten und Immobilien bleibt in Kraft.",
-      "details": "Durch Gerichtsbeschluss wurden eine Vermögenssperre und entsprechende Beschränkungen für Konten und Immobilien verhängt. Die Sperre bleibt bestehen."
+      "details": "Per Gerichtsbeschluss wurden Bankkonten und Immobilien mit entsprechenden Beschränkungen gesperrt. Die Sperre besteht weiterhin."
     },
     "2021-09-apartment-dispute": {
       "when_label": "September 2021",
       "title": "Streit über die Nutzung von Adams Wohnung",
       "summary": "Nutzungsstreit während der Vermögenssperre.",
-      "details": "Während einer Reise zur medizinischen Begutachtung entstand ein Streit über die Nutzung von Adams Wohnung. Fragen zu Wohnsitz und Nutzung unterlagen der laufenden Sperre und weiteren Verfahrensschritten."
+      "details": "Während einer Reise zu medizinischen Untersuchungen entstand ein Streit über die Nutzung von Adams Wohnung. Zugangsfragen standen im Zusammenhang mit der bestehenden Sperre und weiteren prozessualen Schritten."
     },
     "2021-11-prelim-scheduled": {
       "when_label": "November 2021",
-      "title": "Vorläufige Anhörung angesetzt",
-      "summary": "Vorläufige Anhörung für Juli 2024 festgesetzt.",
-      "details": "Das Gericht setzte eine vorläufige Anhörung im Nachlassverfahren für Juli 2024 an."
+      "title": "Vorverhandlung terminiert",
+      "summary": "Vorverhandlung auf Juli 2024 angesetzt.",
+      "details": "Das Gericht setzte die Vorverhandlung im Erbfall für Juli 2024 an."
     },
     "2022-03-hearing-travel": {
-      "when_label": "March 2022 (beginning)",
-      "title": "Anhörung zur Erlaubnis einer Auslandsreise zur Behandlung",
-      "summary": "Gericht prüfte Erlaubnis zur Auslandsreise für Behandlung.",
-      "details": "Das Gericht prüfte, Adam die Erlaubnis zu erteilen, zur Behandlung ins Ausland zu reisen. Die Kläger reichten Einwendungen ein; ein gerichtlich bestelltes medizinisches Gutachten wurde durchgeführt."
+      "when_label": "März 2022 (Anfang)",
+      "title": "Anhörung zur Ausreisegenehmigung zwecks Behandlung",
+      "summary": "Gericht prüfte Genehmigung für Auslandsreise zur Therapie.",
+      "details": "Das Gericht prüfte, Adam eine Ausreisegenehmigung für eine Therapie im Ausland zu erteilen. Die Kläger erhoben Einwände; es wurde ein rechtsmedizinisches Gutachten durchgeführt."
     },
     "2022-03-permission-travel": {
-      "when_label": "March 2022 (end)",
-      "title": "Reiseerlaubnis für Behandlung erteilt",
-      "summary": "Gericht genehmigte Auslandsreise für Therapie.",
-      "details": "Das Gericht gab Adams Antrag statt und genehmigte die Auslandsreise zur Therapie."
+      "when_label": "März 2022 (Ende)",
+      "title": "Ausreisegenehmigung zur Behandlung erteilt",
+      "summary": "Gericht erlaubte die Auslandsreise zur Therapie.",
+      "details": "Das Gericht gab Adams Antrag statt und erlaubte die Auslandsreise zur Durchführung der Therapie."
     },
     "2022-05-visit-med-exam": {
-      "when_label": "May 2022",
-      "title": "Vorfall am Wohnort; Klarstellung des Gerichts zu Untersuchungen",
-      "summary": "Gericht bestätigte: Untersuchungen benötigen Zustimmung oder Rechtsgrundlage.",
-      "details": "Ein Vorfall am Wohnort Adams führte zum Einschreiten der Polizei. Das Gericht stellte klar, dass verpflichtende medizinische Untersuchungen eine Einwilligung oder eine gültige Rechtsgrundlage erfordern. Im Zusammenhang mit dem Vorfall wurden Zugangsbeschränkungen angeordnet."
+      "when_label": "Mai 2022",
+      "title": "Vorfall in der Wohnung; gerichtliche Klarstellungen zu Untersuchungen",
+      "summary": "Gericht bestätigte: Untersuchungen erfordern Einwilligung oder Rechtsgrundlage.",
+      "details": "Ein Vorfall in Adams Wohnung führte zum Einschreiten der Polizei. Das Gericht stellte klar, dass verpflichtende medizinische Untersuchungen nur mit Einwilligung oder anderer Rechtsgrundlage möglich sind. Es wurden Zugangsbeschränkungen angeordnet."
     },
     "2024-06-eviction-start": {
-      "when_label": "June 2024 (end)",
-      "title": "Einleitung eines Räumungsverfahrens gegen Angehörigen",
-      "summary": "Räumungsverfahren eingeleitet; später gerichtlich überprüft.",
-      "details": "Ende Juni 2024 wurde ein Räumungsverfahren gegen einen Angehörigen eingeleitet, der Adams Wohnung bewohnte. Das Gericht stellte später keine Verfahrensverstöße bei der Einreichung fest."
+      "when_label": "Juni 2024 (Ende)",
+      "title": "Einleitung einer Räumung gegenüber einem Verwandten",
+      "summary": "Räumungsverfahren eingeleitet; später gerichtlich geprüft.",
+      "details": "Ende Juni 2024 wurde ein Räumungsverfahren gegen einen Verwandten eingeleitet, der Adams Wohnung bewohnte. Das Gericht stellte später keine Verfahrensverstöße bei der Einreichung fest."
     },
     "2024-07-docs-fee": {
-      "when_label": "July 2024 (beginning)",
-      "title": "Einreichung von Unterlagen; Gerichtsgebühr bezahlt",
-      "summary": "Verfahrensunterlagen eingereicht; erforderliche Gebühr bezahlt.",
-      "details": "Vor der vorläufigen Anhörung wurden Verfahrensunterlagen eingereicht. Die erforderliche Gerichtsgebühr wurde bezahlt (Betrag wird in der öffentlichen Version nicht offengelegt)."
+      "when_label": "Juli 2024 (Anfang)",
+      "title": "Schriftsätze eingereicht; Gerichtsgebühr bezahlt",
+      "summary": "Prozessunterlagen eingereicht; obligatorische Gebühr entrichtet.",
+      "details": "Vor der Vorverhandlung wurden Prozessunterlagen eingereicht. Die obligatorische Gerichtsgebühr wurde bezahlt (Betrag in der öffentlichen Fassung nicht genannt)."
     },
     "2024-07-prelim-hearing": {
-      "when_label": "July 2024 (middle)",
-      "title": "Vorläufige Anhörung; Szenarien skizziert",
-      "summary": "Gericht skizzierte mögliche Ausgänge; Gespräche über Vergleich vermerkt.",
-      "details": "In der vorläufigen Anhörung skizzierte das Gericht mögliche Ausgänge des Erbstreits. Gespräche über einen Vergleich führten zu keinem Ergebnis."
+      "when_label": "Juli 2024 (Mitte)",
+      "title": "Vorverhandlung; mögliche Szenarien skizziert",
+      "summary": "Gericht skizzierte mögliche Ausgänge; Vergleichsgespräche erwähnt.",
+      "details": "In der Vorverhandlung skizzierte das Gericht mögliche Szenarien des Erbstreits. Vergleichsgespräche führten zu keinem Ergebnis."
     },
     "2024-07-motion-freeze-relatives": {
-      "when_label": "July 2024 (middle)",
-      "title": "Antrag bezüglich Konten von Angehörigen",
-      "summary": "Antrag auf Sperre und Prüfung von Transaktionen gestellt.",
-      "details": "Es wurde ein Antrag gestellt, die Konten von Angehörigen zu sperren und Transaktionen zu prüfen. Das Gericht nahm den Antrag zur Kenntnis."
+      "when_label": "Juli 2024 (Mitte)",
+      "title": "Antrag zu Konten von Verwandten",
+      "summary": "Beantragt wurden Sperren und Prüfung von Transaktionen.",
+      "details": "Es wurde ein Antrag gestellt, Konten von Verwandten zu sperren und Transaktionen zu prüfen. Das Gericht nahm den Antrag zur Prüfung an."
     },
     "2024-08-relatives-freeze": {
       "when_label": "August 2024",
-      "title": "Gerichtliche Anordnung zu Konten von Angehörigen",
-      "summary": "Sperre zu Prüfzwecken gewährt.",
-      "details": "Das Gericht gewährte eine Sperre der Konten von Angehörigen zu Prüfzwecken innerhalb des Verfahrens."
+      "title": "Gerichtliche Anordnung zu Konten von Verwandten",
+      "summary": "Sperre zu Prüfzwecken angeordnet.",
+      "details": "Das Gericht ordnete zu Prüfzwecken eine Sperre der Konten von Verwandten im laufenden Verfahren an."
     },
     "2025-07-unfreeze-motion": {
-      "when_label": "July 2025",
+      "when_label": "Juli 2025",
       "title": "Antrag auf Änderung der Vermögenssperre",
-      "summary": "Antrag auf vollständige oder teilweise Änderung der Beschränkungen gestellt.",
-      "details": "Ein Antrag wurde gestellt, die Vermögenssperre ganz oder teilweise zu ändern, aus Gründen im Zusammenhang mit Gesundheit und Behandlung. In der öffentlichen Version sind medizinische Einzelheiten und interne Positionen der Vertretung ausgelassen."
+      "summary": "Beantragt: vollständige oder teilweise Modifikation der Beschränkungen.",
+      "details": "Ein Antrag wurde gestellt, die Vermögenssperre vollständig oder teilweise zu ändern — mit Gründen im Zusammenhang mit Gesundheit und Behandlung. Medizinische Details und interne Positionen der Vertreter sind in der öffentlichen Fassung ausgelassen."
     },
     "2026-11-hearing-scheduled": {
       "when_label": "November 2026",
-      "title": "Anhörung zum Antrag angesetzt",
-      "summary": "Gericht setzte Anhörung für November 2026 an.",
-      "details": "Laut Gerichtsregister setzte das Gericht eine Anhörung zum Antrag für November 2026 an."
+      "title": "Termin zur Anhörung über den Antrag festgesetzt",
+      "summary": "Gericht setzte eine Anhörung für November 2026 an.",
+      "details": "Laut Aktenlage setzte das Gericht eine Anhörung über den Antrag für November 2026 an."
     }
   }
 }

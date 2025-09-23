@@ -2,18 +2,18 @@
   "page": {
     "title": "法律时间线",
     "loading": "正在加载…",
-    "errorLoadGeneric": "数据加载失败",
-    "errorLoadJson": "JSON 加载失败"
+    "errorLoadGeneric": "无法加载数据",
+    "errorLoadJson": "无法加载 JSON"
   },
   "meta": {
     "updated": "更新：{date} • {user} • 版本：{version}",
     "updated_short": "更新：{date} • {user}"
   },
   "legend": {
-    "pre": "前置条件（起诉前）",
-    "base": "诉讼期间",
+    "pre": "背景（起诉前）",
+    "base": "诉讼期",
     "freeze": "资产冻结期",
-    "future": "法律前景（后续）",
+    "future": "法律展望（后续）",
     "event": "事件",
     "eventHint": "（可点击）",
     "eventClickable": "事件（可点击）",
@@ -27,7 +27,7 @@
   },
   "modal": {
     "close": "关闭",
-    "more": "更多详情",
+    "more": "更多",
     "less": "收起",
     "clusterTitle": "事件（{count}）",
     "singleTitle": "{when} — {title}"
@@ -46,102 +46,105 @@
     "十一月",
     "十二月"
   ],
+
+  "Event (clickable)": "事件（可点击）",
+
   "items": {
     "2020-09-will-mother": {
-      "when_label": "September 2020",
-      "title": "母亲的遗嘱指定 Adam",
-      "summary": "母亲去世；遗嘱指定 Adam。",
-      "details": "据现有记录，2020 年 9 月 Adam 的母亲去世，并留下遗嘱指定 Adam。当时法院未记录相关争议。"
+      "when_label": "2020年9月",
+      "title": "母亲遗嘱指定 Adam",
+      "summary": "母亲去世；遗嘱中指定 Adam。",
+      "details": "2020年9月，Adam 的母亲去世，留下遗嘱将 Adam 指定为继承人。当时未记录到相关诉讼。"
     },
     "2021-04-father-dx-will": {
-      "when_label": "April 2021",
-      "title": "父亲遗嘱已确认",
-      "summary": "在父亲去世前，遗嘱已确认由 Adam 受益。",
-      "details": "截至 2021 年 4 月，Adam 的父亲已立下以 Adam 为受益人的遗嘱。涉及第三方的医疗信息在公开版本中予以省略。"
+      "when_label": "2021年4月",
+      "title": "父亲遗嘱获确认",
+      "summary": "父亲去世前确认了对 Adam 有利的遗嘱。",
+      "details": "截至2021年4月，Adam 的父亲已立下对 Adam 有利的遗嘱；该文件随后得到确认。涉及第三方的医疗信息在公开版本中省略。"
     },
     "2021-07-father-death-claims": {
-      "when_label": "July 2021",
-      "title": "父亲去世；提交遗嘱争议之诉",
-      "summary": "亲属提交了对父母遗嘱的争议之诉。",
-      "details": "2021 年 7 月，父亲去世后，针对父母遗嘱的争议诉讼被提起。案件在审查期间适用临时限制措施。"
+      "when_label": "2021年7月",
+      "title": "父亲去世；提起诉讼以质疑遗嘱",
+      "summary": "亲属提起诉讼，质疑父母的遗嘱。",
+      "details": "2021年7月，父亲去世后，亲属提起诉讼以质疑父母的遗嘱。案件启动时，法院在审查期间施加了临时限制措施。"
     },
     "2021-07-asset-freeze": {
-      "when_label": "Since July 2021",
-      "title": "法院下令资产冻结及相关限制",
-      "summary": "账户与不动产冻结仍在生效。",
-      "details": "依据法院命令，对账户与不动产实施资产冻结及相关限制。冻结仍然有效。"
+      "when_label": "自2021年7月起",
+      "title": "法院裁定资产冻结与限制",
+      "summary": "账户与不动产的冻结仍然有效。",
+      "details": "根据法院裁定，银行账户与不动产被冻结并附带相应限制。冻结措施仍在生效。"
     },
     "2021-09-apartment-dispute": {
-      "when_label": "September 2021",
-      "title": "关于 Adam 公寓使用的争议",
-      "summary": "在资产冻结期间就使用问题产生争议。",
-      "details": "在前往进行医疗评估的行程中，围绕 Adam 公寓的使用出现争议。关于居住与使用的问题被纳入既有冻结及后续程序处理。"
+      "when_label": "2021年9月",
+      "title": "关于使用 Adam 公寓的争议",
+      "summary": "资产冻结期间的使用权争议。",
+      "details": "在一次就医出行期间，围绕 Adam 公寓的使用产生争议。出入问题与既有冻结及后续程序步骤相关。"
     },
     "2021-11-prelim-scheduled": {
-      "when_label": "November 2021",
-      "title": "预审听证已排期",
-      "summary": "预审听证定于 2024 年 7 月。",
-      "details": "法院将继承案件的预审听证排期至 2024 年 7 月。"
+      "when_label": "2021年11月",
+      "title": "预审排期确定",
+      "summary": "预审定于2024年7月举行。",
+      "details": "法院将该继承案件的预审排期定于2024年7月。"
     },
     "2022-03-hearing-travel": {
-      "when_label": "March 2022 (beginning)",
-      "title": "关于治疗出境许可的听证",
-      "summary": "法院审议了出境接受治疗的许可。",
-      "details": "法院审议向 Adam 授予出境接受治疗的许可。原告提交了异议；并进行了法院指定的医学评估。"
+      "when_label": "2022年3月（月初）",
+      "title": "关于出境就医许可的听证",
+      "summary": "法院审议允许为治疗而出境。",
+      "details": "法院审议是否准予 Adam 出境接受治疗。原告方提出异议；并进行了法医医学鉴定。"
     },
     "2022-03-permission-travel": {
-      "when_label": "March 2022 (end)",
-      "title": "批准治疗出境许可",
-      "summary": "法院允许出境接受治疗。",
-      "details": "法院支持了 Adam 的申请，准许其出境接受治疗。"
+      "when_label": "2022年3月（月末）",
+      "title": "出境就医许可获批",
+      "summary": "法院允许为治疗而出境。",
+      "details": "法院准许了 Adam 的申请，允许其出境接受治疗。"
     },
     "2022-05-visit-med-exam": {
-      "when_label": "May 2022",
-      "title": "住所发生事件；法院就检查作出说明",
-      "summary": "法院确认：检查须经同意或具备法律依据。",
-      "details": "Adam 住所发生的事件引发警方介入。法院说明，强制性医学检查须取得同意或具有有效法律依据。与该事件相关的出入限制措施已被适用。"
+      "when_label": "2022年5月",
+      "title": "住所发生事件；法院就体检作出澄清",
+      "summary": "法院确认：体检须基于同意或法律依据。",
+      "details": "Adam 住所发生事件并引发警方介入。法院澄清，强制性医疗检查仅在获得同意或具备其他法律依据时方可进行。就出入事宜采取了限制措施。"
     },
     "2024-06-eviction-start": {
-      "when_label": "June 2024 (end)",
-      "title": "对一名亲属启动腾退程序",
-      "summary": "启动了腾退程序；随后由法院审查。",
-      "details": "2024 年 6 月下旬，针对占用 Adam 公寓的亲属启动了腾退程序。随后法院认定提交过程中不存在程序性违规。"
+      "when_label": "2024年6月（月末）",
+      "title": "启动对一位亲属的驱逐程序",
+      "summary": "驱逐程序已启动；随后由法院审查。",
+      "details": "2024年6月底，针对占用 Adam 公寓的一位亲属启动了驱逐程序。其后法院认定提交中不存在程序性违规。"
     },
     "2024-07-docs-fee": {
-      "when_label": "July 2024 (beginning)",
-      "title": "提交文件；已缴纳诉讼费",
-      "summary": "提交了诉讼文件；已缴纳所需费用。",
-      "details": "在预审听证前，提交了诉讼文件。已缴纳所需的诉讼费（公开版本不披露具体金额）。"
+      "when_label": "2024年7月（月初）",
+      "title": "提交文件；缴纳诉讼费用",
+      "summary": "提交了程序性文件；缴清强制性费用。",
+      "details": "在预审前提交了程序性文件。已缴纳强制性的诉讼费用（公开版本不披露金额）。"
     },
     "2024-07-prelim-hearing": {
-      "when_label": "July 2024 (middle)",
-      "title": "预审听证；概述可能情形",
-      "summary": "法院概述了可能结果；记录了和解讨论。",
-      "details": "在预审听证中，法院概述了继承争议的可能结果。和解讨论未达成协议。"
+      "when_label": "2024年7月（月中）",
+      "title": "预审；法院勾勒情景",
+      "summary": "法院提出可能结果；提及和解磋商。",
+      "details": "在预审中，法院勾勒了继承争议的可能走向。和解磋商未取得结果。"
     },
     "2024-07-motion-freeze-relatives": {
-      "when_label": "July 2024 (middle)",
-      "title": "关于亲属账户的动议",
-      "summary": "提出了冻结及交易审查的请求。",
-      "details": "提交了请求冻结亲属账户并审查交易的动议。法院已受理该动议。"
+      "when_label": "2024年7月（月中）",
+      "title": "关于亲属账户的申请",
+      "summary": "申请冻结并审查交易。",
+      "details": "提出申请以冻结亲属账户并审查交易。法院已受理该申请。"
     },
     "2024-08-relatives-freeze": {
-      "when_label": "August 2024",
-      "title": "法院就亲属账户作出命令",
-      "summary": "为审查之目的批准冻结。",
-      "details": "法院为审查之目的，批准冻结亲属账户，纳入本案程序。"
+      "when_label": "2024年8月",
+      "title": "针对亲属账户的法院裁定",
+      "summary": "出于核查目的准予冻结。",
+      "details": "法院为核查之需，准许对亲属账户实施冻结，纳入正在进行的案件框架之内。"
     },
     "2025-07-unfreeze-motion": {
-      "when_label": "July 2025",
+      "when_label": "2025年7月",
       "title": "申请变更资产冻结措施",
-      "summary": "提交了全部或部分变更限制的请求。",
-      "details": "就与健康与治疗相关的理由，提交了对资产冻结进行全部或部分变更的申请。公开版本省略医疗细节及代理方的内部立场。"
+      "summary": "请求全部或部分调整限制。",
+      "details": "提出申请，请求基于健康与治疗相关理由，对资产冻结予以全部或部分调整。有关医疗细节及各方内部立场在公开版本中省略。"
     },
     "2026-11-hearing-scheduled": {
-      "when_label": "November 2026",
+      "when_label": "2026年11月",
       "title": "就该申请的听证已排期",
-      "summary": "法院将听证排期至 2026 年 11 月。",
-      "details": "按照案件卷宗，法院将就该申请的听证排期至 2026 年 11 月。"
+      "summary": "法院将听证排期至2026年11月。",
+      "details": "据案卷记载，法院已将关于该申请的听证排期至2026年11月。"
     }
   }
 }

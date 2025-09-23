@@ -1,0 +1,14 @@
+{
+  "qr": [
+    { "id": "IG",       "thumb": "https://archive.org/download/trus-qr/1.png",  "label": "IG" },
+    { "id": "TT",       "thumb": "https://archive.org/download/trus-qr/2.png",  "label": "TT" },
+    { "id": "YT",       "thumb": "https://archive.org/download/trus-qr/3.png",  "label": "YT" },
+    { "id": "TG",       "thumb": "https://archive.org/download/trus-qr/4.png",  "label": "TG" },
+    { "id": "TG_NOW",   "thumb": "https://archive.org/download/trus-qr/5.png",  "label": "TG Now" },
+    { "id": "X",        "thumb": "https://archive.org/download/trus-qr/6.png",  "label": "X" },
+    { "id": "X_NOW",    "thumb": "https://archive.org/download/trus-qr/7.png",  "label": "X Now" },
+    { "id": "IG_NICO",  "thumb": "https://archive.org/download/trus-qr/8.png",  "label": "IG Nico" },
+    { "id": "TT_NICO",  "thumb": "https://archive.org/download/trus-qr/9.png",  "label": "TT Nico" },
+    { "id": "TG_NICO",  "thumb": "https://archive.org/download/trus-qr/10.png", "label": "TG Nico" }
+  ]
+}

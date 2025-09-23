@@ -2,22 +2,22 @@
   "page": {
     "title": "Chronologie juridique",
     "loading": "Chargement…",
-    "errorLoadGeneric": "Impossible de charger les données",
-    "errorLoadJson": "Impossible de charger le JSON"
+    "errorLoadGeneric": "Échec du chargement des données",
+    "errorLoadJson": "Échec du chargement du JSON"
   },
   "meta": {
     "updated": "Mis à jour : {date} • {user} • version : {version}",
     "updated_short": "Mis à jour : {date} • {user}"
   },
   "legend": {
-    "pre": "Prérequis (avant l’instance)",
-    "base": "Période du litige",
+    "pre": "Contexte (avant la procédure)",
+    "base": "Période de litige",
     "freeze": "Période de gel des avoirs",
     "future": "Perspectives juridiques (à venir)",
     "event": "Événement",
     "eventHint": "(cliquable)",
     "eventClickable": "Événement (cliquable)",
-    "now": "Moment actuel"
+    "now": "Temps actuel"
   },
   "tooltip": {
     "dot": "Événement — cliquez pour les détails"
@@ -27,7 +27,7 @@
   },
   "modal": {
     "close": "Fermer",
-    "more": "Plus de détails",
+    "more": "Plus",
     "less": "Replier",
     "clusterTitle": "Événements ({count})",
     "singleTitle": "{when} — {title}"
@@ -46,102 +46,105 @@
     "Novembre",
     "Décembre"
   ],
+
+  "Event (clickable)": "Événement (cliquable)",
+
   "items": {
     "2020-09-will-mother": {
-      "when_label": "September 2020",
+      "when_label": "Septembre 2020",
       "title": "Testament de la mère désignant Adam",
-      "summary": "Décès de la mère ; testament désignant Adam.",
-      "details": "Selon les documents disponibles, la mère d’Adam est décédée en septembre 2020 et a laissé un testament le désignant. À cette date, aucun litige n’était enregistré au tribunal."
+      "summary": "Décès de la mère ; testament dans lequel Adam est désigné.",
+      "details": "En septembre 2020, la mère d’Adam est décédée et a laissé un testament désignant Adam comme héritier. Aucune contestation judiciaire n’était enregistrée à ce moment-là."
     },
     "2021-04-father-dx-will": {
-      "when_label": "April 2021",
+      "when_label": "Avril 2021",
       "title": "Testament du père confirmé",
       "summary": "Testament en faveur d’Adam confirmé avant le décès du père.",
-      "details": "En avril 2021, le père d’Adam avait déjà établi un testament en faveur d’Adam. Les informations médicales concernant des tiers sont omises dans la version publique."
+      "details": "En avril 2021, le père d’Adam avait établi un testament en faveur d’Adam ; ce document a ensuite été confirmé. Les informations médicales concernant des tiers sont omises dans la version publique."
     },
     "2021-07-father-death-claims": {
-      "when_label": "July 2021",
-      "title": "Décès du père ; actions en contestation des testaments",
-      "summary": "Des proches ont intenté des actions pour contester les testaments des parents.",
-      "details": "En juillet 2021, après le décès du père, des actions ont été engagées pour contester les testaments des parents. Des mesures provisoires ont été appliquées dans l’attente de l’examen."
+      "when_label": "Juillet 2021",
+      "title": "Décès du père ; requêtes pour contester les testaments",
+      "summary": "Des proches ont déposé des requêtes contestant les testaments des parents.",
+      "details": "En juillet 2021, après le décès du père, des requêtes ont été déposées pour contester les testaments des parents. Au démarrage de la procédure, des mesures temporaires ont été imposées dans l’attente de l’examen."
     },
     "2021-07-asset-freeze": {
-      "when_label": "Since July 2021",
-      "title": "Gel judiciaire des avoirs et mesures restrictives",
+      "when_label": "Depuis juillet 2021",
+      "title": "Gel judiciaire des avoirs et restrictions",
       "summary": "Le gel des comptes et des biens immobiliers demeure en vigueur.",
-      "details": "Un gel judiciaire des avoirs et des mesures connexes ont été imposés sur des comptes et des biens immobiliers. Le gel reste en vigueur."
+      "details": "Par décision de justice, des comptes bancaires et des biens immobiliers ont été gelés avec des restrictions associées. Le gel demeure en vigueur."
     },
     "2021-09-apartment-dispute": {
-      "when_label": "September 2021",
-      "title": "Litige relatif à l’occupation de l’appartement d’Adam",
-      "summary": "Litige sur l’occupation pendant la période de gel des biens.",
-      "details": "Lors d’un déplacement pour une évaluation médicale, un litige est né au sujet de l’occupation de l’appartement d’Adam. Les questions de résidence et d’usage ont été rattachées au gel en cours et aux actes de procédure subséquents."
+      "when_label": "Septembre 2021",
+      "title": "Litige sur l’usage de l’appartement d’Adam",
+      "summary": "Litige d’usage pendant la période de gel des avoirs.",
+      "details": "Lors d’un déplacement médical, un litige a surgi quant à l’usage de l’appartement d’Adam. Les questions d’accès étaient liées au gel en cours et aux étapes procédurales ultérieures."
     },
     "2021-11-prelim-scheduled": {
-      "when_label": "November 2021",
+      "when_label": "Novembre 2021",
       "title": "Audience préliminaire programmée",
       "summary": "Audience préliminaire fixée à juillet 2024.",
-      "details": "Le tribunal a programmé une audience préliminaire dans l’affaire successorale pour juillet 2024."
+      "details": "Le tribunal a programmé l’audience préliminaire dans l’affaire successorale pour juillet 2024."
     },
     "2022-03-hearing-travel": {
-      "when_label": "March 2022 (beginning)",
-      "title": "Audience sur l’autorisation de voyager pour traitement",
-      "summary": "Le tribunal a examiné l’autorisation de voyager à l’étranger pour traitement.",
-      "details": "Le tribunal a examiné la possibilité d’accorder à Adam l’autorisation de voyager à l’étranger pour se faire soigner. Des objections ont été déposées par les demandeurs ; une expertise médicale judiciaire a été réalisée."
+      "when_label": "Mars 2022 (début)",
+      "title": "Audience relative à l’autorisation de voyager pour traitement",
+      "summary": "Le tribunal a envisagé d’autoriser un voyage à l’étranger pour une thérapie.",
+      "details": "Le tribunal a examiné l’octroi à Adam d’une autorisation de voyager à l’étranger pour suivre une thérapie. Des objections ont été déposées par les demandeurs ; une expertise médico-légale a été réalisée."
     },
     "2022-03-permission-travel": {
-      "when_label": "March 2022 (end)",
+      "when_label": "Mars 2022 (fin)",
       "title": "Autorisation de voyager pour traitement accordée",
-      "summary": "Le tribunal a autorisé le déplacement à l’étranger pour la thérapie.",
-      "details": "Le tribunal a fait droit à la demande d’Adam et a autorisé le voyage à l’étranger pour suivre la thérapie."
+      "summary": "Le tribunal a autorisé un voyage à l’étranger pour la thérapie.",
+      "details": "Le tribunal a fait droit à la requête d’Adam et a autorisé un voyage à l’étranger pour suivre la thérapie."
     },
     "2022-05-visit-med-exam": {
-      "when_label": "May 2022",
+      "when_label": "Mai 2022",
       "title": "Incident au domicile ; précisions du tribunal sur les examens",
-      "summary": "Le tribunal a confirmé que les examens exigent un consentement ou un fondement légal.",
-      "details": "Un incident au domicile d’Adam a entraîné l’intervention de la police. Le tribunal a précisé que les examens médicaux obligatoires requièrent le consentement ou un fondement légal valable. Des mesures restrictives relatives à l’accès ont été appliquées en lien avec l’incident."
+      "summary": "Le tribunal a confirmé : les examens exigent un consentement ou une base légale.",
+      "details": "Un incident au domicile d’Adam a entraîné l’intervention de la police. Le tribunal a précisé que des examens médicaux obligatoires ne sont possibles qu’avec consentement ou autre base légale. Des mesures restrictives d’accès ont été appliquées."
     },
     "2024-06-eviction-start": {
-      "when_label": "June 2024 (end)",
+      "when_label": "Juin 2024 (fin)",
       "title": "Ouverture d’une procédure d’expulsion visant un proche",
-      "summary": "Procédure d’expulsion engagée ; examinée ultérieurement par le tribunal.",
-      "details": "Fin juin 2024, une procédure d’expulsion a été engagée concernant un proche occupant l’appartement d’Adam. Le tribunal a ensuite constaté l’absence d’irrégularités procédurales lors du dépôt."
+      "summary": "Procédure d’expulsion engagée ; ultérieurement examinée par le tribunal.",
+      "details": "Fin juin 2024, une procédure d’expulsion a été engagée à l’encontre d’un proche occupant l’appartement d’Adam. Le tribunal n’a ensuite relevé aucune irrégularité procédurale dans le dépôt."
     },
     "2024-07-docs-fee": {
-      "when_label": "July 2024 (beginning)",
-      "title": "Dépôt de documents ; taxe judiciaire acquittée",
-      "summary": "Documents procéduraux déposés ; taxe requise acquittée.",
-      "details": "Avant l’audience préliminaire, des documents procéduraux ont été déposés. La taxe judiciaire requise a été acquittée (le montant est omis dans la version publique)."
+      "when_label": "Juillet 2024 (début)",
+      "title": "Dépôt de documents ; taxe judiciaire payée",
+      "summary": "Dépôt d’écrits procéduraux ; taxe obligatoire acquittée.",
+      "details": "Avant l’audience préliminaire, des documents procéduraux ont été déposés. La taxe judiciaire obligatoire a été payée (montant non communiqué dans la version publique)."
     },
     "2024-07-prelim-hearing": {
-      "when_label": "July 2024 (middle)",
-      "title": "Audience préliminaire ; scénarios exposés",
-      "summary": "Le tribunal a présenté des issues possibles ; discussions de règlement mentionnées.",
-      "details": "Lors de l’audience préliminaire, le tribunal a exposé des issues possibles du litige successoral. Les discussions en vue d’un règlement n’ont pas abouti."
+      "when_label": "Juillet 2024 (milieu)",
+      "title": "Audience préliminaire ; scénarios esquissés",
+      "summary": "Le tribunal a exposé des issues possibles ; des pourparlers de règlement ont été mentionnés.",
+      "details": "Lors de l’audience préliminaire, le tribunal a esquissé des scénarios possibles du litige successoral. Les discussions de règlement n’ont pas abouti."
     },
     "2024-07-motion-freeze-relatives": {
-      "when_label": "July 2024 (middle)",
-      "title": "Requête relative aux comptes de proches",
-      "summary": "Demande de gel et d’examen des opérations déposée.",
-      "details": "Une requête a été déposée pour demander le gel des comptes des proches et l’examen des opérations. Le tribunal a pris la requête en considération."
+      "when_label": "Juillet 2024 (milieu)",
+      "title": "Requête concernant les comptes des proches",
+      "summary": "Demande de gel et d’examen des opérations.",
+      "details": "Une requête a été déposée pour geler les comptes de proches et examiner les opérations. Le tribunal a admis la requête à l’examen."
     },
     "2024-08-relatives-freeze": {
-      "when_label": "August 2024",
+      "when_label": "Août 2024",
       "title": "Ordonnance du tribunal sur les comptes des proches",
-      "summary": "Gel accordé aux fins d’examen.",
-      "details": "Le tribunal a accordé le gel des comptes des proches aux fins d’examen dans le cadre de la procédure."
+      "summary": "Gel accordé à des fins de vérification.",
+      "details": "Le tribunal a accordé le gel des comptes de proches à des fins de vérification dans le cadre de l’affaire en cours."
     },
     "2025-07-unfreeze-motion": {
-      "when_label": "July 2025",
+      "when_label": "Juillet 2025",
       "title": "Requête visant à modifier le gel des avoirs",
-      "summary": "Demande déposée pour modifier totalement ou partiellement les restrictions.",
-      "details": "Une requête a été déposée afin de modifier totalement ou partiellement le gel des avoirs pour des motifs liés à la santé et au traitement. La version publique omet les précisions médicales et les positions internes des conseils."
+      "summary": "Demande de modification totale ou partielle des restrictions.",
+      "details": "Une requête a été déposée pour modifier totalement ou partiellement le gel des avoirs, pour des motifs liés à la santé et au traitement. Les détails médicaux et les positions internes des représentants sont omis dans la version publique."
     },
     "2026-11-hearing-scheduled": {
-      "when_label": "November 2026",
+      "when_label": "Novembre 2026",
       "title": "Audience sur la requête programmée",
       "summary": "Le tribunal a fixé une audience pour novembre 2026.",
-      "details": "Selon le registre du dossier, le tribunal a fixé une audience sur la requête pour novembre 2026."
+      "details": "Selon le dossier de l’affaire, le tribunal a programmé une audience sur la requête pour novembre 2026."
     }
   }
 }
