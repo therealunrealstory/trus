@@ -28,30 +28,15 @@
     return null;
   }
 
-  // ===== Modal opener: prefer site modal, else dark fallback =====
+  // ===== Open site modal (no custom styles) =====
   function openCommentModal(title, html) {
-    // если в проекте глобальная openModal есть — используем её
+    // Используем ТОЛЬКО модалку сайта
     if (typeof window.openModal === 'function') {
-      try { window.openModal(title, html); return; } catch (e) {}
+      window.openModal(title, html);
     }
-    // Тёмный фолбэк в стилистике сайта
-    const wrap = document.createElement('div');
-    wrap.className = 'cb-modal-backdrop';
-    wrap.innerHTML = `
-      <div class="cb-modal">
-        <div class="cb-modal-head">
-          <h3 class="cb-modal-title">${title}</h3>
-          <button class="cb-close" aria-label="Close">×</button>
-        </div>
-        <div class="cb-modal-body">${html}</div>
-      </div>`;
-    document.body.appendChild(wrap);
-    const close = () => wrap.remove();
-    wrap.addEventListener('click', (e) => { if (e.target === wrap) close(); });
-    wrap.querySelector('.cb-close').addEventListener('click', close);
   }
 
-  // ===== Styles (scoped & injected) =====
+  // ===== Styles for the on-page block only =====
   function injectStylesOnce() {
     if (document.getElementById('comment-block-styles')) return;
     const css = `
@@ -60,43 +45,20 @@
       @media (min-width: 900px) {
         .cb-wrap { grid-template-columns: 0.3fr 0.7fr; }
       }
-      .cb-card { background: rgba(0,0,0,0.35); border: 1px solid rgba(148,163,184,.35); border-radius: 16px; padding: 1rem; }
+      .cb-card {
+        background: rgba(0,0,0,0.35);
+        border: 1px solid rgba(148,163,184,.35);
+        border-radius: 16px;
+        padding: 1rem;
+      }
       .cb-img {
         width: 100%; aspect-ratio: 1 / 1; object-fit: cover;
         border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,.08);
       }
-      .cb-text { font-size: 1.05rem; line-height: 1.6; color: #fff; } /* белый текст на странице */
+      .cb-text { font-size: 1.05rem; line-height: 1.6; color: #fff; } /* белый текст */
       .cb-actions { margin-top: .9rem; display: flex; flex-wrap: wrap; gap: .5rem .6rem; }
       /* Кнопка "Комментарий Нико" — как меню */
-      .cb-btn-main.subnav-btn { } /* класс берёт стиль из сайта */
-      /* Кнопки соцсетей — как Share */
-      .cb-link {
-        display:inline-flex; align-items:center; justify-content:center; gap:.4rem;
-        padding:.5rem 1rem; border-radius: 0.75rem;
-        border: 1px solid #374151; background: rgba(17,24,39,.4);
-        color:#fff; text-decoration:none; font-size:.875rem;
-        transition: background .2s ease, box-shadow .2s ease, transform .05s ease;
-      }
-      .cb-link:hover { background: rgba(17,24,39,.55); box-shadow: 0 4px 16px rgba(0,0,0,.08); }
-      .cb-links { display:flex; gap:.5rem; }
-
-      /* Тёмный fallback modal */
-      .cb-modal-backdrop {
-        position: fixed; inset: 0; background: rgba(0,0,0,.55);
-        display: grid; place-items: center; z-index: 9999;
-      }
-      .cb-modal {
-        width: min(920px, 94vw); max-height: 86vh; overflow: auto;
-        background: #0b0f1a; color: #fff; /* тёмный фон + белый текст */
-        border: 1px solid rgba(148,163,184,.25);
-        border-radius: 16px; padding: 1rem 1.25rem;
-        box-shadow: 0 20px 60px rgba(0,0,0,.45);
-      }
-      .cb-modal-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; }
-      .cb-modal-title { margin: .25rem 0 .75rem; font-size: 1.1rem; font-weight: 600; }
-      .cb-modal-body { font-size: 1rem; line-height: 1.7; color: #e5e7eb; }
-      .cb-modal-body p { margin: .75rem 0; }
-      .cb-close { border:none; background:transparent; font-size:1.6rem; line-height:1; color:#fff; cursor:pointer; }
+      .cb-btn-main.subnav-btn { }
     `;
     const style = document.createElement('style');
     style.id = 'comment-block-styles';
@@ -126,10 +88,10 @@
             <div class="cb-text">${short}</div>
             <div class="cb-actions">
               <button class="cb-btn-main subnav-btn cb-open" type="button">${cta}</button>
-              <div class="cb-links">
-                <a class="cb-link" href="${IG_URL}" target="_blank" rel="noopener noreferrer">Instagram</a>
-                <a class="cb-link" href="${TG_URL}" target="_blank" rel="noopener noreferrer">Telegram</a>
-              </div>
+              <a class="px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 text-white text-sm"
+                 href="${IG_URL}" target="_blank" rel="noopener noreferrer">Instagram</a>
+              <a class="px-4 py-2 rounded-xl border border-gray-700 bg-gray-900/40 text-white text-sm"
+                 href="${TG_URL}" target="_blank" rel="noopener noreferrer">Telegram</a>
             </div>
           </div>
         </div>
