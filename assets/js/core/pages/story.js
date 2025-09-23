@@ -1,4 +1,4 @@
-// assets/js/core/pages/story.js — readers + tiles + responsive
+// assets/js/core/pages/story.js — readers + tiles + responsive + comment-block loader
 import { $ } from '../dom.js';
 import { t, I18N, DEFAULT_I18N, onLocaleChanged } from '../i18n.js';
 import { openModal } from '../modal.js';
@@ -11,7 +11,7 @@ let announceStatus, shortStatus, fullStatus;
 let announceSeek, shortSeek, fullSeek;
 let announceTimeCur, announceTimeDur, shortTimeCur, shortTimeDur, fullTimeCur, fullTimeDur;
 let onPauseOthers, unLocale;
-let respCleanup = null; // для снятия responsive-слушателей
+let respCleanup = null;
 
 /* ====== Resume settings ====== */
 const RESUME_ENABLED = true;
@@ -185,7 +185,7 @@ function setupMiniPlayer({ key, audioEl, btnEl, statusEl, seekEl, timeCurEl, tim
         } else setTimeout(resume, 80);
       };
       resume();
-      appliedResumeForLang = null;
+      appliedResumeForLang = getLang();
     }
   };
 }
@@ -196,7 +196,7 @@ function setupMiniPlayer({ key, audioEl, btnEl, statusEl, seekEl, timeCurEl, tim
 function readerCalloutNode(kind, playCard){
   const wrap = document.createElement('div');
   wrap.className = playCard ? playCard.className : 'rounded-2xl border border-gray-700 p-4';
-  wrap.classList.add('reader-card');  
+  wrap.classList.add('reader-card');
   wrap.style.background = 'rgba(0,0,0,0.35)';
   wrap.style.marginTop = '8px';
   wrap.style.marginBottom = '12px';
@@ -204,8 +204,7 @@ function readerCalloutNode(kind, playCard){
   const row = document.createElement('div');
   row.className = 'flex items-center gap-3 trus-reader-row';
   row.style.justifyContent = 'flex-start';
-  row.style.flexWrap = 'nowrap'; // по умолчанию (десктоп) — одна строка
-  row.classList.add('reader-row'); 
+  row.style.flexWrap = 'nowrap';
 
   const btn = document.createElement('button');
   btn.id = (kind==='short') ? 'shortReadBtn' : 'fullReadBtn';
@@ -275,7 +274,7 @@ function applyResponsiveLayout(root){
     }
   });
 
-  // АУДИОПЛЕЕРЫ: подпись под кнопкой на мобилке, в линию — на десктопе
+  // АУДИОПЛЕЕРЫ
   const sets = [
     { btn: announceBtn, status: announceStatus },
     { btn: shortBtn,    status: shortStatus    },
@@ -283,14 +282,13 @@ function applyResponsiveLayout(root){
   ];
   sets.forEach(({btn, status})=>{
     if (!btn) return;
-    const row = btn.parentElement; // контейнер кнопки и подписи
+    const row = btn.parentElement;
     if (!row) return;
 
     row.style.display = 'flex';
     row.style.alignItems = 'center';
     row.style.gap = '12px';
 
-    // фикс «двух строк» на кнопке (▶︎ и текст вместе)
     btn.style.whiteSpace = 'nowrap';
     btn.style.display = 'inline-flex';
     btn.style.alignItems = 'center';
@@ -308,17 +306,22 @@ function applyResponsiveLayout(root){
 }
 /* ---------------------------------------------------------------- */
 
-// === Comment block: автозагрузка comment.js по наличию якоря ===
+// === Comment block: автозагрузка /comment/comment.js при наличии якоря ===
 let commentScriptLoaded = false;
-
 function ensureCommentBlock(root){
   if (commentScriptLoaded) return;
   const anchor = root.querySelector('#comment-block');
   if (!anchor) return;
+  // если уже подключали — не дублируем
+  if (document.querySelector('script[src="/comment/comment.js"]')) {
+    commentScriptLoaded = true;
+    return;
+  }
   const s = document.createElement('script');
   s.src = '/comment/comment.js';
   s.defer = true;
   s.onload = () => { commentScriptLoaded = true; };
+  s.onerror = () => { /* optional log */ };
   document.head.appendChild(s);
 }
 
@@ -348,7 +351,6 @@ export function init(root){
   fullSeek       = root.querySelector('#fullSeek');
   fullTimeCur    = root.querySelector('#fullTimeCur');
   fullTimeDur    = root.querySelector('#fullTimeDur');
-  
 
   const langSel  = $('#lang');
   const currentLang = () => (langSel?.value || 'EN').toUpperCase();
@@ -358,13 +360,13 @@ export function init(root){
   const p2 = setupMiniPlayer({ key:'short',        audioEl:shortAudio,    btnEl:shortBtn,    statusEl:shortStatus,    seekEl:shortSeek,    timeCurEl:shortTimeCur,    timeDurEl:shortTimeDur,    getLang: currentLang });
   const p3 = setupMiniPlayer({ key:'full',         audioEl:fullAudio,     btnEl:fullBtn,     statusEl:fullStatus,     seekEl:fullSeek,     timeCurEl:fullTimeCur,     timeDurEl:fullTimeDur,     getLang: currentLang });
 
-  // Reader cards under headings
+  // Reader callouts
   insertReaders(root);
 
-  // Комментарий Нико — подгружаем, если якорь есть
+  // Комментарий Нико — подгружаем, если якорь есть (он стоит под Short+Full секциями)
   ensureCommentBlock(root);
 
-  // Responsive: применяем и подписываемся
+  // Responsive
   applyResponsiveLayout(root);
   const mql = window.matchMedia('(max-width: 768px)');
   const onResp = ()=> applyResponsiveLayout(root);
@@ -381,6 +383,7 @@ export function init(root){
   unLocale = onLocaleChanged(({ detail })=>{
     const l = (detail?.lang || langSel?.value || 'EN').toUpperCase();
     p1?.onLocaleChange(l); p2?.onLocaleChange(l); p3?.onLocaleChange(l);
+
     const sBtn = root.querySelector('#shortReadBtn'); const fBtn = root.querySelector('#fullReadBtn');
     if (sBtn) sBtn.textContent = t('reader.open','Read');
     if (fBtn) fBtn.textContent = t('reader.open','Read');
@@ -388,6 +391,7 @@ export function init(root){
     const fNote = fBtn ? fBtn.parentElement.querySelector('.text-sm') : null;
     if (sNote) sNote.textContent = t('reader.short.note','Some details are omitted. The text focuses on the chronology of events and the overall arc.');
     if (fNote) fNote.textContent = t('reader.full.note','Richer descriptive detail and emotional context, with character interactions and a deeper sense of their personalities.');
+
     updateMiniLabels();
   });
 
@@ -412,7 +416,6 @@ export function init(root){
   bindTile('#tile1', 'tiles.me', 'I\u2019m Nico', 'modal.tile1.body', '…');
   bindTile('#tile2', 'tiles.about', 'About Adam', 'modal.tile2.body', '…');
   bindTile('#tile3', 'tiles.others', 'Other people in the story', 'modal.tile3.body', '…');
-  // ------------------------------------------------------
 
   updateMiniLabels();
 }
@@ -435,17 +438,16 @@ export function destroy(){
 
 
 // === CAST MODULE ===
-(function () {
+;(function () {
   const CAST_BASE = '/cast';
   let CAST_DATA = null;
   let CURR_DICT = null;
   let GRID_OBSERVER_ATTACHED = false;
 
-  // --- helpers ---
   function normLang(raw){
     if (!raw) return 'en';
     let s = String(raw).toLowerCase();
-    if (s.includes('-')) s = s.split('-')[0]; // pt-BR -> pt
+    if (s.includes('-')) s = s.split('-')[0];
     const map = { zh:'cn', cn:'cn', ar:'ar', de:'de', es:'es', fr:'fr', it:'it', pt:'pt', ru:'ru', en:'en' };
     return map[s] || 'en';
   }
@@ -472,7 +474,6 @@ export function destroy(){
     return CAST_DATA;
   }
 
-  // Wait until #castGrid exists (handles SPA re-renders)
   function whenGridReady(cb) {
     const tryNow = () => document.querySelector('#castGrid');
     const grid = tryNow();
@@ -486,11 +487,10 @@ export function destroy(){
     mo.observe(document.body, {childList:true, subtree:true});
   }
 
-  // primary render (language-agnostic DOM)
   async function renderCast(root){
     const grid = root.querySelector('#castGrid');
     if (!grid) return;
-    if (grid.children.length) return; // уже отрисовано
+    if (grid.children.length) return;
 
     const data = await getCastData();
     const frag = document.createDocumentFragment();
@@ -515,7 +515,6 @@ export function destroy(){
     await applyCastLocale(root, getActiveLang());
   }
 
-  // apply current locale to titles & captions (and open modal content)
   async function applyCastLocale(root, langFromEvent){
     CURR_DICT = await loadCastLocale(langFromEvent || getActiveLang());
 
@@ -529,7 +528,6 @@ export function destroy(){
       if (nameEl) nameEl.textContent = name;
     });
 
-    // refresh open modal texts if any
     const box = document.querySelector('#modalBody .cast-modal');
     if (box) {
       const openId = box.getAttribute('data-open-id');
@@ -546,7 +544,6 @@ export function destroy(){
     }
   }
 
-  // open modal (no crossorigin to avoid CORS on archive.org)
   async function openCastModal(id){
     const data = await getCastData();
     const item = (data.cast || []).find(x => x.id === id);
@@ -580,14 +577,10 @@ export function destroy(){
     }, 0);
   }
 
-  // subscribe to language changes
   function subscribeLocaleChanges(root){
-    // Preferred: your site-level hook
     if (typeof window.onLocaleChanged === 'function') {
       window.onLocaleChanged(({ detail }) => {
         const next = (detail && detail.lang) || document.documentElement.lang || 'en';
-        // ПОСЛЕ смены языка фреймворк часто пересобирает DOM.
-        // Дождёмся появления #castGrid и только потом применим.
         setTimeout(() => {
           whenGridReady(() => {
             const grid = document.querySelector('#castGrid');
@@ -600,7 +593,6 @@ export function destroy(){
       return;
     }
 
-    // Fallbacks
     document.addEventListener('trus:lang', (e)=> {
       const next = e?.detail?.lang;
       setTimeout(() => {
@@ -614,7 +606,6 @@ export function destroy(){
     });
 
     new MutationObserver(() => {
-      // если блок был пересобран, дорисуем
       const grid = document.querySelector('#castGrid');
       if (grid && grid.children.length === 0) {
         renderCast(document).catch(console.error);
