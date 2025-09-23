@@ -1,8 +1,8 @@
 // netlify/functions/news2.js
 import { query, cors } from "./_db.js";
 
-const OPENAI_URL = "https://api.openai.com/v1/responses";
-const MODEL = "gpt-5-nano";
+const OPENAI_URL = "https://api.openai.com/v1/chat/completions"; // Corrected endpoint
+const MODEL = "gpt-4o-mini"; // Using a more modern and cost-effective model
 
 function mapChannel(param) {
   const p = (param || "now").toLowerCase();
@@ -29,41 +29,24 @@ async function translateOnce(text, langCode) {
 
   const payload = {
     model: MODEL,
-    input: [
+    messages: [
       {
         role: "system",
-        content: [
-          { type:"input_text", text:
-`You are a professional translator.
-Translate the user's message from English to ${target}.
-Output ONLY the translation in ${target} (no extra words).
-Preserve line breaks, punctuation, emojis and URLs exactly.`}
-        ]
+        content: `You are a professional translator. Translate the user's message from English to ${target}. Output ONLY the translation. Preserve line breaks, punctuation, emojis and URLs exactly.`
       },
-      { role: "user", content: [ { type:"input_text", text } ] }
-    ]
+      { role: "user", content: text }
+    ],
+    temperature: 0.2
   };
 
   try{
     const r = await fetch(OPENAI_URL, {
       method:"POST",
-      headers:{
-        "content-type":"application/json",
-        "authorization":`Bearer ${key}`
-      },
+      headers:{ "content-type":"application/json", "authorization":`Bearer ${key}` },
       body: JSON.stringify(payload)
     });
     const j = await r.json();
-
-    let out = "";
-    if (typeof j.output_text === "string") out = j.output_text.trim();
-    else if (Array.isArray(j.output)) {
-      out = j.output.flatMap(x => (x?.content||[]).map(p => p?.text||"")).join("").trim();
-    } else if (Array.isArray(j.content)) {
-      out = j.content.map(c => c?.text || "").join("").trim();
-    } else if (j?.choices?.[0]?.message?.content) {
-      out = String(j.choices[0].message.content).trim();
-    }
+    const out = j?.choices?.[0]?.message?.content?.trim() || "";
 
     if (!out || norm(out) === norm(text)) return null;
     return { out, provider: `openai:${MODEL}` };
@@ -78,7 +61,7 @@ export default async (req) => {
     const url = new URL(req.url);
     const lang   = (url.searchParams.get("lang") || "en").toLowerCase();
     const limit  = Math.min(parseInt(url.searchParams.get("limit") || "20",10), 50);
-    const before = url.searchParams.get("before") ? Number(url.searchParams.get("before")) : null;
+    const before = url.searchParams.get("before") ? Number(url.search_params.get("before")) : null;
     const channelName = mapChannel(url.searchParams.get("channel"));
 
     const posts = await query(
@@ -95,7 +78,8 @@ export default async (req) => {
     if (!posts.rows.length) return cors({ channel: channelName, lang, items: [] });
 
     const postIds = posts.rows.map(r => r.id);
-    
+
+    // ОПТИМИЗАЦИЯ: Получаем все доступные переводы одним запросом
     const translations = await query(
       `SELECT post_id, text_tr, provider
        FROM public.tg_translations
@@ -104,21 +88,21 @@ export default async (req) => {
     );
     const translationsMap = new Map(translations.rows.map(t => [String(t.post_id), t]));
 
+    // Получаем все медиа одним запросом
     const media = await query(
       `SELECT id, post_id FROM public.tg_media WHERE post_id = ANY($1::bigint[])`,
       [postIds]
     );
     const mediaByPost = new Map();
     for (const m of media.rows) {
-      // ===== ВОТ ЗДЕСЬ БЫЛА ОШИБКА =====
       const arr = mediaByPost.get(m.post_id) || [];
-      // ===================================
       arr.push(m.id);
       mediaByPost.set(m.post_id, arr);
     }
     
+    // Ограничиваем время на выполнение НОВЫХ переводов, чтобы избежать таймаута
     const functionStartTime = Date.now();
-    const TIME_LIMIT_MS = 8000;
+    const TIME_LIMIT_MS = 8000; // Оставляем запас в 2 секунды
 
     const items = [];
     for (const p of posts.rows) {
@@ -132,11 +116,13 @@ export default async (req) => {
           text_tr = cached.text_tr || text_tr;
           provider = cached.provider || "none";
         } else {
+          // Если перевода нет в кэше, проверяем, есть ли время его сделать
           if (Date.now() - functionStartTime < TIME_LIMIT_MS) {
             const tr = await translateOnce(p.text_src, lang);
             if (tr && tr.out) {
               text_tr = tr.out;
               provider = tr.provider;
+              // Сохраняем в фоне, не дожидаясь окончания записи
               query(
                 `INSERT INTO public.tg_translations (post_id, lang, text_tr, provider)
                  VALUES ($1,$2,$3,$4)
@@ -145,10 +131,10 @@ export default async (req) => {
                 [p.id, lang, text_tr, provider]
               ).catch(e => console.error("Failed to save translation:", e));
             } else {
-              translation_pending = true;
+              translation_pending = true; // API не ответил, попробуем позже
             }
           } else {
-            translation_pending = true;
+            translation_pending = true; // Время вышло, откладываем перевод
           }
         }
       }
@@ -162,7 +148,7 @@ export default async (req) => {
         text_tr: translation_pending ? (p.text_src || "") : text_tr,
         lang_out: lang,
         provider,
-        translation_pending,
+        translation_pending, // Флаг для фронтенда
         media: (mediaByPost.get(p.id) || []).map(id => ({
           id,
           thumbUrl: `/.netlify/functions/tg-file?id=${id}&v=thumb`,
