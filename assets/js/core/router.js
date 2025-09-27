@@ -18,6 +18,7 @@ const ROUTES = {
   timeline:  { partial: 'timeline',  module: () => import('./pages/timeline.js')  },
   reporting: { partial: 'reporting', module: () => import('./pages/reporting.js') },
   // NEW:
+  trustfields:{ partial: null,       module: () => import('./pages/trustfields.js') },
   ave:       { partial: null,        module: () => import('./pages/ave.js')       }
 };
 
