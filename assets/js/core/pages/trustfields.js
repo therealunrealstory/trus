@@ -40,11 +40,21 @@ async function readJson(url) {
 
 /* ---------------- Медиа-реестры ---------------- */
 async function loadMedia() {
-  const [videos, images] = await Promise.all([
+  let [videos, images] = await Promise.all([
     readJson('/trustfields/media/videos.json'),
     readJson('/trustfields/media/images.json'),
   ]);
-  return { videos: videos || {}, images: images || {} };
+
+  if (!videos) videos = {};
+  // ДЕФОЛТ, если файла с изображениями нет/пуст
+  if (!images || (!images.byIndex && !images.baseUrl)) {
+    images = {
+      baseUrl: 'https://archive.org/download/trustfields-pics/',
+      min: 1,
+      max: 99,
+    };
+  }
+  return { videos, images };
 }
 
 // Без HEAD/GET-пробежек (CORS). Строим пул URL.
@@ -52,7 +62,8 @@ function buildImagePool(imagesCfg) {
   if (imagesCfg?.byIndex && Object.keys(imagesCfg.byIndex).length) {
     return Object.values(imagesCfg.byIndex);
   }
-  const base = imagesCfg?.baseUrl || '';
+  // дефолтный base — archive.org /download/
+  const base = imagesCfg?.baseUrl || 'https://archive.org/download/trustfields-pics/';
   const min = Number(imagesCfg?.min ?? 1);
   const max = Number(imagesCfg?.max ?? 99);
   const list = [];
@@ -112,7 +123,7 @@ function mountBaseStructure(root) {
       ${htmlSocialBlock()}
       <div id="tf-gallery" class="tf-grid" aria-live="polite"></div>
     </section>
-  `;
+  ";
 
   // локальные стили страницы
   const style = document.createElement('style');
@@ -221,7 +232,7 @@ function startShuffle(container, pool) {
 
 function startGallery(container, pool) {
   if (!pool || !pool.length) {
-    container.innerHTML = `<div class="text-sm opacity-80">No images yet.</div>`;
+    container.innerHTML = `<div class="text-sm opacity-80">Loading images…</div>`;
     return;
   }
   buildPlaceholders(container);
