@@ -89,6 +89,14 @@ function htmlSocialBlock(){
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9.96 15.47l-.4 5.63c.57 0 .81-.24 1.1-.53l2.64-2.53 5.47 4c1.01.56 1.73.27 2-.93l3.62-16.97c.32-1.5-.54-2.08-1.52-1.72L1.2 9.65c-1.46.57-1.44 1.39-.25 1.76l5.54 1.73 12.85-8.11c.6-.39 1.15-.17.7.22"/></svg>
       </a>
     </div>
+    <div class="text-sm text-gray-300">
+      <ul class="list-disc pl-5 space-y-1">
+        <li><span data-i18n="trust.block3.links.youtube">YouTube playlist</span></li>
+        <li><span data-i18n="trust.block3.links.instagram">Instagram</span></li>
+        <li><span data-i18n="trust.block3.links.tiktok">TikTok</span></li>
+        <li><span data-i18n="trust.block3.links.telegram">Telegram</span></li>
+      </ul>
+    </div>
   `;
 }
 
