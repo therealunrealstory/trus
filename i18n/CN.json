@@ -137,6 +137,8 @@
   "reader.error": "无法加载书籍。请稍后重试。",
  
   "video.disclaimer": "本视频中的所有画面均源于真实事件与真人。通读我们的故事后，这些片段的意义将更为清晰。",
+
+  "menu.trustfields": "TrustFields",
   
   "btn.donate": "捐助",
   "donate.monthly": "设为每月",

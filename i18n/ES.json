@@ -136,7 +136,9 @@
   "reader.error": "No se pudo cargar el libro. Inténtalo de nuevo más tarde.",
   
   "video.disclaimer": "Todas las imágenes de este video muestran acontecimientos reales y personas reales. El significado completo de estas escenas se entiende plenamente tras leer nuestra historia.",
-  
+ 
+  "menu.trustfields": "TrustFields",
+ 
   "btn.donate": "Donar",
   "donate.monthly": "Hacer mensual",
   "donate.form.title": "Donar",

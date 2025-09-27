@@ -137,6 +137,8 @@
   "reader.error": "Échec du chargement du livre. Veuillez réessayer plus tard.",
   
    "video.disclaimer": "Toutes les séquences de cette vidéo montrent des événements réels et des personnes réelles. Le sens de ces scènes apparaît pleinement après la lecture de notre histoire.",
+
+  "menu.trustfields": "TrustFields",
    
   "btn.donate": "Faire un don",
   "donate.monthly": "Rendre mensuel",

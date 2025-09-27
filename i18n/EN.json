@@ -141,6 +141,8 @@
   "reader.mode": "Cover/Text",
   
     "video.disclaimer": "All footage in this video shows real events and real people. The full meaning of these scenes becomes clear after reading our story.",
+
+  "menu.trustfields": "TrustFields",
   
   "btn.donate": "Donate",
   "donate.monthly": "Make monthly",

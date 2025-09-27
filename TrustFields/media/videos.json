@@ -1,0 +1,17 @@
+{
+  "intro": [
+    "https://archive.org/download/trustfields-videos/TrustFields.mp4"
+  ],
+  "heroes": {
+    "Adam": [],
+    "Roxana": [],
+    "Sofia": [],
+    "Andre": [],
+    "Lara": [],
+    "Nico": [],
+    "Susanna": []
+  },
+  "byIndex": {
+    "0": "https://archive.org/download/trustfields-videos/TrustFields.mp4"
+  }
+}
