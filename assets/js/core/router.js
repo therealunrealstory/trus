@@ -14,11 +14,11 @@ const ROUTES = {
   story:     { partial: 'story',     module: () => import('./pages/story.js')     },
   support:   { partial: 'support',   module: () => import('./pages/support.js')   },
   now:       { partial: 'now',       module: () => import('./pages/now.js')       },
-  roadmap:   { partial: null,        module: () => import('./pages/roadmap.js')   }, // оставим как было
-  timeline:  { partial: 'timeline',  module: () => import('./pages/timeline.js')  }, // НОВОЕ
+  roadmap:   { partial: null,        module: () => import('./pages/roadmap.js')   },
+  timeline:  { partial: 'timeline',  module: () => import('./pages/timeline.js')  },
   reporting: { partial: 'reporting', module: () => import('./pages/reporting.js') },
   // NEW:
-  trustfields:{ partial: null,       module: () => import('./pages/trustfields.js') }
+  ave:       { partial: null,        module: () => import('./pages/ave.js')       }
 };
 
 function parseRoute() {
