@@ -124,7 +124,7 @@ function mountBaseStructure(root){
     </section>
   `;
 
-  // локальные стили под страницу (подложки + отступы первой строки)
+  // локальные стили под страницу (как «подложки» + отступы первой строки)
   const style = document.createElement('style');
   style.textContent = `
     .page--trustfields section{ background:rgba(0,0,0,0.2); border-radius:1rem; padding:1rem; border:1px solid rgba(255,255,255,.12) }
@@ -133,9 +133,9 @@ function mountBaseStructure(root){
     .tf-split{ display:flex; gap:16px; align-items:flex-start }
     .tf-left{ flex:0 0 30% }
     .tf-right{ flex:1 1 auto }
-    /* Видео 9:16 и без обрезки */
-    #tf-video .video-wrap { position:relative; background:#000; border-radius:10px; overflow:hidden; }
-    #tf-video video { object-fit: contain; background:#000; }
+	/* Видео 9:16 и без обрезки */
+   #tf-video .video-wrap { position:relative; background:#000; border-radius:10px; overflow:hidden; }
+   #tf-video video { object-fit: contain; background:#000; }
     @media (max-width: 820px){
       .tf-split{ flex-direction:column }
       .tf-left{ flex-basis:auto }
@@ -148,7 +148,7 @@ function mountBaseStructure(root){
     }
     .tf-tile{
       position:relative; overflow:hidden; border-radius:12px; border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.04); padding-top:177.78%; /* ← 9:16 */
+      background:rgba(255,255,255,.04); padding-top:65%;
     }
     .tf-tile img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block }
     @media (max-width: 820px){
@@ -182,6 +182,7 @@ function startShuffle(container, pool){
     const tick = ()=>{
       const url = pool[Math.floor(Math.random()*pool.length)];
       if (url){
+        // небольшое предзагрузка через смену src
         img.src = url + `?ts=${Date.now()%1e7}`;
       }
     };
