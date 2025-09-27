@@ -148,9 +148,13 @@ function mountBaseStructure(root){
     }
     .tf-tile{
       position:relative; overflow:hidden; border-radius:12px; border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.04); padding-top:65%;
+      background:rgba(255,255,255,.04); padding-top:177.78%; /* 9:16 = 16/9 * 100% */
     }
-    .tf-tile img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block }
+    .tf-tile img{
+      position:absolute; inset:0; width:100%; height:100%;
+      object-fit: cover; /* заполняем без «плюшек», подрезая лишнее */
+      display:block
+    }
     @media (max-width: 820px){
       /* две строки по 3 элемента (итого 6) */
       .tf-grid{ grid-template-columns: repeat(3, minmax(0,1fr)); }
