@@ -2,26 +2,63 @@
 import { $, $$ } from '../dom.js';
 import { I18N, onLocaleChanged, getLangFromQuery, applyI18nTo } from '../i18n.js';
 
-/* ---------- локали страницы (/ave/EN.json, /ave/RU.json) ---------- */
+/* ---------- загрузка локалей страницы (/ave/EN.json, /ave/RU.json) ---------- */
 async function loadAveLocale(lang){
   const L = (lang || 'EN').toUpperCase();
-  async function fetchJson(u){ try{ const r = await fetch(u, { cache:'no-store' }); return r.ok ? r.json() : null; } catch { return null; } }
+  async function fetchJson(u){
+    try{
+      const r = await fetch(u, { cache: 'no-store' });
+      return r.ok ? r.json() : null;
+    }catch{ return null; }
+  }
   let data = await fetchJson(`/ave/${L}.json`);
   if (!data && L !== 'EN') data = await fetchJson(`/ave/EN.json`);
   if (!data) data = {};
-  for (const k in data) I18N[k] = data[k];
+  for (const k in data) I18N[k] = data[k]; // мягкий merge
 }
 
-/* ---------- утилита: responsive YouTube ---------- */
+/* ---------- утилита: надёжная YouTube-вставка ---------- */
 function ytEmbed(url, { aspect = '16:9' } = {}){
-  const idMatch = String(url||'').match(/(?:v=|\/shorts\/|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
-  const id = idMatch ? idMatch[1] : '';
-  const pad = (aspect==='9:16') ? '177.78%' : '56.25%';
-  if (!id) return `<div class="yt-wrap" style="padding-top:${pad}"><div class="yt-ph">Video coming soon</div></div>`;
+  const pad = (aspect === '9:16') ? '177.78%' : '56.25%';
+
+  const getId = (u) => {
+    if (!u) return '';
+    try {
+      const Y = new URL(u);
+      const host = Y.hostname.replace(/^www\./,'');
+      const parts = Y.pathname.split('/').filter(Boolean);
+      // youtu.be/<id>
+      if (host === 'youtu.be' && parts[0]) return parts[0];
+      // youtube.com/shorts/<id>
+      if (host.endsWith('youtube.com') && parts[0] === 'shorts' && parts[1]) return parts[1];
+      // youtube.com/embed/<id>
+      if (host.endsWith('youtube.com') && parts[0] === 'embed' && parts[1]) return parts[1];
+      // youtube.com/watch?v=<id>
+      const v = Y.searchParams.get('v');
+      if (v) return v;
+      // запасной вариант — последний сегмент
+      const last = parts[parts.length - 1] || '';
+      return last;
+    } catch {
+      const m = String(u).match(/(?:v=|\/shorts\/|youtu\.be\/|\/embed\/)([A-Za-z0-9_-]{6,})/);
+      return m ? m[1] : '';
+    }
+  };
+
+  const id = getId(url).replace(/[?#].*$/,'');
+  if (!id) {
+    return `<div class="yt-wrap" style="padding-top:${pad}"><div class="yt-ph">Video coming soon</div></div>`;
+  }
   const src = `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
   return `
     <div class="yt-wrap" style="padding-top:${pad}">
-      <iframe src="${src}" title="YouTube video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+      <iframe
+        src="${src}"
+        title="YouTube video"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+        loading="lazy"
+        referrerpolicy="strict-origin-when-cross-origin"></iframe>
     </div>`;
 }
 
@@ -36,7 +73,7 @@ function mountBase(root){
       <div data-i18n="ave.intro.html"></div>
     </section>
 
-    <!-- Block 2: Documentary -->
+    <!-- Block 2: Documentary 16:9 -->
     <section id="ave-doc" class="mt-4">
       <h2 class="text-xl font-semibold mb-3" data-i18n="ave.doc.title">Documentary format</h2>
       <div class="mb-3" id="ave-doc-video"></div>
@@ -44,7 +81,7 @@ function mountBase(root){
       <a class="btn" href="https://therealunrealstory.com/" target="_blank" rel="noopener" data-i18n="ave.doc.btn">Go to the main site</a>
     </section>
 
-    <!-- Block 3: TrustFields -->
+    <!-- Block 3: TrustFields 9:16 + текст -->
     <section id="ave-trust" class="mt-4">
       <h2 class="text-xl font-semibold mb-3" data-i18n="ave.tf.title">TrustFields — reimagining</h2>
       <div class="tf-split">
@@ -79,19 +116,17 @@ function mountBase(root){
     .yt-ph{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#aaa; }
 
     .tf-split{ display:flex; gap:16px; align-items:flex-start }
-    .tf-left{ flex:0 0 40% }
+    .tf-left{ flex:0 0 40% }   /* видео 9:16 слева на 40% ширины на десктопе */
     .tf-right{ flex:1 1 auto }
-    /* 9:16 контейнер для вертикального ролика */
-    #ave-trust .yt-wrap{ border-radius:12px; }
     @media (max-width: 820px){
       .tf-split{ flex-direction:column }
-      .tf-left{ flex-basis:auto; flex:1 1 auto }
+      .tf-left{ flex-basis:auto; flex:1 1 auto } /* на мобиле видео на всю ширину */
     }
   `;
   document.head.appendChild(style);
 }
 
-/* ---------- init ---------- */
+/* ---------- init/destroy ---------- */
 export async function init(root){
   const startLang = getLangFromQuery();
   await loadAveLocale(startLang);
@@ -99,23 +134,23 @@ export async function init(root){
   mountBase(root);
   await applyI18nTo(root);
 
-  // Block 2 video (16:9)
+  // Блок 2 — 16:9
   const docUrl = I18N['ave.doc.youtube'] || 'https://youtu.be/IBqpVuGNE1Q';
   $('#ave-doc-video').innerHTML = ytEmbed(docUrl, { aspect:'16:9' });
 
-  // Block 3 video (9:16) — URL берём из локали (можно поставить shorts/видеоID)
+  // Блок 3 — 9:16 (поддерживает ссылку shorts: https://youtube.com/shorts/FsThyQDxHGM)
   const tfUrl = I18N['ave.tf.youtube'] || '';
   $('#ave-tf-video').innerHTML = ytEmbed(tfUrl, { aspect:'9:16' });
 
-  // live i18n
+  // смена языка на лету
   onLocaleChanged(async ({ lang })=>{
     await loadAveLocale(lang);
     await applyI18nTo(root);
-    // перерисовать iframes при смене языка (вдруг URL локализован)
-    const docUrl2 = I18N['ave.doc.youtube'] || 'https://youtu.be/IBqpVuGNE1Q';
-    $('#ave-doc-video').innerHTML = ytEmbed(docUrl2, { aspect:'16:9' });
-    const tfUrl2 = I18N['ave.tf.youtube'] || '';
-    $('#ave-tf-video').innerHTML = ytEmbed(tfUrl2, { aspect:'9:16' });
+    // пересоздать iframes (если URL в локалях разные)
+    const doc2 = I18N['ave.doc.youtube'] || 'https://youtu.be/IBqpVuGNE1Q';
+    $('#ave-doc-video').innerHTML = ytEmbed(doc2, { aspect:'16:9' });
+    const tf2 = I18N['ave.tf.youtube'] || '';
+    $('#ave-tf-video').innerHTML = ytEmbed(tf2, { aspect:'9:16' });
   });
 }
 
