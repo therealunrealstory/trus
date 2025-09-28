@@ -155,10 +155,13 @@ function mountBaseStructure(root){
     }
     .tf-tile img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block }
 
-    @media (max-width: 820px){
-      .tf-split{ flex-direction:column }
-      .tf-left, .tf-right{ flex-basis:auto; width:100% } /* видео и текст на всю ширину */
-    }
+	@media (max-width: 820px){
+	  .tf-split{ flex-direction:column }
+	  .tf-left, .tf-right{ flex-basis:auto; width:100% } /* видео и текст на всю ширину */
+
+	  /* ВАЖНО: на мобиле 3 колонки → 2 строки (всего 6 тайлов) */
+	  .tf-grid{ grid-template-columns: repeat(3, minmax(0,1fr)); }
+	}
   `;
   document.head.appendChild(style);
 }
