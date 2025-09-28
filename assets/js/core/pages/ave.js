@@ -162,7 +162,8 @@ function mountBase(root){
       .intro-split{ flex-direction:column }
       .intro-left{ flex-basis:auto }
       .tf-split{ flex-direction:column }
-      .tf-left{ flex-basis:auto; flex:1 1 auto }
+	  /* ключевые строки ↓ — на мобиле видео и текст на всю ширину */
+	  .tf-left, .tf-right{ flex:0 0 auto; width:100% }
       #ave-trust .yt-wrap{ min-height: 260px; }
     }
   `;
