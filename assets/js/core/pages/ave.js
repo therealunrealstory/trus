@@ -7,7 +7,7 @@ async function fetchJson(u){
   try{ const r = await fetch(u, { cache: 'no-store' }); return r.ok ? r.json() : null; }
   catch{ return null; }
 }
-// Перекрываем только непустыми значениями
+// Перекрываем только непустыми значениями — пустая строка не убивает EN
 function softMergeNonEmpty(target, src){
   if (!src) return target;
   for (const k in src){
@@ -28,18 +28,16 @@ async function loadAveLocale(lang){
 /* ---------- YouTube embed (shorts/watch/youtu.be/embed) ---------- */
 function ytEmbed(rawUrl, { aspect = '16:9' } = {}){
   const url = String(rawUrl || '').trim();
-  const pad = (aspect === '9:16') ? '177.78%' : '56.25%';
-
   const getId = (u) => {
     if (!u) return '';
     try {
       const Y = new URL(u);
       const host = Y.hostname.replace(/^www\./,'');
       const parts = Y.pathname.split('/').filter(Boolean);
-      if (host === 'youtu.be' && parts[0]) return parts[0];               // youtu.be/<id>
+      if (host === 'youtu.be' && parts[0]) return parts[0];                     // youtu.be/<id>
       if (host.endsWith('youtube.com') && parts[0] === 'shorts' && parts[1]) return parts[1]; // /shorts/<id>
       if (host.endsWith('youtube.com') && parts[0] === 'embed'  && parts[1]) return parts[1]; // /embed/<id>
-      const v = Y.searchParams.get('v'); if (v) return v;                 // watch?v=<id>
+      const v = Y.searchParams.get('v'); if (v) return v;                       // watch?v=<id>
       return parts[parts.length - 1] || '';
     } catch {
       const m = String(u).match(/(?:v=|\/shorts\/|youtu\.be\/|\/embed\/)([A-Za-z0-9_-]{6,})/);
@@ -48,19 +46,25 @@ function ytEmbed(rawUrl, { aspect = '16:9' } = {}){
   };
 
   const id = getId(url).replace(/[?#].*$/,'');
+  const ar = (aspect === '9:16') ? '9:16' : '16:9';
   if (!id) {
-    return `<div class="yt-wrap" style="padding-top:${pad}"><div class="yt-ph">Video coming soon</div></div>`;
+    return `<div class="yt-wrap" data-ar="${ar}"><div class="yt-ph">Video coming soon</div></div>`;
   }
-  // Важные параметры для мобилок/iOS
+
+  // важные флаги для мобилок/iOS
   const src = `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1&playsinline=1&iv_load_policy=3`;
+
+  // верт. видео грузим «eager», чтобы не зависало из-за lazy + нулевой высоты
+  const loading = (ar === '9:16') ? 'eager' : 'lazy';
+
   return `
-    <div class="yt-wrap" style="padding-top:${pad}">
+    <div class="yt-wrap" data-ar="${ar}">
       <iframe
         src="${src}"
         title="YouTube video"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowfullscreen
-        loading="lazy"
+        loading="${loading}"
         referrerpolicy="strict-origin-when-cross-origin"></iframe>
     </div>`;
 }
@@ -70,7 +74,6 @@ function mountBase(root){
   const sub = $('#subpage');
   if (sub) sub.classList.add('page--ave');
 
-  // картинка автора из локали (если нет — дефолт из архива)
   const authorImg = I18N['ave.intro.img'] || 'https://archive.org/download/orus-pics/nico.jpg';
   const authorAlt = I18N['ave.intro.imgAlt'] || 'Nico';
 
@@ -112,7 +115,7 @@ function mountBase(root){
     </section>
   `;
 
-  // локальные стили
+  // локальные стили (aspect-ratio + фолбэк на padding-top)
   const style = document.createElement('style');
   style.textContent = `
     .page--ave section{
@@ -127,10 +130,6 @@ function mountBase(root){
     }
     .btn:hover{ background:rgba(99,102,241,.2) }
 
-    .yt-wrap{ position:relative; width:100%; overflow:hidden; background:#000; border-radius:12px; }
-    .yt-wrap iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
-    .yt-ph{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#aaa; }
-
     /* Intro: фото автора слева (30%) / текст справа */
     .intro-split{ display:flex; gap:16px; align-items:flex-start }
     .intro-left{ flex:0 0 30% }
@@ -143,8 +142,21 @@ function mountBase(root){
     .tf-left{ flex:0 0 40% }   /* видео 9:16 слева на 40% ширины на десктопе */
     .tf-right{ flex:1 1 auto }
 
-    /* Минимальная высота вертикального видео на мобиле, чтобы не схлопывалось */
-    #ave-trust .yt-wrap{ min-height: 320px; }
+    /* Универсальный контейнер под iframe: aspect-ratio с фолбэком */
+    .yt-wrap{ position:relative; width:100%; overflow:hidden; background:#000; border-radius:12px; }
+    .yt-wrap iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; display:block; }
+
+    /* Фолбэк на старые вебвью: создаём высоту паддингом через ::before */
+    .yt-wrap::before{ content:''; display:block; padding-top:56.25%; }        /* 16:9 по умолчанию */
+    .yt-wrap[data-ar="9:16"]::before{ padding-top:177.78%; }                  /* 9:16 */
+    @supports (aspect-ratio: 1 / 1){
+      .yt-wrap{ aspect-ratio: 16 / 9; }
+      .yt-wrap[data-ar="9:16"]{ aspect-ratio: 9 / 16; }
+      .yt-wrap::before{ content:none; padding-top:0; }
+    }
+
+    /* Минимальная высота вертикального видео на мобиле, чтобы не схлопывалось до 0 при странных вебвью */
+    #ave-trust .yt-wrap{ min-height: 300px; }
 
     @media (max-width: 820px){
       .intro-split{ flex-direction:column }
@@ -169,7 +181,7 @@ export async function init(root){
   const docUrl = (I18N['ave.doc.youtube'] || 'https://youtu.be/IBqpVuGNE1Q').trim();
   $('#ave-doc-video').innerHTML = ytEmbed(docUrl, { aspect:'16:9' });
 
-  // Блок 3 — 9:16 (Shorts/Watch/youtu.be)
+  // Блок 3 — 9:16
   const tfUrl = (I18N['ave.tf.youtube'] || '').trim();
   $('#ave-tf-video').innerHTML = ytEmbed(tfUrl, { aspect:'9:16' });
 
