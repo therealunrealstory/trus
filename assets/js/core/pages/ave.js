@@ -3,22 +3,31 @@ import { $, $$ } from '../dom.js';
 import { I18N, onLocaleChanged, getLangFromQuery, applyI18nTo } from '../i18n.js';
 
 /* ---------- загрузка локалей страницы (/ave/EN.json, /ave/RU.json) ---------- */
+async function fetchJson(u){
+  try{
+    const r = await fetch(u, { cache: 'no-store' });
+    return r.ok ? r.json() : null;
+  }catch{ return null; }
+}
+function softMerge(target, src){
+  if (!src) return target;
+  for (const k in src) target[k] = src[k];
+  return target;
+}
 async function loadAveLocale(lang){
   const L = (lang || 'EN').toUpperCase();
-  async function fetchJson(u){
-    try{
-      const r = await fetch(u, { cache: 'no-store' });
-      return r.ok ? r.json() : null;
-    }catch{ return null; }
-  }
-  let data = await fetchJson(`/ave/${L}.json`);
-  if (!data && L !== 'EN') data = await fetchJson(`/ave/EN.json`);
-  if (!data) data = {};
-  for (const k in data) I18N[k] = data[k]; // мягкий merge
+  // 1) База: EN
+  const base = await fetchJson('/ave/EN.json') || {};
+  // 2) Поверх — выбранная локаль (если не EN)
+  const local = (L === 'EN') ? {} : (await fetchJson(`/ave/${L}.json`) || {});
+  // мягкий merge в общий словарь I18N (сначала EN, потом L)
+  softMerge(I18N, base);
+  softMerge(I18N, local);
 }
 
-/* ---------- утилита: надёжная YouTube-вставка ---------- */
-function ytEmbed(url, { aspect = '16:9' } = {}){
+/* ---------- YouTube-вставка (shorts/watch/youtu.be/embed) ---------- */
+function ytEmbed(rawUrl, { aspect = '16:9' } = {}){
+  const url = String(rawUrl || '').trim();
   const pad = (aspect === '9:16') ? '177.78%' : '56.25%';
 
   const getId = (u) => {
@@ -36,9 +45,8 @@ function ytEmbed(url, { aspect = '16:9' } = {}){
       // youtube.com/watch?v=<id>
       const v = Y.searchParams.get('v');
       if (v) return v;
-      // запасной вариант — последний сегмент
-      const last = parts[parts.length - 1] || '';
-      return last;
+      // запасной — последний сегмент
+      return parts[parts.length - 1] || '';
     } catch {
       const m = String(u).match(/(?:v=|\/shorts\/|youtu\.be\/|\/embed\/)([A-Za-z0-9_-]{6,})/);
       return m ? m[1] : '';
@@ -135,21 +143,20 @@ export async function init(root){
   await applyI18nTo(root);
 
   // Блок 2 — 16:9
-  const docUrl = I18N['ave.doc.youtube'] || 'https://youtu.be/IBqpVuGNE1Q';
+  const docUrl = (I18N['ave.doc.youtube'] || 'https://youtu.be/IBqpVuGNE1Q').trim();
   $('#ave-doc-video').innerHTML = ytEmbed(docUrl, { aspect:'16:9' });
 
-  // Блок 3 — 9:16 (поддерживает ссылку shorts: https://youtube.com/shorts/FsThyQDxHGM)
-  const tfUrl = I18N['ave.tf.youtube'] || '';
+  // Блок 3 — 9:16 (Shorts/Watch/youtu.be)
+  const tfUrl = (I18N['ave.tf.youtube'] || '').trim();
   $('#ave-tf-video').innerHTML = ytEmbed(tfUrl, { aspect:'9:16' });
 
   // смена языка на лету
   onLocaleChanged(async ({ lang })=>{
     await loadAveLocale(lang);
     await applyI18nTo(root);
-    // пересоздать iframes (если URL в локалях разные)
-    const doc2 = I18N['ave.doc.youtube'] || 'https://youtu.be/IBqpVuGNE1Q';
+    const doc2 = (I18N['ave.doc.youtube'] || 'https://youtu.be/IBqpVuGNE1Q').trim();
     $('#ave-doc-video').innerHTML = ytEmbed(doc2, { aspect:'16:9' });
-    const tf2 = I18N['ave.tf.youtube'] || '';
+    const tf2 = (I18N['ave.tf.youtube'] || '').trim();
     $('#ave-tf-video').innerHTML = ytEmbed(tf2, { aspect:'9:16' });
   });
 }
