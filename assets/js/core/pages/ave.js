@@ -2,30 +2,30 @@
 import { $, $$ } from '../dom.js';
 import { I18N, onLocaleChanged, getLangFromQuery, applyI18nTo } from '../i18n.js';
 
-/* ---------- загрузка локалей страницы (/ave/EN.json, /ave/RU.json) ---------- */
+/* ---------- загрузка локалей (/ave/EN.json, /ave/RU.json, …) ---------- */
 async function fetchJson(u){
-  try{
-    const r = await fetch(u, { cache: 'no-store' });
-    return r.ok ? r.json() : null;
-  }catch{ return null; }
+  try{ const r = await fetch(u, { cache: 'no-store' }); return r.ok ? r.json() : null; }
+  catch{ return null; }
 }
-function softMerge(target, src){
+// Перекрываем только непустыми значениями
+function softMergeNonEmpty(target, src){
   if (!src) return target;
-  for (const k in src) target[k] = src[k];
+  for (const k in src){
+    const v = src[k];
+    const emptyStr = (typeof v === 'string' && v.trim() === '');
+    if (v !== undefined && v !== null && !emptyStr) target[k] = v;
+  }
   return target;
 }
 async function loadAveLocale(lang){
   const L = (lang || 'EN').toUpperCase();
-  // 1) База: EN
   const base = await fetchJson('/ave/EN.json') || {};
-  // 2) Поверх — выбранная локаль (если не EN)
   const local = (L === 'EN') ? {} : (await fetchJson(`/ave/${L}.json`) || {});
-  // мягкий merge в общий словарь I18N (сначала EN, потом L)
-  softMerge(I18N, base);
-  softMerge(I18N, local);
+  softMergeNonEmpty(I18N, base);
+  softMergeNonEmpty(I18N, local);
 }
 
-/* ---------- YouTube-вставка (shorts/watch/youtu.be/embed) ---------- */
+/* ---------- YouTube embed (shorts/watch/youtu.be/embed) ---------- */
 function ytEmbed(rawUrl, { aspect = '16:9' } = {}){
   const url = String(rawUrl || '').trim();
   const pad = (aspect === '9:16') ? '177.78%' : '56.25%';
@@ -36,16 +36,10 @@ function ytEmbed(rawUrl, { aspect = '16:9' } = {}){
       const Y = new URL(u);
       const host = Y.hostname.replace(/^www\./,'');
       const parts = Y.pathname.split('/').filter(Boolean);
-      // youtu.be/<id>
-      if (host === 'youtu.be' && parts[0]) return parts[0];
-      // youtube.com/shorts/<id>
-      if (host.endsWith('youtube.com') && parts[0] === 'shorts' && parts[1]) return parts[1];
-      // youtube.com/embed/<id>
-      if (host.endsWith('youtube.com') && parts[0] === 'embed' && parts[1]) return parts[1];
-      // youtube.com/watch?v=<id>
-      const v = Y.searchParams.get('v');
-      if (v) return v;
-      // запасной — последний сегмент
+      if (host === 'youtu.be' && parts[0]) return parts[0];               // youtu.be/<id>
+      if (host.endsWith('youtube.com') && parts[0] === 'shorts' && parts[1]) return parts[1]; // /shorts/<id>
+      if (host.endsWith('youtube.com') && parts[0] === 'embed'  && parts[1]) return parts[1]; // /embed/<id>
+      const v = Y.searchParams.get('v'); if (v) return v;                 // watch?v=<id>
       return parts[parts.length - 1] || '';
     } catch {
       const m = String(u).match(/(?:v=|\/shorts\/|youtu\.be\/|\/embed\/)([A-Za-z0-9_-]{6,})/);
@@ -57,7 +51,8 @@ function ytEmbed(rawUrl, { aspect = '16:9' } = {}){
   if (!id) {
     return `<div class="yt-wrap" style="padding-top:${pad}"><div class="yt-ph">Video coming soon</div></div>`;
   }
-  const src = `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
+  // Важные параметры для мобилок/iOS
+  const src = `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1&playsinline=1&iv_load_policy=3`;
   return `
     <div class="yt-wrap" style="padding-top:${pad}">
       <iframe
@@ -75,10 +70,23 @@ function mountBase(root){
   const sub = $('#subpage');
   if (sub) sub.classList.add('page--ave');
 
+  // картинка автора из локали (если нет — дефолт из архива)
+  const authorImg = I18N['ave.intro.img'] || 'https://archive.org/download/orus-pics/nico.jpg';
+  const authorAlt = I18N['ave.intro.imgAlt'] || 'Nico';
+
   root.innerHTML = `
-    <!-- Block 1: Intro -->
+    <!-- Block 1: Intro + author photo -->
     <section id="ave-intro">
-      <div data-i18n="ave.intro.html"></div>
+      <div class="intro-split">
+        <div class="intro-left">
+          <div class="intro-img-wrap">
+            <img src="${authorImg}" alt="${authorAlt}" loading="lazy" decoding="async">
+          </div>
+        </div>
+        <div class="intro-right">
+          <div data-i18n="ave.intro.html"></div>
+        </div>
+      </div>
     </section>
 
     <!-- Block 2: Documentary 16:9 -->
@@ -123,12 +131,27 @@ function mountBase(root){
     .yt-wrap iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
     .yt-ph{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#aaa; }
 
+    /* Intro: фото автора слева (30%) / текст справа */
+    .intro-split{ display:flex; gap:16px; align-items:flex-start }
+    .intro-left{ flex:0 0 30% }
+    .intro-right{ flex:1 1 auto }
+    .intro-img-wrap{ width:100%; overflow:hidden; border-radius:16px; border:1px solid rgba(148,163,184,.35); background:rgba(0,0,0,.25) }
+    .intro-img-wrap img{ display:block; width:100%; height:auto; object-fit:cover }
+
+    /* TrustFields split */
     .tf-split{ display:flex; gap:16px; align-items:flex-start }
     .tf-left{ flex:0 0 40% }   /* видео 9:16 слева на 40% ширины на десктопе */
     .tf-right{ flex:1 1 auto }
+
+    /* Минимальная высота вертикального видео на мобиле, чтобы не схлопывалось */
+    #ave-trust .yt-wrap{ min-height: 320px; }
+
     @media (max-width: 820px){
+      .intro-split{ flex-direction:column }
+      .intro-left{ flex-basis:auto }
       .tf-split{ flex-direction:column }
-      .tf-left{ flex-basis:auto; flex:1 1 auto } /* на мобиле видео на всю ширину */
+      .tf-left{ flex-basis:auto; flex:1 1 auto }
+      #ave-trust .yt-wrap{ min-height: 260px; }
     }
   `;
   document.head.appendChild(style);
