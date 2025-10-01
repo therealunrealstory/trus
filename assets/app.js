@@ -21,3 +21,6 @@ document.addEventListener('DOMContentLoaded', applyMusicLink);
 
 // 2) Обновлять при смене языка
 onLocaleChanged(() => applyMusicLink());
+
+// ⬇️ Новое: строка с WhatsApp после «Nico»
+import './js/core/authorContact.js';
