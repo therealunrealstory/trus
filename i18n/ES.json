@@ -138,10 +138,7 @@
   "video.disclaimer": "Todas las imágenes de este video muestran acontecimientos reales y personas reales. El significado completo de estas escenas se entiende plenamente tras leer nuestra historia.",
  
   "menu.trustfields": "TrustFields",
-
-  "contact.nico.html": "— <strong>Nico:</strong> estoy aquí y abierto a hablar. WhatsApp: <a href=\"https://wa.me/393515160791\" target=\"_blank\" rel=\"noopener\" class=\"underline decoration-cyan-500/60 hover:no-underline focus:ring-2 focus:ring-cyan-500/40\">+39 351 516 0791</a>",
- 
-  "btn.donate": "Donar",
+"contact.nico.html": "— <em><strong>Nico:</strong> estoy disponible y abierto a conversar. Actualmente estoy en Italia y busco apoyo individual para mi amigo en Nueva York — ayuda médica y asistencia con asuntos cotidianos. Es posible considerar alojamiento en Nueva York si se brinda tal apoyo. Estamos dispuestos a discutir cualquier forma de colaboración; nos alegrará hacer amistad y, cuando nuestra situación se estabilice, brindar apoyo nosotros también. Podemos aportar cualquier documento que confirme la veracidad de nuestra historia y la complejidad de la situación; si es necesario, las confirmaciones pueden gestionarse con un abogado en Nueva York. WhatsApp: <a href=\"https://wa.me/393515160791\" target=\"_blank\" rel=\"noopener\" class=\"underline decoration-cyan-500/60 hover:no-underline focus:ring-2 focus:ring-cyan-500/40\">+39 351 516 0791</a></em>",  "btn.donate": "Donar",
   "donate.monthly": "Hacer mensual",
   "donate.form.title": "Donar",
   "donate.error.title": "Las donaciones no están disponibles temporalmente",
